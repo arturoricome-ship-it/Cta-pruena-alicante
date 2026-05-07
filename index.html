@@ -823,25 +823,7 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 
 
 <!-- ─── TURNO BOTTOM BAR ─── -->
-<div id="bottom-turno">
-  <div class="tw-main">
-    <div class="tw-ico-wrap" id="tw-ico">⚙️</div>
-    <div class="tw-info">
-      <div class="tw-lbl" id="tw-lbl">Turno hoy</div>
-      <div class="tw-times" id="tw-times">—</div>
-      <div class="tw-subtipo" id="tw-subtipo"></div>
-    </div>
-    <div class="tw-right">
-      <div class="tw-pct" id="tw-pct">0%</div>
-      <div class="tw-remain" id="tw-remain">—</div>
-      <button class="tw-manana-btn" onclick="twShowManana()">mañana ›</button>
-    </div>
-  </div>
-  <div class="tw-bar-row">
-    <div class="tw-bar-wrap"><div class="tw-bar-fill" id="tw-bar" style="width:0%"></div></div>
-    <div class="tw-bar-lbl" id="tw-bar-lbl"></div>
-  </div>
-</div>
+<!-- bottom-turno removed -->
 
 <!-- ─── POPUP MAÑANA ─── -->
 <div id="tw-popup-bg" onclick="twCloseManana()"></div>
@@ -1144,7 +1126,7 @@ function renderOperativa(){
   } else if(isFinished){
     // REST
     card.classList.add('state-rest');
-    if(subEl)subEl.textContent='Descanso hasta el próximo turno';
+    if(subEl)subEl.textContent='';  // No sub text in REST state
     // Show countdown in times span AND big number
     var meses2=["ENERO","FEBRERO","MARZO","ABRIL","MAYO","JUNIO","JULIO","AGOSTO","SEPTIEMBRE","OCTUBRE","NOVIEMBRE","DICIEMBRE"];
     var nxtRaw;try{nxtRaw=localStorage.getItem('cta_ed_'+now.getFullYear());}catch(e){}
@@ -1210,8 +1192,11 @@ function renderOperativa(){
   }
   function updateOpVuelos(){
     if(typeof liveData==='undefined')return;
+    var today=new Date().toDateString();
+    var cached=null;try{var cv=localStorage.getItem('op_vuelos_total');if(cv){var cp=JSON.parse(cv);if(cp.date===today)cached=cp.total;}}catch(e){}
     var total=(liveData.lle?liveData.lle.length:0)+(liveData.sal?liveData.sal.length:0);
-    if(vTotalEl)vTotalEl.textContent=total>0?total:'—';
+    if(total>0){try{localStorage.setItem('op_vuelos_total',JSON.stringify({date:today,total:total}));}catch(e){}cached=total;}
+    if(vTotalEl)vTotalEl.textContent=(cached||total)>0?(cached||total):'—';
     // Also update title date from live
     var lhEl=document.getElementById('live-hora');var vSubEl2=document.getElementById('op-v-sub');
     if(lhEl&&lhEl.textContent&&vSubEl2&&vSubEl2.textContent.indexOf('mañana')<0)vSubEl2.textContent='Llegadas y salidas · Aeropuerto Alicante';
@@ -1855,7 +1840,6 @@ function renderLive(){
   var cutoffs=getLiveCutoffsFromTurnoHoy();
   if(esS){
     // S1/S2: last departure <= exit time → red line BELOW that row
-    // If 2 share same cut, pick the one lower (higher index) in list
     cutoffs.s.forEach(function(cut){
       var bestIdx=-1,bestMin=-1;
       for(var i=0;i<data.length;i++){
@@ -1863,13 +1847,12 @@ function renderLive(){
         if((vv.estadoClass||"")==="e-cancelled")continue;
         var vm=hToMin(vv.horaReal||vv.horaProg||"");
         if(vm===null)continue;
-        if(vm<=cut&&vm>=bestMin){bestMin=vm;bestIdx=i;} // >= keeps latest idx for ties
+        if(vm<=cut&&vm>=bestMin){bestMin=vm;bestIdx=i;}
       }
       if(bestIdx>=0)cortesS[bestIdx]=true;
     });
   } else {
-    // E1/E2: first arrival >= entry time → green line ON TOP of that row
-    // If 2 share same cut, pick the one higher (lower index) in list
+    // LLEGADAS: E green top (first in shift) + S red bottom (last in shift)
     cutoffs.e.forEach(function(cut){
       var bestIdx=-1,bestMin=99999;
       for(var i=0;i<data.length;i++){
@@ -1877,9 +1860,21 @@ function renderLive(){
         if((vv.estadoClass||"")==="e-cancelled")continue;
         var vm=hToMin(vv.horaReal||vv.horaProg||"");
         if(vm===null)continue;
-        if(vm>=cut&&vm<=bestMin){bestMin=vm;bestIdx=i;} // <= keeps lowest idx for ties
+        if(vm>=cut&&vm<=bestMin){bestMin=vm;bestIdx=i;}
       }
       if(bestIdx>=0)cortesE[bestIdx]=true;
+    });
+    // S1/S2 in llegadas: last arrival within shift → red line BELOW
+    cutoffs.s.forEach(function(cut){
+      var bestIdx=-1,bestMin=-1;
+      for(var i=0;i<data.length;i++){
+        var vv=data[i];
+        if((vv.estadoClass||"")==="e-cancelled")continue;
+        var vm=hToMin(vv.horaReal||vv.horaProg||"");
+        if(vm===null)continue;
+        if(vm<=cut&&vm>=bestMin){bestMin=vm;bestIdx=i;}
+      }
+      if(bestIdx>=0)cortesS[bestIdx]=true;
     });
   }
 
