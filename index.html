@@ -1805,9 +1805,16 @@ function getLiveCutoffsFromTurnoHoy(){
   try{raw=localStorage.getItem("cta_ed_"+now.getFullYear());}catch(e){return {s:[],e:[]};}
   if(!raw)return {s:[],e:[]};
   var data;
-  try{data=JSON.parse(raw);}catch(e){return {s:[],e:[]};}
-  var mes=data[meses[now.getMonth()]];
-  var d=mes?mes[now.getDate()]||null:null;
+  try{data=JSON.parse(raw);}catch(e){return {s:[],e:[]};};
+  // Detect if showing tomorrow's flights
+  var hasMañana=false;
+  if(typeof liveData!=="undefined"){
+    var allF=(liveData.lle||[]).concat(liveData.sal||[]);
+    hasMañana=allF.some(function(v){return !!v.esManana;});
+  }
+  function getShift(d2){var m=data[meses[d2.getMonth()]];return m?m[d2.getDate()]||null:null;}
+  var d=getShift(now);
+  if(hasMañana){var tom=new Date(now);tom.setDate(tom.getDate()+1);var dT=getShift(tom);if(dT&&dT.e1)d=dT;}
   if(!d)return {s:[],e:[]};
   var s=[],e=[];
   var e1=hToMin(d.e1||""),s1=hToMin(d.s1||"");
