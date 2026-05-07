@@ -1842,48 +1842,49 @@ function renderLive(){
   if(!data.length){container.innerHTML="<div class='empty-box'>Sin vuelos"+(liveFiltro?" activos":"")+" en este momento</div>";return;}
   container.innerHTML="";
 
-  var cortesS={};  // idx → red bottom line (S1/S2 in departures)
-  var cortesE={};  // idx → green top line (E1/E2 in arrivals)
+  var cortesS={};  // idx → red bottom line (last flight in shift)
+  var cortesE={};  // idx → green top line (first flight in shift)
   var cutoffs=getLiveCutoffsFromTurnoHoy();
-  if(esS){
-    // S1/S2: last departure <= exit time → red line BELOW that row
-    cutoffs.s.forEach(function(cut){
-      var bestIdx=-1,bestMin=-1;
-      for(var i=0;i<data.length;i++){
-        var vv=data[i];
-        if((vv.estadoClass||"")==="e-cancelled")continue;
-        var vm=hToMin(vv.horaReal||vv.horaProg||"");
-        if(vm===null)continue;
-        if(vm<=cut&&vm>=bestMin){bestMin=vm;bestIdx=i;}
-      }
-      if(bestIdx>=0)cortesS[bestIdx]=true;
-    });
-  } else {
-    // LLEGADAS: E green top (first in shift) + S red bottom (last in shift)
-    cutoffs.e.forEach(function(cut){
-      var bestIdx=-1,bestMin=99999;
-      for(var i=0;i<data.length;i++){
-        var vv=data[i];
-        if((vv.estadoClass||"")==="e-cancelled")continue;
-        var vm=hToMin(vv.horaReal||vv.horaProg||"");
-        if(vm===null)continue;
-        if(vm>=cut&&vm<=bestMin){bestMin=vm;bestIdx=i;}
-      }
-      if(bestIdx>=0)cortesE[bestIdx]=true;
-    });
-    // S1/S2 in llegadas: last arrival within shift → red line BELOW
-    cutoffs.s.forEach(function(cut){
-      var bestIdx=-1,bestMin=-1;
-      for(var i=0;i<data.length;i++){
-        var vv=data[i];
-        if((vv.estadoClass||"")==="e-cancelled")continue;
-        var vm=hToMin(vv.horaReal||vv.horaProg||"");
-        if(vm===null)continue;
-        if(vm<=cut&&vm>=bestMin){bestMin=vm;bestIdx=i;}
-      }
-      if(bestIdx>=0)cortesS[bestIdx]=true;
-    });
+
+  // Build shift windows [[e1,s1],[e2,s2]] for range checking
+  var shiftWindows=[];
+  var co=cutoffs;
+  for(var wi=0;wi<co.e.length;wi++){
+    if(co.e[wi]!==null&&co.s[wi]!==null)shiftWindows.push([co.e[wi],co.s[wi]]);
   }
+  // If only one E and one S, pair them
+  if(shiftWindows.length===0&&co.e.length>0&&co.s.length>0){
+    shiftWindows.push([co.e[0],co.s[0]]);
+    if(co.e.length>1&&co.s.length>1)shiftWindows.push([co.e[1],co.s[1]]);
+    else if(co.e.length===1&&co.s.length===2){shiftWindows=[[co.e[0],co.s[0]]];shiftWindows.push([co.e[0],co.s[1]]);}
+  }
+  if(shiftWindows.length===0&&co.e.length>0&&co.s.length>0)shiftWindows=[[co.e[0],co.s[0]]];
+
+  function inAnyWindow(vm){
+    return shiftWindows.some(function(w){return vm>=w[0]&&vm<=w[1];});
+  }
+
+  // For each window: E = first flight in window (green top), S = last flight in window (red bottom)
+  // Apply to BOTH llegadas and salidas
+  shiftWindows.forEach(function(w){
+    var eEntry=w[0],sExit=w[1];
+    // First flight >= eEntry AND <= sExit
+    var firstIdx=-1,firstMin=99999;
+    // Last flight <= sExit AND >= eEntry
+    var lastIdx=-1,lastMin=-1;
+    for(var i=0;i<data.length;i++){
+      var vv=data[i];
+      if((vv.estadoClass||"")==="e-cancelled")continue;
+      var vm=hToMin(vv.horaReal||vv.horaProg||"");
+      if(vm===null)continue;
+      if(vm>=eEntry&&vm<=sExit){
+        if(vm<firstMin){firstMin=vm;firstIdx=i;}
+        if(vm>=lastMin){lastMin=vm;lastIdx=i;}
+      }
+    }
+    if(firstIdx>=0)cortesE[firstIdx]=true;
+    if(lastIdx>=0)cortesS[lastIdx]=true;
+  });
 
   var separadorPuesto=false;
   data.forEach(function(v,idx){
