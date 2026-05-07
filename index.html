@@ -599,7 +599,7 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
           <div class="op-cal-row"><span class="op-cal-rl">Trabajados</span><span class="op-cal-rv" id="op-cal-trab">—</span></div>
           <div class="op-cal-row"><span class="op-cal-rl">Libres</span><span class="op-cal-rv" id="op-cal-lib">—</span></div>
           <div class="op-cal-row"><span class="op-cal-rl">Horas mes</span><span class="op-cal-rv" id="op-cal-hmes">—</span></div>
-          <div class="op-cal-row"><span class="op-cal-rl">Contador</span><span class="op-cal-rv" id="op-cal-cont">—</span></div>
+          <div class="op-cal-row"><span class="op-cal-rl">Contador</span><span class="op-cal-rv" id="op-cal-cont" style="color:#4ade80">—</span></div>
           <div class="op-cal-row"><span class="op-cal-rl">Perentorias</span><span class="op-cal-rv" id="op-cal-peren">—</span></div>
         </div>
       </div>
@@ -624,11 +624,11 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
         <div class="op-pub-sub">FTP · FIJI · Elige tu colectivo</div>
       </div>
       <div class="op-pub-row">
-        <button class="op-pub-btn" onclick="switchTab('turnos',document.querySelectorAll('.tab')[2],document.getElementById('nav-turnos'));setTimeout(function(){var btns=document.querySelectorAll('.turnos-filter-btn');if(btns[0])btns[0].click();},200)">
+        <button class="op-pub-btn" onclick="switchTab('turnos',document.querySelectorAll('.tab')[2],document.getElementById('nav-turnos'))">
           <span class="op-pb-ico">✈️</span>
           <div><span class="op-pb-lbl">Rampa</span><span class="op-pb-sub">Operarios</span></div>
         </button>
-        <button class="op-pub-btn" onclick="switchTab('turnos',document.querySelectorAll('.tab')[2],document.getElementById('nav-turnos'));setTimeout(function(){var btns=document.querySelectorAll('.turnos-filter-btn');if(btns[1])btns[1].click();},200)">
+        <button class="op-pub-btn" onclick="switchTab('turnos',document.querySelectorAll('.tab')[2],document.getElementById('nav-turnos'))">
           <span class="op-pb-ico">🗂️</span>
           <div><span class="op-pb-lbl">Administrativos</span><span class="op-pb-sub">Admin.</span></div>
         </button>
@@ -1018,7 +1018,6 @@ function openLive(){
 }
 
 function renderOperativa(){
-  if(typeof currentPanel!=='undefined'&&currentPanel!=='operativa')return;
   var now=new Date();
   var meses=["ENERO","FEBRERO","MARZO","ABRIL","MAYO","JUNIO","JULIO","AGOSTO","SEPTIEMBRE","OCTUBRE","NOVIEMBRE","DICIEMBRE"];
   var MESES_ES=["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
@@ -1213,6 +1212,9 @@ function renderOperativa(){
     if(typeof liveData==='undefined')return;
     var total=(liveData.lle?liveData.lle.length:0)+(liveData.sal?liveData.sal.length:0);
     if(vTotalEl)vTotalEl.textContent=total>0?total:'—';
+    // Also update title date from live
+    var lhEl=document.getElementById('live-hora');var vSubEl2=document.getElementById('op-v-sub');
+    if(lhEl&&lhEl.textContent&&vSubEl2&&vSubEl2.textContent.indexOf('mañana')<0)vSubEl2.textContent='Llegadas y salidas · Aeropuerto Alicante';
     // Count flights within my shift
     if(d&&d.e1&&vTurnoEl){
       var myE1=toMin(d.e1),myS1=toMin(d.s1);
@@ -1226,9 +1228,32 @@ function renderOperativa(){
       }
       (liveData.lle||[]).forEach(function(v){var t=hToMin(v.horaReal||v.horaProg||'');if(inShift(t))inTurno++;});
       (liveData.sal||[]).forEach(function(v){var t=hToMin(v.horaReal||v.horaProg||'');if(inShift(t))inTurno++;});
-      // If shift is over, show all day's flights (can't filter by current shift)
+      vTurnoEl.textContent=String(inTurno);
+      // If shift is over and 0, check next day
       var isShiftOver=(shiftEnd!==null&&nowMin>shiftEnd);
-      vTurnoEl.textContent=isShiftOver?'✓':inTurno>0?inTurno:'0';
+      if(isShiftOver&&inTurno===0){
+        // Try to find next day shift window
+        var nxtRaw2;try{nxtRaw2=localStorage.getItem('cta_ed_'+now.getFullYear());}catch(e){}
+        var nxtUe2={};try{if(nxtRaw2)nxtUe2=JSON.parse(nxtRaw2);}catch(e){}
+        var meses3=["ENERO","FEBRERO","MARZO","ABRIL","MAYO","JUNIO","JULIO","AGOSTO","SEPTIEMBRE","OCTUBRE","NOVIEMBRE","DICIEMBRE"];
+        for(var di2=1;di2<=3;di2++){
+          var nDate2=new Date(now.getFullYear(),now.getMonth(),now.getDate()+di2);
+          var nMd2=(nxtUe2[meses3[nDate2.getMonth()]]||{})[nDate2.getDate()];
+          if(nMd2&&nMd2.e1){
+            var nE1=toMin(nMd2.e1),nS1=toMin(nMd2.s1);
+            var nE2=nMd2.e2?toMin(nMd2.e2):null,nS2=nMd2.s2?toMin(nMd2.s2):null;
+            var nxtCount=0;
+            (liveData.lle||[]).forEach(function(v){var t=hToMin(v.horaReal||v.horaProg||'');if(t!==null){if(nE1!==null&&nS1!==null&&t>=nE1&&t<=nS1)nxtCount++;if(nE2!==null&&nS2!==null&&t>=nE2&&t<=nS2)nxtCount++;}});
+            (liveData.sal||[]).forEach(function(v){var t=hToMin(v.horaReal||v.horaProg||'');if(t!==null){if(nE1!==null&&nS1!==null&&t>=nE1&&t<=nS1)nxtCount++;if(nE2!==null&&nS2!==null&&t>=nE2&&t<=nS2)nxtCount++;}});
+            if(nxtCount>0&&vTurnoEl){
+              var vSubEl=document.getElementById('op-v-sub');
+              if(vSubEl)vSubEl.textContent='Coincidencias en turno de mañana: '+nxtCount;
+              vTurnoEl.textContent=nxtCount;
+            }
+            break;
+          }
+        }
+      }
     }
   }
   updateOpVuelos();
@@ -1904,8 +1929,6 @@ function loadLive(){
     .then(function(r){return r.json();})
     .then(function(resLle){
       liveData.lle=(resLle.vuelos||[]);
-      // Update operativa panel if active
-      if(typeof currentPanel!=='undefined'&&currentPanel==='operativa')setTimeout(renderOperativa,100);
       return fetch(RAILWAY+"/vuelos?tipo=salidas").then(function(r){return r.json();});
     })
     .then(function(resSal){
@@ -1913,6 +1936,7 @@ function loadLive(){
       var hNow=new Date();
       document.getElementById("live-hora").textContent="Actualizado: "+pad(hNow.getHours())+":"+pad(hNow.getMinutes());
       renderLive();
+      renderOperativa(); // Update Operativa with fresh flight data
     })
     .catch(function(){
       container.innerHTML="<div class='error-box'>Error al cargar vuelos. Pulsa ↻ para reintentar.</div>";
@@ -1974,7 +1998,7 @@ document.getElementById("btn-logout").addEventListener("click",function(){
 </script>
 
 <!-- CALCULADORA FLOTANTE -->
-<button id="calc-btn" title="Convertir horas / unidades">
+<button id="calc-btn" title="Convertir horas / unidades" style="display:none!important">
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
     <rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="10" y2="10"/><line x1="14" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="10" y2="14"/><line x1="14" y1="14" x2="16" y2="14"/><line x1="8" y1="18" x2="10" y2="18"/><line x1="14" y1="18" x2="16" y2="18"/>
   </svg>
