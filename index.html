@@ -541,7 +541,7 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
     " title="Inicio" style="font-size:16px">🏠</button>
     <div id="breadcrumb"></div>
     <button id="btn-accesos" onclick="toggleAccesoDirecto()">&#128279; Accesos Directos</button>
-    <button id="btn-live"><span style="display:flex;align-items:center;gap:4px;font-size:10px;font-weight:700;letter-spacing:.5px"><span class="live-plane">✈</span> VUELOS</span><span id="btn-live-fecha" style="font-size:8px;color:rgba(240,112,112,.7);letter-spacing:.3px"></span></button>
+    <button id="btn-live" style="display:none"><span style="display:flex;align-items:center;gap:4px;font-size:10px;font-weight:700;letter-spacing:.5px"><span class="live-plane">✈</span> VUELOS</span><span id="btn-live-fecha" style="font-size:8px;color:rgba(240,112,112,.7);letter-spacing:.3px"></span></button>
   </div>
 </div>
 
@@ -551,7 +551,7 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
   <div class="tab-wrap"><button class="tab" onclick="switchTab('turnos',this)">📋 Publicados</button></div>
   <div class="tab-wrap"><button class="tab" onclick="switchTab('avisos',this)">&#128226; Avisos</button><span class="badge" id="badge-avisos">!</span></div>
   <div class="tab-wrap"><button class="tab" onclick="switchTab('afiliate',this)">📅 Calendario</button></div>
-  <div class="tab-wrap"><button class="tab" onclick="switchTab('grupos',this)">&#128172; Grupos</button></div>
+  <!-- grupos tab removed --><div style="display:none"><button onclick="switchTab('grupos',this)">&#128172; Grupos</button></div>
 </div>
 
 <div id="scroll-area">
@@ -858,7 +858,7 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
   <button class="nav-btn" id="nav-turnos" onclick="switchTab('turnos',document.querySelectorAll('.tab')[1],this)"><span class="nav-ico">📋</span>Publicados</button>
   <button class="nav-btn" id="nav-avisos" onclick="switchTab('avisos',document.querySelectorAll('.tab')[2],this)" style="position:relative"><span class="nav-ico">&#128226;</span>Avisos<span class="badge" id="badge-avisos-nav">!</span></button>
   <button class="nav-btn" id="nav-afiliate" onclick="switchTab('afiliate',document.querySelectorAll('.tab')[3],this)"><span class="nav-ico">📅</span>Calendario</button>
-  <button class="nav-btn" id="nav-grupos" onclick="switchTab('grupos',document.querySelectorAll('.tab')[4],this)"><span class="nav-ico">&#128101;</span>Grupos</button>
+  <button class="nav-btn" id="nav-grupos" style="display:none" onclick="switchTab('grupos',document.querySelectorAll('.tab')[4],this)"><span class="nav-ico">&#128101;</span>Grupos</button>
 </nav>
 
 <!-- ACCESOS DIRECTOS -->
@@ -1050,7 +1050,10 @@ function renderOperativa(){
   var pdRaw;try{pdRaw=localStorage.getItem('cta_pd_'+now.getFullYear());}catch(e){}
   var PD={};try{if(pdRaw)PD=JSON.parse(pdRaw);}catch(e){}
   var perenMes=0;
+  // From PD (dashboard)
   Object.keys(PD).forEach(function(key){var mp=key.split(':')[0];if(mp===mesKey){perenMes+=(PD[key].gen||0);}});
+  // Also from UE perenDur (portal) — convert hh:mm to decimal
+  Object.keys(mData).forEach(function(dd){var dy=mData[dd];if(dy&&dy.perenDur&&dy.perenDur!=='0:00'){var p=dy.perenDur.split(':');var h=(+p[0]||0)+(+p[1]||0)/60;if(h>0&&!PD[mesKey+':'+dd])perenMes+=h;}});
   var perenStr=perenMes>0?(function(){var h=Math.floor(perenMes),mm=Math.round((perenMes-h)*60);return h+':'+(mm<10?'0':'')+mm;})():'0:00';
 
   var mesEl=document.getElementById('op-cal-mes');if(mesEl)mesEl.textContent=MESES_ES[now.getMonth()]+' '+now.getFullYear();
@@ -1086,7 +1089,7 @@ function renderOperativa(){
     if(timesEl)timesEl.innerHTML='<span style="font-size:12px;color:var(--gray)">Sin turno</span>';
     if(subEl)subEl.textContent='Día libre';
     if(pctEl)pctEl.textContent='';
-    if(remEl)remEl.textContent='';
+    if(remEl){remEl.textContent=nxtDay?'Próximo turno '+nxtDay.e1:'';remEl.style.color='var(--gold)';}
     if(barEl){barEl.style.width='0%';}
     return;
   }
@@ -1098,7 +1101,7 @@ function renderOperativa(){
     if(timesEl)timesEl.innerHTML='<span style="font-size:13px;color:#4ade80">Descanso</span>';
     if(subEl)subEl.textContent='Descanso hasta el próximo turno';
     if(pctEl)pctEl.textContent='💤';
-    if(remEl)remEl.textContent='';
+    if(remEl){remEl.textContent=nxtDay?'Próximo turno '+nxtDay.e1:'';remEl.style.color='var(--gold)';}
     return;
   }
 
@@ -1164,7 +1167,7 @@ function renderOperativa(){
         pctEl.textContent=nxtDay?'Próximo turno '+nxtDay.e1:'';
       } else {pctEl.textContent='💤';if(timesEl)timesEl.innerHTML='<span>💤</span>';}
     }
-    if(remEl)remEl.textContent='';
+    if(remEl){remEl.textContent=nxtDay?'Próximo turno '+nxtDay.e1:'';remEl.style.color='var(--gold)';}
     if(barEl){barEl.style.width='100%';}
   } else if(notStarted){
     // NEXT SHIFT
@@ -1176,24 +1179,21 @@ function renderOperativa(){
     if(barEl){barEl.style.width='0%';}
   }
 
-  // ─ Compañeros count ─
+  // ─ Compañeros count — exact same logic as companion panel ─
   var grupMap={};try{grupMap=JSON.parse(localStorage.getItem('cta_grupo_2026_map')||'{}');}catch(e){}
   var compCount=0;
   if(Object.keys(grupMap).length>0&&d&&d.e1){
     var myE1=toMin(d.e1),myS1=toMin(d.s1);
     var myE2=d.e2?toMin(d.e2):null,myS2=d.s2?toMin(d.s2):null;
-    var mesKeyG=mesKey;
     Object.keys(grupMap).forEach(function(nom){
       var emp=grupMap[nom];
-      var dias=(emp.meses&&emp.meses[mesKeyG])||null;
+      var dias=(emp.meses&&emp.meses[mesKey])||null;
       if(!dias)return;
       var turno=dias[now.getDate()];
       if(!turno||!turno.e1)return;
       var grE1=toMin(turno.e1),grS1=toMin(turno.s1);
       var grE2=turno.e2?toMin(turno.e2):null,grS2=turno.s2?toMin(turno.s2):null;
-      // Check overlap
-      function solapan(a0,a1,b0,b1){if(a0===null||a1===null||b0===null||b1===null)return false;var ae=a1<a0?a1+1440:a1,be=b1<b0?b1+1440:b1;return a0<be&&ae>b0;}
-      if(solapan(myE1,myS1,grE1,grS1)||solapan(myE1,myS1,grE2,grS2)||solapan(myE2,myS2,grE1,grS1)||solapan(myE2,myS2,grE2,grS2))compCount++;
+      if(turnosSeSuperponen(myE1,myS1,myE2,myS2,grE1,grS1,grE2,grS2))compCount++;
     });
   }
   var cnEl=document.getElementById('op-comp-num');
@@ -1226,7 +1226,9 @@ function renderOperativa(){
       }
       (liveData.lle||[]).forEach(function(v){var t=hToMin(v.horaReal||v.horaProg||'');if(inShift(t))inTurno++;});
       (liveData.sal||[]).forEach(function(v){var t=hToMin(v.horaReal||v.horaProg||'');if(inShift(t))inTurno++;});
-      vTurnoEl.textContent=inTurno>0?inTurno:'—';
+      // If shift is over, show all day's flights (can't filter by current shift)
+      var isShiftOver=(shiftEnd!==null&&nowMin>shiftEnd);
+      vTurnoEl.textContent=isShiftOver?'✓':inTurno>0?inTurno:'0';
     }
   }
   updateOpVuelos();
@@ -1241,6 +1243,9 @@ function renderOperativa(){
 var _origSwitchTab=typeof switchTab!=='undefined'?switchTab:null;
 function switchTab(name,tabEl,navEl){
   currentPanel=name;
+  // Hide old turno bar when on Operativa (it's shown in the card instead)
+  var bt=document.getElementById('bottom-turno');
+  if(bt)bt.style.display=(name==='operativa'?'none':'');
   if(name==='operativa')setTimeout(renderOperativa,50);
   document.querySelectorAll(".panel").forEach(function(p){p.classList.remove("active")});
   document.querySelectorAll(".tab").forEach(function(t){t.classList.remove("active")});
@@ -2508,6 +2513,9 @@ function initGoogle(){
   // ── Init ────────────────────────────────────────────
   window.initTurnoWidget=function(){
     renderWidget();
+    renderOperativa();
+    setInterval(renderOperativa,60000);
+    if(typeof loadLive==='function'){loadLive();setTimeout(renderOperativa,3500);}
     if(_timer)clearInterval(_timer);
     _timer=setInterval(renderWidget,60000);
     setInterval(checkTurnoSalida,30000);
