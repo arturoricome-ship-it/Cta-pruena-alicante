@@ -561,11 +561,24 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
     <div class="op-vuelos" onclick="openLive()">
       <span class="op-plane">✈</span>
       <div class="op-v-mid">
-        <div class="op-v-title" id="op-v-title">En directo</div>
-        <div class="op-v-sub" id="op-v-sub">Llegadas y salidas · Aeropuerto Alicante</div>
-        <div class="op-v-nums">
-          <div class="op-v-n"><div class="op-v-nval" id="op-v-total">—</div><div class="op-v-nlbl">total hoy</div></div>
-          <div class="op-v-n"><div class="op-v-nval" id="op-v-turno" style="color:#93c5fd">—</div><div class="op-v-nlbl">en mi turno</div></div>
+        <div class="op-v-title" id="op-v-title">En directo · ALC</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px">
+          <!-- HOY -->
+          <div style="background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.2);border-radius:10px;padding:8px 10px">
+            <div style="font-size:8px;color:var(--gray);letter-spacing:.6px;text-transform:uppercase;margin-bottom:5px">Hoy</div>
+            <div style="display:flex;gap:10px">
+              <div><div class="op-v-nval" id="op-v-total">—</div><div class="op-v-nlbl">total</div></div>
+              <div><div class="op-v-nval" id="op-v-turno" style="color:#93c5fd">—</div><div class="op-v-nlbl">mi turno</div></div>
+            </div>
+          </div>
+          <!-- MAÑANA -->
+          <div style="background:rgba(200,168,75,.06);border:1px solid rgba(200,168,75,.15);border-radius:10px;padding:8px 10px">
+            <div style="font-size:8px;color:var(--gray);letter-spacing:.6px;text-transform:uppercase;margin-bottom:5px">Mañana</div>
+            <div style="display:flex;gap:10px">
+              <div><div class="op-v-nval" id="op-v-total-tom" style="color:var(--gold)">—</div><div class="op-v-nlbl">total</div></div>
+              <div><div class="op-v-nval" id="op-v-turno-tom" style="color:var(--gl)">—</div><div class="op-v-nlbl">mi turno</div></div>
+            </div>
+          </div>
         </div>
       </div>
       <svg width="7" height="12" viewBox="0 0 7 12" fill="none"><path d="M1 1l5 5-5 5" stroke="#8a93a8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -1190,62 +1203,54 @@ function renderOperativa(){
   if(vTitleEl&&fechaEl&&fechaEl.textContent){
     vTitleEl.textContent='En directo · '+fechaEl.textContent;
   }
+  function countInShift2(flights,e1,s1,e2,s2){
+    var n=0;
+    flights.forEach(function(v){
+      var t=hToMin(v.horaReal||v.horaProg||'');
+      if(t===null)return;
+      if(e1!==null&&s1!==null&&t>=e1&&t<=s1)n++;
+      else if(e2!==null&&s2!==null&&t>=e2&&t<=s2)n++;
+    });
+    return n;
+  }
   function updateOpVuelos(){
     if(typeof liveData==='undefined')return;
-    var today=new Date().toDateString();
-    var cached=null;try{var cv=localStorage.getItem('op_vuelos_total');if(cv){var cp=JSON.parse(cv);if(cp.date===today)cached=cp.total;}}catch(e){}
-    var total=(liveData.lle?liveData.lle.length:0)+(liveData.sal?liveData.sal.length:0);
-    if(total>0){try{localStorage.setItem('op_vuelos_total',JSON.stringify({date:today,total:total}));}catch(e){}cached=total;}
-    if(vTotalEl)vTotalEl.textContent=(cached||total)>0?(cached||total):'—';
-    // Also update title date from live
-    var lhEl=document.getElementById('live-hora');var vSubEl2=document.getElementById('op-v-sub');
-    if(lhEl&&lhEl.textContent&&vSubEl2&&vSubEl2.textContent.indexOf('mañana')<0)vSubEl2.textContent='Llegadas y salidas · Aeropuerto Alicante';
-    // Count flights within my shift
-    if(d&&d.e1&&vTurnoEl){
-      var myE1=toMin(d.e1),myS1=toMin(d.s1);
-      var myE2=d.e2?toMin(d.e2):null,myS2=d.s2?toMin(d.s2):null;
-      var inTurno=0;
-      function inShift(vm){
-        if(vm===null)return false;
-        if(myE1!==null&&myS1!==null&&vm>=myE1&&vm<=myS1)return true;
-        if(myE2!==null&&myS2!==null&&vm>=myE2&&vm<=myS2)return true;
-        return false;
-      }
-      (liveData.lle||[]).forEach(function(v){var t=hToMin(v.horaReal||v.horaProg||'');if(inShift(t))inTurno++;});
-      (liveData.sal||[]).forEach(function(v){var t=hToMin(v.horaReal||v.horaProg||'');if(inShift(t))inTurno++;});
-      vTurnoEl.textContent=String(inTurno);
-      // If shift is over and 0, check next day
-      var isShiftOver=(shiftEnd!==null&&nowMin>shiftEnd);
-      if(isShiftOver&&inTurno===0){
-        // Try to find next day shift window
-        var nxtRaw2;try{nxtRaw2=localStorage.getItem('cta_ed_'+now.getFullYear());}catch(e){}
-        var nxtUe2={};try{if(nxtRaw2)nxtUe2=JSON.parse(nxtRaw2);}catch(e){}
-        var meses3=["ENERO","FEBRERO","MARZO","ABRIL","MAYO","JUNIO","JULIO","AGOSTO","SEPTIEMBRE","OCTUBRE","NOVIEMBRE","DICIEMBRE"];
-        for(var di2=1;di2<=3;di2++){
-          var nDate2=new Date(now.getFullYear(),now.getMonth(),now.getDate()+di2);
-          var nMd2=(nxtUe2[meses3[nDate2.getMonth()]]||{})[nDate2.getDate()];
-          if(nMd2&&nMd2.e1){
-            var nE1=toMin(nMd2.e1),nS1=toMin(nMd2.s1);
-            var nE2=nMd2.e2?toMin(nMd2.e2):null,nS2=nMd2.s2?toMin(nMd2.s2):null;
-            var nxtCount=0;
-            (liveData.lle||[]).forEach(function(v){var t=hToMin(v.horaReal||v.horaProg||'');if(t!==null){if(nE1!==null&&nS1!==null&&t>=nE1&&t<=nS1)nxtCount++;if(nE2!==null&&nS2!==null&&t>=nE2&&t<=nS2)nxtCount++;}});
-            (liveData.sal||[]).forEach(function(v){var t=hToMin(v.horaReal||v.horaProg||'');if(t!==null){if(nE1!==null&&nS1!==null&&t>=nE1&&t<=nS1)nxtCount++;if(nE2!==null&&nS2!==null&&t>=nE2&&t<=nS2)nxtCount++;}});
-            if(nxtCount>0&&vTurnoEl){
-              var vSubEl=document.getElementById('op-v-sub');
-              if(vSubEl)vSubEl.textContent='Coincidencias en turno de mañana: '+nxtCount;
-              vTurnoEl.textContent=nxtCount;
-            }
-            break;
-          }
-        }
-      }
-    }
+    var allLle=liveData.lle||[],allSal=liveData.sal||[];
+    var lleHoy=allLle.filter(function(v){return !v.esManana;});
+    var salHoy=allSal.filter(function(v){return !v.esManana;});
+    var lleTom=allLle.filter(function(v){return !!v.esManana;});
+    var salTom=allSal.filter(function(v){return !!v.esManana;});
+    // TODAY — cached
+    var todayStr=new Date().toDateString();
+    var totalHoy=lleHoy.length+salHoy.length,cachedHoy=0;
+    try{var cv=localStorage.getItem('op_vuelos_total');if(cv){var cp=JSON.parse(cv);if(cp.date===todayStr)cachedHoy=cp.total;}}catch(e){}
+    if(totalHoy>0){try{localStorage.setItem('op_vuelos_total',JSON.stringify({date:todayStr,total:totalHoy}));}catch(e){}cachedHoy=totalHoy;}
+    if(vTotalEl)vTotalEl.textContent=cachedHoy>0?cachedHoy:'—';
+    // TOMORROW
+    var totalTom=lleTom.length+salTom.length;
+    var tomTotalEl=document.getElementById('op-v-total-tom');
+    if(tomTotalEl)tomTotalEl.textContent=totalTom>0?totalTom:'—';
+    // TODAY shift
+    var myE1=d&&d.e1?toMin(d.e1):null,myS1=d&&d.s1?toMin(d.s1):null;
+    var myE2=d&&d.e2?toMin(d.e2):null,myS2=d&&d.s2?toMin(d.s2):null;
+    var iTHoy=myE1!==null?countInShift2(lleHoy.concat(salHoy),myE1,myS1,myE2,myS2):0;
+    if(vTurnoEl)vTurnoEl.textContent=String(iTHoy);
+    // TOMORROW shift
+    var mesArr=["ENERO","FEBRERO","MARZO","ABRIL","MAYO","JUNIO","JULIO","AGOSTO","SEPTIEMBRE","OCTUBRE","NOVIEMBRE","DICIEMBRE"];
+    var ueT={};try{var rT=localStorage.getItem('cta_ed_'+now.getFullYear());if(rT)ueT=JSON.parse(rT);}catch(e){}
+    var tom2=new Date(now);tom2.setDate(tom2.getDate()+1);
+    var dTom2=(ueT[mesArr[tom2.getMonth()]]||{})[tom2.getDate()]||null;
+    var tE1=dTom2&&dTom2.e1?toMin(dTom2.e1):null,tS1=dTom2&&dTom2.s1?toMin(dTom2.s1):null;
+    var tE2=dTom2&&dTom2.e2?toMin(dTom2.e2):null,tS2=dTom2&&dTom2.s2?toMin(dTom2.s2):null;
+    var iTTom=tE1!==null&&totalTom>0?countInShift2(lleTom.concat(salTom),tE1,tS1,tE2,tS2):0;
+    var tomTurnoEl=document.getElementById('op-v-turno-tom');
+    if(tomTurnoEl)tomTurnoEl.textContent=totalTom>0?String(iTTom):'—';
   }
   updateOpVuelos();
-  // If liveData not loaded yet, trigger load and update after
   if(typeof liveData!=='undefined'&&liveData.lle.length===0&&liveData.sal.length===0){
     if(typeof loadLive==='function')loadLive();
     setTimeout(updateOpVuelos,3000);
+  }
   }
 }
 
