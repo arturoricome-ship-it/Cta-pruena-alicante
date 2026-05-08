@@ -3775,20 +3775,20 @@ window.renderOperativa=function(){
   } else if(isDone){
     card.classList.add("state-rest");
     var nxtMin=null,nxtStr="";
-    for(var dd2=1;dd2<=7;dd2++){
+    var ANXT=["trabajado","hl","hlp","h6","festivo","baja","rm","curso"];
+    for(var dd2=1;dd2<=14;dd2++){
       var nD=new Date(now.getFullYear(),now.getMonth(),now.getDate()+dd2);
       var nMd=(ue[MESES[nD.getMonth()]]||{})[nD.getDate()];
-      if(nMd&&nMd.e1){nxtMin=toM(nMd.e1);nxtStr=nMd.e1;break;}
+      if(nMd&&nMd.e1&&nMd.tipo&&ANXT.indexOf(nMd.tipo)>=0){nxtMin=toM(nMd.e1);nxtStr=nMd.e1;break;}
     }
-    var restM=nxtMin!==null?(nxtMin-nowMin+1440*7)%1440:null;
+    var restM=nxtMin!==null?(nxtMin-nowMin+1440*14)%1440:null;
     var cnt=restM!==null?fmtT(restM):"";
-    if(g("op-tc-times"))g("op-tc-times").innerHTML="<span>"+(cnt||"---")+"</span>";
-    if(g("op-tc-pct"))g("op-tc-pct").textContent=cnt||"";
-    if(g("op-tc-rem"))g("op-tc-rem").textContent=nxtStr?"Proximo turno "+nxtStr:"";
+    if(g("op-tc-times"))g("op-tc-times").innerHTML="<span>"+(cnt||"💤")+"</span>";
+    if(g("op-tc-sub"))g("op-tc-sub").textContent=nxtStr?"Próximo turno "+nxtStr:"";
+    if(g("op-tc-pct"))g("op-tc-pct").textContent="";
+    if(g("op-tc-rem"))g("op-tc-rem").textContent="";
     if(g("op-tc-bar"))g("op-tc-bar").style.width="100%";
-    if(g("op-tc-sub"))g("op-tc-sub").textContent="";
-  } else if(notYet){
-    card.classList.add("state-next");
+    if(g("op-tc-lbl"))g("op-tc-lbl").textContent="Descanso";
     if(g("op-tc-times"))g("op-tc-times").innerHTML=th;
     if(g("op-tc-sub"))g("op-tc-sub").textContent="Proximo turno";
     if(g("op-tc-pct"))g("op-tc-pct").textContent="0%";
