@@ -585,13 +585,13 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
     </div>
     <p class="op-sec">📊 Resumen operativo del día</p>
     <!-- RESUMEN OPERATIVO -->
-    <div class="op-comp-card" style="flex-direction:column;align-items:stretch;gap:0;padding:0;cursor:default;overflow:hidden">
+    <div class="op-comp-card" style="flex-direction:column;align-items:stretch;gap:0;padding:0;overflow:hidden;cursor:pointer" onclick="if(typeof verCompanerosHoy==='function'){var p=document.getElementById('calc-panel');var o=document.getElementById('calc-overlay');if(p){p.classList.add('show');if(o)o.classList.add('show');setTimeout(function(){verCompanerosHoy();},80);}}">
       <!-- Sub-tabs a todo ancho, pegados al borde superior -->
       <div style="display:flex;gap:0">
-        <button id="op-tab-dist" onclick="opResTab('dist')" style="flex:1;background:rgba(200,168,75,.15);border:none;border-right:1px solid var(--border);border-bottom:2px solid var(--gold);color:var(--gold);font-family:'Outfit',sans-serif;font-size:10px;font-weight:700;padding:9px 4px;cursor:pointer;letter-spacing:.3px">Distribución</button>
-        <button id="op-tab-pico" onclick="opResTab('pico')" style="flex:1;background:none;border:none;border-right:1px solid var(--border);border-bottom:2px solid transparent;color:var(--gray);font-family:'Outfit',sans-serif;font-size:10px;font-weight:700;padding:9px 4px;cursor:pointer;letter-spacing:.3px">Picos</button>
-        <button id="op-tab-now" onclick="opResTab('now')" style="flex:1;background:none;border:none;border-bottom:2px solid transparent;color:var(--gray);font-family:'Outfit',sans-serif;font-size:10px;font-weight:700;padding:9px 4px;cursor:pointer;letter-spacing:.3px">Ahora</button>
-        <div id="op-ver-btn" style="flex-shrink:0;background:none;border:none;border-left:1px solid var(--border);border-bottom:2px solid transparent;color:#60a5fa;font-size:10px;font-weight:800;padding:9px 14px;letter-spacing:.5px;cursor:pointer;display:flex;align-items:center" onclick="if(typeof verCompanerosHoy==='function'){var p=document.getElementById('calc-panel');var o=document.getElementById('calc-overlay');if(p){p.classList.add('show');if(o)o.classList.add('show');setTimeout(function(){verCompanerosHoy();},80);}}">VER</div>
+        <button id="op-tab-dist" onclick="event.stopPropagation();opResTab('dist')" style="flex:1;background:rgba(200,168,75,.15);border:none;border-right:1px solid var(--border);border-bottom:2px solid var(--gold);color:var(--gold);font-family:'Outfit',sans-serif;font-size:10px;font-weight:700;padding:9px 4px;cursor:pointer;letter-spacing:.3px">Distribución</button>
+        <button id="op-tab-pico" onclick="event.stopPropagation();opResTab('pico')" style="flex:1;background:none;border:none;border-right:1px solid var(--border);border-bottom:2px solid transparent;color:var(--gray);font-family:'Outfit',sans-serif;font-size:10px;font-weight:700;padding:9px 4px;cursor:pointer;letter-spacing:.3px">Picos</button>
+        <button id="op-tab-now" onclick="event.stopPropagation();opResTab('now')" style="flex:1;background:none;border:none;border-bottom:2px solid transparent;color:var(--gray);font-family:'Outfit',sans-serif;font-size:10px;font-weight:700;padding:9px 4px;cursor:pointer;letter-spacing:.3px">Ahora</button>
+        <div id="op-ver-btn" style="flex-shrink:0;background:none;border:none;border-left:1px solid var(--border);border-bottom:2px solid transparent;color:#60a5fa;font-size:10px;font-weight:800;padding:9px 14px;letter-spacing:.5px;cursor:pointer;display:flex;align-items:center" onclick="event.stopPropagation();if(typeof verCompanerosHoy==='function'){var p=document.getElementById('calc-panel');var o=document.getElementById('calc-overlay');if(p){p.classList.add('show');if(o)o.classList.add('show');setTimeout(function(){verCompanerosHoy();},80);}}">VER</div>
       </div>
       <!-- Content panels -->
       <div id="op-res-dist" style="padding:12px 14px">
@@ -2252,7 +2252,7 @@ function initGoogle(){
   </div>
 
   <!-- Footer buttons -->
-  <div style="flex-shrink:0;padding:0 16px calc(10px + env(safe-area-inset-bottom));border-top:1px solid rgba(255,255,255,.06);padding-top:10px;background:#182135">
+  <div style="flex-shrink:0;position:sticky;bottom:0;padding:10px 16px calc(10px + env(safe-area-inset-bottom));border-top:1px solid rgba(255,255,255,.06);background:#182135;z-index:2">
     <div style="display:flex;gap:8px;margin-bottom:8px">
       <button onclick="closeTrypImport()"
         style="flex:1;background:var(--card2);border:none;border-radius:12px;padding:13px;font-family:'Outfit',sans-serif;font-size:14px;font-weight:600;color:var(--gray);cursor:pointer">
@@ -3484,13 +3484,18 @@ function renderCompanerosDia(offsetDias,toggleIfOpen){
   var myData={};
   try{myData=JSON.parse(localStorage.getItem('cta_ed_'+target.getFullYear())||'{}')}catch(e){}
   var myDay=(myData[monthKey]||{})[day];
+  var myE1=myDay&&myDay.e1?toMinG(myDay.e1):null;
+  var myS1=myDay&&myDay.s1?toMinG(myDay.s1):null;
+  var myE2=myDay&&myDay.e2?toMinG(myDay.e2):null;
+  var myS2=myDay&&myDay.s2?toMinG(myDay.s2):null;
   if(!myDay||!myDay.e1){
-    panel.innerHTML=navHtml+'<div class="grupo-empty">📅 No tienes turno ese día</div>';
-    panel.classList.add('open');return;
+    if(!modoToda){
+      panel.innerHTML=navHtml+'<div class="grupo-empty">📅 No tienes turno ese día</div>';
+      panel.classList.add('open');return;
+    }
+    // modoToda + día libre → continuar mostrando toda la plantilla
   }
 
-  var myE1=toMinG(myDay.e1),myS1=toMinG(myDay.s1);
-  var myE2=myDay.e2?toMinG(myDay.e2):null,myS2=myDay.s2?toMinG(myDay.s2):null;
   var ahoraMin=now.getHours()*60+now.getMinutes();
   var esDiaActual=offsetDias===0;
 
@@ -3578,7 +3583,7 @@ function renderCompanerosDia(offsetDias,toggleIfOpen){
     window._yaSalieron=[];
   }
 
-  var myHorario=myDay.e1+'→'+myDay.s1+(myDay.e2?' / '+myDay.e2+'→'+myDay.s2:'');
+  var myHorario=(myDay&&myDay.e1)?(myDay.e1+'→'+myDay.s1+(myDay.e2?' / '+myDay.e2+'→'+myDay.s2:'')):'—';
   // Group by category
   var cats={};
   if(window._sortBySalida){
@@ -3588,7 +3593,8 @@ function renderCompanerosDia(offsetDias,toggleIfOpen){
   }
   var html='<div class="grupo-header-sticky">'+navHtml;
   html+='<div class="grupo-title">👥 '+(modoToda?'Toda la plantilla':'Coincidencias')+' · '+coinciden.length+'</div>';
-  html+='<div class="grupo-item" style="opacity:.6"><div class="grupo-solapamiento" style="background:var(--gold)"></div><div class="grupo-nombre" style="color:var(--gold);font-size:12px">Tú</div><div class="grupo-horario" style="color:var(--gold)">'+myHorario+'</div></div>';
+  if(myDay&&myDay.e1)html+='<div class="grupo-item" style="opacity:.6"><div class="grupo-solapamiento" style="background:var(--gold)"></div><div class="grupo-nombre" style="color:var(--gold);font-size:12px">Tú · Libre</div><div class="grupo-horario" style="color:var(--gold)">'+myHorario+'</div></div>';
+  else html+='<div class="grupo-item" style="opacity:.6"><div class="grupo-solapamiento" style="background:var(--gray)"></div><div class="grupo-nombre" style="color:var(--gray);font-size:12px">Tú · Libre</div><div class="grupo-horario" style="color:var(--gray)">—</div></div>';
   html+='</div>';
   Object.keys(cats).sort().forEach(function(cat){
     if(cat!=='_all')html+='<div style="font-size:9px;color:var(--gray);letter-spacing:.6px;text-transform:uppercase;padding:6px 0 2px;border-top:1px solid rgba(255,255,255,.05);margin-top:2px">'+cat+'</div>';
@@ -3908,15 +3914,15 @@ window.renderOperativa=function(){
     return inT(emp.e1,emp.s1,min)||inT(emp.e2,emp.s2,min);
   }
   var total=trabajanHoy.length;
-  var manana=trabajanHoy.filter(function(e){return e.e1>=240&&e.e1<900;}).length;
-  var tarde=trabajanHoy.filter(function(e){return e.e1>=900||e.e1<240;}).length;
+  var manana=trabajanHoy.filter(function(e){return e.e1>=240&&e.e1<901;}).length;
+  var tarde=trabajanHoy.filter(function(e){return e.e1>=901||e.e1<240;}).length;
 
   // Distribución tab
   var dEl=g("op-res-dist");
   if(dEl)dEl.innerHTML='<div style="font-size:13px;font-weight:700;color:var(--white);margin-bottom:8px">Hoy trabajan <span style="color:var(--gold)">'+total+'</span> compañeros</div>'
     +'<div style="display:flex;flex-direction:column;gap:4px">'
-    +'<div style="display:flex;justify-content:space-between;padding:5px 8px;background:rgba(255,255,255,.04);border-radius:8px"><span style="font-size:10px;color:var(--gray)">☀️ Turno mañana (04:00-14:59)</span><span style="font-size:12px;font-weight:700;color:var(--gold)">'+manana+'</span></div>'
-    +'<div style="display:flex;justify-content:space-between;padding:5px 8px;background:rgba(255,255,255,.04);border-radius:8px"><span style="font-size:10px;color:var(--gray)">🌙 Turno tarde/noche (15:00+)</span><span style="font-size:12px;font-weight:700;color:var(--gold)">'+tarde+'</span></div>'
+    +'<div style="display:flex;justify-content:space-between;padding:5px 8px;background:rgba(255,255,255,.04);border-radius:8px"><span style="font-size:10px;color:var(--gray)">☀️ Turno mañana (04:00-15:00)</span><span style="font-size:12px;font-weight:700;color:var(--gold)">'+manana+'</span></div>'
+    +'<div style="display:flex;justify-content:space-between;padding:5px 8px;background:rgba(255,255,255,.04);border-radius:8px"><span style="font-size:10px;color:var(--gray)">🌙 Turno tarde/noche (15:01+)</span><span style="font-size:12px;font-weight:700;color:var(--gold)">'+tarde+'</span></div>'
     +'<div style="display:flex;justify-content:space-between;padding:5px 8px;background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.15);border-radius:8px"><span style="font-size:10px;color:var(--gray)">🔴 Coinciden contigo</span><span style="font-size:12px;font-weight:700;color:#f87171">'+compN+'</span></div>'
     +'</div>';
 
