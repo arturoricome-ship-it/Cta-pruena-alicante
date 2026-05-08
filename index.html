@@ -3793,10 +3793,16 @@ window.renderOperativa=function(){
   var lT=aL.filter(function(v){return !!v.esManana;}),sT=aS.filter(function(v){return !!v.esManana;});
   var tStr=now.toDateString(),totH=lH.length+sH.length,cH=0;
   try{var cv=localStorage.getItem("op_vt");if(cv){var cpo=JSON.parse(cv);if(cpo.d===tStr)cH=cpo.t;}}catch(e){}
-  if(totH>0){try{localStorage.setItem("op_vt",JSON.stringify({d:tStr,t:totH}));}catch(e){}cH=totH;}
+  // Only update cache if new count is HIGHER — once set, never go down during the day
+  if(totH>cH){cH=totH;try{localStorage.setItem("op_vt",JSON.stringify({d:tStr,t:cH}));}catch(e){}}
   if(g("op-v-total"))g("op-v-total").textContent=cH>0?cH:"—";
   var totT=lT.length+sT.length;
-  if(g("op-v-total-tom"))g("op-v-total-tom").textContent=totT>0?totT:"—";
+  // Cache tomorrow total — same logic as today: only goes up, resets at midnight
+  var tom=new Date(now);tom.setDate(tom.getDate()+1);
+  var tStr2=tom.toDateString(),cT=0;
+  try{var cv2=localStorage.getItem("op_vt_tom");if(cv2){var cpt=JSON.parse(cv2);if(cpt.d===tStr2)cT=cpt.t;}}catch(e){}
+  if(totT>cT){cT=totT;try{localStorage.setItem("op_vt_tom",JSON.stringify({d:tStr2,t:cT}));}catch(e){}}
+  if(g("op-v-total-tom"))g("op-v-total-tom").textContent=cT>0?cT:"—";
   function cntSh(fls,e1p,s1p,e2p,s2p){var n=0;fls.forEach(function(v){var t=typeof hToMin==="function"?hToMin(v.horaReal||v.horaProg||""):null;if(t===null)return;if(e1p!==null&&s1p!==null&&t>=e1p&&t<=s1p)n++;else if(e2p!==null&&s2p!==null&&t>=e2p&&t<=s2p)n++;});return n;}
   var iH=e1!==null?cntSh(lH.concat(sH),e1,s1,e2,s2):0;
   if(g("op-v-turno"))g("op-v-turno").textContent=String(iH);
