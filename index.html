@@ -1502,21 +1502,21 @@ function getLiveCutoffsFromTurnoHoy(){
   var now=new Date();
   var meses=["ENERO","FEBRERO","MARZO","ABRIL","MAYO","JUNIO","JULIO","AGOSTO","SEPTIEMBRE","OCTUBRE","NOVIEMBRE","DICIEMBRE"];
   var raw;
-  try{raw=localStorage.getItem("cta_ed_"+now.getFullYear());}catch(e){return {s:[],e:[]};}
-  if(!raw)return {s:[],e:[]};
+  try{raw=localStorage.getItem("cta_ed_"+now.getFullYear());}catch(e){return {s:[],e:[],windows:[]};}
+  if(!raw)return {s:[],e:[],windows:[]};
   var data;
-  try{data=JSON.parse(raw);}catch(e){return {s:[],e:[]};}
-  var mes=data[meses[now.getMonth()]];
-  var d=mes?mes[now.getDate()]||null:null;
-  if(!d)return {s:[],e:[]};
-  var s=[],e=[];
+  try{data=JSON.parse(raw);}catch(e){return {s:[],e:[],windows:[]};}
+  var hasMañana=typeof liveData!=="undefined"&&((liveData.lle||[]).concat(liveData.sal||[])).some(function(v){return !!v.esManana;});
+  function getDay(date){var m=data[meses[date.getMonth()]];return m?m[date.getDate()]||null:null;}
+  var d=getDay(now);
+  if(hasMañana){var tom=new Date(now);tom.setDate(tom.getDate()+1);var dt=getDay(tom);if(dt&&dt.e1)d=dt;}
+  if(!d||!d.e1)return {s:[],e:[],windows:[]};
+  var s=[],e=[],windows=[];
   var e1=hToMin(d.e1||""),s1=hToMin(d.s1||"");
   var e2=hToMin(d.e2||""),s2=hToMin(d.s2||"");
-  if(e1!==null)e.push(e1);
-  if(e2!==null)e.push(e2);
-  if(s1!==null)s.push(s1);
-  if(s2!==null)s.push(s2);
-  return {s:s,e:e};
+  if(e1!==null&&s1!==null){e.push(e1);s.push(s1);windows.push([e1,s1]);}
+  if(e2!==null&&s2!==null){e.push(e2);s.push(s2);windows.push([e2,s2]);}
+  return {s:s,e:e,windows:windows};
 }
 
 function renderLive(){
@@ -1535,38 +1535,26 @@ function renderLive(){
   if(!data.length){container.innerHTML="<div class='empty-box'>Sin vuelos"+(liveFiltro?" activos":"")+" en este momento</div>";return;}
   container.innerHTML="";
 
-  var cortesS={};  // idx → red bottom line (S1/S2 in departures)
-  var cortesE={};  // idx → green top line (E1/E2 in arrivals)
+  var cortesS={};  // idx → red bottom line (last flight in shift window)
+  var cortesE={};  // idx → green top line (first flight in shift window)
   var cutoffs=getLiveCutoffsFromTurnoHoy();
-  if(esS){
-    // S1/S2: last departure <= exit time → red line BELOW that row
-    // If 2 share same cut, pick the one lower (higher index) in list
-    cutoffs.s.forEach(function(cut){
-      var bestIdx=-1,bestMin=-1;
-      for(var i=0;i<data.length;i++){
-        var vv=data[i];
-        if((vv.estadoClass||"")==="e-cancelled")continue;
-        var vm=hToMin(vv.horaReal||vv.horaProg||"");
-        if(vm===null)continue;
-        if(vm<=cut&&vm>=bestMin){bestMin=vm;bestIdx=i;} // >= keeps latest idx for ties
+  // For each shift window [eN, sN]: find first and last flight WITHIN that window
+  (cutoffs.windows||[]).forEach(function(win){
+    var winE=win[0],winS=win[1];
+    var firstIdx=-1,firstMin=99999,lastIdx=-1,lastMin=-1;
+    for(var i=0;i<data.length;i++){
+      var vv=data[i];
+      if((vv.estadoClass||"")==="e-cancelled")continue;
+      var vm=hToMin(vv.horaReal||vv.horaProg||"");
+      if(vm===null)continue;
+      if(vm>=winE&&vm<=winS){
+        if(vm<firstMin){firstMin=vm;firstIdx=i;}
+        if(vm>lastMin||(vm===lastMin&&i>lastIdx)){lastMin=vm;lastIdx=i;}
       }
-      if(bestIdx>=0)cortesS[bestIdx]=true;
-    });
-  } else {
-    // E1/E2: first arrival >= entry time → green line ON TOP of that row
-    // If 2 share same cut, pick the one higher (lower index) in list
-    cutoffs.e.forEach(function(cut){
-      var bestIdx=-1,bestMin=99999;
-      for(var i=0;i<data.length;i++){
-        var vv=data[i];
-        if((vv.estadoClass||"")==="e-cancelled")continue;
-        var vm=hToMin(vv.horaReal||vv.horaProg||"");
-        if(vm===null)continue;
-        if(vm>=cut&&vm<=bestMin){bestMin=vm;bestIdx=i;} // <= keeps lowest idx for ties
-      }
-      if(bestIdx>=0)cortesE[bestIdx]=true;
-    });
-  }
+    }
+    if(firstIdx>=0)cortesE[firstIdx]=true;  // green top
+    if(lastIdx>=0)cortesS[lastIdx]=true;    // red bottom
+  });
 
   var separadorPuesto=false;
   data.forEach(function(v,idx){
@@ -3787,176 +3775,6 @@ window.initTurnoWidget=function(){
 })();
 </script>
 
-<script>
-// ═══ OPERATIVA ═══════════════════════════════════════════════
-(function(){
-  // Hook into switchTab to trigger render
-  var _origST=window.switchTab;
-  window.switchTab=function(name,tabEl,navEl){
-    _origST.call(this,name,tabEl,navEl);
-    if(name==='operativa')setTimeout(opRender,50);
-  };
 
-  // Hook into initTurnoWidget to switch to operativa and render
-  var _origITW=window.initTurnoWidget;
-  window.initTurnoWidget=function(){
-    if(_origITW)_origITW.call(this);
-    setTimeout(function(){
-      if(typeof switchTab==='function')
-        switchTab('operativa',document.getElementById('tab-operativa'),document.getElementById('nav-operativa'));
-      opRender();
-      if(typeof loadLive==='function'){loadLive();setTimeout(opRender,3500);}
-    },200);
-  };
-})();
-
-function opRender(){
-  var now=new Date();
-  var MESES=["ENERO","FEBRERO","MARZO","ABRIL","MAYO","JUNIO","JULIO","AGOSTO","SEPTIEMBRE","OCTUBRE","NOVIEMBRE","DICIEMBRE"];
-  var MESES_ES=["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
-  function toM(t){if(!t)return null;var p=t.split(':');return +p[0]*60+(+p[1]||0);}
-  function fmtM(m){if(!m&&m!==0)return '';var h=Math.floor(m/60),mn=m%60;return h>0?h+'h'+(mn?' '+mn+'m':''):mn+'m';}
-  function fmtH(h){var hh=Math.floor(h),mm=Math.round((h-hh)*60);return hh+':'+(mm<10?'0':'')+mm;}
-  function el(id){return document.getElementById(id);}
-
-  // ─ Calendar ─
-  var raw;try{raw=localStorage.getItem('cta_ed_'+now.getFullYear());}catch(e){}
-  var ue={};try{if(raw)ue=JSON.parse(raw);}catch(e){}
-  var mesKey=MESES[now.getMonth()];
-  var mData=ue[mesKey]||{};
-  var ACTIVOS=['trabajado','hl','hlp','h6','festivo','baja','rm','curso','vacaciones'];
-  var CONT=['trabajado','hl','hlp','h6','curso','baja','rm'];
-  var trab=0,libre=0,horasMes=0,horasCont=0;
-  var dim=new Date(now.getFullYear(),now.getMonth()+1,0).getDate();
-  for(var di=1;di<=dim;di++){var dy=mData[di];if(!dy){libre++;continue;}var t=dy.tipo||'libre';if(ACTIVOS.indexOf(t)>=0){trab++;horasMes+=dy.total||0;}else libre++;}
-  MESES.forEach(function(m){var md=ue[m]||{};Object.keys(md).forEach(function(dd){var d2=md[dd];if(CONT.indexOf(d2.tipo||'')>=0)horasCont+=d2.total||0;});});
-  var perenMes=0;
-  var pdRaw;try{pdRaw=localStorage.getItem('cta_pd_'+now.getFullYear());}catch(e){}
-  var PD={};try{if(pdRaw)PD=JSON.parse(pdRaw);}catch(e){}
-  Object.keys(PD).forEach(function(k){if(k.split(':')[0]===mesKey)perenMes+=PD[k].gen||0;});
-  Object.keys(mData).forEach(function(dd){var dy2=mData[dd];if(dy2&&dy2.perenDur&&dy2.perenDur!=='0:00'&&!PD[mesKey+':'+dd]){var p=dy2.perenDur.split(':');perenMes+=(+p[0]||0)+(+p[1]||0)/60;}});
-
-  if(el('op-cal-mes'))el('op-cal-mes').textContent=MESES_ES[now.getMonth()]+' '+now.getFullYear();
-  if(el('op-cal-trab'))el('op-cal-trab').textContent=trab;
-  if(el('op-cal-lib'))el('op-cal-lib').textContent=libre;
-  if(el('op-cal-hmes'))el('op-cal-hmes').textContent=Math.round(horasMes*10)/10+'h';
-  if(el('op-cal-cont'))el('op-cal-cont').textContent=Math.round(horasCont*10)/10+'h';
-  if(el('op-cal-peren'))el('op-cal-peren').textContent=fmtH(perenMes);
-
-  // ─ Turno ─
-  var nowMin=now.getHours()*60+now.getMinutes();
-  var d=mData[now.getDate()]||null;
-  var card=el('op-turno-card');
-  if(!card)return;
-  ['state-working','state-pausa','state-rest','state-next'].forEach(function(c){card.classList.remove(c);});
-
-  if(!d||!d.tipo||d.tipo==='libre'||(!d.e1&&['festivo','hl','hlp','vacaciones'].indexOf(d.tipo)<0)){
-    card.classList.add('state-next');
-    if(el('op-tc-times'))el('op-tc-times').innerHTML='<span style="color:var(--gray);font-size:11px">Sin turno</span>';
-    if(el('op-tc-sub'))el('op-tc-sub').textContent='Día libre';
-    if(el('op-tc-pct'))el('op-tc-pct').textContent='';
-    return;
-  }
-  if(['festivo','hl','hlp','vacaciones'].indexOf(d.tipo)>=0){
-    card.classList.add('state-rest');
-    if(el('op-tc-lbl'))el('op-tc-lbl').textContent='Turno hoy';
-    if(el('op-tc-times'))el('op-tc-times').innerHTML='<span>💤 Descanso</span>';
-    if(el('op-tc-sub'))el('op-tc-sub').textContent='';
-    return;
-  }
-  var e1=toM(d.e1),s1=toM(d.s1),e2=d.e2?toM(d.e2):null,s2=d.s2?toM(d.s2):null;
-  var shiftEnd=s2||s1;
-  var totalMin=0;
-  if(e1!==null&&s1!==null)totalMin+=(s1>=e1?s1-e1:s1+1440-e1);
-  if(e2!==null&&s2!==null)totalMin+=(s2>=e2?s2-e2:s2+1440-e2);
-  if(el('op-tc-lbl'))el('op-tc-lbl').textContent='Turno hoy · '+fmtM(totalMin);
-  var tHtml='<span>'+d.e1+' → '+d.s1+'</span>'+(d.e2&&d.s2?'<span>'+d.e2+' → '+d.s2+'</span>':'');
-  if(el('op-tc-times'))el('op-tc-times').innerHTML=tHtml;
-
-  var inS1=e1!==null&&s1!==null&&nowMin>=e1&&nowMin<s1;
-  var inS2=e2!==null&&s2!==null&&nowMin>=e2&&nowMin<s2;
-  var isPausa=e2!==null&&s1!==null&&nowMin>=s1&&nowMin<e2;
-  var isFinished=shiftEnd!==null&&nowMin>=shiftEnd;
-
-  if(inS1||inS2){
-    card.classList.add('state-working');
-    var elapsed=inS1?nowMin-e1:(s1-e1)+(nowMin-e2);
-    var pct=Math.min(100,Math.round(elapsed/totalMin*100));
-    var remMin=shiftEnd-nowMin+(inS1&&e2?Math.max(0,e2-s1):0);
-    if(el('op-tc-sub'))el('op-tc-sub').textContent='Trabajando';
-    if(el('op-tc-pct'))el('op-tc-pct').textContent=pct+'%';
-    if(el('op-tc-rem'))el('op-tc-rem').textContent='Quedan '+fmtM(Math.max(0,remMin));
-    if(el('op-tc-bar'))el('op-tc-bar').style.width=pct+'%';
-  } else if(isPausa){
-    card.classList.add('state-pausa');
-    var el2=s1-e1,pct2=Math.round(el2/totalMin*100);
-    if(el('op-tc-sub'))el('op-tc-sub').textContent='Pausa · Vuelves a las '+d.e2;
-    if(el('op-tc-pct'))el('op-tc-pct').textContent=pct2+'%';
-    if(el('op-tc-rem'))el('op-tc-rem').textContent='Pausa '+fmtM(e2-nowMin);
-    if(el('op-tc-bar'))el('op-tc-bar').style.width=pct2+'%';
-  } else if(isFinished){
-    card.classList.add('state-rest');
-    var nxtMin=null,nxtStr='';
-    for(var dd2=1;dd2<=7;dd2++){
-      var nDate=new Date(now.getFullYear(),now.getMonth(),now.getDate()+dd2);
-      var nMd=(ue[MESES[nDate.getMonth()]]||{})[nDate.getDate()];
-      if(nMd&&nMd.e1){nxtMin=toM(nMd.e1);nxtStr=nMd.e1;break;}
-    }
-    var diff=nxtMin!==null?((nxtMin-nowMin+10080)%1440):null;
-    var cnt=diff!==null?fmtM(diff):'';
-    if(el('op-tc-times'))el('op-tc-times').innerHTML='<span>'+(cnt||'💤')+'</span>';
-    if(el('op-tc-sub'))el('op-tc-sub').textContent='';
-    if(el('op-tc-pct'))el('op-tc-pct').textContent=cnt||'💤';
-    if(el('op-tc-rem'))el('op-tc-rem').textContent=nxtStr?'Próximo turno '+nxtStr:'';
-    if(el('op-tc-bar'))el('op-tc-bar').style.width='100%';
-  } else {
-    card.classList.add('state-next');
-    var mL=e1-nowMin;
-    if(el('op-tc-sub'))el('op-tc-sub').textContent='Próximo turno';
-    if(el('op-tc-pct'))el('op-tc-pct').textContent='0%';
-    if(el('op-tc-rem'))el('op-tc-rem').textContent='Empieza en '+fmtM(mL);
-    if(el('op-tc-bar'))el('op-tc-bar').style.width='0%';
-  }
-
-  // ─ Compañeros ─
-  var gmap={};try{gmap=JSON.parse(localStorage.getItem('cta_grupo_2026_map')||'{}');}catch(e){}
-  var compN=0;
-  if(Object.keys(gmap).length>0&&d&&d.e1){
-    var mE1=toM(d.e1),mS1=toM(d.s1),mE2=d.e2?toM(d.e2):null,mS2=d.s2?toM(d.s2):null;
-    Object.keys(gmap).forEach(function(nom){
-      var emp=gmap[nom],dias=(emp.meses&&emp.meses[mesKey])||null;
-      if(!dias)return;
-      var turno=dias[now.getDate()];if(!turno||!turno.e1)return;
-      var gE1=toM(turno.e1),gS1=toM(turno.s1),gE2=turno.e2?toM(turno.e2):null,gS2=turno.s2?toM(turno.s2):null;
-      if(typeof turnosSeSuperponen==='function'&&turnosSeSuperponen(mE1,mS1,mE2,mS2,gE1,gS1,gE2,gS2))compN++;
-    });
-  }
-  if(el('op-comp-num'))el('op-comp-num').textContent=compN>0?compN:'—';
-  if(el('op-comp-sub'))el('op-comp-sub').textContent=compN>0?'Coincidencias en tu turno':Object.keys(gmap).length>0?'0 coincidencias':'Sin grupo importado';
-
-  // ─ Vuelos ─
-  if(typeof liveData==='undefined')return;
-  var allLle=liveData.lle||[],allSal=liveData.sal||[];
-  var lleH=allLle.filter(function(v){return !v.esManana;}),salH=allSal.filter(function(v){return !v.esManana;});
-  var lleT=allLle.filter(function(v){return !!v.esManana;}),salT=allSal.filter(function(v){return !!v.esManana;});
-  var todayStr=now.toDateString(),totH=lleH.length+salH.length,cacH=0;
-  try{var cv=localStorage.getItem('op_vt');if(cv){var cp=JSON.parse(cv);if(cp.d===todayStr)cacH=cp.t;}}catch(e){}
-  if(totH>0){try{localStorage.setItem('op_vt',JSON.stringify({d:todayStr,t:totH}));}catch(e){}cacH=totH;}
-  if(el('op-v-total'))el('op-v-total').textContent=cacH>0?cacH:'—';
-  var totT=lleT.length+salT.length;
-  if(el('op-v-total-tom'))el('op-v-total-tom').textContent=totT>0?totT:'—';
-  function cntSh(fls,e1p,s1p,e2p,s2p){var n=0;fls.forEach(function(v){var t=typeof hToMin==='function'?hToMin(v.horaReal||v.horaProg||''):null;if(t===null)return;if(e1p!==null&&s1p!==null&&t>=e1p&&t<=s1p)n++;else if(e2p!==null&&s2p!==null&&t>=e2p&&t<=s2p)n++;});return n;}
-  var iH=e1!==null?cntSh(lleH.concat(salH),e1,s1,e2,s2):0;
-  if(el('op-v-turno'))el('op-v-turno').textContent=String(iH);
-  var tom3=new Date(now);tom3.setDate(tom3.getDate()+1);
-  var dT3=(ue[MESES[tom3.getMonth()]]||{})[tom3.getDate()]||null;
-  var tE1=dT3&&dT3.e1?toM(dT3.e1):null,tS1=dT3&&dT3.s1?toM(dT3.s1):null;
-  var tE2=dT3&&dT3.e2?toM(dT3.e2):null,tS2=dT3&&dT3.s2?toM(dT3.s2):null;
-  var iT=tE1!==null&&totT>0?cntSh(lleT.concat(salT),tE1,tS1,tE2,tS2):0;
-  if(el('op-v-turno-tom'))el('op-v-turno-tom').textContent=totT>0?String(iT):'—';
-
-  setInterval(opRender,60000);
-}
-</script>
 </body>
 </html>
