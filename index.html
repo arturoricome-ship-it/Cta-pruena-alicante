@@ -3538,22 +3538,25 @@ function renderCompanerosDia(offsetDias,toggleIfOpen){
   }
 
   // Sort by start time
+  var _nowMin=(function(){var n=new Date();return n.getHours()*60+n.getMinutes();})();
   if(window._sortBySalida){
-    // Sort by next exit time: first by S1, then S2 if S1 already passed
-    var _nowMin=(function(){var n=new Date();return n.getHours()*60+n.getMinutes();})();
-    coinciden.sort(function(a,b){
-      function nextExit(c){
-        var s1=c.s1,s2=c.s2||null;
-        // Pick the next exit that hasn't passed yet
-        if(s1!==null&&s1>_nowMin)return s1;
-        if(s2!==null&&s2>_nowMin)return s2;
-        if(s1!==null)return s1+1440; // passed today, tomorrow
-        return 9999;
-      }
-      return nextExit(a)-nextExit(b);
+    function nextExit(c){
+      var s1=c.s1,s2=c.s2||null;
+      if(s1!==null&&s1>_nowMin)return s1;
+      if(s2!==null&&s2>_nowMin)return s2;
+      return null; // already left
+    }
+    var activos=coinciden.filter(function(c){return nextExit(c)!==null;});
+    var yaSalieron=coinciden.filter(function(c){return nextExit(c)===null;});
+    activos.sort(function(a,b){return nextExit(a)-nextExit(b);});
+    yaSalieron.sort(function(a,b){
+      var sa=a.s2||a.s1||0,sb=b.s2||b.s1||0;return sb-sa; // most recent exit first
     });
+    coinciden=activos; // activos first in main array
+    window._yaSalieron=yaSalieron;
   } else {
     coinciden.sort(function(a,b){return a.e1-b.e1;});
+    window._yaSalieron=[];
   }
 
   var myHorario=myDay.e1+'→'+myDay.s1+(myDay.e2?' / '+myDay.e2+'→'+myDay.s2:'');
@@ -3581,6 +3584,18 @@ function renderCompanerosDia(offsetDias,toggleIfOpen){
         '<div class="grupo-horario" style="'+_nameColor+'">'+_hor+'</div></div>';
     });
   });
+  // Add "Ya salieron" section if any
+  if(window._sortBySalida&&window._yaSalieron&&window._yaSalieron.length>0){
+    html+='<div style="font-size:9px;color:var(--gray);letter-spacing:.6px;text-transform:uppercase;padding:8px 0 4px;border-top:1px solid rgba(255,255,255,.08);margin-top:4px;opacity:.7">✓ Ya salieron · '+window._yaSalieron.length+'</div>';
+    window._yaSalieron.forEach(function(c){
+      var _dot=c.overnight?'#fb923c':'#8a93a8';
+      var _hor=buildHorarioHtml(c);
+      html+='<div class="grupo-item" style="opacity:.45">'+
+        '<div class="grupo-solapamiento" style="background:'+_dot+'"></div>'+
+        '<div class="grupo-nombre">'+c.nombre+'</div>'+
+        '<div class="grupo-horario">'+_hor+'</div></div>';
+    });
+  }
   panel.innerHTML=html+'<div style="height:16px"></div>';
   panel.classList.add('open');
   setTimeout(checkExitBlinks,100);
