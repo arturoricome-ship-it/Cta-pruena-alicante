@@ -3774,23 +3774,33 @@ window.renderOperativa=function(){
     if(g("op-tc-bar"))g("op-tc-bar").style.width=pct3+"%";
   } else if(isDone){
     card.classList.add("state-rest");
-    var nxtMin=null,nxtStr="";
+    var nxtMin=null,nxtStr="",nxtDays=0;
     var ANXT=["trabajado","hl","hlp","h6","festivo","baja","rm","curso"];
-    for(var dd2=1;dd2<=14;dd2++){
+    for(var dd2=1;dd2<=30;dd2++){
       var nD=new Date(now.getFullYear(),now.getMonth(),now.getDate()+dd2);
       var nMd=(ue[MESES[nD.getMonth()]]||{})[nD.getDate()];
-      if(nMd&&nMd.e1&&nMd.tipo&&ANXT.indexOf(nMd.tipo)>=0){nxtMin=toM(nMd.e1);nxtStr=nMd.e1;break;}
+      if(nMd&&nMd.e1&&nMd.tipo&&ANXT.indexOf(nMd.tipo)>=0){nxtMin=toM(nMd.e1);nxtStr=nMd.e1;nxtDays=dd2;break;}
     }
-    var restM=nxtMin!==null?(nxtMin-nowMin+1440*14)%1440:null;
-    var cnt=restM!==null?fmtT(restM):"";
+    // Calculate total minutes remaining (including full days)
+    var restM=nxtMin!==null?(nxtDays*1440+nxtMin-nowMin):null;
+    function fmtRest(m){
+      if(m===null||m<0)return "💤";
+      var d=Math.floor(m/1440),h=Math.floor((m%1440)/60),mn=m%60;
+      if(d>0)return d+"d "+h+"h"+(mn?" "+mn+"m":"");
+      if(h>0)return h+"h"+(mn?" "+mn+"m":"");
+      return mn+"m";
+    }
+    var cnt=fmtRest(restM);
+    if(g("op-tc-lbl"))g("op-tc-lbl").textContent="Descanso";
     if(g("op-tc-times"))g("op-tc-times").innerHTML="<span>"+(cnt||"💤")+"</span>";
     if(g("op-tc-sub"))g("op-tc-sub").textContent=nxtStr?"Próximo turno "+nxtStr:"";
     if(g("op-tc-pct"))g("op-tc-pct").textContent="";
     if(g("op-tc-rem"))g("op-tc-rem").textContent="";
     if(g("op-tc-bar"))g("op-tc-bar").style.width="100%";
-    if(g("op-tc-lbl"))g("op-tc-lbl").textContent="Descanso";
+  } else if(notYet){
+    card.classList.add("state-next");
     if(g("op-tc-times"))g("op-tc-times").innerHTML=th;
-    if(g("op-tc-sub"))g("op-tc-sub").textContent="Proximo turno";
+    if(g("op-tc-sub"))g("op-tc-sub").textContent="Próximo turno";
     if(g("op-tc-pct"))g("op-tc-pct").textContent="0%";
     if(g("op-tc-rem"))g("op-tc-rem").textContent="Empieza en "+fmtT(e1-nowMin);
     if(g("op-tc-bar"))g("op-tc-bar").style.width="0%";
