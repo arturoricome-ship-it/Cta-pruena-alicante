@@ -584,17 +584,26 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
       </div>
     </div>
     <p class="op-sec">Compañeros</p>
-    <div class="op-comp-card" style="flex-direction:column;gap:0;padding:12px 14px" onclick="if(typeof verCompanerosHoy==='function'){var p=document.getElementById('calc-panel');var o=document.getElementById('calc-overlay');if(p){p.classList.add('show');if(o)o.classList.add('show');setTimeout(function(){verCompanerosHoy();},80);}}">
-      <!-- Top row: title + VER -->
-      <div style="display:flex;align-items:center;justify-content:space-between;width:100%;margin-bottom:10px">
-        <div style="font-size:12px;font-weight:700">👥 Plantilla de hoy</div>
-        <div style="background:rgba(96,165,250,.12);border:1px solid rgba(96,165,250,.25);border-radius:8px;color:#60a5fa;font-size:10px;font-weight:800;padding:4px 12px;letter-spacing:.5px">VER</div>
+    <!-- RESUMEN OPERATIVO -->
+    <div class="op-comp-card" style="flex-direction:column;gap:0;padding:0;cursor:default">
+      <!-- Header -->
+      <div style="padding:12px 14px 10px;display:flex;align-items:center;justify-content:space-between">
+        <div style="font-size:12px;font-weight:700">📊 Resumen operativo del día</div>
+        <div id="op-ver-btn" style="background:rgba(96,165,250,.12);border:1px solid rgba(96,165,250,.25);border-radius:8px;color:#60a5fa;font-size:10px;font-weight:800;padding:4px 12px;letter-spacing:.5px;cursor:pointer" onclick="if(typeof verCompanerosHoy==='function'){var p=document.getElementById('calc-panel');var o=document.getElementById('calc-overlay');if(p){p.classList.add('show');if(o)o.classList.add('show');setTimeout(function(){verCompanerosHoy();},80);}}">VER</div>
       </div>
-      <!-- Center: big red number + label -->
-      <div style="display:flex;flex-direction:column;align-items:center;width:100%">
-        <div class="op-comp-num" id="op-comp-num">—</div>
-        <div id="op-comp-sub" style="font-size:9px;color:var(--gray);margin-top:2px;text-align:center">coincidencias</div>
+      <!-- Sub-tabs -->
+      <div style="display:flex;gap:0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+        <button id="op-tab-dist" onclick="opResTab('dist')" style="flex:1;background:rgba(200,168,75,.12);border:none;border-right:1px solid var(--border);color:var(--gold);font-family:'Outfit',sans-serif;font-size:9px;font-weight:700;padding:7px 4px;cursor:pointer;letter-spacing:.3px">Distribución</button>
+        <button id="op-tab-pico" onclick="opResTab('pico')" style="flex:1;background:none;border:none;border-right:1px solid var(--border);color:var(--gray);font-family:'Outfit',sans-serif;font-size:9px;font-weight:700;padding:7px 4px;cursor:pointer;letter-spacing:.3px">Picos</button>
+        <button id="op-tab-now" onclick="opResTab('now')" style="flex:1;background:none;border:none;color:var(--gray);font-family:'Outfit',sans-serif;font-size:9px;font-weight:700;padding:7px 4px;cursor:pointer;letter-spacing:.3px">Ahora</button>
       </div>
+      <!-- Content panels -->
+      <div id="op-res-dist" style="padding:12px 14px">
+        <div id="op-comp-num" style="display:none"></div><div id="op-comp-sub" style="display:none"></div>
+        <div style="font-size:11px;color:var(--gray)">Cargando...</div>
+      </div>
+      <div id="op-res-pico" style="display:none;padding:12px 14px"></div>
+      <div id="op-res-now" style="display:none;padding:12px 14px"></div>
     </div>
     <p class="op-sec">Turnos publicados</p>
     <div class="op-pub-card">
@@ -3641,6 +3650,16 @@ function filtrarEnTurno(){
   renderCompanerosDia(window._grupoOffsetDias);
 }
 
+
+function opResTab(tab){
+  ['dist','pico','now'].forEach(function(t){
+    var btn=document.getElementById('op-tab-'+t);
+    var panel=document.getElementById('op-res-'+t);
+    var active=(t===tab);
+    if(btn){btn.style.background=active?'rgba(200,168,75,.12)':'none';btn.style.color=active?'var(--gold)':'var(--gray)';}
+    if(panel)panel.style.display=active?'block':'none';
+  });
+}
 function toggleSortSalida(){
   window._sortBySalida=!window._sortBySalida;
   var btn=document.getElementById('btn-sort-salida');
@@ -3868,22 +3887,84 @@ window.renderOperativa=function(){
     if(g("op-tc-bar"))g("op-tc-bar").style.width="0%";
   }
 
-  // Companions
+  // ─ Resumen Operativo ─────────────────────────────────────
   var gmap={};try{gmap=JSON.parse(localStorage.getItem("cta_grupo_2026_map")||"{}");}catch(e){}
-  var compN=0;
-  if(Object.keys(gmap).length>0&&d&&d.e1){
-    var mE1=toM(d.e1),mS1=toM(d.s1),mE2=d.e2?toM(d.e2):null,mS2=d.s2?toM(d.s2):null;
-    Object.keys(gmap).forEach(function(nom){
-      var emp=gmap[nom],dias=(emp.meses&&emp.meses[mK])||null;
-      if(!dias)return;
-      var t=dias[now.getDate()];if(!t||!t.e1)return;
-      var gE1=toM(t.e1),gS1=toM(t.s1),gE2=t.e2?toM(t.e2):null,gS2=t.s2?toM(t.s2):null;
-      var excl=!!(t.noVieneInterrogacion||t.disponibilidadNoConfirmada);
-      if(!excl&&typeof turnosSeSuperponen==="function"&&turnosSeSuperponen(mE1,mS1,mE2,mS2,gE1,gS1,gE2,gS2))compN++;
-    });
+  var todayNum=now.getDate();
+  var trabajanHoy=[],compN=0;
+  var mE1o=d&&d.e1?toM(d.e1):null,mS1o=d&&d.s1?toM(d.s1):null;
+  var mE2o=d&&d.e2?toM(d.e2):null,mS2o=d&&d.s2?toM(d.s2):null;
+  Object.keys(gmap).forEach(function(nom){
+    var emp=gmap[nom],dias=(emp.meses&&emp.meses[mK])||null;
+    if(!dias)return;
+    var t=dias[todayNum];if(!t||!t.e1)return;
+    var excl=!!(t.noVieneInterrogacion||t.disponibilidadNoConfirmada);if(excl)return;
+    var gE1=toM(t.e1),gS1=toM(t.s1),gE2=t.e2?toM(t.e2):null,gS2=t.s2?toM(t.s2):null;
+    trabajanHoy.push({nombre:nom,e1:gE1,s1:gS1,e2:gE2,s2:gS2});
+    if(mE1o!==null&&typeof turnosSeSuperponen==="function"&&turnosSeSuperponen(mE1o,mS1o,mE2o,mS2o,gE1,gS1,gE2,gS2))compN++;
+  });
+
+  function isWorkingAt(emp,min){
+    function inT(e,s,m){if(e===null||s===null)return false;if(s<e)return m>=e||m<s;return m>=e&&m<s;}
+    return inT(emp.e1,emp.s1,min)||inT(emp.e2,emp.s2,min);
   }
-  if(g("op-comp-num"))g("op-comp-num").textContent=compN>0?compN:"—";
-  if(g("op-comp-sub"))g("op-comp-sub").textContent=compN>0?"Coincidencias en tu turno":Object.keys(gmap).length>0?"0 coincidencias hoy":"Sin datos del grupo importados";
+  var total=trabajanHoy.length;
+  var manana=trabajanHoy.filter(function(e){return e.e1>=240&&e.e1<900;}).length;
+  var tarde=trabajanHoy.filter(function(e){return e.e1>=900||e.e1<240;}).length;
+
+  // Distribución tab
+  var dEl=g("op-res-dist");
+  if(dEl)dEl.innerHTML='<div style="font-size:13px;font-weight:700;color:var(--white);margin-bottom:8px">Hoy trabajan <span style="color:var(--gold)">'+total+'</span> compañeros</div>'
+    +'<div style="display:flex;flex-direction:column;gap:4px">'
+    +'<div style="display:flex;justify-content:space-between;padding:5px 8px;background:rgba(255,255,255,.04);border-radius:8px"><span style="font-size:10px;color:var(--gray)">☀️ Turno mañana (04:00-14:59)</span><span style="font-size:12px;font-weight:700;color:var(--gold)">'+manana+'</span></div>'
+    +'<div style="display:flex;justify-content:space-between;padding:5px 8px;background:rgba(255,255,255,.04);border-radius:8px"><span style="font-size:10px;color:var(--gray)">🌙 Turno tarde/noche (15:00+)</span><span style="font-size:12px;font-weight:700;color:var(--gold)">'+tarde+'</span></div>'
+    +'<div style="display:flex;justify-content:space-between;padding:5px 8px;background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.15);border-radius:8px"><span style="font-size:10px;color:var(--gray)">🔴 Coinciden contigo</span><span style="font-size:12px;font-weight:700;color:#f87171">'+compN+'</span></div>'
+    +'</div>';
+
+  // Picos tab
+  var maxW=0,minW=999,maxSlot=0,minSlot=0;
+  for(var hh=0;hh<48;hh++){
+    var cnt30=trabajanHoy.filter(function(e){return isWorkingAt(e,hh*30);}).length;
+    if(cnt30>maxW){maxW=cnt30;maxSlot=hh;}
+    if(cnt30<minW&&cnt30>0){minW=cnt30;minSlot=hh;}
+  }
+  function slotS(i){var h=Math.floor(i/2),m=i%2===0?'00':'30';return (h<10?'0':'')+h+':'+m;}
+  var pEl=g("op-res-pico");
+  if(pEl)pEl.innerHTML='<div style="display:flex;flex-direction:column;gap:8px">'
+    +'<div style="background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.2);border-radius:10px;padding:10px 12px">'
+    +'<div style="font-size:9px;color:#4ade80;font-weight:700;letter-spacing:.5px;text-transform:uppercase;margin-bottom:4px">↑ Pico de plantilla</div>'
+    +'<div style="font-size:10px;color:var(--gray)">Mayor concentración de personal</div>'
+    +'<div style="font-size:13px;font-weight:700;color:var(--white);margin:3px 0">'+slotS(maxSlot)+' – '+slotS(maxSlot+2)+'</div>'
+    +'<div style="font-size:12px;font-weight:700;color:#4ade80">'+maxW+' compañeros a la vez</div></div>'
+    +'<div style="background:rgba(251,191,36,.05);border:1px solid rgba(251,191,36,.15);border-radius:10px;padding:10px 12px">'
+    +'<div style="font-size:9px;color:#fbbf24;font-weight:700;letter-spacing:.5px;text-transform:uppercase;margin-bottom:4px">↓ Franja más floja</div>'
+    +'<div style="font-size:10px;color:var(--gray)">Franja con menos personal</div>'
+    +'<div style="font-size:13px;font-weight:700;color:var(--white);margin:3px 0">'+slotS(minSlot)+' – '+slotS(minSlot+2)+'</div>'
+    +'<div style="font-size:12px;font-weight:700;color:#fbbf24">'+(minW===999?0:minW)+' compañeros disponibles</div></div></div>';
+
+  // Ahora tab
+  var wNow=trabajanHoy.filter(function(e){return isWorkingAt(e,nowMin);}).length;
+  var eNow=trabajanHoy.filter(function(e){
+    var d1=e.e1-nowMin,d2=e.e2!==null?e.e2-nowMin:9999;
+    return (d1>0&&d1<=120)||(d2>0&&d2<=120);
+  }).length;
+  var sNow=trabajanHoy.filter(function(e){
+    function nextS(em){
+      var ov=em.s1!==null&&em.e1!==null&&em.s1<em.e1;
+      var es=ov?em.s1+1440:em.s1;
+      if(es!==null){var dd=es-nowMin;if(dd>0&&dd<=60)return true;}
+      if(em.s2!==null){var dd2=em.s2-nowMin;if(dd2>0&&dd2<=60)return true;}
+      return false;
+    }
+    return nextS(e);
+  }).length;
+  var nEl=g("op-res-now");
+  if(nEl)nEl.innerHTML='<div style="font-size:12px;font-weight:700;color:var(--white);margin-bottom:8px">Compañeros disponibles ahora</div>'
+    +'<div style="display:flex;flex-direction:column;gap:5px">'
+    +'<div style="display:flex;justify-content:space-between;padding:7px 10px;background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.2);border-radius:10px"><span style="font-size:10px;color:var(--gray)">✈️ Trabajando ahora mismo</span><span style="font-size:14px;font-weight:800;color:#60a5fa">'+wNow+'</span></div>'
+    +'<div style="display:flex;justify-content:space-between;padding:7px 10px;background:rgba(34,197,94,.05);border:1px solid rgba(34,197,94,.15);border-radius:10px"><span style="font-size:10px;color:var(--gray)">▶ Entran en las próximas 2h</span><span style="font-size:14px;font-weight:800;color:#4ade80">'+eNow+'</span></div>'
+    +'<div style="display:flex;justify-content:space-between;padding:7px 10px;background:rgba(239,68,68,.05);border:1px solid rgba(239,68,68,.15);border-radius:10px"><span style="font-size:10px;color:var(--gray)">■ Salen en la próxima hora</span><span style="font-size:14px;font-weight:800;color:#f87171">'+sNow+'</span></div>'
+    +'</div>';
+
 
   // Flights
   if(typeof liveData==="undefined")return;
