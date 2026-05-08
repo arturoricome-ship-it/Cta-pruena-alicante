@@ -1661,6 +1661,7 @@ document.getElementById("btn-live").addEventListener("click",function(){
   document.getElementById("live-overlay").classList.add("show");
   document.getElementById("live-panel").classList.add("show");
   if(!liveLoaded)loadLive();
+  if(typeof logActividad==="function")logActividad("ver_vuelos");
 });
 document.getElementById("live-overlay").addEventListener("click",function(){
   document.getElementById("live-overlay").classList.remove("show");
@@ -3425,6 +3426,7 @@ function navToFolderByName(searchTerm){
 function verCompanerosHoy(){
   window._grupoOffsetDias=0;
   if(typeof window._grupoMostrarTodaPlantilla!=='boolean')window._grupoMostrarTodaPlantilla=false;
+  if(typeof logActividad==='function')logActividad('ver_companeros');
   // Always render, never toggle — reset open state first
   var gp=document.getElementById('grupo-panel');
   if(gp)gp.classList.remove('open');
