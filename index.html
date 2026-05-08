@@ -3425,7 +3425,10 @@ function navToFolderByName(searchTerm){
 function verCompanerosHoy(){
   window._grupoOffsetDias=0;
   if(typeof window._grupoMostrarTodaPlantilla!=='boolean')window._grupoMostrarTodaPlantilla=false;
-  return renderCompanerosDia(window._grupoOffsetDias,true);
+  // Always render, never toggle — reset open state first
+  var gp=document.getElementById('grupo-panel');
+  if(gp)gp.classList.remove('open');
+  return renderCompanerosDia(window._grupoOffsetDias,false);
 }
 
 function moverCompanerosDia(delta){
