@@ -2580,21 +2580,7 @@ function exportarICS(){
   lines.push('PRODID:-//CTA Alicante//Turnos//ES');
   lines.push('CALSCALE:GREGORIAN');
   lines.push('X-WR-TIMEZONE:Europe/Madrid');
-  lines.push('BEGIN:VTIMEZONE');
-  lines.push('TZID:Europe/Madrid');
-  lines.push('BEGIN:STANDARD');
-  lines.push('DTSTART:19701025T030000');
-  lines.push('TZOFFSETFROM:+0200');
-  lines.push('TZOFFSETTO:+0100');
-  lines.push('TZNAME:CET');
-  lines.push('END:STANDARD');
-  lines.push('BEGIN:DAYLIGHT');
-  lines.push('DTSTART:19700329T020000');
-  lines.push('TZOFFSETFROM:+0100');
-  lines.push('TZOFFSETTO:+0200');
-  lines.push('TZNAME:CEST');
-  lines.push('END:DAYLIGHT');
-  lines.push('END:VTIMEZONE');
+  // UTC times used — no VTIMEZONE needed
 
   var eventCount=0;
 
@@ -2614,19 +2600,29 @@ function exportarICS(){
       var titulo=d.e1+' a '+d.s1;
       if(d.e2&&d.s2)titulo+=', '+d.e2+' a '+d.s2;
 
-      // DTSTART
-      var dtStart=dtStr(year,mIdx,day,e1.h,e1.m);
-
-      // DTEND — handle overnight (end time < start time)
-      var endDay=day;
-      var endM=mIdx;
-      var endY=year;
-      if(endTime.h<e1.h||(endTime.h===e1.h&&endTime.m<e1.m)){
-        // Overnight — end is next day
-        var nextDate=new Date(year,mIdx,day+1);
-        endY=nextDate.getFullYear();endM=nextDate.getMonth();endDay=nextDate.getDate();
+      // Convert local time to UTC
+      // Use Date object to handle DST automatically
+      function toUTC(y,m,d,h,mn){
+        var localDt=new Date(y,m,d,h,mn,0);
+        var utc=new Date(localDt.getTime()-localDt.getTimezoneOffset()*60000);
+        // Use actual offset from a Madrid-like Date
+        // Simpler: create date and use getTimezoneOffset
+        // Since we're running in user's browser, use Date directly
+        var dt=new Date(y,m,d,h,mn,0);
+        var uo=dt.getTimezoneOffset(); // in minutes, negative for UTC+
+        var utcMs=dt.getTime()+uo*60000;
+        var ud=new Date(utcMs);
+        return dtStr(ud.getFullYear(),ud.getMonth(),ud.getDate(),ud.getHours(),ud.getMinutes());
       }
-      var dtEnd=dtStr(endY,endM,endDay,endTime.h,endTime.m);
+      var dtStart=toUTC(year,mIdx,day,e1.h,e1.m);
+      // DTEND — handle overnight
+      var endDate=new Date(year,mIdx,day,endTime.h,endTime.m,0);
+      if(endTime.h<e1.h||(endTime.h===e1.h&&endTime.m<e1.m)){
+        endDate=new Date(year,mIdx,day+1,endTime.h,endTime.m,0);
+      }
+      var uo2=endDate.getTimezoneOffset();
+      var utcEnd=new Date(endDate.getTime()+uo2*60000);
+      var dtEnd=dtStr(utcEnd.getFullYear(),utcEnd.getMonth(),utcEnd.getDate(),utcEnd.getHours(),utcEnd.getMinutes());
 
       // UID único
       var uid='turno-'+year+'-'+MESES_NUM[mIdx]+'-'+pad(day)+'@cta-alicante.es';
@@ -2637,8 +2633,8 @@ function exportarICS(){
       lines.push('BEGIN:VEVENT');
       lines.push('UID:'+uid);
       lines.push('DTSTAMP:'+stamp+'Z');
-      lines.push('DTSTART;TZID=Europe/Madrid:'+dtStart);
-      lines.push('DTEND;TZID=Europe/Madrid:'+dtEnd);
+      lines.push('DTSTART:'+dtStart+'Z');
+      lines.push('DTEND:'+dtEnd+'Z');
       lines.push('SUMMARY:'+titulo);
       lines.push('DESCRIPTION:');
       lines.push('LOCATION:');
@@ -2646,7 +2642,7 @@ function exportarICS(){
       lines.push('COLOR:red');
       lines.push('X-APPLE-CALENDAR-COLOR:#FF2968');
       lines.push('BEGIN:VALARM');
-      lines.push('TRIGGER:-PT70M');
+      lines.push('TRIGGER:-PT1H10M');
       lines.push('ACTION:DISPLAY');
       lines.push('DESCRIPTION:Tu turno empieza en 1h 10min');
       lines.push('END:VALARM');
