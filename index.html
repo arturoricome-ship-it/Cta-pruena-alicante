@@ -1716,7 +1716,7 @@ document.getElementById("btn-logout").addEventListener("click",function(){
     <button class="calc-small-btn" id="btn-import-grupo" onclick="importarGrupo()">📥 Importar</button>
     <button class="calc-small-btn" id="btn-mismo-turno" onclick="filtrarMismoTurno()">🎯 Mismo turno</button>
     <button class="calc-small-btn" id="btn-en-turno" onclick="filtrarEnTurno()">⚡ En turno</button>
-    <button id="btn-hide-tachados" onclick="toggleHideTachados()" title="Ocultar/mostrar no disponibles" style="background:rgba(200,168,75,.12);border:1px solid rgba(200,168,75,.3);border-radius:8px;padding:5px 9px;cursor:pointer;font-size:13px;line-height:1">👁</button>
+    <button id="btn-sort-salida" onclick="toggleSortSalida()" title="Ordenar por próxima salida" style="background:rgba(200,168,75,.12);border:1px solid rgba(200,168,75,.3);border-radius:8px;padding:5px 9px;cursor:pointer;font-size:13px;line-height:1">⇅</button>
     <input type="file" id="grupo-file-input" accept=".xlsx" style="display:none" onchange="procesarGrupoXlsx(this.files[0])">
   </div>
   <div id="grupo-panel"></div>
@@ -3508,7 +3508,7 @@ function renderCompanerosDia(offsetDias,toggleIfOpen){
         var opAhora=esDiaActual&&(enT1||enT2)&&!turno.disponibilidadNoConfirmada&&!turno.noVieneInterrogacion;
         // Mark as future-overnight if shift starts tonight but hasn't begun yet
         var _futOvn=(grS1!==null&&grE1!==null&&grS1<grE1&&nowMinReal<grE1);
-        coinciden.push({nombre:emp.nombre,horario:horario,e1:grE1,s1:grS1,categoria:emp.categoria||'General',disponibilidadNoConfirmada:!!turno.disponibilidadNoConfirmada,noVieneInterrogacion:!!turno.noVieneInterrogacion,operativoAhora:opAhora,overnight:false,futuraNoche:_futOvn});
+        coinciden.push({nombre:emp.nombre,horario:horario,e1:grE1,s1:grS1,s2:turno.s2?hToMin(turno.s2):null,categoria:emp.categoria||'General',disponibilidadNoConfirmada:!!turno.disponibilidadNoConfirmada,noVieneInterrogacion:!!turno.noVieneInterrogacion,operativoAhora:opAhora,overnight:false,futuraNoche:_futOvn});
       }
     }
     // Yesterday's overnight shift crossing into today
@@ -3538,18 +3538,38 @@ function renderCompanerosDia(offsetDias,toggleIfOpen){
   }
 
   // Sort by start time
-  coinciden.sort(function(a,b){return a.e1-b.e1;});
+  if(window._sortBySalida){
+    // Sort by next exit time: first by S1, then S2 if S1 already passed
+    var _nowMin=(function(){var n=new Date();return n.getHours()*60+n.getMinutes();})();
+    coinciden.sort(function(a,b){
+      function nextExit(c){
+        var s1=c.s1,s2=c.s2||null;
+        // Pick the next exit that hasn't passed yet
+        if(s1!==null&&s1>_nowMin)return s1;
+        if(s2!==null&&s2>_nowMin)return s2;
+        if(s1!==null)return s1+1440; // passed today, tomorrow
+        return 9999;
+      }
+      return nextExit(a)-nextExit(b);
+    });
+  } else {
+    coinciden.sort(function(a,b){return a.e1-b.e1;});
+  }
 
   var myHorario=myDay.e1+'→'+myDay.s1+(myDay.e2?' / '+myDay.e2+'→'+myDay.s2:'');
   // Group by category
   var cats={};
-  coinciden.forEach(function(c){var cat=c.categoria||'General';if(!cats[cat])cats[cat]=[];cats[cat].push(c);});
+  if(window._sortBySalida){
+    cats['_all']=coinciden; // no category grouping when sorted by exit
+  } else {
+    coinciden.forEach(function(c){var cat=c.categoria||'General';if(!cats[cat])cats[cat]=[];cats[cat].push(c);});
+  }
   var html='<div class="grupo-header-sticky">'+navHtml;
   html+='<div class="grupo-title">👥 '+(modoToda?'Toda la plantilla':'Coincidencias')+' · '+coinciden.length+'</div>';
   html+='<div class="grupo-item" style="opacity:.6"><div class="grupo-solapamiento" style="background:var(--gold)"></div><div class="grupo-nombre" style="color:var(--gold);font-size:12px">Tú</div><div class="grupo-horario" style="color:var(--gold)">'+myHorario+'</div></div>';
   html+='</div>';
   Object.keys(cats).sort().forEach(function(cat){
-    html+='<div style="font-size:9px;color:var(--gray);letter-spacing:.6px;text-transform:uppercase;padding:6px 0 2px;border-top:1px solid rgba(255,255,255,.05);margin-top:2px">'+cat+'</div>';
+    if(cat!=='_all')html+='<div style="font-size:9px;color:var(--gray);letter-spacing:.6px;text-transform:uppercase;padding:6px 0 2px;border-top:1px solid rgba(255,255,255,.05);margin-top:2px">'+cat+'</div>';
     cats[cat].forEach(function(c){
       var _dot=c.overnight?'#fb923c':'#60a5fa';
       var _nameExtra=c.overnight?' 🌙':'';
@@ -3581,7 +3601,8 @@ function renderCompanerosDia(offsetDias,toggleIfOpen){
 
 var _enTurnoMode=false;
 var _hideTachados=false;
-window._showExcl=false; // exclamation mark companions hidden by default
+window._showExcl=false;
+window._sortBySalida=false;
 
 function filtrarEnTurno(){
   _enTurnoMode=!_enTurnoMode;
@@ -3591,10 +3612,10 @@ function filtrarEnTurno(){
   renderCompanerosDia(window._grupoOffsetDias);
 }
 
-function toggleHideTachados(){
-  window._showExcl=!window._showExcl;
-  var btn=document.getElementById('btn-hide-tachados');
-  if(btn){btn.style.opacity=window._showExcl?'1':'0.5';btn.title=window._showExcl?'Ocultar no disponibles':'Mostrar no disponibles';}
+function toggleSortSalida(){
+  window._sortBySalida=!window._sortBySalida;
+  var btn=document.getElementById('btn-sort-salida');
+  if(btn){btn.style.background=window._sortBySalida?'rgba(200,168,75,.3)':'rgba(200,168,75,.12)';btn.style.color=window._sortBySalida?'var(--gold)':'inherit';}
   renderCompanerosDia(window._grupoOffsetDias||0);
 }
 var _mismoTurnoMode=false;
