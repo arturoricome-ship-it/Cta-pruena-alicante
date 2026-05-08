@@ -24,7 +24,7 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 .header-portal{font-size:10px;color:var(--gray);letter-spacing:.5px}
 #btn-logout{position:fixed;top:10px;right:10px;z-index:200;background:rgba(13,22,35,.85);border:1px solid var(--border);border-radius:8px;color:var(--gray);font-size:10px;font-weight:600;padding:5px 8px;cursor:pointer;font-family:"Outfit",sans-serif;transition:all .2s;backdrop-filter:blur(8px)}
 #btn-logout:hover{background:rgba(230,80,70,.2);border-color:rgba(230,80,70,.5);color:#f07070}
-#nav-bar{display:flex;align-items:center;gap:8px;padding:6px 0 8px}
+#nav-bar{display:flex;align-items:center;gap:8px;padding:6px 14px 8px}
 #btn-back{height:32px;padding:0 12px 0 8px;border-radius:10px;border:1px solid rgba(200,168,75,.35);background:linear-gradient(135deg,rgba(200,168,75,.18),rgba(200,168,75,.08));color:var(--gold);font-size:16px;display:flex;align-items:center;gap:5px;cursor:pointer;flex-shrink:0;transition:all .2s;font-family:"Outfit",sans-serif;font-weight:700;letter-spacing:.3px}
 #btn-back::after{content:"Atrás";font-size:11px;font-weight:700;color:var(--gold)}
 #btn-back:hover{background:linear-gradient(135deg,rgba(200,168,75,.32),rgba(200,168,75,.15));border-color:var(--gold);box-shadow:0 2px 10px rgba(200,168,75,.25)}
@@ -508,6 +508,7 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
       switchTab('operativa',document.getElementById('tab-operativa'),document.getElementById('nav-operativa'));document.getElementById('scroll-area').scrollTop=0;
     " title="Inicio" style="font-size:16px">🏠</button>
     <div id="breadcrumb" style="display:none"></div>
+    <div style="flex:1"></div>
     <button id="btn-accesos" onclick="toggleAccesoDirecto()">&#128279; Accesos Directos</button>
     <button id="btn-live" style="display:none"><span style="display:flex;align-items:center;gap:4px;font-size:10px;font-weight:700;letter-spacing:.5px"><span class="live-plane">✈</span> VUELOS</span><span id="btn-live-fecha" style="font-size:8px;color:rgba(240,112,112,.7);letter-spacing:.3px"></span></button>
   </div>
@@ -587,8 +588,8 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
     <div class="op-pub-card">
       <div style="padding:10px 14px 8px;text-align:center"><div style="font-size:12px;font-weight:700">📋 Turnos publicados empresa</div><div style="font-size:9px;color:var(--gray);margin-top:1px">FTP · FIJI · Elige tu colectivo</div></div>
       <div class="op-pub-row">
-        <button class="op-pub-btn" onclick="switchTab('turnos',document.querySelectorAll('.tab')[2],document.getElementById('nav-turnos'))"><span style="font-size:20px">✈️</span><div><span style="font-size:11px;font-weight:700;color:var(--white);display:block">Rampa</span><span style="font-size:8px;color:var(--gray);display:block;margin-top:1px">Operarios</span></div></button>
-        <button class="op-pub-btn" onclick="switchTab('turnos',document.querySelectorAll('.tab')[2],document.getElementById('nav-turnos'))"><span style="font-size:20px">🗂️</span><div><span style="font-size:11px;font-weight:700;color:var(--white);display:block">Administrativos</span><span style="font-size:8px;color:var(--gray);display:block;margin-top:1px">Admin.</span></div></button>
+        <button class="op-pub-btn" onclick="navToFolderByName('turnos rampa')"><span style="font-size:20px">✈️</span><div><span style="font-size:11px;font-weight:700;color:var(--white);display:block">Rampa</span><span style="font-size:8px;color:var(--gray);display:block;margin-top:1px">Operarios</span></div></button>
+        <button class="op-pub-btn" onclick="navToFolderByName('turnos admin')"><span style="font-size:20px">🗂️</span><div><span style="font-size:11px;font-weight:700;color:var(--white);display:block">Administrativos</span><span style="font-size:8px;color:var(--gray);display:block;margin-top:1px">Admin.</span></div></button>
       </div>
     </div>
   </div>
@@ -3351,6 +3352,41 @@ function turnosSeSuperponen(myE1,myS1,myE2,myS2,grE1,grS1,grE2,grS2){
   return false;
 }
 
+
+function navToFolderByName(searchTerm){
+  switchTab('documentos',null,document.getElementById('nav-documentos'));
+  setTimeout(function(){
+    // Search the index for the folder
+    var found=null;
+    for(var i=0;i<searchIndex.length;i++){
+      var item=searchIndex[i];
+      if(item.name&&item.name.toLowerCase().indexOf(searchTerm.toLowerCase())!==-1&&item.type==='folder'){
+        found=item;break;
+      }
+    }
+    if(found){
+      breadcrumb=[{id:ROOT_ID,name:'Inicio'},{id:found.id,name:found.name}];
+      renderBreadcrumb();
+      renderFolder(found.id);
+      document.getElementById('scroll-area').scrollTop=0;
+    } else {
+      // Build index first then retry
+      buildSearchIndex();
+      setTimeout(function(){
+        for(var i=0;i<searchIndex.length;i++){
+          var item=searchIndex[i];
+          if(item.name&&item.name.toLowerCase().indexOf(searchTerm.toLowerCase())!==-1&&item.type==='folder'){
+            breadcrumb=[{id:ROOT_ID,name:'Inicio'},{id:item.id,name:item.name}];
+            renderBreadcrumb();renderFolder(item.id);
+            document.getElementById('scroll-area').scrollTop=0;
+            return;
+          }
+        }
+        // Fallback: just open docs root
+      },2000);
+    }
+  },300);
+}
 function verCompanerosHoy(){
   window._grupoOffsetDias=0;
   if(typeof window._grupoMostrarTodaPlantilla!=='boolean')window._grupoMostrarTodaPlantilla=false;
@@ -3628,10 +3664,8 @@ window.renderOperativa=function(){
   var trab=0,lib=0,hMes=0,hCont=0;
   for(var di=1;di<=dim;di++){var dy=mD[di];if(!dy){lib++;continue;}if(ACTIVOS.indexOf(dy.tipo||"libre")>=0){trab++;hMes+=dy.total||0;}else lib++;}
   MESES.forEach(function(m){var md=ue[m]||{};Object.keys(md).forEach(function(d){var dx=md[d];if(CONT.indexOf(dx.tipo||"")>=0)hCont+=dx.total||0;});});
-  var PD={};try{var pr=localStorage.getItem("cta_pd_"+now.getFullYear());if(pr)PD=JSON.parse(pr);}catch(e){}
   var pMes=0;
-  Object.keys(PD).forEach(function(k){if(k.split(":")[0]===mK)pMes+=PD[k].gen||0;});
-  Object.keys(mD).forEach(function(dd){var dx=mD[dd];if(dx&&dx.perenDur&&dx.perenDur!=="0:00"&&!PD[mK+":"+dd]){try{var p=String(dx.perenDur).split(":");pMes+=(+p[0]||0)+(+p[1]||0)/60;}catch(e){}}});
+  Object.keys(mD).forEach(function(dd){var dx=mD[dd];if(dx&&dx.perenDur&&dx.perenDur!=="0:00"){try{var pdur=typeof _mcDuration==="function"?_mcDuration(String(dx.perenDur)):((+String(dx.perenDur).split(":")[0]||0)*60+(+String(dx.perenDur).split(":")[1]||0));if(dx.perenTipo==="cp")pMes-=pdur/60;else pMes+=pdur/60;}catch(e){}}});
   function fP(h){var hh=Math.floor(h),mm=Math.round((h-hh)*60);return hh+":"+(mm<10?"0":"")+mm;}
   if(g("op-cal-mes"))g("op-cal-mes").textContent=MESES_ES[now.getMonth()]+" "+now.getFullYear();
   if(g("op-cal-trab"))g("op-cal-trab").textContent=trab;
@@ -3728,7 +3762,8 @@ window.renderOperativa=function(){
       if(!dias)return;
       var t=dias[now.getDate()];if(!t||!t.e1)return;
       var gE1=toM(t.e1),gS1=toM(t.s1),gE2=t.e2?toM(t.e2):null,gS2=t.s2?toM(t.s2):null;
-      if(typeof turnosSeSuperponen==="function"&&turnosSeSuperponen(mE1,mS1,mE2,mS2,gE1,gS1,gE2,gS2))compN++;
+      var excl=!!(t.noVieneInterrogacion||t.disponibilidadNoConfirmada);
+      if(!excl&&typeof turnosSeSuperponen==="function"&&turnosSeSuperponen(mE1,mS1,mE2,mS2,gE1,gS1,gE2,gS2))compN++;
     });
   }
   if(g("op-comp-num"))g("op-comp-num").textContent=compN>0?compN:"—";
