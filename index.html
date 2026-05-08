@@ -507,24 +507,23 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
     <button id="btn-home" onclick="
       switchTab('operativa',document.getElementById('tab-operativa'),document.getElementById('nav-operativa'));document.getElementById('scroll-area').scrollTop=0;
     " title="Inicio" style="font-size:16px">🏠</button>
-    <div id="breadcrumb"></div>
+    <div id="breadcrumb" style="display:none"></div>
     <button id="btn-accesos" onclick="toggleAccesoDirecto()">&#128279; Accesos Directos</button>
     <button id="btn-live" style="display:none"><span style="display:flex;align-items:center;gap:4px;font-size:10px;font-weight:700;letter-spacing:.5px"><span class="live-plane">✈</span> VUELOS</span><span id="btn-live-fecha" style="font-size:8px;color:rgba(240,112,112,.7);letter-spacing:.3px"></span></button>
   </div>
 </div>
 
 <div id="tab-bar">
-  <div class="tab-wrap"><button class="tab" id="tab-operativa" onclick="switchTab('operativa',this)">⚡ Operativa</button></div>
-  <div class="tab-wrap"><button class="tab active" onclick="switchTab('documentos',this)">&#128194; Documentos</button></div>
+  <div class="tab-wrap"><button class="tab active" id="tab-operativa" onclick="switchTab('operativa',this)">⚡ Operativa</button></div>
+  <div class="tab-wrap"><button class="tab" onclick="switchTab('documentos',this)">&#128194; Documentos</button></div>
   <div class="tab-wrap"><button class="tab" onclick="switchTab('turnos',this)">📋 Publicados</button></div>
-  <div class="tab-wrap"><button class="tab" onclick="switchTab('avisos',this)">&#128226; Avisos</button><span class="badge" id="badge-avisos">!</span></div>
   <div class="tab-wrap"><button class="tab" onclick="switchTab('afiliate',this)">📅 Calendario</button></div>
-  <div class="tab-wrap"><button class="tab" onclick="switchTab('grupos',this)">&#128172; Grupos</button></div>
+  <div class="tab-wrap"><button class="tab" onclick="switchTab('avisos',this)">&#128226; Avisos</button><span class="badge" id="badge-avisos">!</span></div>
 </div>
 
 <div id="scroll-area">
 
-  <div class="panel" id="panel-operativa">
+  <div class="panel active" id="panel-operativa">
     <p class="op-sec">Vuelos hoy · ALC</p>
     <div class="op-vuelos" onclick="document.getElementById('btn-live').click()">
       <span class="op-plane">✈</span>
@@ -594,7 +593,7 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
     </div>
   </div>
 
-  <div class="panel active" id="panel-documentos">
+  <div class="panel" id="panel-documentos">
     <div id="search-wrap">
       <div id="search-wrap-inner">
         <input id="search-input" type="text" placeholder="🔍  Buscar documento...">
@@ -811,8 +810,8 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 </div>
 
 <nav id="bottom-nav">
-  <button class="nav-btn" id="nav-operativa" onclick="switchTab('operativa',document.getElementById('tab-operativa'),this)"><span class="nav-ico">⚡</span>Operativa</button>
-  <button class="nav-btn active" id="nav-documentos" onclick="switchTab('documentos',document.querySelectorAll('.tab')[0],this)"><span class="nav-ico">&#128194;</span>Docs</button>
+  <button class="nav-btn active" id="nav-operativa" onclick="switchTab('operativa',document.getElementById('tab-operativa'),this)"><span class="nav-ico">⚡</span>Operativa</button>
+  <button class="nav-btn" id="nav-documentos" onclick="switchTab('documentos',document.querySelectorAll('.tab')[0],this)"><span class="nav-ico">&#128194;</span>Docs</button>
   <button class="nav-btn" id="nav-turnos" onclick="switchTab('turnos',document.querySelectorAll('.tab')[1],this)"><span class="nav-ico">📋</span>Publicados</button>
   <button class="nav-btn" id="nav-avisos" onclick="switchTab('avisos',document.querySelectorAll('.tab')[2],this)" style="position:relative"><span class="nav-ico">&#128226;</span>Avisos<span class="badge" id="badge-avisos-nav">!</span></button>
   <button class="nav-btn" id="nav-afiliate" onclick="switchTab('afiliate',document.querySelectorAll('.tab')[3],this)"><span class="nav-ico">📅</span>Calendario</button>
