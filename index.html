@@ -1594,6 +1594,8 @@ function renderLive(){
       +"<div style='display:flex;flex-direction:column;align-items:flex-end;gap:3px'><div class='vuelo-estado "+(v.estadoClass||"e-scheduled")+"'>"+(v.estado||"Programado")+"</div><div class='vuelo-countdown' data-hora='"+(horaEfectiva||"")+"'>—</div></div>";
     container.appendChild(row);
   });
+  // Update countdowns immediately after every render
+  if(typeof updateFlightCountdowns==='function')setTimeout(updateFlightCountdowns,0);
 }
 
 
