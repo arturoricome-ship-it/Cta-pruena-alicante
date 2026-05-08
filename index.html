@@ -3632,7 +3632,7 @@ window.renderOperativa=function(){
   var PD={};try{var pr=localStorage.getItem("cta_pd_"+now.getFullYear());if(pr)PD=JSON.parse(pr);}catch(e){}
   var pMes=0;
   Object.keys(PD).forEach(function(k){if(k.split(":")[0]===mK)pMes+=PD[k].gen||0;});
-  Object.keys(mD).forEach(function(dd){var dx=mD[dd];if(dx&&dx.perenDur&&dx.perenDur!=="0:00"&&!PD[mK+":"+dd]){var p=dx.perenDur.split(":");pMes+=(+p[0]||0)+(+p[1]||0)/60;}});
+  Object.keys(mD).forEach(function(dd){var dx=mD[dd];if(dx&&dx.perenDur&&dx.perenDur!=="0:00"&&!PD[mK+":"+dd]){try{var p=String(dx.perenDur).split(":");pMes+=(+p[0]||0)+(+p[1]||0)/60;}catch(e){}}});
   function fP(h){var hh=Math.floor(h),mm=Math.round((h-hh)*60);return hh+":"+(mm<10?"0":"")+mm;}
   if(g("op-cal-mes"))g("op-cal-mes").textContent=MESES_ES[now.getMonth()]+" "+now.getFullYear();
   if(g("op-cal-trab"))g("op-cal-trab").textContent=trab;
@@ -3642,9 +3642,9 @@ window.renderOperativa=function(){
   if(g("op-cal-peren"))g("op-cal-peren").textContent=fP(pMes);
 
   var d=mD[now.getDate()]||null;
-  var card=g("op-tc");
+  var card=g("op-turno-card");
   if(!card)return;
-  card.className="op-turno-card";
+  ["state-working","state-pausa","state-rest","state-next"].forEach(function(c){card.classList.remove(c);});
 
   if(!d||!d.tipo||d.tipo==="libre"||(!d.e1&&["festivo","hl","hlp","vacaciones"].indexOf(d.tipo)<0)){
     card.classList.add("state-next");
