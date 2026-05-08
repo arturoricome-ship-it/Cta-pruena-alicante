@@ -3802,13 +3802,13 @@ window.renderOperativa=function(){
     var cntHtml=restM!==null&&Math.floor(restM/1440)>0?cnt:"<span>"+(cnt||"💤")+"</span>";
     if(g("op-tc-times"))g("op-tc-times").innerHTML=cntHtml;
     if(g("op-tc-sub"))g("op-tc-sub").textContent=nxtStr?"Próximo turno "+nxtStr:"";
-    // % of rest elapsed since shift ended
+    // % of rest REMAINING (what's left to enjoy)
     var restElapsed=nowMin-shEnd;if(restElapsed<0)restElapsed+=1440;
     var totalRest=(restElapsed+(restM||0));
-    var restPct=totalRest>0?Math.round(restElapsed/totalRest*100):0;
-    if(g("op-tc-pct"))g("op-tc-pct").textContent=restPct+"%";
+    var restRemPct=totalRest>0?Math.round((restM||0)/totalRest*100):0;
+    if(g("op-tc-pct"))g("op-tc-pct").textContent=restRemPct+"%";
     if(g("op-tc-rem"))g("op-tc-rem").textContent="";
-    if(g("op-tc-bar"))g("op-tc-bar").style.width=restPct+"%";
+    if(g("op-tc-bar"))g("op-tc-bar").style.width=restRemPct+"%";
   } else if(notYet){
     card.classList.add("state-next");
     if(g("op-tc-times"))g("op-tc-times").innerHTML=th;
@@ -3853,7 +3853,8 @@ window.renderOperativa=function(){
   if(totT>cT){cT=totT;try{localStorage.setItem("op_vt_tom",JSON.stringify({d:tStr2,t:cT}));}catch(e){}}
   if(g("op-v-total-tom"))g("op-v-total-tom").textContent=cT>0?cT:"—";
   function cntSh(fls,e1p,s1p,e2p,s2p){var n=0;fls.forEach(function(v){var t=typeof hToMin==="function"?hToMin(v.horaReal||v.horaProg||""):null;if(t===null)return;if(e1p!==null&&s1p!==null&&t>=e1p&&t<=s1p)n++;else if(e2p!==null&&s2p!==null&&t>=e2p&&t<=s2p)n++;});return n;}
-  var iH=e1!==null?cntSh(lH.concat(sH),e1,s1,e2,s2):0;
+  var _shDone=(shEnd!==null&&nowMin>=shEnd);
+  var iH=(e1!==null&&!_shDone)?cntSh(lH.concat(sH),e1,s1,e2,s2):0;
   if(g("op-v-turno"))g("op-v-turno").textContent=String(iH);
   var tom=new Date(now);tom.setDate(tom.getDate()+1);
   var dT=(ue[MESES[tom.getMonth()]]||{})[tom.getDate()]||null;
