@@ -584,9 +584,17 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
       </div>
     </div>
     <p class="op-sec">Compañeros</p>
-    <div class="op-comp-card" onclick="if(typeof verCompanerosHoy==='function'){var p=document.getElementById('calc-panel');var o=document.getElementById('calc-overlay');if(p){p.classList.add('show');if(o)o.classList.add('show');setTimeout(function(){verCompanerosHoy();},80);}}">
-      <div style="flex:1"><div style="font-size:12px;font-weight:700;margin-bottom:2px">👥 Compañeros hoy</div><div style="font-size:9px;color:var(--gray)" id="op-comp-sub">Pulsa para ver coincidencias</div></div>
-      <div><div class="op-comp-num" id="op-comp-num">—</div><div style="font-size:8px;color:var(--gray);text-align:right;margin-top:2px">coinciden</div></div>
+    <div class="op-comp-card" style="flex-direction:column;gap:0;padding:12px 14px" onclick="if(typeof verCompanerosHoy==='function'){var p=document.getElementById('calc-panel');var o=document.getElementById('calc-overlay');if(p){p.classList.add('show');if(o)o.classList.add('show');setTimeout(function(){verCompanerosHoy();},80);}}">
+      <!-- Top row: title + VER -->
+      <div style="display:flex;align-items:center;justify-content:space-between;width:100%;margin-bottom:10px">
+        <div style="font-size:12px;font-weight:700">👥 Plantilla de hoy</div>
+        <div style="background:rgba(96,165,250,.12);border:1px solid rgba(96,165,250,.25);border-radius:8px;color:#60a5fa;font-size:10px;font-weight:800;padding:4px 12px;letter-spacing:.5px">VER</div>
+      </div>
+      <!-- Center: big red number + label -->
+      <div style="display:flex;flex-direction:column;align-items:center;width:100%">
+        <div class="op-comp-num" id="op-comp-num">—</div>
+        <div id="op-comp-sub" style="font-size:9px;color:var(--gray);margin-top:2px;text-align:center">coincidencias</div>
+      </div>
     </div>
     <p class="op-sec">Turnos publicados</p>
     <div class="op-pub-card">
@@ -3508,7 +3516,7 @@ function renderCompanerosDia(offsetDias,toggleIfOpen){
         var opAhora=esDiaActual&&(enT1||enT2)&&!turno.disponibilidadNoConfirmada&&!turno.noVieneInterrogacion;
         // Mark as future-overnight if shift starts tonight but hasn't begun yet
         var _futOvn=(grS1!==null&&grE1!==null&&grS1<grE1&&nowMinReal<grE1);
-        coinciden.push({nombre:emp.nombre,horario:horario,e1:grE1,s1:grS1,s2:turno.s2?hToMin(turno.s2):null,categoria:emp.categoria||'General',disponibilidadNoConfirmada:!!turno.disponibilidadNoConfirmada,noVieneInterrogacion:!!turno.noVieneInterrogacion,operativoAhora:opAhora,overnight:false,futuraNoche:_futOvn});
+        coinciden.push({nombre:emp.nombre,horario:horario,e1:grE1,s1:grS1,e2:grE2,s2:grS2,categoria:emp.categoria||'General',disponibilidadNoConfirmada:!!turno.disponibilidadNoConfirmada,noVieneInterrogacion:!!turno.noVieneInterrogacion,operativoAhora:opAhora,overnight:false,futuraNoche:_futOvn});
       }
     }
     // Yesterday's overnight shift crossing into today
@@ -3541,10 +3549,16 @@ function renderCompanerosDia(offsetDias,toggleIfOpen){
   var _nowMin=(function(){var n=new Date();return n.getHours()*60+n.getMinutes();})();
   if(window._sortBySalida){
     function nextExit(c){
-      var s1=c.s1,s2=c.s2||null;
-      if(s1!==null&&s1>_nowMin)return s1;
-      if(s2!==null&&s2>_nowMin)return s2;
-      return null; // already left
+      var e1=c.e1,s1=c.s1,e2=c.e2||null,s2=c.s2||null;
+      // Overnight T1: s1 is next day (e.g. 20:00→01:30, s1=90 < e1=1200)
+      var overnight1=(e1!==null&&s1!==null&&s1<e1);
+      var effS1=overnight1?s1+1440:s1;
+      if(effS1!==null&&effS1>_nowMin)return effS1;
+      // Overnight T2
+      var overnight2=(e2!==null&&s2!==null&&s2<e2);
+      var effS2=s2!==null?(overnight2?s2+1440:s2):null;
+      if(effS2!==null&&effS2>_nowMin)return effS2;
+      return null; // truly already left
     }
     var activos=coinciden.filter(function(c){return nextExit(c)!==null;});
     var yaSalieron=coinciden.filter(function(c){return nextExit(c)===null;});
