@@ -588,8 +588,8 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
     <div class="op-pub-card">
       <div style="padding:10px 14px 8px;text-align:center"><div style="font-size:12px;font-weight:700">📋 Turnos publicados empresa</div><div style="font-size:9px;color:var(--gray);margin-top:1px">FTP · FIJI · Elige tu colectivo</div></div>
       <div class="op-pub-row">
-        <button class="op-pub-btn" onclick="navToFolderByName('turnos rampa')"><span style="font-size:20px">✈️</span><div><span style="font-size:11px;font-weight:700;color:var(--white);display:block">Rampa</span><span style="font-size:8px;color:var(--gray);display:block;margin-top:1px">Operarios</span></div></button>
-        <button class="op-pub-btn" onclick="navToFolderByName('turnos admin')"><span style="font-size:20px">🗂️</span><div><span style="font-size:11px;font-weight:700;color:var(--white);display:block">Administrativos</span><span style="font-size:8px;color:var(--gray);display:block;margin-top:1px">Admin.</span></div></button>
+        <button class="op-pub-btn" onclick="navToFolderByName('01_Turnos Rampa')"><span style="font-size:20px">✈️</span><div><span style="font-size:11px;font-weight:700;color:var(--white);display:block">Rampa</span><span style="font-size:8px;color:var(--gray);display:block;margin-top:1px">Operarios</span></div></button>
+        <button class="op-pub-btn" onclick="navToFolderByName('01b_Turnos Administrativos')"><span style="font-size:20px">🗂️</span><div><span style="font-size:11px;font-weight:700;color:var(--white);display:block">Administrativos</span><span style="font-size:8px;color:var(--gray);display:block;margin-top:1px">Admin.</span></div></button>
       </div>
     </div>
   </div>
@@ -3354,38 +3354,33 @@ function turnosSeSuperponen(myE1,myS1,myE2,myS2,grE1,grS1,grE2,grS2){
 
 
 function navToFolderByName(searchTerm){
+  // Switch to documentos and navigate into the matching subfolder of ROOT_ID
   switchTab('documentos',null,document.getElementById('nav-documentos'));
   setTimeout(function(){
-    // Search the index for the folder
-    var found=null;
-    for(var i=0;i<searchIndex.length;i++){
-      var item=searchIndex[i];
-      if(item.name&&item.name.toLowerCase().indexOf(searchTerm.toLowerCase())!==-1&&item.type==='folder'){
-        found=item;break;
-      }
-    }
-    if(found){
-      breadcrumb=[{id:ROOT_ID,name:'Inicio'},{id:found.id,name:found.name}];
-      renderBreadcrumb();
-      renderFolder(found.id);
-      document.getElementById('scroll-area').scrollTop=0;
-    } else {
-      // Build index first then retry
-      buildSearchIndex();
-      setTimeout(function(){
-        for(var i=0;i<searchIndex.length;i++){
-          var item=searchIndex[i];
-          if(item.name&&item.name.toLowerCase().indexOf(searchTerm.toLowerCase())!==-1&&item.type==='folder'){
-            breadcrumb=[{id:ROOT_ID,name:'Inicio'},{id:item.id,name:item.name}];
-            renderBreadcrumb();renderFolder(item.id);
-            document.getElementById('scroll-area').scrollTop=0;
-            return;
-          }
+    driveList({q:"'"+ROOT_ID+"' in parents and trashed=false and mimeType='application/vnd.google-apps.folder'",fields:"files(id,name)"})
+    .then(function(data){
+      var folders=data.files||[];
+      var found=null;
+      for(var i=0;i<folders.length;i++){
+        if(folders[i].name.toLowerCase().indexOf(searchTerm.toLowerCase())!==-1){
+          found=folders[i];break;
         }
-        // Fallback: just open docs root
-      },2000);
-    }
-  },300);
+      }
+      if(found){
+        breadcrumb=[{id:ROOT_ID,name:'Inicio'},{id:found.id,name:found.name}];
+        renderBreadcrumb();
+        renderFolder(found.id);
+        document.getElementById('scroll-area').scrollTop=0;
+      } else {
+        // Not found at root, just open documentos
+        breadcrumb=[{id:ROOT_ID,name:'Inicio'}];
+        renderBreadcrumb();
+        renderFolder(ROOT_ID);
+      }
+    }).catch(function(){
+      breadcrumb=[{id:ROOT_ID,name:'Inicio'}];renderBreadcrumb();renderFolder(ROOT_ID);
+    });
+  },350);
 }
 function verCompanerosHoy(){
   window._grupoOffsetDias=0;
