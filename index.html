@@ -3786,17 +3786,29 @@ window.renderOperativa=function(){
     function fmtRest(m){
       if(m===null||m<0)return "💤";
       var d=Math.floor(m/1440),h=Math.floor((m%1440)/60),mn=m%60;
-      if(d>0)return d+"d "+h+"h"+(mn?" "+mn+"m":"");
-      if(h>0)return h+"h"+(mn?" "+mn+"m":"");
+      if(d>0){
+        // Days in gold, time in green
+        return "<span style='display:flex;flex-direction:column;align-items:center;gap:2px'>"
+          +"<span style='font-size:13px;color:var(--gold);font-weight:700'>"+d+" días</span>"
+          +"<span style='font-size:22px;font-weight:800;color:#4ade80'>"+h+"h"+(mn?" "+mn+"m":"")+"</span>"
+          +"</span>";
+      }
+      if(h>0)return h+"h "+(mn?mn+"m":"");
       return mn+"m";
     }
     var cnt=fmtRest(restM);
     if(g("op-tc-lbl"))g("op-tc-lbl").textContent="Descanso";
-    if(g("op-tc-times"))g("op-tc-times").innerHTML="<span>"+(cnt||"💤")+"</span>";
+    // For multi-day: use raw HTML, otherwise wrap in span
+    var cntHtml=restM!==null&&Math.floor(restM/1440)>0?cnt:"<span>"+(cnt||"💤")+"</span>";
+    if(g("op-tc-times"))g("op-tc-times").innerHTML=cntHtml;
     if(g("op-tc-sub"))g("op-tc-sub").textContent=nxtStr?"Próximo turno "+nxtStr:"";
-    if(g("op-tc-pct"))g("op-tc-pct").textContent="";
+    // % of rest elapsed since shift ended
+    var restElapsed=nowMin-shEnd;if(restElapsed<0)restElapsed+=1440;
+    var totalRest=(restElapsed+(restM||0));
+    var restPct=totalRest>0?Math.round(restElapsed/totalRest*100):0;
+    if(g("op-tc-pct"))g("op-tc-pct").textContent=restPct+"%";
     if(g("op-tc-rem"))g("op-tc-rem").textContent="";
-    if(g("op-tc-bar"))g("op-tc-bar").style.width="100%";
+    if(g("op-tc-bar"))g("op-tc-bar").style.width=restPct+"%";
   } else if(notYet){
     card.classList.add("state-next");
     if(g("op-tc-times"))g("op-tc-times").innerHTML=th;
