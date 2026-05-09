@@ -3931,104 +3931,6 @@ window.renderOperativa=function(){
 
   var d=mD[now.getDate()]||null;
   var card=g("op-turno-card");
-  if(!card)return;
-  ["state-working","state-pausa","state-rest","state-next"].forEach(function(c){card.classList.remove(c);});
-
-  if(!d||!d.tipo||d.tipo==="libre"||(!d.e1&&["festivo","hl","hlp","vacaciones"].indexOf(d.tipo)<0)){
-    card.classList.add("state-next");
-    if(g("op-tc-lbl"))g("op-tc-lbl").textContent="Turno hoy";
-    if(g("op-tc-times"))g("op-tc-times").innerHTML="<span style='color:var(--gray);font-size:11px'>Dia libre</span>";
-    if(g("op-tc-sub"))g("op-tc-sub").textContent="";
-    if(g("op-tc-pct"))g("op-tc-pct").textContent="";
-    if(g("op-tc-rem"))g("op-tc-rem").textContent="";
-    return;
-  }
-  if(["festivo","hl","hlp","vacaciones"].indexOf(d.tipo)>=0){
-    card.classList.add("state-rest");
-    if(g("op-tc-lbl"))g("op-tc-lbl").textContent="Turno hoy";
-    if(g("op-tc-times"))g("op-tc-times").innerHTML="<span>Descanso</span>";
-    if(g("op-tc-pct"))g("op-tc-pct").textContent="";
-    return;
-  }
-
-  var e1=toM(d.e1),s1=toM(d.s1),e2=d.e2?toM(d.e2):null,s2=d.s2?toM(d.s2):null;
-  var shEnd=s2||s1,totMin=0;
-  if(e1!==null&&s1!==null)totMin+=(s1>=e1?s1-e1:s1+1440-e1);
-  if(e2!==null&&s2!==null)totMin+=(s2>=e2?s2-e2:s2+1440-e2);
-  if(g("op-tc-lbl"))g("op-tc-lbl").textContent="Turno hoy · "+fmtT(totMin);
-  var th="<span>"+d.e1+" → "+d.s1+"</span>";
-  if(d.e2&&d.s2)th+="<span>"+d.e2+" → "+d.s2+"</span>";
-
-  var inS1=e1!==null&&s1!==null&&nowMin>=e1&&nowMin<s1;
-  var inS2=e2!==null&&s2!==null&&nowMin>=e2&&nowMin<s2;
-  var isPausa=e2!==null&&s1!==null&&nowMin>=s1&&nowMin<e2;
-  var isDone=shEnd!==null&&nowMin>=shEnd;
-  var notYet=e1!==null&&nowMin<e1;
-
-  if(inS1||inS2){
-    card.classList.add("state-working");
-    if(g("op-tc-times"))g("op-tc-times").innerHTML=th;
-    var el2=inS1?nowMin-e1:(s1-e1)+(nowMin-e2);
-    var pct=Math.min(100,Math.round(el2/totMin*100));
-    var rem=shEnd-nowMin+(inS1&&e2?Math.max(0,e2-s1):0);
-    if(g("op-tc-sub"))g("op-tc-sub").textContent="Trabajando";
-    if(g("op-tc-pct"))g("op-tc-pct").textContent=pct+"%";
-    if(g("op-tc-rem"))g("op-tc-rem").textContent="Quedan "+fmtT(Math.max(0,rem));
-    if(g("op-tc-bar"))g("op-tc-bar").style.width=pct+"%";
-  } else if(isPausa){
-    card.classList.add("state-pausa");
-    if(g("op-tc-times"))g("op-tc-times").innerHTML=th;
-    var el3=s1-e1,pct3=Math.round(el3/totMin*100);
-    if(g("op-tc-sub"))g("op-tc-sub").textContent="Pausa · Vuelves a las "+d.e2;
-    if(g("op-tc-pct"))g("op-tc-pct").textContent=pct3+"%";
-    if(g("op-tc-rem"))g("op-tc-rem").textContent="Pausa "+fmtT(e2-nowMin);
-    if(g("op-tc-bar"))g("op-tc-bar").style.width=pct3+"%";
-  } else if(isDone){
-    card.classList.add("state-rest");
-    var nxtMin=null,nxtStr="",nxtDays=0;
-    var ANXT=["trabajado","hl","hlp","h6","festivo","baja","rm","curso"];
-    for(var dd2=1;dd2<=30;dd2++){
-      var nD=new Date(now.getFullYear(),now.getMonth(),now.getDate()+dd2);
-      var nMd=(ue[MESES[nD.getMonth()]]||{})[nD.getDate()];
-      if(nMd&&nMd.e1&&nMd.tipo&&ANXT.indexOf(nMd.tipo)>=0){nxtMin=toM(nMd.e1);nxtStr=nMd.e1;nxtDays=dd2;break;}
-    }
-    // Calculate total minutes remaining (including full days)
-    var restM=nxtMin!==null?(nxtDays*1440+nxtMin-nowMin):null;
-    function fmtRest(m){
-      if(m===null||m<0)return "💤";
-      var d=Math.floor(m/1440),h=Math.floor((m%1440)/60),mn=m%60;
-      if(d>0){
-        // Days in gold, time in green
-        return "<span style='display:flex;flex-direction:column;align-items:center;gap:2px'>"
-          +"<span style='font-size:13px;color:var(--gold);font-weight:700'>"+d+" días</span>"
-          +"<span style='font-size:22px;font-weight:800;color:#4ade80'>"+h+"h"+(mn?" "+mn+"m":"")+"</span>"
-          +"</span>";
-      }
-      if(h>0)return h+"h "+(mn?mn+"m":"");
-      return mn+"m";
-    }
-    var cnt=fmtRest(restM);
-    if(g("op-tc-lbl"))g("op-tc-lbl").textContent="Descanso";
-    // For multi-day: use raw HTML, otherwise wrap in span
-    var cntHtml=restM!==null&&Math.floor(restM/1440)>0?cnt:"<span>"+(cnt||"💤")+"</span>";
-    if(g("op-tc-times"))g("op-tc-times").innerHTML=cntHtml;
-    if(g("op-tc-sub"))g("op-tc-sub").textContent=nxtStr?"Próximo turno "+nxtStr:"";
-    // % of rest REMAINING (what's left to enjoy)
-    var restElapsed=nowMin-shEnd;if(restElapsed<0)restElapsed+=1440;
-    var totalRest=(restElapsed+(restM||0));
-    var restRemPct=totalRest>0?Math.round((restM||0)/totalRest*100):0;
-    if(g("op-tc-pct"))g("op-tc-pct").textContent=restRemPct+"%";
-    if(g("op-tc-rem"))g("op-tc-rem").textContent="";
-    if(g("op-tc-bar"))g("op-tc-bar").style.width=restRemPct+"%";
-  } else if(notYet){
-    card.classList.add("state-next");
-    if(g("op-tc-times"))g("op-tc-times").innerHTML=th;
-    if(g("op-tc-sub"))g("op-tc-sub").textContent="Próximo turno";
-    if(g("op-tc-pct"))g("op-tc-pct").textContent="0%";
-    if(g("op-tc-rem"))g("op-tc-rem").textContent="Empieza en "+fmtT(e1-nowMin);
-    if(g("op-tc-bar"))g("op-tc-bar").style.width="0%";
-  }
-
   // ─ Resumen Operativo ─────────────────────────────────────
   var gmap={};try{gmap=JSON.parse(localStorage.getItem("cta_grupo_2026_map")||"{}");}catch(e){}
   var todayNum=now.getDate();
@@ -4135,6 +4037,108 @@ window.renderOperativa=function(){
   var tE2=dT&&dT.e2?toM(dT.e2):null,tS2=dT&&dT.s2?toM(dT.s2):null;
   var iT=tE1!==null&&totT>0?cntSh(lT.concat(sT),tE1,tS1,tE2,tS2):0;
   if(g("op-v-turno-tom"))g("op-v-turno-tom").textContent=totT>0?String(iT):"—";
+  if(!card)return;
+  ["state-working","state-pausa","state-rest","state-next"].forEach(function(c){card.classList.remove(c);});
+
+  var _isFreeDay=false;
+  if(!d||!d.tipo||d.tipo==="libre"||(!d.e1&&["festivo","hl","hlp","vacaciones"].indexOf(d.tipo)<0)){
+    card.classList.add("state-next");
+    if(g("op-tc-lbl"))g("op-tc-lbl").textContent="Turno hoy";
+    if(g("op-tc-times"))g("op-tc-times").innerHTML="<span style='color:var(--gray);font-size:11px'>Dia libre</span>";
+    if(g("op-tc-sub"))g("op-tc-sub").textContent="";
+    if(g("op-tc-pct"))g("op-tc-pct").textContent="";
+    if(g("op-tc-rem"))g("op-tc-rem").textContent="";
+    _isFreeDay=true;
+  } else if(["festivo","hl","hlp","vacaciones"].indexOf(d.tipo)>=0){
+    card.classList.add("state-rest");
+    if(g("op-tc-lbl"))g("op-tc-lbl").textContent="Turno hoy";
+    if(g("op-tc-times"))g("op-tc-times").innerHTML="<span>Descanso</span>";
+    if(g("op-tc-pct"))g("op-tc-pct").textContent="";
+    _isFreeDay=true;
+  }
+  if(!_isFreeDay){
+  }
+
+  var e1=toM(d.e1),s1=toM(d.s1),e2=d.e2?toM(d.e2):null,s2=d.s2?toM(d.s2):null;
+  var shEnd=s2||s1,totMin=0;
+  if(e1!==null&&s1!==null)totMin+=(s1>=e1?s1-e1:s1+1440-e1);
+  if(e2!==null&&s2!==null)totMin+=(s2>=e2?s2-e2:s2+1440-e2);
+  if(g("op-tc-lbl"))g("op-tc-lbl").textContent="Turno hoy · "+fmtT(totMin);
+  var th="<span>"+d.e1+" → "+d.s1+"</span>";
+  if(d.e2&&d.s2)th+="<span>"+d.e2+" → "+d.s2+"</span>";
+
+  var inS1=e1!==null&&s1!==null&&nowMin>=e1&&nowMin<s1;
+  var inS2=e2!==null&&s2!==null&&nowMin>=e2&&nowMin<s2;
+  var isPausa=e2!==null&&s1!==null&&nowMin>=s1&&nowMin<e2;
+  var isDone=shEnd!==null&&nowMin>=shEnd;
+  var notYet=e1!==null&&nowMin<e1;
+
+  if(inS1||inS2){
+    card.classList.add("state-working");
+    if(g("op-tc-times"))g("op-tc-times").innerHTML=th;
+    var el2=inS1?nowMin-e1:(s1-e1)+(nowMin-e2);
+    var pct=Math.min(100,Math.round(el2/totMin*100));
+    var rem=shEnd-nowMin+(inS1&&e2?Math.max(0,e2-s1):0);
+    if(g("op-tc-sub"))g("op-tc-sub").textContent="Trabajando";
+    if(g("op-tc-pct"))g("op-tc-pct").textContent=pct+"%";
+    if(g("op-tc-rem"))g("op-tc-rem").textContent="Quedan "+fmtT(Math.max(0,rem));
+    if(g("op-tc-bar"))g("op-tc-bar").style.width=pct+"%";
+  } else if(isPausa){
+    card.classList.add("state-pausa");
+    if(g("op-tc-times"))g("op-tc-times").innerHTML=th;
+    var el3=s1-e1,pct3=Math.round(el3/totMin*100);
+    if(g("op-tc-sub"))g("op-tc-sub").textContent="Pausa · Vuelves a las "+d.e2;
+    if(g("op-tc-pct"))g("op-tc-pct").textContent=pct3+"%";
+    if(g("op-tc-rem"))g("op-tc-rem").textContent="Pausa "+fmtT(e2-nowMin);
+    if(g("op-tc-bar"))g("op-tc-bar").style.width=pct3+"%";
+  } else if(isDone){
+    card.classList.add("state-rest");
+    var nxtMin=null,nxtStr="",nxtDays=0;
+    var ANXT=["trabajado","hl","hlp","h6","festivo","baja","rm","curso"];
+    for(var dd2=1;dd2<=30;dd2++){
+      var nD=new Date(now.getFullYear(),now.getMonth(),now.getDate()+dd2);
+      var nMd=(ue[MESES[nD.getMonth()]]||{})[nD.getDate()];
+      if(nMd&&nMd.e1&&nMd.tipo&&ANXT.indexOf(nMd.tipo)>=0){nxtMin=toM(nMd.e1);nxtStr=nMd.e1;nxtDays=dd2;break;}
+    }
+    // Calculate total minutes remaining (including full days)
+    var restM=nxtMin!==null?(nxtDays*1440+nxtMin-nowMin):null;
+    function fmtRest(m){
+      if(m===null||m<0)return "💤";
+      var d=Math.floor(m/1440),h=Math.floor((m%1440)/60),mn=m%60;
+      if(d>0){
+        // Days in gold, time in green
+        return "<span style='display:flex;flex-direction:column;align-items:center;gap:2px'>"
+          +"<span style='font-size:13px;color:var(--gold);font-weight:700'>"+d+" días</span>"
+          +"<span style='font-size:22px;font-weight:800;color:#4ade80'>"+h+"h"+(mn?" "+mn+"m":"")+"</span>"
+          +"</span>";
+      }
+      if(h>0)return h+"h "+(mn?mn+"m":"");
+      return mn+"m";
+    }
+    var cnt=fmtRest(restM);
+    if(g("op-tc-lbl"))g("op-tc-lbl").textContent="Descanso";
+    // For multi-day: use raw HTML, otherwise wrap in span
+    var cntHtml=restM!==null&&Math.floor(restM/1440)>0?cnt:"<span>"+(cnt||"💤")+"</span>";
+    if(g("op-tc-times"))g("op-tc-times").innerHTML=cntHtml;
+    if(g("op-tc-sub"))g("op-tc-sub").textContent=nxtStr?"Próximo turno "+nxtStr:"";
+    // % of rest REMAINING (what's left to enjoy)
+    var restElapsed=nowMin-shEnd;if(restElapsed<0)restElapsed+=1440;
+    var totalRest=(restElapsed+(restM||0));
+    var restRemPct=totalRest>0?Math.round((restM||0)/totalRest*100):0;
+    if(g("op-tc-pct"))g("op-tc-pct").textContent=restRemPct+"%";
+    if(g("op-tc-rem"))g("op-tc-rem").textContent="";
+    if(g("op-tc-bar"))g("op-tc-bar").style.width=restRemPct+"%";
+  } else if(notYet){
+    card.classList.add("state-next");
+    if(g("op-tc-times"))g("op-tc-times").innerHTML=th;
+    if(g("op-tc-sub"))g("op-tc-sub").textContent="Próximo turno";
+    if(g("op-tc-pct"))g("op-tc-pct").textContent="0%";
+    if(g("op-tc-rem"))g("op-tc-rem").textContent="Empieza en "+fmtT(e1-nowMin);
+    if(g("op-tc-bar"))g("op-tc-bar").style.width="0%";
+  }
+
+
+
 };
 
 // Hook switchTab safely
