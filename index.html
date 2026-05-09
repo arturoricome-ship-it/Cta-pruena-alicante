@@ -74,7 +74,7 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 #tab-bar::-webkit-scrollbar{display:none}
 .tab{flex:1;min-width:0;padding:8px 0;border-radius:100px;font-size:11px;font-weight:600;cursor:pointer;color:var(--gray);background:transparent;border:none;font-family:"Outfit",sans-serif;transition:all .25s;letter-spacing:.1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center}
 .tab.active{background:linear-gradient(135deg,var(--gold),var(--gold-light));color:var(--navy);box-shadow:0 4px 12px rgba(200,168,75,.35)}
-#scroll-area{flex:1;overflow-y:auto;overflow-x:hidden;padding:12px 12px 90px;-webkit-overflow-scrolling:touch}
+#scroll-area{flex:1;overflow-y:auto;overflow-x:hidden;padding-bottom:calc(72px + env(safe-area-inset-bottom));padding:12px 12px 90px;-webkit-overflow-scrolling:touch}
 .panel{display:none;animation:fadeUp .3s ease}.panel.active{display:block}
 @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 @media(max-width:400px){.vuelo-estado{font-size:9px;padding:3px 6px}}
@@ -144,8 +144,8 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 .search-empty{text-align:center;padding:28px;font-size:13px;color:var(--gray)}
 /* BADGE AVISOS */
 .tab-wrap{position:relative;flex:1;min-width:0;display:flex;justify-content:center}
-.badge{position:absolute;top:0px;right:4px;background:#e64646;color:white;font-size:9px;font-weight:700;border-radius:100px;padding:1px 5px;min-width:16px;text-align:center;display:none;line-height:14px;z-index:10}
-.badge.show{display:block}
+.badge{position:absolute;top:-4px;right:-4px;background:#e64646;color:white;font-size:9px;font-weight:700;border-radius:100px;padding:1px 5px;min-width:16px;text-align:center;display:none;line-height:14px;z-index:10}
+.badge.show{display:block;}
 /* PANEL HOY */
 .hoy-hero{background:linear-gradient(135deg,var(--navy),var(--navy-light));border:1px solid rgba(200,168,75,.25);border-radius:16px;padding:20px;margin-bottom:14px;text-align:center}
 .hoy-fecha{font-family:"Bebas Neue",sans-serif;font-size:13px;letter-spacing:2px;color:var(--gold);text-transform:uppercase;margin-bottom:4px}
@@ -469,6 +469,9 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 .vuelo-countdown{font-size:9px;font-weight:700;color:var(--gray);white-space:nowrap;text-align:right;line-height:1.2;margin-left:auto;padding-left:6px;flex-shrink:0}
 .vuelo-countdown.ct-soon{color:#f87171}
 .vuelo-countdown.ct-now{color:#4ade80}
+
+@keyframes badgePulse{0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(230,70,70,.7);}50%{transform:scale(1.15);box-shadow:0 0 0 5px rgba(230,70,70,0);}}
+.badge.show{animation:badgePulse 1.4s ease-in-out infinite;}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
@@ -518,7 +521,7 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
   </div>
 </div>
 
-<div id="tab-bar">
+<div id="tab-bar" style="display:none">
   <div class="tab-wrap"><button class="tab active" id="tab-operativa" onclick="switchTab('operativa',this)">⚡ Operativa</button></div>
   <div class="tab-wrap"><button class="tab" onclick="switchTab('documentos',this)">&#128194; Documentos</button></div>
   <div class="tab-wrap"><button class="tab" onclick="switchTab('turnos',this)">📋 Publicados</button></div>
@@ -1300,6 +1303,7 @@ function loadAvisos(){
       var bn=document.getElementById("badge-avisos-nav");
       if(b)b.classList.add("show");
       if(bn)bn.classList.add("show");
+      if(typeof showPushNotif==="function")showPushNotif("📢 CTA Alicante","Hay avisos nuevos sin leer");
     }
     return fetch(DRIVE_API+"/files/"+files[0].id+"?alt=media&key="+API_KEY)
     .then(function(r){return r.text();})
@@ -2720,6 +2724,26 @@ function dashCheckSession(){
     document.getElementById('dash-real').style.display='block';
   }
 }
+
+// ── Notificaciones push del navegador ─────────────────────────
+function requestNotifPermission(){
+  if(!('Notification' in window))return;
+  if(Notification.permission==='default'){
+    Notification.requestPermission().then(function(p){
+      console.log('Notification permission:',p);
+    });
+  }
+}
+function showPushNotif(title,body){
+  if(!('Notification' in window)||Notification.permission!=='granted')return;
+  try{
+    if(navigator.serviceWorker&&navigator.serviceWorker.controller){
+      navigator.serviceWorker.controller.postMessage({type:'show_notif',title:title,body:body});
+    } else {
+      new Notification(title,{body:body,icon:'/icon-192.png',badge:'/icon-192.png',tag:'cta-aviso',renotify:true});
+    }
+  }catch(e){console.warn('Notif error',e);}
+}
 function closeTrypImport(){
   var panel=document.getElementById('tryp-import-panel');
   panel.style.transform='translateY(100%)';
@@ -4008,8 +4032,17 @@ window.renderOperativa=function(){
     return inT(emp.e1,emp.s1,min)||inT(emp.e2,emp.s2,min);
   }
   var total=trabajanHoy.length;
-  var manana=trabajanHoy.filter(function(e){return e.e1>=240&&e.e1<901;}).length;
-  var tarde=trabajanHoy.filter(function(e){return e.e1>=901||e.e1<240;}).length;
+  // Check if a tramo [e,s] overlaps with a time period [pStart, pEnd]
+  function tramoOverlaps(e,s,pStart,pEnd){
+    if(e===null||s===null)return false;
+    var effS=s<e?s+1440:s; // handle overnight
+    return e<pEnd&&effS>pStart;
+  }
+  // Mañana: 04:00-15:00 (240-900), Tarde: 15:01-28:00 (901-1680=next 04:00)
+  function isMañana(c){return tramoOverlaps(c.e1,c.s1,240,901)||tramoOverlaps(c.e2,c.s2,240,901);}
+  function isTarde(c){return tramoOverlaps(c.e1,c.s1,901,1680)||tramoOverlaps(c.e2,c.s2,901,1680);}
+  var manana=trabajanHoy.filter(isMañana).length;
+  var tarde=trabajanHoy.filter(isTarde).length;
 
   // Distribución tab
   var dEl=g("op-res-dist");
