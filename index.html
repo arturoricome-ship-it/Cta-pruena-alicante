@@ -4070,9 +4070,23 @@ window.renderOperativa=function(){
     var isMultiDay=restMF!==null&&Math.floor(restMF/1440)>0;
     if(g("op-tc-times"))g("op-tc-times").innerHTML=isMultiDay?cntF:"<span>"+(cntF||"💤")+"</span>";
     if(g("op-tc-sub"))g("op-tc-sub").textContent=nxtStrF?"Próximo turno "+nxtStrF:"";
-    if(g("op-tc-pct"))g("op-tc-pct").textContent="";
+    // % remaining: look back to find when last shift ended
+    var lastShiftEnd=null;
+    for(var ddB=1;ddB<=30;ddB++){
+      var pDB=new Date(now.getFullYear(),now.getMonth(),now.getDate()-ddB);
+      var pMdB=(ue[MESES[pDB.getMonth()]]||{})[pDB.getDate()];
+      if(pMdB&&pMdB.e1&&pMdB.tipo&&ANXTF.indexOf(pMdB.tipo)>=0){
+        var lastS=pMdB.s2?toM(pMdB.s2):toM(pMdB.s1);
+        if(lastS!==null)lastShiftEnd=ddB*1440-lastS+nowMin; // minutes elapsed since last shift ended
+        break;
+      }
+    }
+    var totalRestF2=(lastShiftEnd||nowMin)+(restMF||0);
+    var restRemPctF=totalRestF2>0?Math.round((restMF||0)/totalRestF2*100):0;
+    var showPctF=(restMF!==null&&restMF<1440);
+    if(g("op-tc-pct"))g("op-tc-pct").textContent=showPctF?restRemPctF+"%":"";
     if(g("op-tc-rem"))g("op-tc-rem").textContent="";
-    if(g("op-tc-bar"))g("op-tc-bar").style.width="0%";
+    if(g("op-tc-bar"))g("op-tc-bar").style.width=showPctF?restRemPctF+"%":"0%";
   }
   if(!_isFreeDay){
   }
