@@ -4083,10 +4083,9 @@ window.renderOperativa=function(){
     }
     var totalRestF2=(lastShiftEnd||nowMin)+(restMF||0);
     var restRemPctF=totalRestF2>0?Math.round((restMF||0)/totalRestF2*100):0;
-    var showPctF=(restMF!==null&&restMF<1440);
-    if(g("op-tc-pct"))g("op-tc-pct").textContent=showPctF?restRemPctF+"%":"";
+    if(g("op-tc-pct"))g("op-tc-pct").textContent=restMF!==null?restRemPctF+"%":"";
     if(g("op-tc-rem"))g("op-tc-rem").textContent="";
-    if(g("op-tc-bar"))g("op-tc-bar").style.width=showPctF?restRemPctF+"%":"0%";
+    if(g("op-tc-bar"))g("op-tc-bar").style.width=restMF!==null?restRemPctF+"%":"0%";
   }
   if(!_isFreeDay){
   }
@@ -4095,7 +4094,7 @@ window.renderOperativa=function(){
   var shEnd=s2||s1,totMin=0;
   if(e1!==null&&s1!==null)totMin+=(s1>=e1?s1-e1:s1+1440-e1);
   if(e2!==null&&s2!==null)totMin+=(s2>=e2?s2-e2:s2+1440-e2);
-  if(g("op-tc-lbl"))g("op-tc-lbl").textContent="Turno hoy · "+fmtT(totMin);
+  if(g("op-tc-lbl")&&!_isFreeDay)g("op-tc-lbl").textContent="Turno hoy · "+fmtT(totMin);
   var th="<span>"+d.e1+" → "+d.s1+"</span>";
   if(d.e2&&d.s2)th+="<span>"+d.e2+" → "+d.s2+"</span>";
 
