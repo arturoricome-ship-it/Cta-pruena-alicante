@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<!-- CTA_OPERATIVA_V13_DETALLES_DESPLEGABLE_RAYAS_TURNO_2026-05-11 -->
+<!-- CTA_OPERATIVA_V14_RAYAS_TURNO_RESTANTES_COLORES_2026-05-11 -->
 <meta charset="UTF-8">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -50,6 +50,9 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 .vuelo-row{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:11px 13px;margin-bottom:8px;display:grid;grid-template-columns:auto 1fr auto;gap:6px;align-items:center}
 .vuelo-row.vuelo-corte-s{box-shadow:inset 0 -2px 0 rgba(239,68,68,.5)}
 .vuelo-row.vuelo-corte-e{box-shadow:inset 0 2px 0 rgba(34,197,94,.5)}
+.vuelo-row.vuelo-en-turno{border-color:rgba(34,197,94,.26);background:linear-gradient(90deg,rgba(34,197,94,.055),var(--card) 28%)}
+.vuelo-row.vuelo-en-turno.vuelo-corte-s{box-shadow:inset 0 -2px 0 rgba(239,68,68,.65)}
+.vuelo-row.vuelo-en-turno.vuelo-corte-e{box-shadow:inset 0 2px 0 rgba(34,197,94,.65)}
 .vuelo-estado{font-size:10px;font-weight:700;padding:3px 7px;border-radius:100px;white-space:nowrap;min-width:0;text-align:center}
 .vuelo-num{font-family:"Bebas Neue",sans-serif;font-size:16px;color:var(--gold);letter-spacing:1px}
 .vuelo-dest{font-size:13px;font-weight:700}
@@ -616,7 +619,7 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
             <div style="font-size:8px;color:var(--gray);text-transform:uppercase;margin-bottom:4px">Hoy</div>
             <div style="display:flex;gap:10px">
               <div><div class="op-v-nval" id="op-v-total">—</div><div class="op-v-nlbl">total</div></div>
-              <div><div class="op-v-nval" id="op-v-turno" style="color:#93c5fd">—</div><div class="op-v-nlbl">mi turno</div></div>
+              <div><div class="op-v-nval" id="op-v-turno" style="color:#93c5fd">—</div><div class="op-v-nlbl">quedan turno</div></div>
             </div>
           </div>
           <div style="background:rgba(200,168,75,.06);border:1px solid rgba(200,168,75,.15);border-radius:10px;padding:7px 9px">
@@ -1722,6 +1725,16 @@ function renderLive(){
     });
   }
 
+  // Orden cronológico real: evita que un vuelo dentro de tu turno quede visualmente
+  // fuera de las rayas verde/roja si la API devuelve vuelos desordenados.
+  data.sort(function(a,b){
+    var ah=hToMin(a.horaReal||a.horaProg||"");
+    var bh=hToMin(b.horaReal||b.horaProg||"");
+    if(ah===null)ah=9999;if(bh===null)bh=9999;
+    if(a.esManana)ah+=1440;if(b.esManana)bh+=1440;
+    return ah-bh;
+  });
+
   if(!data.length){container.innerHTML="<div class='empty-box'>Sin vuelos"+(liveFiltro?" activos":"")+" en este momento</div>";return;}
   container.innerHTML="";
 
@@ -1778,12 +1791,26 @@ function renderLive(){
     var row=document.createElement("div");row.className="vuelo-row";
     if(cortesS[idx])row.classList.add("vuelo-corte-s");
     if(cortesE[idx])row.classList.add("vuelo-corte-e");
+    // Marca suave todos los vuelos que caen dentro de tu turno, no solo el primero/último.
+    // Así un vuelo como 08:25 queda claramente dentro si tu turno es 05:00-10:00.
+    try{
+      var off=v.esManana?1:0;
+      var cw=getShiftWindowsForOffset(off);
+      var vmIn=hToMin(v.horaReal||v.horaProg||"");
+      var dentro=(cw.windows||[]).some(function(win){
+        var a=win[0],b=win[1],x=vmIn;
+        if(x===null)return false;
+        if(b>=1440&&x<a)x+=1440;
+        return x>=a&&x<=b;
+      });
+      if(dentro)row.classList.add("vuelo-en-turno");
+    }catch(_e){}
     if(rowStyle)row.style.cssText=rowStyle;
     var horaEfectiva=v.horaReal||v.horaProg||"";
     row.setAttribute("data-hora",horaEfectiva);
     row.innerHTML="<div><div class='vuelo-num'>"+num+"</div>"+(extraLabel?"<div class='vuelo-puerta'>"+extraLabel+"</div>":"")+"</div>"
       +"<div style='min-width:0'><div class='vuelo-dest'>"+ciudad+"</div><div class='vuelo-hora'>"+horaStr+"</div></div>"
-      +"<div style='display:flex;flex-direction:column;align-items:flex-end;gap:3px'><div class='vuelo-estado "+(v.estadoClass||"e-scheduled")+"'>"+(v.estado||"Programado")+"</div><div class='vuelo-countdown' data-hora='"+(horaEfectiva||"")+"'>—</div></div>";
+      +"<div style='display:flex;flex-direction:column;align-items:flex-end;gap:3px'><div class='vuelo-estado "+(v.estadoClass||"e-scheduled")+"'>"+(v.estado||"Programado")+"</div><div class='vuelo-countdown' data-hora='"+(horaEfectiva||"")+"' data-manana='"+(v.esManana?'1':'0')+"'>—</div></div>";
     container.appendChild(row);
   });
   // Update countdowns immediately after every render
@@ -1797,9 +1824,12 @@ function updateFlightCountdowns(){
     var h=el.getAttribute('data-hora');
     if(!h||h==='--:--'){el.textContent='';return;}
     var p=h.split(':'),flMin=(+p[0]||0)*60+(+p[1]||0);
-    // Handle next-day flights (hora < nowMin by a lot means tomorrow)
-    var diff=flMin-nowMin;
-    if(diff<-120)diff+=1440; // crosses midnight
+    // Si el vuelo está en el bloque de mañana, siempre suma 24h.
+    // No lo deduzcas solo por la hora, porque a las 20:30 un vuelo de mañana a las 21:00
+    // parecía erróneamente que quedaban 30m.
+    var isTom=el.getAttribute('data-manana')==='1';
+    var diff=(isTom?flMin+1440:flMin)-nowMin;
+    if(!isTom&&diff<-120)diff+=1440; // cruces reales de medianoche de hoy
     if(diff<0){el.textContent='';el.className='vuelo-countdown';return;}
     var hh=Math.floor(diff/60),mm=diff%60;
     var str=(hh>0?hh+'h ':'')+mm+'m';
@@ -4180,6 +4210,10 @@ window.renderOperativa=function(){
 
   var d=mD[now.getDate()]||null;
   var card=g("op-turno-card");
+  // Turno propio de hoy: se define aquí para que vuelos/ratios y resumen usen la misma base.
+  var e1=d&&d.e1?toM(d.e1):null, s1=d&&d.s1?toM(d.s1):null;
+  var e2=d&&d.e2?toM(d.e2):null, s2=d&&d.s2?toM(d.s2):null;
+  var shEnd=s2||s1;
   // ─ Resumen Operativo ─────────────────────────────────────
   var gmap={};try{gmap=JSON.parse(localStorage.getItem("cta_grupo_2026_map")||"{}");}catch(e){}
   var todayNum=now.getDate();
@@ -4309,10 +4343,29 @@ window.renderOperativa=function(){
   try{var cv2=localStorage.getItem("op_vt_tom");if(cv2){var cpt=JSON.parse(cv2);if(cpt.d===tStr2)cT=cpt.t;}}catch(e){}
   if(totT>cT){cT=totT;try{localStorage.setItem("op_vt_tom",JSON.stringify({d:tStr2,t:cT}));}catch(e){}}
   if(g("op-v-total-tom"))g("op-v-total-tom").textContent=cT>0?cT:"—";
-  function cntSh(fls,e1p,s1p,e2p,s2p){var n=0;fls.forEach(function(v){var t=typeof hToMin==="function"?hToMin(v.horaReal||v.horaProg||""):null;if(t===null)return;if(e1p!==null&&s1p!==null&&t>=e1p&&t<=s1p)n++;else if(e2p!==null&&s2p!==null&&t>=e2p&&t<=s2p)n++;});return n;}
-  var _shDone=(shEnd!==null&&nowMin>=shEnd);
+  function cntSh(fls,e1p,s1p,e2p,s2p,remainingOnly){
+    var n=0;
+    function inTramo(t,a,b){
+      if(a===null||b===null)return false;
+      var end=b<a?b+1440:b, x=t;
+      if(end>=1440&&x<a)x+=1440;
+      if(remainingOnly){
+        var nowX=nowMin;
+        if(end>=1440&&nowX<a)nowX+=1440;
+        if(x<nowX)return false;
+      }
+      return x>=a&&x<=end;
+    }
+    fls.forEach(function(v){
+      if((v.estadoClass||"")==="e-cancelled")return;
+      var t=typeof hToMin==="function"?hToMin(v.horaReal||v.horaProg||""):null;
+      if(t===null)return;
+      if(inTramo(t,e1p,s1p)||inTramo(t,e2p,s2p))n++;
+    });
+    return n;
+  }
   var _liveEmpty=(lH.length===0&&sH.length===0);
-  var iH=(e1!==null&&!_liveEmpty)?cntSh(lH.concat(sH),e1,s1,e2,s2):0;
+  var iH=(e1!==null&&!_liveEmpty)?cntSh(lH.concat(sH),e1,s1,e2,s2,true):0;
   if(g("op-v-turno"))g("op-v-turno").textContent=_liveEmpty?"—":String(iH);
   var tom=new Date(now);tom.setDate(tom.getDate()+1);
   var dT=(ue[MESES[tom.getMonth()]]||{})[tom.getDate()]||null;
@@ -4431,8 +4484,7 @@ window.renderOperativa=function(){
   if(!_isFreeDay){
   }
 
-  var e1=toM(d.e1),s1=toM(d.s1),e2=d.e2?toM(d.e2):null,s2=d.s2?toM(d.s2):null;
-  var shEnd=s2||s1,totMin=0;
+  var totMin=0;
   if(e1!==null&&s1!==null)totMin+=(s1>=e1?s1-e1:s1+1440-e1);
   if(e2!==null&&s2!==null)totMin+=(s2>=e2?s2-e2:s2+1440-e2);
   if(g("op-tc-lbl")&&!_isFreeDay)g("op-tc-lbl").textContent="Turno hoy · "+fmtT(totMin);
