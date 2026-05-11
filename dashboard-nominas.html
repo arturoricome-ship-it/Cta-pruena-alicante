@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+<!-- CTA_NOMINAS_MANTENIMIENTO_5CLICKS_PASSWORD_2026-05-11 -->
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <link rel="manifest" href="/manifest-dashboard.json">
@@ -452,11 +453,101 @@ option[value="bp"]{background:#1a000a;color:#f9a8d4}
 #dias-popup-title span:hover{color:#f0f4ff}
 .dias-popup-day{font-size:12px;color:#f0f4ff;padding:3px 0;display:flex;align-items:center;gap:6px}
 .dias-popup-day::before{content:'';width:4px;height:4px;border-radius:50%;background:var(--blue2);flex-shrink:0}
+
+
+/* ── MODO MANTENIMIENTO NÓMINAS: conserva el contenido pero lo oculta ── */
+body.maintenance-mode{overflow:hidden!important;background:#0e1117!important;}
+body.maintenance-mode > :not(#maintenance-lock):not(script):not(style){display:none!important;}
+#maintenance-lock{position:fixed;inset:0;z-index:999999;background:radial-gradient(circle at top,#1e2535 0,#0e1117 58%);display:flex;align-items:center;justify-content:center;padding:24px;font-family:'Inter',system-ui,sans-serif;color:#e2e8f0;text-align:center;}
+.maint-card{width:min(430px,100%);background:#161b25;border:1px solid rgba(245,158,11,.35);border-radius:18px;padding:30px 24px;box-shadow:0 20px 70px rgba(0,0,0,.55);}
+.maint-ico{font-size:46px;margin-bottom:14px;}
+.maint-title{font-size:22px;font-weight:800;margin-bottom:8px;color:#fbbf24;}
+.maint-text{font-size:14px;line-height:1.65;color:#94a3b8;margin-bottom:18px;}
+.maint-chip{display:inline-flex;align-items:center;gap:7px;border:1px solid rgba(245,158,11,.35);background:rgba(245,158,11,.10);color:#fbbf24;border-radius:999px;padding:7px 12px;font-size:12px;font-weight:700;}
+.maint-back{display:inline-flex;margin-top:18px;color:#60a5fa;text-decoration:none;font-size:13px;font-weight:700;}
+
+.maint-secret{display:none;margin-top:18px;border-top:1px solid rgba(255,255,255,.08);padding-top:16px;}
+.maint-secret.on{display:block;}
+.maint-secret-title{font-size:12px;color:#94a3b8;margin-bottom:8px;}
+.maint-secret-row{display:flex;gap:8px;align-items:center;justify-content:center;}
+.maint-secret-input{background:#1e2535;border:1px solid #344060;color:#e2e8f0;border-radius:8px;padding:10px 12px;font-family:'Inter',system-ui,sans-serif;font-size:14px;width:160px;text-align:center;letter-spacing:2px;outline:none;}
+.maint-secret-input:focus{border-color:#60a5fa;}
+.maint-secret-btn{background:#3b82f6;border:none;color:white;border-radius:8px;padding:10px 12px;font-family:'Inter',system-ui,sans-serif;font-size:13px;font-weight:800;cursor:pointer;}
+.maint-secret-error{display:none;color:#f87171;font-size:11px;margin-top:8px;}
+.maint-secret-hint{font-size:10px;color:#64748b;margin-top:8px;}
+
 </style>
 <script src="https://accounts.google.com/gsi/client" async></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 </head>
-<body>
+<body class="maintenance-mode">
+
+<div id="maintenance-lock">
+  <div class="maint-card">
+    <div class="maint-ico">🛠️</div>
+    <div class="maint-title">Nóminas en mantenimiento</div>
+    <div class="maint-text">
+      Esta sección está temporalmente desactivada mientras se revisa la herramienta.
+      Vuelve a intentarlo más tarde.
+    </div>
+    <div class="maint-chip" id="maint-secret-trigger">🔒 Acceso temporalmente bloqueado</div>
+    <div class="maint-secret" id="maint-secret-box">
+      <div class="maint-secret-title">Acceso privado</div>
+      <div class="maint-secret-row">
+        <input class="maint-secret-input" id="maint-secret-pass" type="password" placeholder="Contraseña" onkeydown="if(event.key==='Enter')unlockMaintenance()">
+        <button class="maint-secret-btn" onclick="unlockMaintenance()">Entrar</button>
+      </div>
+      <div class="maint-secret-error" id="maint-secret-error">Contraseña incorrecta</div>
+      <div class="maint-secret-hint">Acceso oculto activado.</div>
+    </div>
+    <br>
+    <a class="maint-back" href="/">Volver al inicio</a>
+  </div>
+</div>
+
+
+<script>
+(function(){
+  var clicks=[];
+  var trigger=null;
+  function showSecretBox(){
+    var box=document.getElementById('maint-secret-box');
+    var input=document.getElementById('maint-secret-pass');
+    if(box){ box.classList.add('on'); }
+    if(input){ setTimeout(function(){input.focus();},80); }
+  }
+  window.unlockMaintenance=function(){
+    var input=document.getElementById('maint-secret-pass');
+    var err=document.getElementById('maint-secret-error');
+    var val=input ? input.value : '';
+    if(val==='Pepito'){
+      document.body.classList.remove('maintenance-mode');
+      var lock=document.getElementById('maintenance-lock');
+      if(lock){ lock.style.display='none'; }
+      document.body.classList.add('unlocked');
+      try{ if(typeof renderAll==='function') renderAll(); }catch(e){}
+    }else{
+      if(err){ err.style.display='block'; setTimeout(function(){err.style.display='none';},2500); }
+      if(input){ input.value=''; input.focus(); }
+    }
+  };
+  document.addEventListener('DOMContentLoaded',function(){
+    trigger=document.getElementById('maintenance-lock');
+    if(!trigger) return;
+    trigger.addEventListener('click',function(e){
+      if(e.target.closest('#maint-secret-box')) return;
+      var now=Date.now();
+      clicks=clicks.filter(function(t){return now-t<1400;});
+      clicks.push(now);
+      if(clicks.length>=5){
+        clicks=[];
+        showSecretBox();
+      }
+    });
+  });
+})();
+</script>
+
 <!-- ── PANTALLA LOGIN ── -->
 <div id="dash-login" class="hidden">
   <div class="dl-logo">📋</div>
