@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<!-- CTA_OPERATIVA_V4_AJUSTES_2026-05-10 -->
+<!-- CTA_OPERATIVA_V9_DETALLES_PERSONAS_AVION_2026-05-11 -->
 <meta charset="UTF-8">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -193,7 +193,7 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 .grupo-btn-wa{background:linear-gradient(135deg,#25D366,#1da851)}
 .grupo-btn:hover{transform:translateY(-2px);opacity:.9}
 .grupo-proximamente{font-size:12px;color:var(--gray);font-style:italic;padding:8px 0}
-#bottom-nav{position:fixed;bottom:0;left:0;right:0;background:rgba(13,22,35,.96);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid rgba(255,255,255,.08);display:flex;padding:8px 0 max(8px,env(safe-area-inset-bottom));z-index:100}
+#bottom-nav{position:fixed;bottom:0;left:0;right:0;background:rgba(13,22,35,.96);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid rgba(255,255,255,.08);display:flex!important;padding:8px 0 max(8px,env(safe-area-inset-bottom));z-index:1000}
 .nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;border:none;background:none;color:var(--gray);font-family:"Outfit",sans-serif;font-size:8px;font-weight:600;letter-spacing:.2px;text-transform:uppercase;transition:color .2s;padding:2px 0}
 .nav-btn.active{color:var(--gold)}.nav-ico{font-size:20px;line-height:1}
 #install-banner{display:none;position:fixed;bottom:80px;left:12px;right:12px;background:var(--navy-light);border:1px solid rgba(200,168,75,.4);border-radius:16px;padding:12px 14px;z-index:300;flex-direction:row;align-items:center;gap:11px;box-shadow:0 8px 32px rgba(0,0,0,.5)}
@@ -486,7 +486,7 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 /* ─── Panel operativo ampliado ───────────────────────────── */
 .op-dashboard{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
 @media(max-width:720px){.op-dashboard{grid-template-columns:1fr}}
-.op-pressure-card,.op-now-card,.op-load-card,.op-peaks-card,.op-hourly-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:13px 14px;overflow:hidden}
+.op-pressure-card,.op-now-card,.op-load-card,.op-peaks-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:13px 14px;overflow:hidden}
 .op-pressure-card{border-color:rgba(200,168,75,.28);background:linear-gradient(160deg,rgba(200,168,75,.08),rgba(200,168,75,.025))}
 .op-card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:10px}
 .op-card-title{font-size:12px;font-weight:800;color:var(--white);letter-spacing:.2px}
@@ -521,27 +521,30 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 .op-pill.mid{background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.25);color:#fbbf24}
 .op-pill.high{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.28);color:#f87171}
 .op-pill.very{background:rgba(192,38,211,.14);border:1px solid rgba(192,38,211,.28);color:#e879f9}
-.op-hourly-list{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:10px}
-@media(max-width:380px){.op-hourly-list{grid-template-columns:repeat(3,1fr)}}
-.op-hour-chip{background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.07);border-radius:11px;padding:7px 7px;min-height:60px;display:flex;flex-direction:column;justify-content:space-between;gap:3px}
-.op-hour-chip.low{background:rgba(34,197,94,.06);border-color:rgba(34,197,94,.17)}
-.op-hour-chip.mid{background:rgba(251,191,36,.06);border-color:rgba(251,191,36,.17)}
-.op-hour-chip.high{background:rgba(239,68,68,.07);border-color:rgba(239,68,68,.2)}
-.op-hour-chip.very{background:rgba(192,38,211,.08);border-color:rgba(192,38,211,.22)}
-.op-hour-top{display:flex;align-items:center;justify-content:space-between;gap:4px}
-.op-hour-h{font-size:10px;font-weight:900;color:var(--white);letter-spacing:.2px}
-.op-hour-r{font-size:13px;font-weight:900;color:var(--gold);line-height:1}
-.op-hour-r.low{color:#4ade80}.op-hour-r.mid{color:#fbbf24}.op-hour-r.high{color:#f87171}.op-hour-r.very{color:#e879f9}
-.op-hour-meta{font-size:8px;color:var(--gray);line-height:1.25;white-space:nowrap}
-
 .op-peak-chip.low{border-color:rgba(34,197,94,.18);background:rgba(34,197,94,.045)}
 .op-peak-chip.mid{border-color:rgba(251,191,36,.18);background:rgba(251,191,36,.045)}
 .op-peak-chip.high{border-color:rgba(239,68,68,.22);background:rgba(239,68,68,.055)}
 .op-peak-chip.very{border-color:rgba(192,38,211,.25);background:rgba(192,38,211,.06)}
 
+.op-details-toggle{width:100%;background:linear-gradient(135deg,rgba(200,168,75,.18),rgba(200,168,75,.07));border:1px solid rgba(200,168,75,.35);border-radius:15px;padding:13px 14px;color:var(--gold);font-family:"Outfit",sans-serif;font-size:13px;font-weight:900;letter-spacing:.3px;display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer;margin-bottom:10px}
+.op-details-toggle:active{transform:scale(.99)}
+.op-details-chevron{font-size:15px;color:var(--gold);transition:transform .2s ease}
+.op-details-toggle.open .op-details-chevron{transform:rotate(180deg)}
+.op-ratio-card{background:var(--card);border:1px solid rgba(96,165,250,.18);border-radius:16px;padding:13px 14px;overflow:hidden;grid-column:1/-1}
+.op-hour-ratio-list{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:10px}
+@media(max-width:520px){.op-hour-ratio-list{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:360px){.op-hour-ratio-list{grid-template-columns:repeat(2,1fr)}}
+.op-hour-ratio-chip{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:11px;padding:8px 6px;min-height:62px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:3px}
+.op-hour-ratio-chip.low{border-color:rgba(34,197,94,.18);background:rgba(34,197,94,.045)}
+.op-hour-ratio-chip.mid{border-color:rgba(251,191,36,.18);background:rgba(251,191,36,.045)}
+.op-hour-ratio-chip.high{border-color:rgba(239,68,68,.22);background:rgba(239,68,68,.055)}
+.op-hour-ratio-chip.very{border-color:rgba(192,38,211,.25);background:rgba(192,38,211,.06)}
+.op-hour-ratio-chip .op-hour{font-size:10px;font-weight:800;color:var(--white);line-height:1}
+.op-hour-ratio-chip .op-hour-meta{font-size:8px;color:rgba(255,255,255,.42);line-height:1.15}
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<!-- CTA_OPERATIVA_V7_RATIO_HORARIO_2026-05-10 -->
+<!-- CTA_OPERATIVA_V9_DETALLES_PERSONAS_AVION_2026-05-11 -->
 </head>
 <body>
 
@@ -654,8 +657,25 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
         </div>
       </div>
     </div>
-    <p class="op-sec">📊 Panel operativo del día</p>
-    <div class="op-dashboard">
+    <p class="op-sec">Compañeros</p>
+    <div class="op-comp-card" onclick="abrirTodaPlantilla()">
+      <div class="op-comp-num">👥</div>
+      <div style="flex:1;min-width:0">
+        <div class="op-card-title">Compañeros por día</div>
+        <div class="op-card-sub">Ver quién trabaja, quién coincide contigo e importar el Excel del grupo.</div>
+        <div class="op-comp-actions">
+          <button class="op-comp-action view" onclick="event.stopPropagation();abrirTodaPlantilla()">👥 Ver compañeros</button>
+          <button class="op-comp-action import" onclick="event.stopPropagation();document.getElementById('calc-panel').classList.add('show');document.getElementById('calc-overlay').classList.add('show');importarGrupo()">📥 Importar grupo</button>
+        </div>
+      </div>
+      <svg width="7" height="12" viewBox="0 0 7 12" fill="none"><path d="M1 1l5 5-5 5" stroke="#8a93a8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+
+    <p class="op-sec">📊 Detalles operativos</p>
+    <button id="op-details-btn" class="op-details-toggle" onclick="toggleOpDetails()">
+      <span>📊 Detalles operativos del día</span><span class="op-details-chevron">⌄</span>
+    </button>
+    <div id="op-details-panel" class="op-dashboard" style="display:none">
       <div class="op-pressure-card">
         <div class="op-card-head">
           <div>
@@ -689,31 +709,17 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
         <div class="op-metric-list">
           <div class="op-metric-row"><span>Compañeros trabajando</span><b id="op-load-workers">—</b></div>
           <div class="op-metric-row"><span>Vuelos previstos</span><b id="op-load-flights">—</b></div>
-          <div class="op-metric-row"><span>Ratio vuelos por trabajador</span><b id="op-load-ratio">—</b></div>
+          <div class="op-metric-row"><span>Personas por avión</span><b id="op-load-ratio">—</b></div>
           <div class="op-metric-row"><span>Franja más cargada</span><b id="op-load-peak">—</b></div>
           <div class="op-metric-row warn"><span>Posible falta de personal</span><b id="op-load-lack">—</b></div>
         </div>
       </div>
 
-      <div class="op-hourly-card">
-        <div class="op-card-title">Ratio vuelo/trabajador por hora</div>
-        <div class="op-card-sub">Vuelos previstos en cada hora dividido entre compañeros disponibles en esa hora</div>
-        <div id="op-hourly-ratio-list" class="op-hourly-list">
-          <div class="op-hour-chip"><span class="op-hour-h">Cargando...</span></div>
-        </div>
-      </div>
 
-      <div class="op-comp-card" onclick="abrirTodaPlantilla()">
-        <div class="op-comp-num">👥</div>
-        <div style="flex:1;min-width:0">
-          <div class="op-card-title">Compañeros por día</div>
-          <div class="op-card-sub">Ver quién trabaja, quién coincide contigo e importar el Excel del grupo.</div>
-          <div class="op-comp-actions">
-            <button class="op-comp-action view" onclick="event.stopPropagation();abrirTodaPlantilla()">👥 Ver compañeros</button>
-            <button class="op-comp-action import" onclick="event.stopPropagation();document.getElementById('calc-panel').classList.add('show');document.getElementById('calc-overlay').classList.add('show');importarGrupo()">📥 Importar grupo</button>
-          </div>
-        </div>
-        <svg width="7" height="12" viewBox="0 0 7 12" fill="none"><path d="M1 1l5 5-5 5" stroke="#8a93a8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div class="op-ratio-card">
+        <div class="op-card-title">Personas por avión por hora</div>
+        <div class="op-card-sub">Ratio horario = compañeros trabajando en esa hora ÷ vuelos de esa hora</div>
+        <div id="op-hour-ratio-list" class="op-hour-ratio-list"></div>
       </div>
 
       <div class="op-peaks-card">
@@ -2083,7 +2089,7 @@ function initGoogle(){
     // Festivo/HL/vacaciones → rest countdown
     var _restTipos=['festivo','hl','hlp','vacaciones'];
     if(_restTipos.indexOf(d?d.tipo:'')>=0){
-      if(bar)bar.style.display='block';if(nav)nav.style.display='none';
+      if(bar)bar.style.display='block';if(nav)nav.style.display='flex';
       var twT_=document.getElementById('tw-times');
       twT_.style.fontSize='22px';twT_.style.fontWeight='800';twT_.style.letterSpacing='0';twT_.style.color='#22c55e';
       document.getElementById('tw-ico').textContent='😴';document.getElementById('tw-ico').style.background='rgba(34,197,94,.08)';
@@ -2109,7 +2115,7 @@ function initGoogle(){
       var sa2=document.getElementById('scroll-area');if(sa2)sa2.style.paddingBottom='90px';
       return;
     }
-    if(nav)nav.style.display='none';
+    if(nav)nav.style.display='flex';
     if(bar)bar.style.display='block';
     var cb=document.getElementById('calc-btn');if(cb)cb.style.bottom='215px';
     var sa=document.getElementById('scroll-area');if(sa)sa.style.paddingBottom='90px';
@@ -4126,6 +4132,16 @@ function g(id){return document.getElementById(id);}
 function toM(t){if(!t)return null;var p=t.split(":");return +p[0]*60+(+p[1]||0);}
 function fmtT(m){if(!m&&m!==0)return"";var h=Math.floor(m/60),mn=m%60;return h>0?h+"h"+(mn?" "+mn+"m":""):mn+"m";}
 
+
+window.toggleOpDetails=function(){
+  var p=document.getElementById('op-details-panel');
+  var b=document.getElementById('op-details-btn');
+  if(!p)return;
+  var open=p.style.display && p.style.display!=='none';
+  p.style.display=open?'none':'grid';
+  if(b)b.classList.toggle('open',!open);
+};
+
 window.renderOperativa=function(){
   var now=new Date(),nowMin=now.getHours()*60+now.getMinutes();
   var mK=MESES[now.getMonth()];
@@ -4269,7 +4285,7 @@ window.renderOperativa=function(){
     var le=g('op-pressure-level');if(le){le.textContent=lvl;le.className='op-pressure-level '+cls;}
     var pctEl=g('op-pressure-pct');if(pctEl){pctEl.textContent=pct+'%';pctEl.className='op-pressure-pct '+cls;}
     var bar=g('op-pressure-bar');if(bar){bar.style.width=pct+'%';bar.className='op-pressure-bar '+cls;}
-    setTextOp('op-pressure-note','Vuelos + pico '+(peakFlights||0)+' + retrasos '+(delays||0)+' + plantilla '+total+'.');
+    setTextOp('op-pressure-note','Estimación por vuelos, pico '+(peakFlights||0)+', retrasos '+(delays||0)+' y plantilla '+total+'.');
     setTextOp('op-load-lack',pct>=75?'Sí':'No');
   }
   setTextOp('op-load-workers',total||'—');
@@ -4347,38 +4363,29 @@ window.renderOperativa=function(){
   var peakWin=windows.slice().sort(function(a,b){return b.count-a.count;})[0]||null;
   setTextOp('op-load-workers',total||'—');
   setTextOp('op-load-flights',cH>0?cH:'—');
-  setTextOp('op-load-ratio',(total&&cH)?(cH/total).toFixed(2).replace('.',','):'—');
+  setTextOp('op-load-ratio',(total&&cH)?(total/cH).toFixed(2).replace('.',','):'—');
   setTextOp('op-load-peak',peakWin&&peakWin.count>0?peakWin.label:'—');
-
-  // Ratio vuelo/trabajador por hora
-  function fmtRatioOp(n){return isFinite(n)?n.toFixed(2).replace('.',','):'—';}
-  function hourLabelOp(h){return (h<10?'0':'')+h+':00';}
-  function workerOverlapsHourOp(emp,a,b){
-    return tramoOverlaps(emp.e1,emp.s1,a,b)||tramoOverlaps(emp.e2,emp.s2,a,b);
+  var hrl=g('op-hour-ratio-list');
+  if(hrl){
+    var hours=[];
+    for(var hh=0;hh<24;hh++){
+      var a=hh*60,b=a+60,mid=a+30;
+      var flights=inWindowCount(allH,a,b);
+      var workers=trabajanHoy.filter(function(emp){return isWorkingAt(emp,mid);}).length;
+      var ratio=flights>0?(workers/flights):null;
+      var cls='low',txt='Sin vuelos';
+      if(ratio!==null){
+        if(ratio>=8)cls='low';
+        else if(ratio>=5)cls='mid';
+        else if(ratio>=3)cls='high';
+        else cls='very';
+        txt=ratio.toFixed(1).replace('.',',')+' pers/av.';
+      }
+      var label=(hh<10?'0':'')+hh+'-'+(((hh+1)%24)<10?'0':'')+((hh+1)%24);
+      hours.push('<div class="op-hour-ratio-chip '+cls+'"><span class="op-hour">'+label+'</span><b class="op-pill '+cls+'">'+txt+'</b><small class="op-hour-meta">'+workers+' pers. / '+flights+' vuelos</small></div>');
+    }
+    hrl.innerHTML=hours.join('');
   }
-  var hourly=[];
-  for(var hrOp=0;hrOp<24;hrOp++){
-    var aOp=hrOp*60,bOp=aOp+60;
-    var fOp=inWindowCount(allH,aOp,bOp);
-    var wOp=trabajanHoy.filter(function(emp){return workerOverlapsHourOp(emp,aOp,bOp);}).length;
-    var rOp=wOp>0?fOp/wOp:null;
-    hourly.push({h:hrOp,flights:fOp,workers:wOp,ratio:rOp});
-  }
-  var maxRatioOp=hourly.reduce(function(m,x){return Math.max(m,x.ratio||0);},0);
-  function ratioClassOp(r){
-    if(r===null)return 'low';
-    if(maxRatioOp<=0)return 'low';
-    if(r>=Math.max(0.35,maxRatioOp*.90))return 'very';
-    if(r>=Math.max(0.25,maxRatioOp*.65))return 'high';
-    if(r>=Math.max(0.10,maxRatioOp*.35))return 'mid';
-    return 'low';
-  }
-  var hrList=g('op-hourly-ratio-list');
-  if(hrList)hrList.innerHTML=hourly.map(function(x){
-    var cls=ratioClassOp(x.ratio);
-    var ratioTxt=x.ratio===null?'—':fmtRatioOp(x.ratio);
-    return '<div class="op-hour-chip '+cls+'"><div class="op-hour-top"><span class="op-hour-h">'+hourLabelOp(x.h)+'</span><b class="op-hour-r '+cls+'">'+ratioTxt+'</b></div><div class="op-hour-meta">'+x.flights+' vuelos / '+x.workers+' trab.</div></div>';
-  }).join('');
 
   function isDelay(v){var e=(v.estadoClass||'')+' '+(v.estado||'');return /delay|retras/i.test(e);}
   function inNext(v,min){var tm=flMin(v);if(tm===null)return false;var dd=tm-nowMin;if(dd<0)dd+=1440;return dd>=0&&dd<=min;}
