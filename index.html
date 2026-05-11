@@ -1,7 +1,11 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+<!-- CTA_OPERATIVA_V3_PANEL_2026-05-10 -->
 <meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
 <meta name="theme-color" content="#0f1828">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -254,6 +258,8 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 #bottom-turno{display:none;flex-shrink:0;background:rgba(13,22,35,.98);border-top:1px solid rgba(200,168,75,.2);padding:7px 14px 10px;transition:background .5s}
 @keyframes twpulse{0%,100%{background:rgba(239,68,68,.32)}50%{background:rgba(239,68,68,.05)}}
 #bottom-turno.saliendo{animation:twpulse 2s ease-in-out infinite;border-top-color:rgba(239,68,68,.4)}
+@keyframes cardPulseRed{0%,100%{background:rgba(239,68,68,.03);border-color:rgba(239,68,68,.2);box-shadow:0 0 0 0 rgba(239,68,68,0)}50%{background:rgba(239,68,68,.18);border-color:rgba(239,68,68,.8);box-shadow:0 0 18px rgba(239,68,68,.25)}}
+.op-tc-card.saliendo{animation:cardPulseRed 1.4s ease-in-out infinite!important;}
 .tw-main{display:flex;align-items:center;gap:10px;margin-bottom:7px}
 .tw-ico-wrap{width:36px;height:36px;border-radius:10px;background:rgba(200,168,75,.1);border:1px solid rgba(200,168,75,.18);display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0}
 .tw-info{flex:1;min-width:0}
@@ -472,6 +478,38 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 
 @keyframes badgePulse{0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(230,70,70,.7);}50%{transform:scale(1.15);box-shadow:0 0 0 5px rgba(230,70,70,0);}}
 .badge.show{animation:badgePulse 1.4s ease-in-out infinite;}
+/* ─── Panel operativo ampliado ───────────────────────────── */
+.op-dashboard{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+@media(max-width:720px){.op-dashboard{grid-template-columns:1fr}}
+.op-pressure-card,.op-now-card,.op-load-card,.op-peaks-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:13px 14px;overflow:hidden}
+.op-pressure-card{border-color:rgba(200,168,75,.28);background:linear-gradient(160deg,rgba(200,168,75,.08),rgba(200,168,75,.025))}
+.op-card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:10px}
+.op-card-title{font-size:12px;font-weight:800;color:var(--white);letter-spacing:.2px}
+.op-card-sub{font-size:8.5px;color:var(--gray);margin-top:2px;line-height:1.4}
+.op-pressure-level{font-size:10px;font-weight:900;border-radius:999px;padding:4px 8px;background:rgba(255,255,255,.06);color:var(--gray);white-space:nowrap;text-transform:uppercase;letter-spacing:.5px}
+.op-pressure-level.low{background:rgba(34,197,94,.12);color:#4ade80;border:1px solid rgba(34,197,94,.25)}
+.op-pressure-level.mid{background:rgba(251,191,36,.12);color:#fbbf24;border:1px solid rgba(251,191,36,.25)}
+.op-pressure-level.high{background:rgba(251,146,60,.12);color:#fb923c;border:1px solid rgba(251,146,60,.3)}
+.op-pressure-level.very{background:rgba(239,68,68,.13);color:#f87171;border:1px solid rgba(239,68,68,.32)}
+.op-pressure-main{display:flex;align-items:center;gap:12px;margin:8px 0}
+.op-pressure-pct{font-size:34px;font-weight:900;line-height:1;color:var(--gold)}
+.op-pressure-bar-bg{flex:1;height:8px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden}
+.op-pressure-bar{height:100%;border-radius:999px;background:var(--gold);transition:width .4s ease}
+.op-mini-note{font-size:9px;color:var(--gray);line-height:1.4}
+.op-metric-list{display:flex;flex-direction:column;gap:5px;margin-top:10px}
+.op-metric-row,.op-peak-row{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 8px;background:rgba(255,255,255,.04);border-radius:9px}
+.op-metric-row span,.op-peak-row span{font-size:10px;color:var(--gray);line-height:1.25}
+.op-metric-row b{font-size:12px;color:var(--gold);text-align:right;white-space:nowrap;max-width:48%;overflow:hidden;text-overflow:ellipsis}
+.op-metric-row.danger{background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.13)}
+.op-metric-row.danger b{color:#f87171}
+.op-metric-row.warn{background:rgba(251,191,36,.055);border:1px solid rgba(251,191,36,.13)}
+.op-metric-row.warn b{color:#fbbf24}
+.op-peaks-list{display:flex;flex-direction:column;gap:5px;margin-top:10px}
+.op-pill{font-size:10px;font-weight:900;border-radius:999px;padding:4px 8px;min-width:54px;text-align:center;text-transform:uppercase;letter-spacing:.4px}
+.op-pill.low{background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.25);color:#4ade80}
+.op-pill.mid{background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.25);color:#fbbf24}
+.op-pill.high{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.28);color:#f87171}
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
@@ -586,24 +624,59 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
         </div>
       </div>
     </div>
-    <p class="op-sec">📊 Resumen operativo del día</p>
-    <!-- RESUMEN OPERATIVO -->
-    <div class="op-comp-card" style="flex-direction:column;align-items:stretch;gap:0;padding:0;overflow:hidden;cursor:pointer" onclick="if(typeof verCompanerosHoy==='function'){var p=document.getElementById('calc-panel');var o=document.getElementById('calc-overlay');if(p){p.classList.add('show');if(o)o.classList.add('show');setTimeout(function(){verCompanerosHoy();},80);}}">
-      <!-- Sub-tabs a todo ancho, pegados al borde superior -->
-      <div style="display:flex;gap:0">
-        <button id="op-tab-dist" onclick="event.stopPropagation();opResTab('dist')" style="flex:1;background:rgba(200,168,75,.15);border:none;border-right:1px solid var(--border);border-bottom:2px solid var(--gold);color:var(--gold);font-family:'Outfit',sans-serif;font-size:10px;font-weight:700;padding:9px 4px;cursor:pointer;letter-spacing:.3px">Distribución</button>
-        <button id="op-tab-pico" onclick="event.stopPropagation();opResTab('pico')" style="flex:1;background:none;border:none;border-right:1px solid var(--border);border-bottom:2px solid transparent;color:var(--gray);font-family:'Outfit',sans-serif;font-size:10px;font-weight:700;padding:9px 4px;cursor:pointer;letter-spacing:.3px">Picos</button>
-        <button id="op-tab-now" onclick="event.stopPropagation();opResTab('now')" style="flex:1;background:none;border:none;border-bottom:2px solid transparent;color:var(--gray);font-family:'Outfit',sans-serif;font-size:10px;font-weight:700;padding:9px 4px;cursor:pointer;letter-spacing:.3px">Ahora</button>
-        <div id="op-ver-btn" style="flex-shrink:0;background:none;border:none;border-left:1px solid var(--border);border-bottom:2px solid transparent;color:#60a5fa;font-size:10px;font-weight:800;padding:9px 14px;letter-spacing:.5px;cursor:pointer;display:flex;align-items:center" onclick="event.stopPropagation();if(typeof verCompanerosHoy==='function'){var p=document.getElementById('calc-panel');var o=document.getElementById('calc-overlay');if(p){p.classList.add('show');if(o)o.classList.add('show');setTimeout(function(){verCompanerosHoy();},80);}}">VER</div>
+    <p class="op-sec">📊 Panel operativo del día</p>
+    <div class="op-dashboard">
+      <div class="op-pressure-card">
+        <div class="op-card-head">
+          <div>
+            <div class="op-card-title">Presión operativa</div>
+            <div class="op-card-sub">Estimación interna, no dato oficial</div>
+          </div>
+          <div id="op-pressure-level" class="op-pressure-level">—</div>
+        </div>
+        <div class="op-pressure-main">
+          <div id="op-pressure-pct" class="op-pressure-pct">—</div>
+          <div class="op-pressure-bar-bg"><div id="op-pressure-bar" class="op-pressure-bar" style="width:0%"></div></div>
+        </div>
+        <div id="op-pressure-note" class="op-mini-note">Calculada con vuelos, picos, plantilla y retrasos.</div>
       </div>
-      <!-- Content panels -->
-      <div id="op-res-dist" style="padding:12px 14px">
-        <div id="op-comp-num" style="display:none"></div><div id="op-comp-sub" style="display:none"></div>
-        <div style="font-size:11px;color:var(--gray)">Cargando...</div>
+
+      <div class="op-now-card">
+        <div class="op-card-title">Ahora mismo</div>
+        <div class="op-card-sub">Foto rápida de la operativa actual</div>
+        <div class="op-metric-list">
+          <div class="op-metric-row"><span>Vuelos en curso</span><b id="op-now-active">—</b></div>
+          <div class="op-metric-row"><span>Próximo vuelo crítico</span><b id="op-now-critical">—</b></div>
+          <div class="op-metric-row"><span>Llegadas próximas 30 min</span><b id="op-now-arrivals">—</b></div>
+          <div class="op-metric-row"><span>Salidas próximas 30 min</span><b id="op-now-departures">—</b></div>
+          <div class="op-metric-row danger"><span>Retrasos activos</span><b id="op-now-delays">—</b></div>
+        </div>
       </div>
-      <div id="op-res-pico" style="display:none;padding:12px 14px"></div>
-      <div id="op-res-now" style="display:none;padding:12px 14px"></div>
+
+      <div class="op-load-card">
+        <div class="op-card-title">Carga / plantilla</div>
+        <div class="op-card-sub">Comparativa de vuelos previstos y personal disponible</div>
+        <div class="op-metric-list">
+          <div class="op-metric-row"><span>Compañeros trabajando</span><b id="op-load-workers">—</b></div>
+          <div class="op-metric-row"><span>Vuelos previstos</span><b id="op-load-flights">—</b></div>
+          <div class="op-metric-row"><span>Ratio vuelos por trabajador</span><b id="op-load-ratio">—</b></div>
+          <div class="op-metric-row"><span>Franja más cargada</span><b id="op-load-peak">—</b></div>
+          <div class="op-metric-row warn"><span>Posible falta de personal</span><b id="op-load-lack">—</b></div>
+        </div>
+      </div>
+
+      <div class="op-peaks-card">
+        <div class="op-card-title">Picos previstos por franjas</div>
+        <div class="op-card-sub">Estimación según vuelos publicados</div>
+        <div id="op-peaks-list" class="op-peaks-list">
+          <div class="op-peak-row"><span>05:00 - 07:00</span><b class="op-pill mid">—</b></div>
+          <div class="op-peak-row"><span>10:00 - 12:00</span><b class="op-pill mid">—</b></div>
+          <div class="op-peak-row"><span>14:00 - 16:00</span><b class="op-pill mid">—</b></div>
+          <div class="op-peak-row"><span>20:00 - 22:00</span><b class="op-pill mid">—</b></div>
+        </div>
+      </div>
     </div>
+
     <p class="op-sec">Turnos publicados</p>
     <div class="op-pub-card">
       <div style="padding:10px 14px 8px;text-align:center"><div style="font-size:12px;font-weight:700">📋 Turnos publicados empresa</div><div style="font-size:9px;color:var(--gray);margin-top:1px">FTP · FIJI · Elige tu colectivo</div></div>
@@ -2787,7 +2860,7 @@ function tiColorToTipo(sheet,row,col){
   var rgb=fg.rgb||fg.argb||'';
   if(rgb.length===8)rgb=rgb.slice(2);
   rgb=rgb.toUpperCase();
-  if(rgb==='A9D0F5')return'hl';
+  if(rgb==='A9D0F5')return'baja'; // azul → Baja por defecto
   if(rgb==='AEFC04')return'vacaciones';
   return null;
 }
@@ -3448,6 +3521,9 @@ function procesarGrupoXlsx(file){
       if(lastToken.length>2&&lastToken.length<50&&!/^\d+$/.test(lastToken)){
         categoria=lastToken;
       }
+      // FD detection: check filename AND row2 for "FD"
+      var isFD=/\bFD\b/i.test(file&&file.name||'')||/\bFD\b/i.test(row2)||/\bFD\b/i.test(row2clean);
+      if(isFD)categoria='FD';
 
       // Detect month from row 3 or sheet name
       var sheetName=wb.SheetNames[0];
@@ -3810,8 +3886,19 @@ function renderCompanerosDia(offsetDias,toggleIfOpen){
     html+='<div class="grupo-item" style="opacity:.6"><div class="grupo-solapamiento" style="background:var(--gray)"></div><div class="grupo-nombre" style="color:var(--gray);font-size:12px">Tú · Libre</div><div class="grupo-horario" style="color:var(--gray)">—</div></div>';
   }
   html+='</div>';
-  Object.keys(cats).sort().forEach(function(cat){
-    if(cat!=='_all')html+='<div style="font-size:9px;color:var(--gray);letter-spacing:.6px;text-transform:uppercase;padding:6px 0 2px;border-top:1px solid rgba(255,255,255,.05);margin-top:2px">'+cat+'</div>';
+  // Sort categories: FD always last, rest alphabetical
+  var catKeys=Object.keys(cats).sort(function(a,b){
+    if(a==='_all')return 0;
+    if(a==='FD')return 1;
+    if(b==='FD')return -1;
+    return a.localeCompare(b,'es');
+  });
+  catKeys.forEach(function(cat){
+    if(cat==='FD'){
+      html+='<div style="font-size:9px;letter-spacing:.8px;text-transform:uppercase;padding:7px 0 3px;border-top:2px dashed rgba(255,255,255,.1);margin-top:6px;display:flex;align-items:center;gap:6px"><span style="background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.3);border-radius:6px;color:#fbbf24;font-size:8px;font-weight:700;padding:1px 6px">FD</span><span style="color:var(--gray)">Fijos Discontinuos</span></div>';
+    } else if(cat!=='_all'){
+      html+='<div style="font-size:9px;color:var(--gray);letter-spacing:.6px;text-transform:uppercase;padding:6px 0 2px;border-top:1px solid rgba(255,255,255,.05);margin-top:2px">'+cat+'</div>';
+    }
     cats[cat].forEach(function(c){
       var _dot=c.overnight?'#fb923c':'#60a5fa';
       var _nameExtra=c.overnight?' 🌙':'';
@@ -3926,6 +4013,9 @@ function checkTurnoSalida(){
   if(d.s2){var t2=hToMin(d.s2);if(t2!==null)salidas.push(t2);}
   var saliendo=salidas.some(function(t){var diff=t-nowMin;return diff>=0&&diff<=10;});
   tw.classList.toggle('saliendo',saliendo);
+  // Also apply to operativa card
+  var opCard=document.querySelector('.op-tc-card');
+  if(opCard)opCard.classList.toggle('saliendo',saliendo);
 }
 function checkExitBlinks(){
   var now=new Date(),nowMin=now.getHours()*60+now.getMinutes();
@@ -4099,6 +4189,30 @@ window.renderOperativa=function(){
     +'</div>';
 
 
+  function setTextOp(id,val){var el=g(id);if(el)el.textContent=val;}
+  function setPressureOp(pct,delays,peakFlights){
+    pct=Math.max(0,Math.min(100,Math.round(pct||0)));
+    var lvl='Baja',cls='low';
+    if(pct>=80){lvl='Muy alta';cls='very';}
+    else if(pct>=60){lvl='Alta';cls='high';}
+    else if(pct>=35){lvl='Media';cls='mid';}
+    var le=g('op-pressure-level');if(le){le.textContent=lvl;le.className='op-pressure-level '+cls;}
+    setTextOp('op-pressure-pct',pct+'%');
+    var bar=g('op-pressure-bar');if(bar)bar.style.width=pct+'%';
+    setTextOp('op-pressure-note','Vuelos + pico '+(peakFlights||0)+' + retrasos '+(delays||0)+' + plantilla '+total+'.');
+    setTextOp('op-load-lack',pct>=75?'Sí':'No');
+  }
+  setTextOp('op-load-workers',total||'—');
+  setTextOp('op-load-flights','—');
+  setTextOp('op-load-ratio','—');
+  setTextOp('op-load-peak','—');
+  setTextOp('op-now-active','—');
+  setTextOp('op-now-critical','—');
+  setTextOp('op-now-arrivals','—');
+  setTextOp('op-now-departures','—');
+  setTextOp('op-now-delays','—');
+  setPressureOp(total?25:0,0,0);
+
   // Flights
   if(typeof liveData==="undefined")return;
   var aL=liveData.lle||[],aS=liveData.sal||[];
@@ -4118,14 +4232,56 @@ window.renderOperativa=function(){
   if(g("op-v-total-tom"))g("op-v-total-tom").textContent=cT>0?cT:"—";
   function cntSh(fls,e1p,s1p,e2p,s2p){var n=0;fls.forEach(function(v){var t=typeof hToMin==="function"?hToMin(v.horaReal||v.horaProg||""):null;if(t===null)return;if(e1p!==null&&s1p!==null&&t>=e1p&&t<=s1p)n++;else if(e2p!==null&&s2p!==null&&t>=e2p&&t<=s2p)n++;});return n;}
   var _shDone=(shEnd!==null&&nowMin>=shEnd);
-  var iH=(e1!==null&&!_shDone)?cntSh(lH.concat(sH),e1,s1,e2,s2):0;
-  if(g("op-v-turno"))g("op-v-turno").textContent=String(iH);
+  var _liveEmpty=(lH.length===0&&sH.length===0);
+  var iH=(e1!==null&&!_shDone&&!_liveEmpty)?cntSh(lH.concat(sH),e1,s1,e2,s2):0;
+  if(g("op-v-turno"))g("op-v-turno").textContent=(_shDone||_liveEmpty)?"—":String(iH);
   var tom=new Date(now);tom.setDate(tom.getDate()+1);
   var dT=(ue[MESES[tom.getMonth()]]||{})[tom.getDate()]||null;
   var tE1=dT&&dT.e1?toM(dT.e1):null,tS1=dT&&dT.s1?toM(dT.s1):null;
   var tE2=dT&&dT.e2?toM(dT.e2):null,tS2=dT&&dT.s2?toM(dT.s2):null;
   var iT=tE1!==null&&totT>0?cntSh(lT.concat(sT),tE1,tS1,tE2,tS2):0;
   if(g("op-v-turno-tom"))g("op-v-turno-tom").textContent=totT>0?String(iT):"—";
+
+  // ─ Panel operativo ampliado: picos, ahora, carga/plantilla y presión ─
+  function flMin(v){return typeof hToMin==="function"?hToMin(v.horaReal||v.horaProg||""):null;}
+  var allH=lH.concat(sH).filter(function(v){return (v.estadoClass||"")!=="e-cancelled";});
+  function inWindowCount(arr,a,b){return arr.filter(function(v){var tm=flMin(v);return tm!==null&&tm>=a&&tm<b;}).length;}
+  var windows=[
+    {label:'05:00 - 07:00',a:300,b:420},
+    {label:'10:00 - 12:00',a:600,b:720},
+    {label:'14:00 - 16:00',a:840,b:960},
+    {label:'20:00 - 22:00',a:1200,b:1320}
+  ];
+  windows.forEach(function(w){w.count=inWindowCount(allH,w.a,w.b);});
+  var maxFlights=windows.reduce(function(m,w){return Math.max(m,w.count);},0);
+  function lvlFor(c){if(maxFlights<=0)return {txt:'—',cls:'mid'};if(c>=Math.max(3,Math.ceil(maxFlights*.75)))return {txt:'Alto',cls:'high'};if(c>=Math.max(1,Math.ceil(maxFlights*.4)))return {txt:'Medio',cls:'mid'};return {txt:'Bajo',cls:'low'};}
+  var pl=g('op-peaks-list');
+  if(pl)pl.innerHTML=windows.map(function(w){var l=lvlFor(w.count);return '<div class="op-peak-row"><span>'+w.label+' <small style="color:rgba(255,255,255,.35)">('+w.count+' vuelos)</small></span><b class="op-pill '+l.cls+'">'+l.txt+'</b></div>';}).join('');
+  var peakWin=windows.slice().sort(function(a,b){return b.count-a.count;})[0]||null;
+  setTextOp('op-load-workers',total||'—');
+  setTextOp('op-load-flights',cH>0?cH:'—');
+  setTextOp('op-load-ratio',(total&&cH)?(cH/total).toFixed(2).replace('.',','):'—');
+  setTextOp('op-load-peak',peakWin&&peakWin.count>0?peakWin.label:'—');
+
+  function isDelay(v){var e=(v.estadoClass||'')+' '+(v.estado||'');return /delay|retras/i.test(e);}
+  function inNext(v,min){var tm=flMin(v);if(tm===null)return false;var dd=tm-nowMin;if(dd<0)dd+=1440;return dd>=0&&dd<=min;}
+  var activeFlights=allH.filter(function(v){var c=v.estadoClass||'';return c==='e-active'||c==='e-boarding'||c==='e-gate'||c==='e-taxiing'||inNext(v,10);}).length;
+  var arr30=lH.filter(function(v){return (v.estadoClass||'')!=='e-cancelled'&&inNext(v,30);}).length;
+  var dep30=sH.filter(function(v){return (v.estadoClass||'')!=='e-cancelled'&&inNext(v,30);}).length;
+  var delays=allH.filter(isDelay).length;
+  var upcoming=allH.filter(function(v){return inNext(v,180);}).sort(function(a,b){return (flMin(a)||9999)-(flMin(b)||9999);});
+  var critical=upcoming.filter(isDelay)[0]||upcoming[0]||null;
+  setTextOp('op-now-active',activeFlights);
+  setTextOp('op-now-critical',critical?((critical.numero||'Vuelo')+' - '+(critical.horaReal||critical.horaProg||'--:--')):'—');
+  setTextOp('op-now-arrivals',arr30);
+  setTextOp('op-now-departures',dep30);
+  setTextOp('op-now-delays',delays);
+  var ratioScore=(total&&cH)?Math.min(45,(cH/total)*35):0;
+  var peakScore=peakWin?Math.min(30,peakWin.count*4):0;
+  var delayScore=Math.min(15,delays*5);
+  var nowScore=Math.min(10,activeFlights*2);
+  setPressureOp(ratioScore+peakScore+delayScore+nowScore,delays,peakWin?peakWin.count:0);
+
   if(!card)return;
   ["state-working","state-pausa","state-rest","state-next"].forEach(function(c){card.classList.remove(c);});
 
@@ -4203,13 +4359,20 @@ window.renderOperativa=function(){
     if(g("op-tc-pct"))g("op-tc-pct").textContent=pct+"%";
     if(g("op-tc-rem"))g("op-tc-rem").textContent="Quedan "+fmtT(Math.max(0,rem));
     if(g("op-tc-bar"))g("op-tc-bar").style.width=pct+"%";
+    // Pulse red if ≤10min to end of any tramo
+    var salidas2=[];if(s1!==null)salidas2.push(s1);if(s2!==null)salidas2.push(s2);
+    var saliendoNow=salidas2.some(function(t){var d=t-nowMin;return d>=0&&d<=10;});
+    if(card)card.classList.toggle('saliendo',saliendoNow);
   } else if(isPausa){
     card.classList.add("state-pausa");
     if(g("op-tc-times"))g("op-tc-times").innerHTML=th;
-    var el3=s1-e1,pct3=Math.round(el3/totMin*100);
+    // Pausa: % descending = remaining pause time / total pause duration
+    var pausaTot=e2-s1; // total pause minutes
+    var pausaRem=e2-nowMin; // remaining pause minutes
+    var pct3=pausaTot>0?Math.round(pausaRem/pausaTot*100):0;
     if(g("op-tc-sub"))g("op-tc-sub").textContent="Pausa · Vuelves a las "+d.e2;
     if(g("op-tc-pct"))g("op-tc-pct").textContent=pct3+"%";
-    if(g("op-tc-rem"))g("op-tc-rem").textContent="Pausa "+fmtT(e2-nowMin);
+    if(g("op-tc-rem"))g("op-tc-rem").textContent="Vuelves en "+fmtT(pausaRem);
     if(g("op-tc-bar"))g("op-tc-bar").style.width=pct3+"%";
   } else if(isDone){
     card.classList.add("state-rest");
