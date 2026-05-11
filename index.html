@@ -1,11 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<!-- CTA_OPERATIVA_V9_DETALLES_PERSONAS_AVION_2026-05-11 -->
 <meta charset="UTF-8">
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
 <meta name="theme-color" content="#0f1828">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -193,7 +189,7 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 .grupo-btn-wa{background:linear-gradient(135deg,#25D366,#1da851)}
 .grupo-btn:hover{transform:translateY(-2px);opacity:.9}
 .grupo-proximamente{font-size:12px;color:var(--gray);font-style:italic;padding:8px 0}
-#bottom-nav{position:fixed;bottom:0;left:0;right:0;background:rgba(13,22,35,.96);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid rgba(255,255,255,.08);display:flex!important;padding:8px 0 max(8px,env(safe-area-inset-bottom));z-index:1000}
+#bottom-nav{position:fixed!important;bottom:0!important;left:0!important;right:0!important;background:rgba(13,22,35,.96);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid rgba(255,255,255,.08);display:flex!important;padding:8px 0 max(8px,env(safe-area-inset-bottom));z-index:10000!important}
 .nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;border:none;background:none;color:var(--gray);font-family:"Outfit",sans-serif;font-size:8px;font-weight:600;letter-spacing:.2px;text-transform:uppercase;transition:color .2s;padding:2px 0}
 .nav-btn.active{color:var(--gold)}.nav-ico{font-size:20px;line-height:1}
 #install-banner{display:none;position:fixed;bottom:80px;left:12px;right:12px;background:var(--navy-light);border:1px solid rgba(200,168,75,.4);border-radius:16px;padding:12px 14px;z-index:300;flex-direction:row;align-items:center;gap:11px;box-shadow:0 8px 32px rgba(0,0,0,.5)}
@@ -465,14 +461,9 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 .op-cal-row{display:flex;justify-content:space-between;align-items:center;padding:4px 7px;background:rgba(255,255,255,.04);border-radius:6px}
 .op-cal-rl{font-size:8px;color:var(--gray)}
 .op-cal-rv{font-size:11px;font-weight:700;color:var(--gold)}
-.op-comp-card{background:linear-gradient(160deg,rgba(96,165,250,.075),rgba(96,165,250,.025));border:1px solid rgba(96,165,250,.22);border-radius:16px;padding:13px 14px;cursor:pointer;display:flex;align-items:center;gap:12px;-webkit-tap-highlight-color:transparent;grid-column:1/-1}
+.op-comp-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:12px 14px;cursor:pointer;display:flex;align-items:center;gap:12px;-webkit-tap-highlight-color:transparent}
 .op-comp-card:active{transform:scale(.98)}
 .op-comp-num{font-size:36px;font-weight:800;color:#f87171;line-height:1}
-
-.op-comp-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
-.op-comp-action{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:9px;padding:6px 9px;font-family:"Outfit",sans-serif;font-size:10px;font-weight:800;color:var(--white);cursor:pointer}
-.op-comp-action.import{background:rgba(200,168,75,.12);border-color:rgba(200,168,75,.28);color:var(--gold)}
-.op-comp-action.view{background:rgba(96,165,250,.12);border-color:rgba(96,165,250,.28);color:#93c5fd}
 .op-pub-card{background:var(--card);border:1px solid rgba(192,132,252,.2);border-radius:16px;overflow:hidden}
 .op-pub-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 10px 10px}
 .op-pub-btn{background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:12px 10px;cursor:pointer;display:flex;align-items:center;gap:8px;font-family:"Outfit",sans-serif;width:100%;-webkit-tap-highlight-color:transparent}
@@ -483,68 +474,11 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 
 @keyframes badgePulse{0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(230,70,70,.7);}50%{transform:scale(1.15);box-shadow:0 0 0 5px rgba(230,70,70,0);}}
 .badge.show{animation:badgePulse 1.4s ease-in-out infinite;}
-/* ─── Panel operativo ampliado ───────────────────────────── */
-.op-dashboard{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
-@media(max-width:720px){.op-dashboard{grid-template-columns:1fr}}
-.op-pressure-card,.op-now-card,.op-load-card,.op-peaks-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:13px 14px;overflow:hidden}
-.op-pressure-card{border-color:rgba(200,168,75,.28);background:linear-gradient(160deg,rgba(200,168,75,.08),rgba(200,168,75,.025))}
-.op-card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:10px}
-.op-card-title{font-size:12px;font-weight:800;color:var(--white);letter-spacing:.2px}
-.op-card-sub{font-size:8.5px;color:var(--gray);margin-top:2px;line-height:1.4}
-.op-pressure-level{font-size:10px;font-weight:900;border-radius:999px;padding:4px 8px;background:rgba(255,255,255,.06);color:var(--gray);white-space:nowrap;text-transform:uppercase;letter-spacing:.5px}
-.op-pressure-level.low{background:rgba(34,197,94,.12);color:#4ade80;border:1px solid rgba(34,197,94,.25)}
-.op-pressure-level.mid{background:rgba(251,191,36,.12);color:#fbbf24;border:1px solid rgba(251,191,36,.25)}
-.op-pressure-level.high{background:rgba(239,68,68,.12);color:#f87171;border:1px solid rgba(239,68,68,.28)}
-.op-pressure-level.very{background:rgba(192,38,211,.14);color:#e879f9;border:1px solid rgba(192,38,211,.28)}
-.op-pressure-pct.low{color:#4ade80}.op-pressure-pct.mid{color:#fbbf24}.op-pressure-pct.high{color:#f87171}.op-pressure-pct.very{color:#e879f9}
-.op-pressure-bar.low{background:#4ade80}.op-pressure-bar.mid{background:#fbbf24}.op-pressure-bar.high{background:#f87171}.op-pressure-bar.very{background:#e879f9}
-.op-pressure-main{display:flex;align-items:center;gap:12px;margin:8px 0}
-.op-pressure-pct{font-size:34px;font-weight:900;line-height:1;color:var(--gold)}
-.op-pressure-bar-bg{flex:1;height:8px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden}
-.op-pressure-bar{height:100%;border-radius:999px;background:var(--gold);transition:width .4s ease}
-.op-mini-note{font-size:9px;color:var(--gray);line-height:1.4}
-.op-metric-list{display:flex;flex-direction:column;gap:5px;margin-top:10px}
-.op-metric-row{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 8px;background:rgba(255,255,255,.04);border-radius:9px}
-.op-metric-row span{font-size:10px;color:var(--gray);line-height:1.25}
-.op-metric-row b{font-size:12px;color:var(--gold);text-align:right;white-space:nowrap;max-width:48%;overflow:hidden;text-overflow:ellipsis}
-.op-metric-row.danger{background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.13)}
-.op-metric-row.danger b{color:#f87171}
-.op-metric-row.warn{background:rgba(251,191,36,.055);border:1px solid rgba(251,191,36,.13)}
-.op-metric-row.warn b{color:#fbbf24}
-.op-peaks-list{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:10px}
-@media(max-width:380px){.op-peaks-list{grid-template-columns:repeat(2,1fr)}}
-.op-peak-chip{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:11px;padding:8px 6px;min-height:58px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:3px}
-.op-peak-chip .op-peak-hour{font-size:10px;font-weight:800;color:var(--white);line-height:1}
-.op-peak-chip .op-peak-count{font-size:8px;color:rgba(255,255,255,.38);line-height:1}
-.op-pill{font-size:8px;font-weight:900;border-radius:999px;padding:3px 6px;min-width:42px;text-align:center;text-transform:uppercase;letter-spacing:.3px}
-.op-pill.low{background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.25);color:#4ade80}
-.op-pill.mid{background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.25);color:#fbbf24}
-.op-pill.high{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.28);color:#f87171}
-.op-pill.very{background:rgba(192,38,211,.14);border:1px solid rgba(192,38,211,.28);color:#e879f9}
-.op-peak-chip.low{border-color:rgba(34,197,94,.18);background:rgba(34,197,94,.045)}
-.op-peak-chip.mid{border-color:rgba(251,191,36,.18);background:rgba(251,191,36,.045)}
-.op-peak-chip.high{border-color:rgba(239,68,68,.22);background:rgba(239,68,68,.055)}
-.op-peak-chip.very{border-color:rgba(192,38,211,.25);background:rgba(192,38,211,.06)}
-
-.op-details-toggle{width:100%;background:linear-gradient(135deg,rgba(200,168,75,.18),rgba(200,168,75,.07));border:1px solid rgba(200,168,75,.35);border-radius:15px;padding:13px 14px;color:var(--gold);font-family:"Outfit",sans-serif;font-size:13px;font-weight:900;letter-spacing:.3px;display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer;margin-bottom:10px}
-.op-details-toggle:active{transform:scale(.99)}
-.op-details-chevron{font-size:15px;color:var(--gold);transition:transform .2s ease}
-.op-details-toggle.open .op-details-chevron{transform:rotate(180deg)}
-.op-ratio-card{background:var(--card);border:1px solid rgba(96,165,250,.18);border-radius:16px;padding:13px 14px;overflow:hidden;grid-column:1/-1}
-.op-hour-ratio-list{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:10px}
-@media(max-width:520px){.op-hour-ratio-list{grid-template-columns:repeat(3,1fr)}}
-@media(max-width:360px){.op-hour-ratio-list{grid-template-columns:repeat(2,1fr)}}
-.op-hour-ratio-chip{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:11px;padding:8px 6px;min-height:62px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:3px}
-.op-hour-ratio-chip.low{border-color:rgba(34,197,94,.18);background:rgba(34,197,94,.045)}
-.op-hour-ratio-chip.mid{border-color:rgba(251,191,36,.18);background:rgba(251,191,36,.045)}
-.op-hour-ratio-chip.high{border-color:rgba(239,68,68,.22);background:rgba(239,68,68,.055)}
-.op-hour-ratio-chip.very{border-color:rgba(192,38,211,.25);background:rgba(192,38,211,.06)}
-.op-hour-ratio-chip .op-hour{font-size:10px;font-weight:800;color:var(--white);line-height:1}
-.op-hour-ratio-chip .op-hour-meta{font-size:8px;color:rgba(255,255,255,.42);line-height:1.15}
+/* ─── Detalles operativos del día ───────────────────────────── */
+.op-details{margin-bottom:12px}.op-details summary{list-style:none;cursor:pointer;background:linear-gradient(135deg,rgba(96,165,250,.12),rgba(96,165,250,.035));border:1px solid rgba(96,165,250,.28);border-radius:14px;padding:12px 14px;font-size:12px;font-weight:900;color:#93c5fd;display:flex;justify-content:space-between;align-items:center;gap:10px}.op-details summary::-webkit-details-marker{display:none}.op-details summary::after{content:'+';font-size:18px;color:#60a5fa;font-weight:900;line-height:1}.op-details[open] summary{border-radius:14px 14px 8px 8px;background:linear-gradient(135deg,rgba(96,165,250,.18),rgba(96,165,250,.055))}.op-details[open] summary::after{content:'−'}.op-details-body{padding-top:10px}.op-dashboard{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}@media(max-width:720px){.op-dashboard{grid-template-columns:1fr}}.op-pressure-card,.op-now-card,.op-load-card,.op-peaks-card,.op-ratio-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:13px 14px;overflow:hidden}.op-pressure-card{border-color:rgba(200,168,75,.28);background:linear-gradient(160deg,rgba(200,168,75,.08),rgba(200,168,75,.025))}.op-card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:10px}.op-card-title{font-size:12px;font-weight:800;color:var(--white);letter-spacing:.2px}.op-card-sub{font-size:8.5px;color:var(--gray);margin-top:2px;line-height:1.4}.op-pressure-level{font-size:10px;font-weight:900;border-radius:999px;padding:4px 8px;background:rgba(255,255,255,.06);color:var(--gray);white-space:nowrap;text-transform:uppercase;letter-spacing:.5px}.op-pressure-level.low,.op-pressure-pct.low{color:#4ade80}.op-pressure-level.low{background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.25)}.op-pressure-level.mid,.op-pressure-pct.mid{color:#fbbf24}.op-pressure-level.mid{background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.25)}.op-pressure-level.high,.op-pressure-pct.high{color:#f87171}.op-pressure-level.high{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.28)}.op-pressure-level.very,.op-pressure-pct.very{color:#e879f9}.op-pressure-level.very{background:rgba(192,38,211,.14);border:1px solid rgba(192,38,211,.28)}.op-pressure-bar.low{background:#4ade80}.op-pressure-bar.mid{background:#fbbf24}.op-pressure-bar.high{background:#f87171}.op-pressure-bar.very{background:#e879f9}.op-pressure-main{display:flex;align-items:center;gap:12px;margin:8px 0}.op-pressure-pct{font-size:34px;font-weight:900;line-height:1;color:var(--gold)}.op-pressure-bar-bg{flex:1;height:8px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden}.op-pressure-bar{height:100%;border-radius:999px;background:var(--gold);transition:width .4s ease}.op-mini-note{font-size:9px;color:var(--gray);line-height:1.4}.op-metric-list{display:flex;flex-direction:column;gap:5px;margin-top:10px}.op-metric-row{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 8px;background:rgba(255,255,255,.04);border-radius:9px}.op-metric-row span{font-size:10px;color:var(--gray);line-height:1.25}.op-metric-row b{font-size:12px;color:var(--gold);text-align:right;white-space:nowrap;max-width:48%;overflow:hidden;text-overflow:ellipsis}.op-metric-row.danger{background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.13)}.op-metric-row.danger b{color:#f87171}.op-metric-row.warn{background:rgba(251,191,36,.055);border:1px solid rgba(251,191,36,.13)}.op-metric-row.warn b{color:#fbbf24}.op-peaks-list{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:10px}@media(max-width:420px){.op-peaks-list{grid-template-columns:repeat(2,1fr)}}.op-peak-chip{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:7px 6px;text-align:center;min-width:0}.op-peak-chip.low{border-color:rgba(34,197,94,.18);background:rgba(34,197,94,.045)}.op-peak-chip.mid{border-color:rgba(251,191,36,.18);background:rgba(251,191,36,.045)}.op-peak-chip.high{border-color:rgba(239,68,68,.2);background:rgba(239,68,68,.05)}.op-peak-chip.very{border-color:rgba(192,38,211,.22);background:rgba(192,38,211,.06)}.op-peak-hour{display:block;font-size:10px;font-weight:900;color:var(--white);margin-bottom:4px}.op-peak-count{display:block;font-size:8px;color:var(--gray);margin-top:4px;white-space:nowrap}.op-pill{display:inline-block;font-size:8.5px;font-weight:900;border-radius:999px;padding:3px 6px;min-width:48px;text-align:center;text-transform:uppercase;letter-spacing:.25px}.op-pill.low{background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.25);color:#4ade80}.op-pill.mid{background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.25);color:#fbbf24}.op-pill.high{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.28);color:#f87171}.op-pill.very{background:rgba(192,38,211,.14);border:1px solid rgba(192,38,211,.28);color:#e879f9}.op-hour-ratio-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-top:10px}@media(max-width:420px){.op-hour-ratio-grid{grid-template-columns:repeat(3,1fr)}}.op-hour-ratio{border-radius:9px;padding:6px 4px;text-align:center;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07)}.op-hour-ratio.low{border-color:rgba(34,197,94,.16)}.op-hour-ratio.mid{border-color:rgba(251,191,36,.18)}.op-hour-ratio.high{border-color:rgba(239,68,68,.2)}.op-hour-ratio.very{border-color:rgba(192,38,211,.22)}.op-hour-ratio .h{font-size:8px;color:var(--gray)}.op-hour-ratio .r{font-size:12px;font-weight:900;color:var(--white);margin:2px 0}.op-hour-ratio .d{font-size:7px;color:var(--gray);line-height:1.25}
 
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<!-- CTA_OPERATIVA_V9_DETALLES_PERSONAS_AVION_2026-05-11 -->
 </head>
 <body>
 
@@ -657,90 +591,36 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
         </div>
       </div>
     </div>
-    <p class="op-sec">Compañeros</p>
-    <div class="op-comp-card" onclick="abrirTodaPlantilla()">
-      <div class="op-comp-num">👥</div>
-      <div style="flex:1;min-width:0">
-        <div class="op-card-title">Compañeros por día</div>
-        <div class="op-card-sub">Ver quién trabaja, quién coincide contigo e importar el Excel del grupo.</div>
-        <div class="op-comp-actions">
-          <button class="op-comp-action view" onclick="event.stopPropagation();abrirTodaPlantilla()">👥 Ver compañeros</button>
-          <button class="op-comp-action import" onclick="event.stopPropagation();document.getElementById('calc-panel').classList.add('show');document.getElementById('calc-overlay').classList.add('show');importarGrupo()">📥 Importar grupo</button>
-        </div>
+    <p class="op-sec">📊 Resumen operativo del día</p>
+    <!-- RESUMEN OPERATIVO -->
+    <div class="op-comp-card" style="flex-direction:column;align-items:stretch;gap:0;padding:0;overflow:hidden;cursor:pointer" onclick="if(typeof verCompanerosHoy==='function'){var p=document.getElementById('calc-panel');var o=document.getElementById('calc-overlay');if(p){p.classList.add('show');if(o)o.classList.add('show');setTimeout(function(){verCompanerosHoy();},80);}}">
+      <!-- Sub-tabs a todo ancho, pegados al borde superior -->
+      <div style="display:flex;gap:0">
+        <button id="op-tab-dist" onclick="event.stopPropagation();opResTab('dist')" style="flex:1;background:rgba(200,168,75,.15);border:none;border-right:1px solid var(--border);border-bottom:2px solid var(--gold);color:var(--gold);font-family:'Outfit',sans-serif;font-size:10px;font-weight:700;padding:9px 4px;cursor:pointer;letter-spacing:.3px">Distribución</button>
+        <button id="op-tab-pico" onclick="event.stopPropagation();opResTab('pico')" style="flex:1;background:none;border:none;border-right:1px solid var(--border);border-bottom:2px solid transparent;color:var(--gray);font-family:'Outfit',sans-serif;font-size:10px;font-weight:700;padding:9px 4px;cursor:pointer;letter-spacing:.3px">Picos</button>
+        <button id="op-tab-now" onclick="event.stopPropagation();opResTab('now')" style="flex:1;background:none;border:none;border-bottom:2px solid transparent;color:var(--gray);font-family:'Outfit',sans-serif;font-size:10px;font-weight:700;padding:9px 4px;cursor:pointer;letter-spacing:.3px">Ahora</button>
+        <div id="op-ver-btn" style="flex-shrink:0;background:none;border:none;border-left:1px solid var(--border);border-bottom:2px solid transparent;color:#60a5fa;font-size:10px;font-weight:800;padding:9px 14px;letter-spacing:.5px;cursor:pointer;display:flex;align-items:center" onclick="event.stopPropagation();if(typeof verCompanerosHoy==='function'){var p=document.getElementById('calc-panel');var o=document.getElementById('calc-overlay');if(p){p.classList.add('show');if(o)o.classList.add('show');setTimeout(function(){verCompanerosHoy();},80);}}">VER</div>
       </div>
-      <svg width="7" height="12" viewBox="0 0 7 12" fill="none"><path d="M1 1l5 5-5 5" stroke="#8a93a8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <!-- Content panels -->
+      <div id="op-res-dist" style="padding:12px 14px">
+        <div id="op-comp-num" style="display:none"></div><div id="op-comp-sub" style="display:none"></div>
+        <div style="font-size:11px;color:var(--gray)">Cargando...</div>
+      </div>
+      <div id="op-res-pico" style="display:none;padding:12px 14px"></div>
+      <div id="op-res-now" style="display:none;padding:12px 14px"></div>
     </div>
-
-    <p class="op-sec">📊 Detalles operativos</p>
-    <button id="op-details-btn" class="op-details-toggle" onclick="toggleOpDetails()">
-      <span>📊 Detalles operativos del día</span><span class="op-details-chevron">⌄</span>
-    </button>
-    <div id="op-details-panel" class="op-dashboard" style="display:none">
-      <div class="op-pressure-card">
-        <div class="op-card-head">
-          <div>
-            <div class="op-card-title">Presión operativa</div>
-            <div class="op-card-sub">Estimación interna, no dato oficial</div>
-          </div>
-          <div id="op-pressure-level" class="op-pressure-level">—</div>
-        </div>
-        <div class="op-pressure-main">
-          <div id="op-pressure-pct" class="op-pressure-pct">—</div>
-          <div class="op-pressure-bar-bg"><div id="op-pressure-bar" class="op-pressure-bar" style="width:0%"></div></div>
-        </div>
-        <div id="op-pressure-note" class="op-mini-note">Calculada con vuelos, picos, plantilla y retrasos.</div>
-      </div>
-
-      <div class="op-now-card">
-        <div class="op-card-title">Ahora mismo</div>
-        <div class="op-card-sub">Foto rápida de la operativa actual</div>
-        <div class="op-metric-list">
-          <div class="op-metric-row"><span>Vuelos en curso</span><b id="op-now-active">—</b></div>
-          <div class="op-metric-row"><span>Próximo vuelo crítico</span><b id="op-now-critical">—</b></div>
-          <div class="op-metric-row"><span>Llegadas próximas 30 min</span><b id="op-now-arrivals">—</b></div>
-          <div class="op-metric-row"><span>Salidas próximas 30 min</span><b id="op-now-departures">—</b></div>
-          <div class="op-metric-row danger"><span>Retrasos activos</span><b id="op-now-delays">—</b></div>
+    <details class="op-details">
+      <summary>📊 Detalles operativos del día</summary>
+      <div class="op-details-body">
+        <div class="op-dashboard">
+          <div class="op-pressure-card"><div class="op-card-head"><div><div class="op-card-title">Presión operativa</div><div class="op-card-sub">Estimación interna, no dato oficial</div></div><div id="op-pressure-level" class="op-pressure-level">—</div></div><div class="op-pressure-main"><div id="op-pressure-pct" class="op-pressure-pct">—</div><div class="op-pressure-bar-bg"><div id="op-pressure-bar" class="op-pressure-bar" style="width:0%"></div></div></div><div id="op-pressure-note" class="op-mini-note">Calculada con vuelos, picos, plantilla y retrasos.</div></div>
+          <div class="op-now-card"><div class="op-card-title">Ahora mismo</div><div class="op-card-sub">Foto rápida de la operativa actual</div><div class="op-metric-list"><div class="op-metric-row"><span>Vuelos en curso</span><b id="op-now-active">—</b></div><div class="op-metric-row"><span>Próximo vuelo crítico</span><b id="op-now-critical">—</b></div><div class="op-metric-row"><span>Llegadas próximas 30 min</span><b id="op-now-arrivals">—</b></div><div class="op-metric-row"><span>Salidas próximas 30 min</span><b id="op-now-departures">—</b></div><div class="op-metric-row danger"><span>Retrasos activos</span><b id="op-now-delays">—</b></div></div></div>
+          <div class="op-load-card"><div class="op-card-title">Carga / plantilla</div><div class="op-card-sub">Personas por avión, no vuelos por trabajador</div><div class="op-metric-list"><div class="op-metric-row"><span>Compañeros trabajando</span><b id="op-load-workers">—</b></div><div class="op-metric-row"><span>Vuelos previstos</span><b id="op-load-flights">—</b></div><div class="op-metric-row"><span>Personas por avión</span><b id="op-load-ratio">—</b></div><div class="op-metric-row"><span>Franja más cargada</span><b id="op-load-peak">—</b></div><div class="op-metric-row warn"><span>Posible falta de personal</span><b id="op-load-lack">—</b></div></div></div>
+          <div class="op-peaks-card"><div class="op-card-title">Picos previstos por vuelos</div><div class="op-card-sub">Estimación orientativa por franjas de 2 horas</div><div id="op-peaks-list" class="op-peaks-list"></div></div>
+          <div class="op-ratio-card" style="grid-column:1/-1"><div class="op-card-title">Personas por avión por hora</div><div class="op-card-sub">Plantilla presente en cada hora dividida entre vuelos de esa hora</div><div id="op-hour-ratio-list" class="op-hour-ratio-grid"></div></div>
         </div>
       </div>
-
-      <div class="op-load-card">
-        <div class="op-card-title">Carga / plantilla</div>
-        <div class="op-card-sub">Comparativa de vuelos previstos y personal disponible</div>
-        <div class="op-metric-list">
-          <div class="op-metric-row"><span>Compañeros trabajando</span><b id="op-load-workers">—</b></div>
-          <div class="op-metric-row"><span>Vuelos previstos</span><b id="op-load-flights">—</b></div>
-          <div class="op-metric-row"><span>Personas por avión</span><b id="op-load-ratio">—</b></div>
-          <div class="op-metric-row"><span>Franja más cargada</span><b id="op-load-peak">—</b></div>
-          <div class="op-metric-row warn"><span>Posible falta de personal</span><b id="op-load-lack">—</b></div>
-        </div>
-      </div>
-
-
-      <div class="op-ratio-card">
-        <div class="op-card-title">Personas por avión por hora</div>
-        <div class="op-card-sub">Ratio horario = compañeros trabajando en esa hora ÷ vuelos de esa hora</div>
-        <div id="op-hour-ratio-list" class="op-hour-ratio-list"></div>
-      </div>
-
-      <div class="op-peaks-card">
-        <div class="op-card-title">Picos previstos por vuelos</div>
-        <div class="op-card-sub">Estimación orientativa por franjas de 2 horas</div>
-        <div id="op-peaks-list" class="op-peaks-list">
-          <div class="op-peak-chip"><span class="op-peak-hour">00-02</span><b class="op-pill mid">—</b><small class="op-peak-count">— vuelos</small></div>
-          <div class="op-peak-chip"><span class="op-peak-hour">02-04</span><b class="op-pill mid">—</b><small class="op-peak-count">— vuelos</small></div>
-          <div class="op-peak-chip"><span class="op-peak-hour">04-06</span><b class="op-pill mid">—</b><small class="op-peak-count">— vuelos</small></div>
-          <div class="op-peak-chip"><span class="op-peak-hour">06-08</span><b class="op-pill mid">—</b><small class="op-peak-count">— vuelos</small></div>
-          <div class="op-peak-chip"><span class="op-peak-hour">08-10</span><b class="op-pill mid">—</b><small class="op-peak-count">— vuelos</small></div>
-          <div class="op-peak-chip"><span class="op-peak-hour">10-12</span><b class="op-pill mid">—</b><small class="op-peak-count">— vuelos</small></div>
-          <div class="op-peak-chip"><span class="op-peak-hour">12-14</span><b class="op-pill mid">—</b><small class="op-peak-count">— vuelos</small></div>
-          <div class="op-peak-chip"><span class="op-peak-hour">14-16</span><b class="op-pill mid">—</b><small class="op-peak-count">— vuelos</small></div>
-          <div class="op-peak-chip"><span class="op-peak-hour">16-18</span><b class="op-pill mid">—</b><small class="op-peak-count">— vuelos</small></div>
-          <div class="op-peak-chip"><span class="op-peak-hour">18-20</span><b class="op-pill mid">—</b><small class="op-peak-count">— vuelos</small></div>
-          <div class="op-peak-chip"><span class="op-peak-hour">20-22</span><b class="op-pill mid">—</b><small class="op-peak-count">— vuelos</small></div>
-          <div class="op-peak-chip"><span class="op-peak-hour">22-00</span><b class="op-pill mid">—</b><small class="op-peak-count">— vuelos</small></div>
-        </div>
-      </div>
-    </div>
+    </details>
 
     <p class="op-sec">Turnos publicados</p>
     <div class="op-pub-card">
@@ -1767,10 +1647,9 @@ function renderLive(){
     if(rowStyle)row.style.cssText=rowStyle;
     var horaEfectiva=v.horaReal||v.horaProg||"";
     row.setAttribute("data-hora",horaEfectiva);
-    row.setAttribute("data-manana",v.esManana?"1":"0");
     row.innerHTML="<div><div class='vuelo-num'>"+num+"</div>"+(extraLabel?"<div class='vuelo-puerta'>"+extraLabel+"</div>":"")+"</div>"
       +"<div style='min-width:0'><div class='vuelo-dest'>"+ciudad+"</div><div class='vuelo-hora'>"+horaStr+"</div></div>"
-      +"<div style='display:flex;flex-direction:column;align-items:flex-end;gap:3px'><div class='vuelo-estado "+(v.estadoClass||"e-scheduled")+"'>"+(v.estado||"Programado")+"</div><div class='vuelo-countdown' data-hora='"+(horaEfectiva||"")+"' data-manana='"+(v.esManana?"1":"0")+"'>—</div></div>";
+      +"<div style='display:flex;flex-direction:column;align-items:flex-end;gap:3px'><div class='vuelo-estado "+(v.estadoClass||"e-scheduled")+"'>"+(v.estado||"Programado")+"</div><div class='vuelo-countdown' data-hora='"+(horaEfectiva||"")+"'>—</div></div>";
     container.appendChild(row);
   });
   // Update countdowns immediately after every render
@@ -1784,16 +1663,9 @@ function updateFlightCountdowns(){
     var h=el.getAttribute('data-hora');
     if(!h||h==='--:--'){el.textContent='';return;}
     var p=h.split(':'),flMin=(+p[0]||0)*60+(+p[1]||0);
-    var esManana=el.getAttribute('data-manana')==='1';
-    var diff;
-    if(esManana){
-      // Si el vuelo viene marcado como mañana, nunca se calcula como si fuese hoy.
-      diff=(flMin+1440)-nowMin;
-    }else{
-      diff=flMin-nowMin;
-      // Solo asumimos cruce de medianoche para vuelos de madrugada vistos por la noche.
-      if(diff<0&&nowMin>=20*60&&flMin<=3*60)diff+=1440;
-    }
+    // Handle next-day flights (hora < nowMin by a lot means tomorrow)
+    var diff=flMin-nowMin;
+    if(diff<-120)diff+=1440; // crosses midnight
     if(diff<0){el.textContent='';el.className='vuelo-countdown';return;}
     var hh=Math.floor(diff/60),mm=diff%60;
     var str=(hh>0?hh+'h ':'')+mm+'m';
@@ -2089,7 +1961,7 @@ function initGoogle(){
     // Festivo/HL/vacaciones → rest countdown
     var _restTipos=['festivo','hl','hlp','vacaciones'];
     if(_restTipos.indexOf(d?d.tipo:'')>=0){
-      if(bar)bar.style.display='block';if(nav)nav.style.display='flex';
+      if(bar)bar.style.display='block';if(nav)nav.style.display='none';
       var twT_=document.getElementById('tw-times');
       twT_.style.fontSize='22px';twT_.style.fontWeight='800';twT_.style.letterSpacing='0';twT_.style.color='#22c55e';
       document.getElementById('tw-ico').textContent='😴';document.getElementById('tw-ico').style.background='rgba(34,197,94,.08)';
@@ -2115,7 +1987,7 @@ function initGoogle(){
       var sa2=document.getElementById('scroll-area');if(sa2)sa2.style.paddingBottom='90px';
       return;
     }
-    if(nav)nav.style.display='flex';
+    if(nav)nav.style.display='none';
     if(bar)bar.style.display='block';
     var cb=document.getElementById('calc-btn');if(cb)cb.style.bottom='215px';
     var sa=document.getElementById('scroll-area');if(sa)sa.style.paddingBottom='90px';
@@ -3918,19 +3790,16 @@ function renderCompanerosDia(offsetDias,toggleIfOpen){
   // Sort by start time
   var _nowMin=(function(){var n=new Date();return n.getHours()*60+n.getMinutes();})();
   if(window._sortBySalida){
-    // En días futuros no existe "ya salieron": no se puede comparar con la hora actual de hoy.
-    // En días pasados, al revés: todos los turnos ya han terminado.
-    var _refSalidaMin=esDiaActual?_nowMin:(offsetDias>0?-1:99999);
     function nextExit(c){
       var e1=c.e1,s1=c.s1,e2=c.e2||null,s2=c.s2||null;
       // Overnight T1: s1 is next day (e.g. 20:00→01:30, s1=90 < e1=1200)
       var overnight1=(e1!==null&&s1!==null&&s1<e1);
       var effS1=overnight1?s1+1440:s1;
-      if(effS1!==null&&effS1>_refSalidaMin)return effS1;
+      if(effS1!==null&&effS1>_nowMin)return effS1;
       // Overnight T2
       var overnight2=(e2!==null&&s2!==null&&s2<e2);
       var effS2=s2!==null?(overnight2?s2+1440:s2):null;
-      if(effS2!==null&&effS2>_refSalidaMin)return effS2;
+      if(effS2!==null&&effS2>_nowMin)return effS2;
       return null; // truly already left
     }
     var activos=coinciden.filter(function(c){return nextExit(c)!==null;});
@@ -4132,16 +4001,6 @@ function g(id){return document.getElementById(id);}
 function toM(t){if(!t)return null;var p=t.split(":");return +p[0]*60+(+p[1]||0);}
 function fmtT(m){if(!m&&m!==0)return"";var h=Math.floor(m/60),mn=m%60;return h>0?h+"h"+(mn?" "+mn+"m":""):mn+"m";}
 
-
-window.toggleOpDetails=function(){
-  var p=document.getElementById('op-details-panel');
-  var b=document.getElementById('op-details-btn');
-  if(!p)return;
-  var open=p.style.display && p.style.display!=='none';
-  p.style.display=open?'none':'grid';
-  if(b)b.classList.toggle('open',!open);
-};
-
 window.renderOperativa=function(){
   var now=new Date(),nowMin=now.getHours()*60+now.getMinutes();
   var mK=MESES[now.getMonth()];
@@ -4275,30 +4134,6 @@ window.renderOperativa=function(){
     +'</div>';
 
 
-  function setTextOp(id,val){var el=g(id);if(el)el.textContent=val;}
-  function setPressureOp(pct,delays,peakFlights){
-    pct=Math.max(0,Math.min(100,Math.round(pct||0)));
-    var lvl='Baja',cls='low';
-    if(pct>=80){lvl='Muy alta';cls='very';}
-    else if(pct>=60){lvl='Alta';cls='high';}
-    else if(pct>=35){lvl='Media';cls='mid';}
-    var le=g('op-pressure-level');if(le){le.textContent=lvl;le.className='op-pressure-level '+cls;}
-    var pctEl=g('op-pressure-pct');if(pctEl){pctEl.textContent=pct+'%';pctEl.className='op-pressure-pct '+cls;}
-    var bar=g('op-pressure-bar');if(bar){bar.style.width=pct+'%';bar.className='op-pressure-bar '+cls;}
-    setTextOp('op-pressure-note','Estimación por vuelos, pico '+(peakFlights||0)+', retrasos '+(delays||0)+' y plantilla '+total+'.');
-    setTextOp('op-load-lack',pct>=75?'Sí':'No');
-  }
-  setTextOp('op-load-workers',total||'—');
-  setTextOp('op-load-flights','—');
-  setTextOp('op-load-ratio','—');
-  setTextOp('op-load-peak','—');
-  setTextOp('op-now-active','—');
-  setTextOp('op-now-critical','—');
-  setTextOp('op-now-arrivals','—');
-  setTextOp('op-now-departures','—');
-  setTextOp('op-now-delays','—');
-  setPressureOp(total?25:0,0,0);
-
   // Flights
   if(typeof liveData==="undefined")return;
   var aL=liveData.lle||[],aS=liveData.sal||[];
@@ -4316,11 +4151,10 @@ window.renderOperativa=function(){
   try{var cv2=localStorage.getItem("op_vt_tom");if(cv2){var cpt=JSON.parse(cv2);if(cpt.d===tStr2)cT=cpt.t;}}catch(e){}
   if(totT>cT){cT=totT;try{localStorage.setItem("op_vt_tom",JSON.stringify({d:tStr2,t:cT}));}catch(e){}}
   if(g("op-v-total-tom"))g("op-v-total-tom").textContent=cT>0?cT:"—";
-  function cntSh(fls,e1p,s1p,e2p,s2p){var n=0;fls.forEach(function(v){var t=typeof hToMin==="function"?hToMin(v.horaReal||v.horaProg||""):null;if(t===null)return;if(e1p!==null&&s1p!==null&&t>=e1p&&t<=s1p)n++;else if(e2p!==null&&s2p!==null&&t>=e2p&&t<=s2p)n++;});return n;}
-  var _shDone=(shEnd!==null&&nowMin>=shEnd);
-  var _liveEmpty=(lH.length===0&&sH.length===0);
-  var iH=(e1!==null&&!_shDone&&!_liveEmpty)?cntSh(lH.concat(sH),e1,s1,e2,s2):0;
-  if(g("op-v-turno"))g("op-v-turno").textContent=(_shDone||_liveEmpty)?"—":String(iH);
+  function inShiftMinOp(t,e,s){if(t===null||e===null||s===null)return false;if(s<e){return t>=e||t<=s;}return t>=e&&t<=s;}
+  function cntSh(fls,e1p,s1p,e2p,s2p){var n=0;fls.forEach(function(v){if((v.estadoClass||'')==='e-cancelled')return;var t=typeof hToMin==="function"?hToMin(v.horaReal||v.horaProg||""):null;if(t===null)return;if(inShiftMinOp(t,e1p,s1p)||inShiftMinOp(t,e2p,s2p))n++;});return n;}
+  var iH=(e1!==null)?cntSh(lH.concat(sH),e1,s1,e2,s2):0;
+  if(g("op-v-turno"))g("op-v-turno").textContent=(e1!==null&&lH.concat(sH).length>0)?String(iH):"—";
   var tom=new Date(now);tom.setDate(tom.getDate()+1);
   var dT=(ue[MESES[tom.getMonth()]]||{})[tom.getDate()]||null;
   var tE1=dT&&dT.e1?toM(dT.e1):null,tS1=dT&&dT.s1?toM(dT.s1):null;
@@ -4328,84 +4162,30 @@ window.renderOperativa=function(){
   var iT=tE1!==null&&totT>0?cntSh(lT.concat(sT),tE1,tS1,tE2,tS2):0;
   if(g("op-v-turno-tom"))g("op-v-turno-tom").textContent=totT>0?String(iT):"—";
 
-  // ─ Panel operativo ampliado: picos, ahora, carga/plantilla y presión ─
+  // Detalles operativos del día
+  function setTextOp(id,val){var el=g(id);if(el)el.textContent=val;}
   function flMin(v){return typeof hToMin==="function"?hToMin(v.horaReal||v.horaProg||""):null;}
-  var allH=lH.concat(sH).filter(function(v){return (v.estadoClass||"")!=="e-cancelled";});
+  var allH=lH.concat(sH).filter(function(v){return (v.estadoClass||'')!=="e-cancelled";});
   function inWindowCount(arr,a,b){return arr.filter(function(v){var tm=flMin(v);return tm!==null&&tm>=a&&tm<b;}).length;}
-  var windows=[
-    {label:'00:00 - 02:00',short:'00-02',a:0,b:120},
-    {label:'02:00 - 04:00',short:'02-04',a:120,b:240},
-    {label:'04:00 - 06:00',short:'04-06',a:240,b:360},
-    {label:'06:00 - 08:00',short:'06-08',a:360,b:480},
-    {label:'08:00 - 10:00',short:'08-10',a:480,b:600},
-    {label:'10:00 - 12:00',short:'10-12',a:600,b:720},
-    {label:'12:00 - 14:00',short:'12-14',a:720,b:840},
-    {label:'14:00 - 16:00',short:'14-16',a:840,b:960},
-    {label:'16:00 - 18:00',short:'16-18',a:960,b:1080},
-    {label:'18:00 - 20:00',short:'18-20',a:1080,b:1200},
-    {label:'20:00 - 22:00',short:'20-22',a:1200,b:1320},
-    {label:'22:00 - 00:00',short:'22-00',a:1320,b:1440}
-  ];
+  var windows=[{label:'00:00 - 02:00',short:'00-02',a:0,b:120},{label:'02:00 - 04:00',short:'02-04',a:120,b:240},{label:'04:00 - 06:00',short:'04-06',a:240,b:360},{label:'06:00 - 08:00',short:'06-08',a:360,b:480},{label:'08:00 - 10:00',short:'08-10',a:480,b:600},{label:'10:00 - 12:00',short:'10-12',a:600,b:720},{label:'12:00 - 14:00',short:'12-14',a:720,b:840},{label:'14:00 - 16:00',short:'14-16',a:840,b:960},{label:'16:00 - 18:00',short:'16-18',a:960,b:1080},{label:'18:00 - 20:00',short:'18-20',a:1080,b:1200},{label:'20:00 - 22:00',short:'20-22',a:1200,b:1320},{label:'22:00 - 00:00',short:'22-00',a:1320,b:1440}];
   windows.forEach(function(w){w.count=inWindowCount(allH,w.a,w.b);});
   var maxFlights=windows.reduce(function(m,w){return Math.max(m,w.count);},0);
-  function lvlFor(c){
-    if(maxFlights<=0)return {txt:'—',cls:'mid'};
-    if(c>=Math.max(5,Math.ceil(maxFlights*.9)))return {txt:'Muy alto',cls:'very'};
-    if(c>=Math.max(3,Math.ceil(maxFlights*.65)))return {txt:'Alto',cls:'high'};
-    if(c>=Math.max(1,Math.ceil(maxFlights*.35)))return {txt:'Medio',cls:'mid'};
-    return {txt:'Bajo',cls:'low'};
-  }
-  var pl=g('op-peaks-list');
-  if(pl)pl.innerHTML=windows.map(function(w){
-    var l=lvlFor(w.count);
-    return '<div class="op-peak-chip '+l.cls+'"><span class="op-peak-hour">'+w.short+'</span><b class="op-pill '+l.cls+'">'+l.txt+'</b><small class="op-peak-count">'+w.count+' vuelos</small></div>';
-  }).join('');
+  function lvlFor(c){if(maxFlights<=0)return {txt:'—',cls:'mid'};if(c>=Math.max(5,Math.ceil(maxFlights*.90)))return {txt:'Muy alto',cls:'very'};if(c>=Math.max(3,Math.ceil(maxFlights*.65)))return {txt:'Alto',cls:'high'};if(c>=Math.max(1,Math.ceil(maxFlights*.35)))return {txt:'Medio',cls:'mid'};return {txt:'Bajo',cls:'low'};}
+  var pl=g('op-peaks-list');if(pl)pl.innerHTML=windows.map(function(w){var l=lvlFor(w.count);return '<div class="op-peak-chip '+l.cls+'"><span class="op-peak-hour">'+w.short+'</span><b class="op-pill '+l.cls+'">'+l.txt+'</b><small class="op-peak-count">'+w.count+' vuelos</small></div>';}).join('');
   var peakWin=windows.slice().sort(function(a,b){return b.count-a.count;})[0]||null;
-  setTextOp('op-load-workers',total||'—');
-  setTextOp('op-load-flights',cH>0?cH:'—');
-  setTextOp('op-load-ratio',(total&&cH)?(total/cH).toFixed(2).replace('.',','):'—');
-  setTextOp('op-load-peak',peakWin&&peakWin.count>0?peakWin.label:'—');
-  var hrl=g('op-hour-ratio-list');
-  if(hrl){
-    var hours=[];
-    for(var hh=0;hh<24;hh++){
-      var a=hh*60,b=a+60,mid=a+30;
-      var flights=inWindowCount(allH,a,b);
-      var workers=trabajanHoy.filter(function(emp){return isWorkingAt(emp,mid);}).length;
-      var ratio=flights>0?(workers/flights):null;
-      var cls='low',txt='Sin vuelos';
-      if(ratio!==null){
-        if(ratio>=8)cls='low';
-        else if(ratio>=5)cls='mid';
-        else if(ratio>=3)cls='high';
-        else cls='very';
-        txt=ratio.toFixed(1).replace('.',',')+' pers/av.';
-      }
-      var label=(hh<10?'0':'')+hh+'-'+(((hh+1)%24)<10?'0':'')+((hh+1)%24);
-      hours.push('<div class="op-hour-ratio-chip '+cls+'"><span class="op-hour">'+label+'</span><b class="op-pill '+cls+'">'+txt+'</b><small class="op-hour-meta">'+workers+' pers. / '+flights+' vuelos</small></div>');
-    }
-    hrl.innerHTML=hours.join('');
-  }
-
-  function isDelay(v){var e=(v.estadoClass||'')+' '+(v.estado||'');return /delay|retras/i.test(e);}
-  function inNext(v,min){var tm=flMin(v);if(tm===null)return false;var dd=tm-nowMin;if(dd<0)dd+=1440;return dd>=0&&dd<=min;}
+  setTextOp('op-load-workers',total||'—');setTextOp('op-load-flights',cH>0?cH:'—');setTextOp('op-load-ratio',(total&&cH)?(total/cH).toFixed(2).replace('.',','):'—');setTextOp('op-load-peak',peakWin&&peakWin.count>0?peakWin.label:'—');
+  function isDelay(v){var e=(v.estadoClass||'')+' '+(v.estado||'');return /delay|retras/i.test(e);}function inNext(v,min){var tm=flMin(v);if(tm===null)return false;var dd=tm-nowMin;if(dd<0)dd+=1440;return dd>=0&&dd<=min;}
   var activeFlights=allH.filter(function(v){var c=v.estadoClass||'';return c==='e-active'||c==='e-boarding'||c==='e-gate'||c==='e-taxiing'||inNext(v,10);}).length;
-  var arr30=lH.filter(function(v){return (v.estadoClass||'')!=='e-cancelled'&&inNext(v,30);}).length;
-  var dep30=sH.filter(function(v){return (v.estadoClass||'')!=='e-cancelled'&&inNext(v,30);}).length;
-  var delays=allH.filter(isDelay).length;
-  var upcoming=allH.filter(function(v){return inNext(v,180);}).sort(function(a,b){return (flMin(a)||9999)-(flMin(b)||9999);});
-  var critical=upcoming.filter(isDelay)[0]||upcoming[0]||null;
-  setTextOp('op-now-active',activeFlights);
-  setTextOp('op-now-critical',critical?((critical.numero||'Vuelo')+' - '+(critical.horaReal||critical.horaProg||'--:--')):'—');
-  setTextOp('op-now-arrivals',arr30);
-  setTextOp('op-now-departures',dep30);
-  setTextOp('op-now-delays',delays);
-  var ratioScore=(total&&cH)?Math.min(45,(cH/total)*35):0;
-  var peakScore=peakWin?Math.min(30,peakWin.count*4):0;
-  var delayScore=Math.min(15,delays*5);
-  var nowScore=Math.min(10,activeFlights*2);
-  setPressureOp(ratioScore+peakScore+delayScore+nowScore,delays,peakWin?peakWin.count:0);
-
+  var arr30=lH.filter(function(v){return (v.estadoClass||'')!=='e-cancelled'&&inNext(v,30);}).length,dep30=sH.filter(function(v){return (v.estadoClass||'')!=='e-cancelled'&&inNext(v,30);}).length,delays=allH.filter(isDelay).length;
+  var upcoming=allH.filter(function(v){return inNext(v,180);}).sort(function(a,b){return (flMin(a)||9999)-(flMin(b)||9999);});var critical=upcoming.filter(isDelay)[0]||upcoming[0]||null;
+  setTextOp('op-now-active',activeFlights);setTextOp('op-now-critical',critical?((critical.numero||'Vuelo')+' - '+(critical.horaReal||critical.horaProg||'--:--')):'—');setTextOp('op-now-arrivals',arr30);setTextOp('op-now-departures',dep30);setTextOp('op-now-delays',delays);
+  var ratioScore=(total&&cH)?Math.min(45,(cH/total)*35):0,peakScore=peakWin?Math.min(30,peakWin.count*4):0,delayScore=Math.min(15,delays*5),nowScore=Math.min(10,activeFlights*2),pressure=Math.max(0,Math.min(100,Math.round(ratioScore+peakScore+delayScore+nowScore)));
+  var lvl='Baja',cls='low';if(pressure>=80){lvl='Muy alta';cls='very';}else if(pressure>=60){lvl='Alta';cls='high';}else if(pressure>=35){lvl='Media';cls='mid';}
+  var le=g('op-pressure-level');if(le){le.textContent=lvl;le.className='op-pressure-level '+cls;}var pe=g('op-pressure-pct');if(pe){pe.textContent=pressure+'%';pe.className='op-pressure-pct '+cls;}var pb=g('op-pressure-bar');if(pb){pb.style.width=pressure+'%';pb.className='op-pressure-bar '+cls;}setTextOp('op-pressure-note','Vuelos + pico '+(peakWin?peakWin.count:0)+' + retrasos '+delays+' + plantilla '+total+'.');setTextOp('op-load-lack',pressure>=75?'Sí':'No');
+  function fmtRatioOp(n){return isFinite(n)?n.toFixed(2).replace('.',','):'—';}function hourLabelOp(h){return (h<10?'0':'')+h+':00';}function tramoOverlapsOp(e,s,a,b){if(e===null||s===null)return false;if(s<e)s+=1440;return Math.max(e,a)<Math.min(s,b);}function workerOverlapsHourOp(emp,a,b){return tramoOverlapsOp(emp.e1,emp.s1,a,b)||tramoOverlapsOp(emp.e2,emp.s2,a,b);}
+  var hourly=[];for(var hrOp=0;hrOp<24;hrOp++){var aOp=hrOp*60,bOp=aOp+60;var fOp=inWindowCount(allH,aOp,bOp);var wOp=trabajanHoy.filter(function(emp){return workerOverlapsHourOp(emp,aOp,bOp);}).length;var rOp=fOp>0?wOp/fOp:null;hourly.push({h:hrOp,flights:fOp,workers:wOp,ratio:rOp});}
+  var maxRatioOp=hourly.reduce(function(m,x){return Math.max(m,x.ratio||0);},0);function ratioClassOp(r){if(r===null)return 'low';if(maxRatioOp<=0)return 'low';if(r>=Math.max(8,maxRatioOp*.90))return 'very';if(r>=Math.max(5,maxRatioOp*.65))return 'high';if(r>=Math.max(2,maxRatioOp*.35))return 'mid';return 'low';}
+  var rh=g('op-hour-ratio-list');if(rh)rh.innerHTML=hourly.map(function(x){var cls=ratioClassOp(x.ratio);return '<div class="op-hour-ratio '+cls+'"><div class="h">'+hourLabelOp(x.h)+'</div><div class="r">'+(x.ratio===null?'—':fmtRatioOp(x.ratio))+'</div><div class="d">'+x.workers+' pers. / '+x.flights+' vuelos</div></div>';}).join('');
   if(!card)return;
   ["state-working","state-pausa","state-rest","state-next"].forEach(function(c){card.classList.remove(c);});
 
@@ -4537,13 +4317,10 @@ window.renderOperativa=function(){
     if(g("op-tc-bar"))g("op-tc-bar").style.width=restRemPct+"%";
   } else if(notYet){
     card.classList.add("state-next");
-    var faltaInicio=Math.max(0,e1-nowMin);
-    var faltaTxt=fmtT(faltaInicio);
-    if(g("op-tc-times"))g("op-tc-times").innerHTML=
-      "<span style='font-size:22px;font-weight:800;color:#60a5fa'>"+faltaTxt+"</span>"+th;
-    if(g("op-tc-sub"))g("op-tc-sub").textContent="Próximo turno "+(d.e1||"");
-    if(g("op-tc-pct"))g("op-tc-pct").textContent=faltaTxt;
-    if(g("op-tc-rem"))g("op-tc-rem").textContent="Empieza a las "+(d.e1||"--:--");
+    if(g("op-tc-times"))g("op-tc-times").innerHTML=th;
+    if(g("op-tc-sub"))g("op-tc-sub").textContent="Próximo turno";
+    if(g("op-tc-pct"))g("op-tc-pct").textContent="0%";
+    if(g("op-tc-rem"))g("op-tc-rem").textContent="Empieza en "+fmtT(e1-nowMin);
     if(g("op-tc-bar"))g("op-tc-bar").style.width="0%";
   }
 
