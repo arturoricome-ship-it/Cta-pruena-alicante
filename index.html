@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<!-- CTA_OPERATIVA_V18_BASE_ANTERIOR_HISTORIAL_DESPLEGABLE_2026-05-11 -->
+<!-- CTA_OPERATIVA_V20_DETALLES_HISTORIAL_PRESION_REAL_2026-05-11 -->
 <meta charset="UTF-8">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -511,11 +511,15 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 .op-metric-row.danger b{color:#f87171}
 .op-metric-row.warn{background:rgba(251,191,36,.055);border:1px solid rgba(251,191,36,.13)}
 .op-metric-row.warn b{color:#fbbf24}
-.op-peaks-list{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:10px}
-@media(max-width:380px){.op-peaks-list{grid-template-columns:repeat(2,1fr)}}
-.op-peak-chip{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:11px;padding:8px 6px;min-height:58px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:3px}
-.op-peak-chip .op-peak-hour{font-size:10px;font-weight:800;color:var(--white);line-height:1}
-.op-peak-chip .op-peak-count{font-size:8px;color:rgba(255,255,255,.38);line-height:1}
+.op-peaks-list{height:136px;display:flex;align-items:flex-end;gap:5px;border-left:1px solid rgba(255,255,255,.06);border-bottom:1px solid rgba(255,255,255,.06);padding:8px 4px 0;margin-top:10px;overflow:hidden}
+.op-peak-chip{flex:1;min-width:0;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:4px;background:transparent;border:0;border-radius:0;padding:0;text-align:center}
+.op-peak-bar{width:100%;max-width:24px;min-height:3px;border-radius:5px 5px 0 0;background:rgba(34,197,94,.28);border:1px solid rgba(34,197,94,.35)}
+.op-peak-bar.low{background:rgba(34,197,94,.28);border-color:rgba(34,197,94,.35)}
+.op-peak-bar.mid{background:rgba(251,191,36,.32);border-color:rgba(251,191,36,.4)}
+.op-peak-bar.high{background:rgba(239,68,68,.34);border-color:rgba(239,68,68,.42)}
+.op-peak-bar.very{background:rgba(192,38,211,.38);border-color:rgba(192,38,211,.48)}
+.op-peak-hour{font-size:7px;color:var(--gray);font-weight:800;transform:rotate(-45deg);transform-origin:center;white-space:nowrap;height:14px;line-height:1}
+.op-peak-count{font-size:8px;color:rgba(255,255,255,.55);font-weight:800;line-height:1}
 .op-pill{font-size:8px;font-weight:900;border-radius:999px;padding:3px 6px;min-width:42px;text-align:center;text-transform:uppercase;letter-spacing:.3px}
 .op-pill.low{background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.25);color:#4ade80}
 .op-pill.mid{background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.25);color:#fbbf24}
@@ -534,10 +538,10 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 .op-hour-r.low{color:#4ade80}.op-hour-r.mid{color:#fbbf24}.op-hour-r.high{color:#f87171}.op-hour-r.very{color:#e879f9}
 .op-hour-meta{font-size:8px;color:var(--gray);line-height:1.25;white-space:nowrap}
 
-.op-peak-chip.low{border-color:rgba(34,197,94,.18);background:rgba(34,197,94,.045)}
-.op-peak-chip.mid{border-color:rgba(251,191,36,.18);background:rgba(251,191,36,.045)}
-.op-peak-chip.high{border-color:rgba(239,68,68,.22);background:rgba(239,68,68,.055)}
-.op-peak-chip.very{border-color:rgba(192,38,211,.25);background:rgba(192,38,211,.06)}
+
+
+
+
 
 
 /* ─── Desplegables operativos ─── */
@@ -576,10 +580,10 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 .op-heat-h{font-size:8px;color:var(--gray);text-align:center;font-weight:700}
 .op-heat-d{font-size:9px;color:var(--gray);font-weight:700;text-align:right;padding-right:4px}
 .op-heat-cell{height:24px;border-radius:7px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.06);font-size:8px;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.75)}
-.op-heat-cell.low{background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.2)}
-.op-heat-cell.mid{background:rgba(251,191,36,.14);border-color:rgba(251,191,36,.22)}
-.op-heat-cell.high{background:rgba(239,68,68,.16);border-color:rgba(239,68,68,.25)}
-.op-heat-cell.very{background:rgba(192,38,211,.18);border-color:rgba(192,38,211,.28)}
+.op-heat-cell.low{background:rgba(34,197,94,.10);border-color:rgba(34,197,94,.18)}
+.op-heat-cell.mid{background:rgba(34,197,94,.24);border-color:rgba(34,197,94,.32)}
+.op-heat-cell.high{background:rgba(239,68,68,.20);border-color:rgba(239,68,68,.30)}
+.op-heat-cell.very{background:rgba(239,68,68,.38);border-color:rgba(239,68,68,.48)}
 .op-history-empty{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:12px;padding:12px;font-size:11px;color:var(--gray);line-height:1.5}
 
 </style>
@@ -697,6 +701,24 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
         </div>
       </div>
     </div>
+
+    <p class="op-sec">📊 Resumen operativo del día</p>
+    <!-- RESUMEN OPERATIVO -->
+    <div class="op-comp-card" style="flex-direction:column;align-items:stretch;gap:0;padding:0;overflow:hidden;cursor:pointer" onclick="if(typeof verCompanerosHoy==='function'){var p=document.getElementById('calc-panel');var o=document.getElementById('calc-overlay');if(p){p.classList.add('show');if(o)o.classList.add('show');setTimeout(function(){verCompanerosHoy();},80);}}">
+      <div style="display:flex;gap:0">
+        <button id="op-tab-dist" onclick="event.stopPropagation();opResTab('dist')" style="flex:1;background:rgba(200,168,75,.15);border:none;border-right:1px solid var(--border);border-bottom:2px solid var(--gold);color:var(--gold);font-family:'Outfit',sans-serif;font-size:10px;font-weight:700;padding:9px 4px;cursor:pointer;letter-spacing:.3px">Distribución</button>
+        <button id="op-tab-pico" onclick="event.stopPropagation();opResTab('pico')" style="flex:1;background:none;border:none;border-right:1px solid var(--border);border-bottom:2px solid transparent;color:var(--gray);font-family:'Outfit',sans-serif;font-size:10px;font-weight:700;padding:9px 4px;cursor:pointer;letter-spacing:.3px">Picos</button>
+        <button id="op-tab-now" onclick="event.stopPropagation();opResTab('now')" style="flex:1;background:none;border:none;border-bottom:2px solid transparent;color:var(--gray);font-family:'Outfit',sans-serif;font-size:10px;font-weight:700;padding:9px 4px;cursor:pointer;letter-spacing:.3px">Ahora</button>
+        <div id="op-ver-btn" style="flex-shrink:0;background:none;border:none;border-left:1px solid var(--border);border-bottom:2px solid transparent;color:#60a5fa;font-size:10px;font-weight:800;padding:9px 14px;letter-spacing:.5px;cursor:pointer;display:flex;align-items:center" onclick="event.stopPropagation();if(typeof verCompanerosHoy==='function'){var p=document.getElementById('calc-panel');var o=document.getElementById('calc-overlay');if(p){p.classList.add('show');if(o)o.classList.add('show');setTimeout(function(){verCompanerosHoy();},80);}}">VER</div>
+      </div>
+      <div id="op-res-dist" style="padding:12px 14px">
+        <div id="op-comp-num" style="display:none"></div><div id="op-comp-sub" style="display:none"></div>
+        <div style="font-size:11px;color:var(--gray)">Cargando...</div>
+      </div>
+      <div id="op-res-pico" style="display:none;padding:12px 14px"></div>
+      <div id="op-res-now" style="display:none;padding:12px 14px"></div>
+    </div>
+
     <details class="op-details">
       <summary>📊 Detalles operativos del día</summary>
       <div class="op-details-body">
@@ -730,19 +752,19 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 
       <div class="op-load-card">
         <div class="op-card-title">Carga / plantilla</div>
-        <div class="op-card-sub">Comparativa de vuelos previstos y personal disponible</div>
+        <div class="op-card-sub">Personas por avión, no vuelos por trabajador</div>
         <div class="op-metric-list">
           <div class="op-metric-row"><span>Compañeros trabajando</span><b id="op-load-workers">—</b></div>
           <div class="op-metric-row"><span>Vuelos previstos</span><b id="op-load-flights">—</b></div>
-          <div class="op-metric-row"><span>Ratio vuelos por trabajador</span><b id="op-load-ratio">—</b></div>
+          <div class="op-metric-row"><span>Personas por avión</span><b id="op-load-ratio">—</b></div>
           <div class="op-metric-row"><span>Franja más cargada</span><b id="op-load-peak">—</b></div>
           <div class="op-metric-row warn"><span>Posible falta de personal</span><b id="op-load-lack">—</b></div>
         </div>
       </div>
 
       <div class="op-hourly-card">
-        <div class="op-card-title">Ratio vuelo/trabajador por hora</div>
-        <div class="op-card-sub">Vuelos previstos en cada hora dividido entre compañeros disponibles en esa hora</div>
+        <div class="op-card-title">Personas por avión por hora</div>
+        <div class="op-card-sub">Plantilla presente en cada hora dividida entre vuelos de esa hora</div>
         <div id="op-hourly-ratio-list" class="op-hourly-list">
           <div class="op-hour-chip"><span class="op-hour-h">Cargando...</span></div>
         </div>
@@ -765,18 +787,18 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
         <div class="op-card-title">Picos previstos por vuelos</div>
         <div class="op-card-sub">Estimación orientativa por franjas de 2 horas</div>
         <div id="op-peaks-list" class="op-peaks-list">
-          <div class="op-peak-chip"><span class="op-peak-hour">00-02</span><b class="op-pill mid">—</b><small class="op-peak-count">— vuelos</small></div>
-          <div class="op-peak-chip"><span class="op-peak-hour">02-04</span><b class="op-pill mid">—</b><small class="op-peak-count">— vuelos</small></div>
-          <div class="op-peak-chip"><span class="op-peak-hour">04-06</span><b class="op-pill mid">—</b><small class="op-peak-count">— vuelos</small></div>
-          <div class="op-peak-chip"><span class="op-peak-hour">06-08</span><b class="op-pill mid">—</b><small class="op-peak-count">— vuelos</small></div>
-          <div class="op-peak-chip"><span class="op-peak-hour">08-10</span><b class="op-pill mid">—</b><small class="op-peak-count">— vuelos</small></div>
-          <div class="op-peak-chip"><span class="op-peak-hour">10-12</span><b class="op-pill mid">—</b><small class="op-peak-count">— vuelos</small></div>
-          <div class="op-peak-chip"><span class="op-peak-hour">12-14</span><b class="op-pill mid">—</b><small class="op-peak-count">— vuelos</small></div>
-          <div class="op-peak-chip"><span class="op-peak-hour">14-16</span><b class="op-pill mid">—</b><small class="op-peak-count">— vuelos</small></div>
-          <div class="op-peak-chip"><span class="op-peak-hour">16-18</span><b class="op-pill mid">—</b><small class="op-peak-count">— vuelos</small></div>
-          <div class="op-peak-chip"><span class="op-peak-hour">18-20</span><b class="op-pill mid">—</b><small class="op-peak-count">— vuelos</small></div>
-          <div class="op-peak-chip"><span class="op-peak-hour">20-22</span><b class="op-pill mid">—</b><small class="op-peak-count">— vuelos</small></div>
-          <div class="op-peak-chip"><span class="op-peak-hour">22-00</span><b class="op-pill mid">—</b><small class="op-peak-count">— vuelos</small></div>
+          <div class="op-peak-chip"><div class="op-peak-bar low" style="height:3px"></div><small class="op-peak-count">—</small><span class="op-peak-hour">00-02</span></div>
+          <div class="op-peak-chip"><div class="op-peak-bar low" style="height:3px"></div><small class="op-peak-count">—</small><span class="op-peak-hour">02-04</span></div>
+          <div class="op-peak-chip"><div class="op-peak-bar low" style="height:3px"></div><small class="op-peak-count">—</small><span class="op-peak-hour">04-06</span></div>
+          <div class="op-peak-chip"><div class="op-peak-bar low" style="height:3px"></div><small class="op-peak-count">—</small><span class="op-peak-hour">06-08</span></div>
+          <div class="op-peak-chip"><div class="op-peak-bar low" style="height:3px"></div><small class="op-peak-count">—</small><span class="op-peak-hour">08-10</span></div>
+          <div class="op-peak-chip"><div class="op-peak-bar low" style="height:3px"></div><small class="op-peak-count">—</small><span class="op-peak-hour">10-12</span></div>
+          <div class="op-peak-chip"><div class="op-peak-bar low" style="height:3px"></div><small class="op-peak-count">—</small><span class="op-peak-hour">12-14</span></div>
+          <div class="op-peak-chip"><div class="op-peak-bar low" style="height:3px"></div><small class="op-peak-count">—</small><span class="op-peak-hour">14-16</span></div>
+          <div class="op-peak-chip"><div class="op-peak-bar low" style="height:3px"></div><small class="op-peak-count">—</small><span class="op-peak-hour">16-18</span></div>
+          <div class="op-peak-chip"><div class="op-peak-bar low" style="height:3px"></div><small class="op-peak-count">—</small><span class="op-peak-hour">18-20</span></div>
+          <div class="op-peak-chip"><div class="op-peak-bar low" style="height:3px"></div><small class="op-peak-count">—</small><span class="op-peak-hour">20-22</span></div>
+          <div class="op-peak-chip"><div class="op-peak-bar low" style="height:3px"></div><small class="op-peak-count">—</small><span class="op-peak-hour">22-00</span></div>
         </div>
       </div>
     </div>
@@ -813,14 +835,6 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
       </div>
     </details>
 
-    <p class="op-sec">Turnos publicados</p>
-    <div class="op-pub-card">
-      <div style="padding:10px 14px 8px;text-align:center"><div style="font-size:12px;font-weight:700">📋 Turnos publicados empresa</div><div style="font-size:9px;color:var(--gray);margin-top:1px">FTP · FIJI · Elige tu colectivo</div></div>
-      <div class="op-pub-row">
-        <button class="op-pub-btn" onclick="navToFolderByName('01_Turnos Rampa')"><span style="font-size:20px">✈️</span><div><span style="font-size:11px;font-weight:700;color:var(--white);display:block">Rampa</span><span style="font-size:8px;color:var(--gray);display:block;margin-top:1px">Operarios</span></div></button>
-        <button class="op-pub-btn" onclick="navToFolderByName('01b_Turnos Administrativos')"><span style="font-size:20px">🗂️</span><div><span style="font-size:11px;font-weight:700;color:var(--white);display:block">Administrativos</span><span style="font-size:8px;color:var(--gray);display:block;margin-top:1px">Admin.</span></div></button>
-      </div>
-    </div>
   </div>
 
   <div class="panel" id="panel-documentos">
@@ -4375,17 +4389,18 @@ window.renderOperativa=function(){
 
 
   function setTextOp(id,val){var el=g(id);if(el)el.textContent=val;}
-  function setPressureOp(pct,delays,peakFlights){
-    pct=Math.max(0,Math.min(100,Math.round(pct||0)));
+  function setPressureOp(pct,neededOps,activeWorkers,activePlanes){
+    var showPct=Math.max(0,Math.round(pct||0));
+    var barPct=Math.min(100,showPct);
     var lvl='Baja',cls='low';
-    if(pct>=80){lvl='Muy alta';cls='very';}
-    else if(pct>=60){lvl='Alta';cls='high';}
-    else if(pct>=35){lvl='Media';cls='mid';}
+    if(showPct>110){lvl='Muy alta';cls='very';}
+    else if(showPct>=86){lvl='Alta';cls='high';}
+    else if(showPct>=61){lvl='Media';cls='mid';}
     var le=g('op-pressure-level');if(le){le.textContent=lvl;le.className='op-pressure-level '+cls;}
-    var pctEl=g('op-pressure-pct');if(pctEl){pctEl.textContent=pct+'%';pctEl.className='op-pressure-pct '+cls;}
-    var bar=g('op-pressure-bar');if(bar){bar.style.width=pct+'%';bar.className='op-pressure-bar '+cls;}
-    setTextOp('op-pressure-note','Vuelos + pico '+(peakFlights||0)+' + retrasos '+(delays||0)+' + plantilla '+total+'.');
-    setTextOp('op-load-lack',pct>=75?'Sí':'No');
+    var pctEl=g('op-pressure-pct');if(pctEl){pctEl.textContent=showPct+'%';pctEl.className='op-pressure-pct '+cls;}
+    var bar=g('op-pressure-bar');if(bar){bar.style.width=barPct+'%';bar.className='op-pressure-bar '+cls;}
+    setTextOp('op-pressure-note','Necesarios '+(neededOps||0)+' / activos '+(activeWorkers||0)+' · aviones activos '+(activePlanes||0)+'.');
+    setTextOp('op-load-lack',showPct>=86?'Sí':'No');
   }
   setTextOp('op-load-workers',total||'—');
   setTextOp('op-load-flights','—');
@@ -4396,7 +4411,7 @@ window.renderOperativa=function(){
   setTextOp('op-now-arrivals','—');
   setTextOp('op-now-departures','—');
   setTextOp('op-now-delays','—');
-  setPressureOp(total?25:0,0,0);
+  setPressureOp(0,0,0,0);
 
   // Flights
   if(typeof liveData==="undefined")return;
@@ -4458,16 +4473,17 @@ window.renderOperativa=function(){
   var pl=g('op-peaks-list');
   if(pl)pl.innerHTML=windows.map(function(w){
     var l=lvlFor(w.count);
-    return '<div class="op-peak-chip '+l.cls+'"><span class="op-peak-hour">'+w.short+'</span><b class="op-pill '+l.cls+'">'+l.txt+'</b><small class="op-peak-count">'+w.count+' vuelos</small></div>';
+    var h=maxFlights>0?Math.max(3,Math.round((w.count/maxFlights)*108)):3;
+    return '<div class="op-peak-chip '+l.cls+'" title="'+w.short+' · '+w.count+' vuelos · '+l.txt+'"><div class="op-peak-bar '+l.cls+'" style="height:'+h+'px"></div><small class="op-peak-count">'+w.count+'</small><span class="op-peak-hour">'+w.short+'</span></div>';
   }).join('');
   var peakWin=windows.slice().sort(function(a,b){return b.count-a.count;})[0]||null;
   setTextOp('op-load-workers',total||'—');
   setTextOp('op-load-flights',cH>0?cH:'—');
-  setTextOp('op-load-ratio',(total&&cH)?(cH/total).toFixed(2).replace('.',','):'—');
+  setTextOp('op-load-ratio',(total&&cH)?(total/cH).toFixed(1).replace('.',','):'—');
   setTextOp('op-load-peak',peakWin&&peakWin.count>0?peakWin.label:'—');
 
-  // Ratio vuelo/trabajador por hora
-  function fmtRatioOp(n){return isFinite(n)?n.toFixed(2).replace('.',','):'—';}
+  // Personas por avión por hora
+  function fmtRatioOp(n){return isFinite(n)?n.toFixed(1).replace('.',','):'—';}
   function hourLabelOp(h){return (h<10?'0':'')+h+':00';}
   function workerOverlapsHourOp(emp,a,b){
     return tramoOverlaps(emp.e1,emp.s1,a,b)||tramoOverlaps(emp.e2,emp.s2,a,b);
@@ -4477,23 +4493,21 @@ window.renderOperativa=function(){
     var aOp=hrOp*60,bOp=aOp+60;
     var fOp=inWindowCount(allH,aOp,bOp);
     var wOp=trabajanHoy.filter(function(emp){return workerOverlapsHourOp(emp,aOp,bOp);}).length;
-    var rOp=wOp>0?fOp/wOp:null;
+    var rOp=fOp>0?wOp/fOp:null;
     hourly.push({h:hrOp,flights:fOp,workers:wOp,ratio:rOp});
   }
-  var maxRatioOp=hourly.reduce(function(m,x){return Math.max(m,x.ratio||0);},0);
   function ratioClassOp(r){
     if(r===null)return 'low';
-    if(maxRatioOp<=0)return 'low';
-    if(r>=Math.max(0.35,maxRatioOp*.90))return 'very';
-    if(r>=Math.max(0.25,maxRatioOp*.65))return 'high';
-    if(r>=Math.max(0.10,maxRatioOp*.35))return 'mid';
+    if(r<3)return 'very';
+    if(r<4)return 'high';
+    if(r<6)return 'mid';
     return 'low';
   }
   var hrList=g('op-hourly-ratio-list');
   if(hrList)hrList.innerHTML=hourly.map(function(x){
     var cls=ratioClassOp(x.ratio);
     var ratioTxt=x.ratio===null?'—':fmtRatioOp(x.ratio);
-    return '<div class="op-hour-chip '+cls+'"><div class="op-hour-top"><span class="op-hour-h">'+hourLabelOp(x.h)+'</span><b class="op-hour-r '+cls+'">'+ratioTxt+'</b></div><div class="op-hour-meta">'+x.flights+' vuelos / '+x.workers+' trab.</div></div>';
+    return '<div class="op-hour-chip '+cls+'"><div class="op-hour-top"><span class="op-hour-h">'+hourLabelOp(x.h)+'</span><b class="op-hour-r '+cls+'">'+ratioTxt+'</b></div><div class="op-hour-meta">'+x.workers+' pers. / '+x.flights+' vuelos</div></div>';
   }).join('');
 
   function isDelay(v){var e=(v.estadoClass||'')+' '+(v.estado||'');return /delay|retras/i.test(e);}
@@ -4509,11 +4523,38 @@ window.renderOperativa=function(){
   setTextOp('op-now-arrivals',arr30);
   setTextOp('op-now-departures',dep30);
   setTextOp('op-now-delays',delays);
-  var ratioScore=(total&&cH)?Math.min(45,(cH/total)*35):0;
-  var peakScore=peakWin?Math.min(30,peakWin.count*4):0;
-  var delayScore=Math.min(15,delays*5);
-  var nowScore=Math.min(10,activeFlights*2);
-  setPressureOp(ratioScore+peakScore+delayScore+nowScore,delays,peakWin?peakWin.count:0);
+  // Presión operativa en tiempo real: operarios necesarios / operarios activos
+  function pairRotations(arrivals,deps){
+    var arr=arrivals.map(function(v){return {v:v,t:flMin(v),used:false};}).filter(function(x){return x.t!==null;}).sort(function(a,b){return a.t-b.t;});
+    var dep=deps.map(function(v){return {v:v,t:flMin(v),used:false};}).filter(function(x){return x.t!==null;}).sort(function(a,b){return a.t-b.t;});
+    var pairs=[];
+    arr.forEach(function(a){
+      var best=null;
+      dep.forEach(function(d){
+        if(d.used||best)return;
+        var diff=d.t-a.t;
+        if(diff>=25&&diff<=240)best=d;
+      });
+      if(best){a.used=true;best.used=true;pairs.push({a:a.t,b:best.t});}
+    });
+    return {pairs:pairs,arr:arr,dep:dep};
+  }
+  var pr=pairRotations(lH.filter(function(v){return (v.estadoClass||'')!=='e-cancelled';}),sH.filter(function(v){return (v.estadoClass||'')!=='e-cancelled';}));
+  var neededOps=0,activePlanesRt=0;
+  pr.pairs.forEach(function(p){if(nowMin>=p.a&&nowMin<=p.b){neededOps+=4;activePlanesRt++;}});
+  pr.dep.forEach(function(d){
+    if(d.used)return;
+    var start=d.t-35,end=d.t;
+    if(nowMin>=start&&nowMin<=end){var morning=d.t>=240&&d.t<=660;neededOps+=morning?3:4;activePlanesRt++;}
+  });
+  pr.arr.forEach(function(a){
+    if(a.used)return;
+    var end=a.t+45;
+    if(nowMin>=a.t&&nowMin<=end){neededOps+=3;activePlanesRt++;}
+  });
+  var activeWorkersRt=trabajanHoy.filter(function(emp){return isWorkingAt(emp,nowMin);}).length;
+  var pressurePct=activeWorkersRt>0?(neededOps/activeWorkersRt)*100:(neededOps>0?120:0);
+  setPressureOp(pressurePct,neededOps,activeWorkersRt,activePlanesRt);
 
   if(!card)return;
   ["state-working","state-pausa","state-rest","state-next"].forEach(function(c){card.classList.remove(c);});
