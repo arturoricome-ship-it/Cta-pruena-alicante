@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<!-- CTA_OPERATIVA_V34_INFO_DATOS_ORIENTATIVOS_2026-05-12 -->
+<!-- CTA_OPERATIVA_V35_HL_COMO_LIBRE_DESCANSO_2026-05-12 -->
 <meta charset="UTF-8">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -4619,13 +4619,14 @@ window.renderOperativa=function(){
   ["state-working","state-pausa","state-rest","state-next"].forEach(function(c){card.classList.remove(c);});
 
   var _isFreeDay=false;
+  // Libre, Festivo, HL/HLP y Vacaciones se pintan como descanso en Mi jornada.
   if(!d||!d.tipo||d.tipo==="libre"||(!d.e1&&["festivo","hl","hlp","vacaciones"].indexOf(d.tipo)<0)||["festivo","hl","hlp","vacaciones"].indexOf(d.tipo)>=0){
     _isFreeDay=true;
     card.classList.add("state-rest");
     if(g("op-tc-lbl"))g("op-tc-lbl").textContent="Descanso";
     // Find next shift (up to 30 days)
     var nxtMinF=null,nxtStrF="",nxtDaysF=0;
-    var ANXTF=["trabajado","hl","hlp","h6","festivo","baja","rm","curso"];
+    var ANXTF=["trabajado","h6","baja","rm","curso"]; // HL/HLP se tratan como libre: descanso, no próximo turno
     for(var ddF=1;ddF<=30;ddF++){
       var nDF=new Date(now.getFullYear(),now.getMonth(),now.getDate()+ddF);
       var nMdF=(ue[MESES[nDF.getMonth()]]||{})[nDF.getDate()];
@@ -4714,7 +4715,7 @@ window.renderOperativa=function(){
   } else if(isDone){
     card.classList.add("state-rest");
     var nxtMin=null,nxtStr="",nxtDays=0;
-    var ANXT=["trabajado","hl","hlp","h6","festivo","baja","rm","curso"];
+    var ANXT=["trabajado","h6","baja","rm","curso"]; // HL/HLP se tratan como libre: descanso, no próximo turno
     for(var dd2=1;dd2<=30;dd2++){
       var nD=new Date(now.getFullYear(),now.getMonth(),now.getDate()+dd2);
       var nMd=(ue[MESES[nD.getMonth()]]||{})[nD.getDate()];
