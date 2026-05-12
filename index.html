@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<!-- CTA_OPERATIVA_V49_HFUN_OVERLAY_030_2026-05-12 -->
+<!-- CTA_OPERATIVA_V50_HFUN_MANTIENE_TURNO_ORIGINAL_2026-05-12 -->
 <meta charset="UTF-8">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -308,6 +308,7 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 .mc-day.baja{background:rgba(239,68,68,.1);color:#f87171}
 .mc-day.perentorias{background:rgba(251,146,60,.12);color:#fb923c}
 .mc-day.h6,.mc-day.hfun{background:rgba(99,102,241,.12);color:#818cf8}
+.mc-day.hfun-mark{box-shadow:inset 0 -2px 0 rgba(129,140,248,.9)}
 .mc-day.bp,.mc-day.rm,.mc-day.nh{background:rgba(20,184,166,.1);color:#2dd4bf}
 .mc-day.hoy{box-shadow:0 0 0 2px var(--gold)!important}
 .mc-day-num{font-weight:700;font-size:11px;line-height:1.2}
@@ -3271,7 +3272,8 @@ function mcRender(){
     // cls now computed per-cell below (hasPeren check)
     var hasPeren=dayObj&&dayObj.perenDur&&dayObj.perenDur!=='0:00';
     var hasHfun=dayObj&&dayObj.hfunDur&&dayObj.hfunDur!=='0:00';
-    var dispCls='mc-day '+(hasPeren?'perentorias':hasHfun?'hfun':(tipo||'libre'));
+    var dispCls='mc-day '+(hasPeren?'perentorias':(tipo||'libre'));
+    if(hasHfun)dispCls+=' hfun-mark';
     if(isThisMonth&&d===today.getDate())dispCls+=' hoy';
     var timeLines='';
     if(dayObj&&dayObj.e1&&dayObj.s1){
@@ -3612,14 +3614,20 @@ function mcEditSave(){
     // If day was libre, mark as trabajado so shift shows
     if(!ue[month][day].tipo||ue[month][day].tipo==='libre')ue[month][day].tipo='trabajado';
   } else if(tipoVal==='hfun'){
-    // Overlay on existing day: keep shift, add H. Función.
-    // Igual que perentorias, pero en morado y por defecto +0:30.
+    // Overlay: H. Función NO sustituye el turno del día.
+    // Mantiene tipo, horarios y total existentes; solo añade la línea morada +hh:mm.
     var hfunTxt=(document.getElementById('mc-hfun-total').value.trim()||'0:30');
+    var baseTipo=existingDay.tipo;
+    if(!baseTipo||baseTipo==='libre'||baseTipo==='hfun')baseTipo='trabajado';
     ue[month][day]=Object.assign({},existingDay,{
+      tipo:baseTipo,
+      e1:existingDay.e1||'',
+      s1:existingDay.s1||'',
+      e2:existingDay.e2||'',
+      s2:existingDay.s2||'',
+      total:existingDay.total||0,
       hfunDur:hfunTxt
     });
-    // If day was libre, mark as trabajado so the day keeps visible data.
-    if(!ue[month][day].tipo||ue[month][day].tipo==='libre')ue[month][day].tipo='trabajado';
   } else {
     // Update tipo and SAVE the edited times from the modal.
     // Antes se priorizaban los horarios existentes (existingDay.e1 || e1),
