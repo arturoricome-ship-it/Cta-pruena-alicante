@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<!-- CTA_OPERATIVA_V28_FESTIVOS_PENDIENTES_ANUALES_2026-05-12 -->
+<!-- CTA_OPERATIVA_V29_FESTIVOS_CUENTAN_COMO_DIA_COMPUTABLE_2026-05-12 -->
 <meta charset="UTF-8">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -3293,7 +3293,7 @@ function mcSaveFestCarryover(val){
 }
 function _mcFestivoCuentaDia(day){
   if(!day)return false;
-  var tipos=['trabajado','vacaciones','curso','hl','hlp','baja','rm','hfun'];
+  var tipos=['trabajado','vacaciones','curso','hl','hlp','baja','rm','hfun','festivo'];
   if(tipos.indexOf(day.tipo)>=0)return true;
   if(day.perenDur&&day.perenDur!=='0:00')return true;
   if(day.hfunDur&&day.hfunDur!=='0:00')return true;
