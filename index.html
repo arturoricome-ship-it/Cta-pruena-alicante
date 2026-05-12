@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<!-- CTA_OPERATIVA_V45_FD_MEZCLADOS_AL_ORDENAR_SALIDA_2026-05-12 -->
+<!-- CTA_OPERATIVA_V47_SELECTOR_HOY_MANANA_DETALLES_2026-05-12 -->
 <meta charset="UTF-8">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -520,6 +520,10 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 .op-pill.mid{background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.25);color:#fbbf24}
 .op-pill.high{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.28);color:#f87171}
 
+.op-day-toggle{grid-column:1/-1;display:flex;gap:6px;background:rgba(255,255,255,.045);border:1px solid var(--border);border-radius:12px;padding:4px;margin:2px 0 0}
+.op-day-toggle button{flex:1;border:none;border-radius:9px;background:transparent;color:var(--gray);font-family:"Outfit",sans-serif;font-size:11px;font-weight:800;padding:8px 10px;cursor:pointer;letter-spacing:.4px;text-transform:uppercase}
+.op-day-toggle button.active{background:linear-gradient(135deg,var(--gold),var(--gold-light));color:var(--navy);box-shadow:0 3px 10px rgba(200,168,75,.25)}
+
 
 /* CTA V22: detalles, historial y barra inferior */
 #bottom-nav{display:flex!important;visibility:visible!important;opacity:1!important;position:fixed!important;left:0!important;right:0!important;bottom:0!important;z-index:99999!important;transform:none!important;pointer-events:auto!important}
@@ -765,6 +769,11 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
               <div class="op-metric-row"><span>Franja más cargada</span><b id="op-load-peak">—</b></div>
               <div class="op-metric-row warn"><span>Posible falta de personal</span><b id="op-load-lack">—</b></div>
             </div>
+          </div>
+
+          <div class="op-day-toggle" aria-label="Selector día detalles operativos">
+            <button type="button" id="op-day-hoy" onclick="event.stopPropagation();opSetDetalleDia('hoy')">Hoy</button>
+            <button type="button" id="op-day-manana" onclick="event.stopPropagation();opSetDetalleDia('manana')">Mañana</button>
           </div>
 
           <div class="op-hourly-card">
@@ -4367,6 +4376,11 @@ function g(id){return document.getElementById(id);}
 function toM(t){if(!t)return null;var p=t.split(":");return +p[0]*60+(+p[1]||0);}
 function fmtT(m){if(!m&&m!==0)return"";var h=Math.floor(m/60),mn=m%60;return h>0?h+"h"+(mn?" "+mn+"m":""):mn+"m";}
 
+window.opSetDetalleDia=function(dia){
+  try{localStorage.setItem('op_detalle_dia',dia==='manana'?'manana':'hoy');}catch(e){}
+  if(typeof window.renderOperativa==='function')window.renderOperativa();
+};
+
 window.renderOperativa=function(){
   var now=new Date(),nowMin=now.getHours()*60+now.getMinutes();
   var mK=MESES[now.getMonth()];
@@ -4435,6 +4449,16 @@ window.renderOperativa=function(){
   function plannedMinutesEmp(emp){
     function dur(e,s){if(e===null||s===null)return 0;var ss=s<e?s+1440:s;return Math.max(0,ss-e);}
     return dur(emp.e1,emp.s1)+dur(emp.e2,emp.s2);
+  }
+  function opTrabajadoresFecha(dateObj){
+    var mk=MESES[dateObj.getMonth()],dn=dateObj.getDate(),out=[];
+    Object.keys(gmap).forEach(function(nom){
+      var emp=gmap[nom],dias=(emp.meses&&emp.meses[mk])||null;if(!dias)return;
+      var t=dias[dn];if(!t||!t.e1)return;
+      var excl=!!(t.noVieneInterrogacion||t.disponibilidadNoConfirmada);if(excl)return;
+      out.push({nombre:nom,e1:toM(t.e1),s1:toM(t.s1),e2:t.e2?toM(t.e2):null,s2:t.s2?toM(t.s2):null});
+    });
+    return out;
   }
   var total=trabajanHoy.length;
   // Check if a tramo [e,s] overlaps with a time period [pStart, pEnd]
@@ -4594,6 +4618,7 @@ window.renderOperativa=function(){
     if(g("op-v-total-tom"))g("op-v-total-tom").textContent=tTot>0?tTot:"—";
     var rtMi=tE1!==null?opHistTurnoCount(rT,tE1,tS1,tE2,tS2):0;
     if(g("op-v-turno-tom"))g("op-v-turno-tom").textContent=tTot>0?String(Math.max(iT,rtMi)):"—";
+    if(!window._opRemoteHistoryLoadedOnce){window._opRemoteHistoryLoadedOnce=1;setTimeout(function(){if(typeof window.renderOperativa==='function')window.renderOperativa();},80);}
   };
 
   // ─ Panel operativo ampliado: picos, ahora, carga/plantilla y presión ─
@@ -4606,6 +4631,33 @@ window.renderOperativa=function(){
   function inWindowCount(arr,a,b){return arr.filter(function(v){var tm=flMin(v);return tm!==null&&tm>=a&&tm<b;}).length;}
   var hourCounts=Array(24).fill(0);
   allH.forEach(function(v){var tm=flMin(v);if(tm!==null)hourCounts[Math.floor(tm/60)%24]++;});
+
+  var opDetalleSel='hoy';try{opDetalleSel=localStorage.getItem('op_detalle_dia')||'hoy';}catch(e){}
+  if(opDetalleSel!=='manana')opDetalleSel='hoy';
+  var opBaseDate=new Date(now);if(opBaseDate.getHours()<3)opBaseDate.setDate(opBaseDate.getDate()-1);
+  var opDetalleDate=new Date(opBaseDate);if(opDetalleSel==='manana')opDetalleDate.setDate(opDetalleDate.getDate()+1);
+  var bHoy=g('op-day-hoy'),bMan=g('op-day-manana');
+  if(bHoy)bHoy.classList.toggle('active',opDetalleSel==='hoy');
+  if(bMan)bMan.classList.toggle('active',opDetalleSel==='manana');
+
+  var opDetalleRec=opHistRecord(opDetalleDate);
+  var opDetalleRemoteHours=opDetalleRec?(opDetalleRec.hours||[]).concat(Array(24).fill(0)).slice(0,24):Array(24).fill(0);
+  var opDetalleLive=(opDetalleSel==='manana'?lT.concat(sT):allH);
+  var opDetalleLiveHours=Array(24).fill(0);
+  opDetalleLive.forEach(function(v){var tm=flMin(v);if(tm!==null)opDetalleLiveHours[Math.floor(tm/60)%24]++;});
+  hourCounts=hourCounts.map(function(_,i){return Math.max(Number(opDetalleRemoteHours[i]||0),Number(opDetalleLiveHours[i]||0));});
+  var opDetalleTotal=Math.max(opHistTotal(opDetalleRec),opDetalleLive.length,hourCounts.reduce(function(a,b){return a+Number(b||0);},0));
+  var opDetalleTrabajadores=opDetalleSel==='hoy'?trabajanHoy:opTrabajadoresFecha(opDetalleDate);
+  var opDetalleHorasPlan=opDetalleTrabajadores.reduce(function(sum,e){return sum+plannedMinutesEmp(e);},0)/60;
+  if(opDetalleHorasPlan>0&&opDetalleTotal>0){
+    setTextOp('op-prod-vh',(opDetalleTotal/opDetalleHorasPlan).toFixed(2).replace('.',',')+' vuelos/h');
+    setTextOp('op-prod-hv',(opDetalleHorasPlan/opDetalleTotal).toFixed(2).replace('.',',')+' h/vuelo');
+  }else{setTextOp('op-prod-vh','—');setTextOp('op-prod-hv','—');}
+  setTextOp('op-prod-hours',opDetalleHorasPlan>0?(Math.round(opDetalleHorasPlan*10)/10).toString().replace('.',',')+' h':'—');
+  setTextOp('op-prod-flights',opDetalleTotal>0?opDetalleTotal:'—');
+  setTextOp('op-load-workers',opDetalleTrabajadores.length||'—');
+  setTextOp('op-load-flights',opDetalleTotal>0?opDetalleTotal:'—');
+
   var windows=[
     {label:'05:00 - 07:00',a:300,b:420},
     {label:'10:00 - 12:00',a:600,b:720},
@@ -4622,7 +4674,7 @@ window.renderOperativa=function(){
   function opBuildLocalHistory(todayCounts){return {};}
   function opParseRemoteHourArray(v){if(Array.isArray(v))return v.map(function(n){return Number(n||0);}).concat(Array(24).fill(0)).slice(0,24);return String(v||'').split(',').map(function(n){return Number(String(n).trim()||0);}).concat(Array(24).fill(0)).slice(0,24);}
   function opDowFromISO(ds){var d=new Date(ds+'T12:00:00');if(isNaN(d.getTime()))return 0;return (d.getDay()+6)%7;}
-  function opNormalizeHistRows(payload){var rows=[];if(Array.isArray(payload))rows=payload;else if(payload&&Array.isArray(payload.rows))rows=payload.rows;else if(payload&&Array.isArray(payload.data))rows=payload.data;var data={};rows.forEach(function(r){var fecha=String(r.fecha||r.Fecha||'').trim();if(!fecha)return;data[fecha]={hours:opParseRemoteHourArray(r.por_hora||r.porHora||r.hours||r.horas),dow:opDowFromISO(fecha),total:Number(r.total_vuelos||r.total||0),salidas:Number(r.salidas||0),llegadas:Number(r.llegadas||0),estado:String(r.estado||'')};});return data;}
+  function opNormalizeHistRows(payload){var rows=[];if(Array.isArray(payload))rows=payload;else if(payload&&Array.isArray(payload.registros))rows=payload.registros;else if(payload&&Array.isArray(payload.rows))rows=payload.rows;else if(payload&&Array.isArray(payload.data))rows=payload.data;var data={};rows.forEach(function(r){var fecha=String(r.fecha||r.Fecha||'').trim();if(!fecha)return;data[fecha]={hours:opParseRemoteHourArray(r.por_hora||r.porHora||r.hours||r.horas),dow:opDowFromISO(fecha),total:Number(r.total_vuelos||r.total||0),salidas:Number(r.salidas||0),llegadas:Number(r.llegadas||0),estado:String(r.estado||'')};});return data;}
   function opMergeHistory(a,b){var out={};Object.keys(a||{}).forEach(function(k){out[k]={hours:(a[k].hours||Array(24).fill(0)).slice(0,24),dow:a[k].dow!==undefined?a[k].dow:opDowFromISO(k),total:Number(a[k].total||0)};});Object.keys(b||{}).forEach(function(k){var arr=(b[k].hours||Array(24).fill(0)).concat(Array(24).fill(0)).slice(0,24);if(!out[k])out[k]={hours:Array(24).fill(0),dow:b[k].dow!==undefined?b[k].dow:opDowFromISO(k),total:Number(b[k].total||0)};out[k].hours=out[k].hours.map(function(v,i){return Math.max(v||0,arr[i]||0);});out[k].total=Math.max(Number(out[k].total||0),Number(b[k].total||0));});return out;}
   function opRenderHistoryData(data){var hourTotals=Array(24).fill(0),dayTotals=Array(7).fill(0),heat={};Object.keys(data||{}).forEach(function(date){var rec=data[date]||{},arr=rec.hours||[],dow=(rec.dow!==undefined)?rec.dow:opDowFromISO(date);for(var i=0;i<24;i++){var v=Number(arr[i]||0);hourTotals[i]+=v;dayTotals[dow]+=v;if(!heat[dow])heat[dow]=Array(24).fill(0);heat[dow][i]+=v;}});var maxH=Math.max.apply(null,hourTotals.concat([1]));var hb=g('op-history-hour-bars');if(hb)hb.innerHTML=opBars24Html(hourTotals,maxH,'vuelos');var maxD=Math.max.apply(null,dayTotals.concat([1]));var db=g('op-history-day-bars');if(db)db.innerHTML=opBars7Html(dayTotals,maxD);var hg=g('op-history-heat');if(hg){var labs=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];var maxCell=1;for(var dd=0;dd<7;dd++){var row=heat[dd]||Array(24).fill(0);for(var hh2=0;hh2<24;hh2++)maxCell=Math.max(maxCell,row[hh2]||0);}var html='<div></div>'+Array.from({length:24},function(_,h){return '<div class="op-heat-head">'+('0'+h).slice(-2)+'</div>';}).join('');for(var dd2=0;dd2<7;dd2++){html+='<div class="op-heat-day">'+labs[dd2]+'</div>';var row2=heat[dd2]||Array(24).fill(0);for(var h2=0;h2<24;h2++){var v=row2[h2]||0;var ratio=maxCell?v/maxCell:0;var bg=v===0?'rgba(255,255,255,.025)':('rgba('+(ratio>.55?'239,68,68':'34,197,94')+','+(0.10+ratio*0.35).toFixed(2)+')');var border=v===0?'rgba(255,255,255,.06)':(ratio>.55?'rgba(239,68,68,.35)':'rgba(34,197,94,.35)');html+='<div class="op-heat-cell" style="background:'+bg+';border-color:'+border+'" title="'+labs[dd2]+' '+('0'+h2).slice(-2)+':00 · '+v+' vuelos">'+(v||'')+'</div>';}}hg.innerHTML=html;}}
   function opSaveAndRenderHistory(todayCounts){try{Object.keys(localStorage).forEach(function(k){if(k&&k.indexOf('cta_historial_operativa_vuelos')===0)localStorage.removeItem(k);});}catch(e){}var empty={};opRenderHistoryData(empty);var url='https://script.google.com/macros/s/AKfycbz44ZHwMDkVnJ3DRFPLBmqol473EpklTwLMD2kS-SA2ReeFb2XmpyKeo4JuYWfdABMw1A/exec?action=historico';if(!url)return;fetch(url,{cache:'no-store'}).then(function(r){return r.json();}).then(function(payload){if(payload&&payload.ok===false)return;var remoteData=opNormalizeHistRows(payload);window._opRemoteHistory=remoteData;if(typeof window.opApplyRemoteFlightSummary==='function')window.opApplyRemoteFlightSummary(remoteData);opRenderHistoryData(remoteData);}).catch(function(){opRenderHistoryData({});});}
@@ -4633,15 +4685,14 @@ window.renderOperativa=function(){
   if(typeof opSaveAndRenderHistory==='function')opSaveAndRenderHistory(hourCounts);
   var peakHour=hourCounts.reduce(function(best,c,h){return c>(best.count||0)?{hour:h,count:c}:best;},{hour:0,count:0});
   var peakWin=peakHour.count>0?{label:(('0'+peakHour.hour).slice(-2)+':00 - '+('0'+((peakHour.hour+1)%24)).slice(-2)+':00'),count:peakHour.count}:null;
-  setTextOp('op-load-workers',wNow||'—');
-  setTextOp('op-load-flights',cH>0?cH:'—');
+  // Trabajadores/vuelos de detalles se actualizan según selector Hoy/Mañana
   setTextOp('op-load-ratio','—');
   setTextOp('op-load-peak',peakWin&&peakWin.count>0?peakWin.label:'—');
 
   var hrList=g('op-hourly-ratio-list');
   if(hrList){
     hrList.innerHTML=hourCounts.map(function(fc,h){
-      var people=trabajanHoy.filter(function(e){return isWorkingAt(e,h*60);}).length;
+      var people=opDetalleTrabajadores.filter(function(e){return isWorkingAt(e,h*60);}).length;
       var ratio=fc>0?people/fc:null;
       var cls='low';
       if(ratio===null)cls='low'; else if(ratio<3)cls='very'; else if(ratio<4)cls='high'; else if(ratio<6)cls='mid'; else cls='low';
