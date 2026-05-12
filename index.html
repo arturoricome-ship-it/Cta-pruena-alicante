@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<!-- CTA_OPERATIVA_V31_PRESION_PERSONAL_NECESARIO_2026-05-12 -->
+<!-- CTA_OPERATIVA_V32_PRESION_TIEMPO_REAL_Y_PRODUCTIVIDAD_2026-05-12 -->
 <meta charset="UTF-8">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -483,8 +483,9 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 /* ─── Panel operativo ampliado ───────────────────────────── */
 .op-dashboard{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
 @media(max-width:720px){.op-dashboard{grid-template-columns:1fr}}
-.op-pressure-card,.op-now-card,.op-load-card,.op-peaks-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:13px 14px;overflow:hidden}
+.op-pressure-card,.op-now-card,.op-load-card,.op-peaks-card,.op-productivity-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:13px 14px;overflow:hidden}
 .op-pressure-card{border-color:rgba(200,168,75,.28);background:linear-gradient(160deg,rgba(200,168,75,.08),rgba(200,168,75,.025))}
+.op-productivity-card{border-color:rgba(34,197,94,.22);background:linear-gradient(160deg,rgba(34,197,94,.07),rgba(34,197,94,.02))}
 .op-card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:10px}
 .op-card-title{font-size:12px;font-weight:800;color:var(--white);letter-spacing:.2px}
 .op-card-sub{font-size:8.5px;color:var(--gray);margin-top:2px;line-height:1.4}
@@ -693,7 +694,7 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
           <div class="op-pressure-card">
             <div class="op-card-head">
               <div>
-                <div class="op-card-title">Presión operativa</div>
+                <div class="op-card-title">Presión operativa en tiempo real</div>
                 <div class="op-card-sub">Estimación interna, no dato oficial</div>
               </div>
               <div id="op-pressure-level" class="op-pressure-level">—</div>
@@ -704,6 +705,17 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
             </div>
             <div id="op-pressure-note" class="op-mini-note">Calculada solo con vuelos en tierra y personal activo ahora.</div>
             <div id="op-pressure-formula" class="op-pressure-formula">Resumen: necesarios / disponibles para vuelos. 50% = equilibrio.</div>
+          </div>
+
+          <div class="op-productivity-card">
+            <div class="op-card-title">Productividad operativa del día</div>
+            <div class="op-card-sub">Vuelos del día divididos entre horas planificadas</div>
+            <div class="op-metric-list">
+              <div class="op-metric-row"><span>Productividad</span><b id="op-prod-vh">—</b></div>
+              <div class="op-metric-row"><span>Horas por vuelo</span><b id="op-prod-hv">—</b></div>
+              <div class="op-metric-row"><span>Horas planificadas</span><b id="op-prod-hours">—</b></div>
+              <div class="op-metric-row"><span>Vuelos del día</span><b id="op-prod-flights">—</b></div>
+            </div>
           </div>
 
           <div class="op-now-card">
@@ -4310,6 +4322,10 @@ window.renderOperativa=function(){
     function inT(e,s,m){if(e===null||s===null)return false;if(s<e)return m>=e||m<s;return m>=e&&m<s;}
     return inT(emp.e1,emp.s1,min)||inT(emp.e2,emp.s2,min);
   }
+  function plannedMinutesEmp(emp){
+    function dur(e,s){if(e===null||s===null)return 0;var ss=s<e?s+1440:s;return Math.max(0,ss-e);}
+    return dur(emp.e1,emp.s1)+dur(emp.e2,emp.s2);
+  }
   var total=trabajanHoy.length;
   // Check if a tramo [e,s] overlaps with a time period [pStart, pEnd]
   function tramoOverlaps(e,s,pStart,pEnd){
@@ -4390,7 +4406,7 @@ window.renderOperativa=function(){
     var le=g('op-pressure-level');if(le){le.textContent=lvl;le.className='op-pressure-level '+cls;}
     var pctNode=g('op-pressure-pct');if(pctNode){pctNode.textContent=score+'%';pctNode.className='op-pressure-pct '+cls;}
     var bar=g('op-pressure-bar');if(bar){bar.style.width=score+'%';bar.className='op-pressure-bar '+cls;}
-    setTextOp('op-pressure-note','50% = equilibrio. La presión compara personal necesario contra disponibles para vuelos.');
+    setTextOp('op-pressure-note','50% = equilibrio. Presión en tiempo real con vuelos en tierra y personal disponible para aviones.');
     setTextOp('op-load-lack',score>=70?'Sí':'No');
   }
   setTextOp('op-load-workers',total||'—');
@@ -4402,6 +4418,10 @@ window.renderOperativa=function(){
   setTextOp('op-now-arrivals','—');
   setTextOp('op-now-departures','—');
   setTextOp('op-now-delays','—');
+  setTextOp('op-prod-vh','—');
+  setTextOp('op-prod-hv','—');
+  setTextOp('op-prod-hours','—');
+  setTextOp('op-prod-flights','—');
   setPressureOp(0,0,0,wNow||0);
 
   // Flights
@@ -4414,6 +4434,17 @@ window.renderOperativa=function(){
   // Only update cache if new count is HIGHER — once set, never go down during the day
   if(totH>cH){cH=totH;try{localStorage.setItem("op_vt",JSON.stringify({d:tStr,t:cH}));}catch(e){}}
   if(g("op-v-total"))g("op-v-total").textContent=cH>0?cH:"—";
+  var horasPlanificadasDia=trabajanHoy.reduce(function(sum,e){return sum+plannedMinutesEmp(e);},0)/60;
+  var vuelosProductividad=cH||totH||0;
+  if(horasPlanificadasDia>0&&vuelosProductividad>0){
+    setTextOp('op-prod-vh',(vuelosProductividad/horasPlanificadasDia).toFixed(2).replace('.',',')+' vuelos/h');
+    setTextOp('op-prod-hv',(horasPlanificadasDia/vuelosProductividad).toFixed(2).replace('.',',')+' h/vuelo');
+  }else{
+    setTextOp('op-prod-vh','—');
+    setTextOp('op-prod-hv','—');
+  }
+  setTextOp('op-prod-hours',horasPlanificadasDia>0?(Math.round(horasPlanificadasDia*10)/10).toString().replace('.',',')+' h':'—');
+  setTextOp('op-prod-flights',vuelosProductividad>0?vuelosProductividad:'—');
   var totT=lT.length+sT.length;
   // Cache tomorrow total — same logic as today: only goes up, resets at midnight
   var tom=new Date(now);tom.setDate(tom.getDate()+1);
