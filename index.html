@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<!-- CTA_OPERATIVA_V24_PRESION_INDICE_0_100_2026-05-12 -->
+<!-- CTA_OPERATIVA_V24_FIX_DETALLES_OPERATIVA_2026-05-12 -->
 <meta charset="UTF-8">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -529,6 +529,21 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 
 .op-history-details{background:var(--card);border:1px solid rgba(96,165,250,.18);border-radius:16px;margin:12px 0 14px;overflow:hidden}.op-history-details[open]{border-color:rgba(96,165,250,.32);box-shadow:0 8px 28px rgba(0,0,0,.16)}.op-history-details summary{list-style:none;cursor:pointer;background:linear-gradient(135deg,rgba(96,165,250,.12),rgba(96,165,250,.035));border-bottom:1px solid rgba(255,255,255,.06);padding:12px 14px;font-size:12px;font-weight:900;color:#93c5fd;display:flex;justify-content:space-between;align-items:center;gap:10px;letter-spacing:.2px}.op-history-details summary::-webkit-details-marker{display:none}.op-history-details summary::after{content:'+';font-size:18px;color:#60a5fa;font-weight:900;line-height:1}.op-history-details[open] summary::after{content:'−'}.op-history-body{padding:12px 14px 14px;display:flex;flex-direction:column;gap:12px}.op-history-card{background:rgba(255,255,255,.025);border:1px solid var(--border);border-radius:14px;padding:12px;overflow:hidden}.op-history-title{font-size:13px;font-weight:900;color:var(--white);margin-bottom:2px}.op-history-sub{font-size:9px;color:var(--gray);margin-bottom:10px;line-height:1.35}.op-bars-7{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;align-items:end;height:130px;margin-top:10px;padding:8px 7px 18px;border-left:1px solid rgba(255,255,255,.07);border-bottom:1px solid rgba(255,255,255,.07);background:linear-gradient(to top,rgba(255,255,255,.04) 1px,transparent 1px) 0 0/100% 25%}.op-bars-7 .op-bar-fill{width:70%}.op-bars-7 .op-bar-lab{font-size:10px;transform:none;margin-top:4px}.op-heat-wrap{overflow-x:auto;padding-bottom:2px}.op-heat-grid{display:grid;grid-template-columns:38px repeat(24,28px);gap:4px;min-width:max-content;align-items:center}.op-heat-head,.op-heat-day{font-size:9px;color:var(--gray);text-align:center}.op-heat-day{text-align:right;padding-right:4px;font-size:10px}.op-heat-cell{height:28px;border-radius:7px;border:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:900;color:rgba(255,255,255,.78);background:rgba(255,255,255,.025)}
 
+
+/* CTA V24 fixes: detalles operativos, gráficas a ancho completo */
+.op-hourly-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:13px 14px;overflow:hidden}
+.op-hourly-list{display:grid!important;grid-template-columns:repeat(24,minmax(0,1fr))!important;gap:2px!important;align-items:end;width:100%;min-width:0;height:136px;margin-top:10px;padding:8px 4px 18px;border-left:1px solid rgba(255,255,255,.07);border-bottom:1px solid rgba(255,255,255,.07);background:linear-gradient(to top,rgba(255,255,255,.04) 1px,transparent 1px) 0 0/100% 25%;overflow:visible!important}
+.op-hour-chip{height:100%;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:3px;position:relative;border-radius:0;background:transparent!important;border:0!important;padding:0!important}
+.op-hour-chip::before{content:"";display:block;width:58%;height:var(--h,2%);min-height:2px;border-radius:5px 5px 0 0;background:#4ade80;border:1px solid rgba(255,255,255,.16)}
+.op-hour-chip.mid::before{background:#fbbf24}.op-hour-chip.high::before,.op-hour-chip.very::before{background:#f87171}
+.op-hour-top{display:flex!important;flex-direction:column-reverse!important;align-items:center!important;gap:2px!important;width:100%}
+.op-hour-h{font-size:6px!important;color:var(--gray)!important;line-height:1!important;transform:rotate(-70deg);transform-origin:center;white-space:nowrap;margin-top:6px}
+.op-hour-r{position:absolute;bottom:100%;margin-bottom:4px;font-size:8px;font-weight:900;color:var(--white);background:rgba(13,22,35,.96);border:1px solid rgba(200,168,75,.35);border-radius:7px;padding:2px 4px;display:none;white-space:nowrap;z-index:2}
+.op-hour-chip:active .op-hour-r,.op-hour-chip.show .op-hour-r{display:block}
+.op-hour-meta{display:none!important}
+.op-pressure-pct{white-space:nowrap}
+@media(max-width:430px){.op-hourly-list{gap:1px;height:128px;padding-left:2px;padding-right:2px}.op-hour-chip::before{width:64%}.op-hour-r{font-size:7px}}
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
@@ -679,7 +694,7 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
               <div class="op-pressure-bar-bg"><div id="op-pressure-bar" class="op-pressure-bar" style="width:0%"></div></div>
             </div>
             <div id="op-pressure-note" class="op-mini-note">Calculada con aviones activos y personal activo ahora.</div>
-            <div id="op-pressure-formula" class="op-pressure-formula">Fórmula: índice 0-100 = ((salidas×1,2)+(llegadas×1,0)+(escala×1,4)+(retrasos×0,3)-(operarios×0,18)) × 10.</div>
+            <div id="op-pressure-formula" class="op-pressure-formula">Fórmula: ((salidas×1,2)+(llegadas×1,0)+(escala×1,4)+(retrasos×0,3)-(operarios×0,18)) × 10, limitado a 0-100.</div>
           </div>
 
           <div class="op-now-card">
@@ -4251,18 +4266,17 @@ window.renderOperativa=function(){
 
 
   function setTextOp(id,val){var el=g(id);if(el)el.textContent=val;}
-  function setPressureOp(valor,detalle){
-    valor=Math.max(0,Math.min(100,Math.round(valor||0)));
-    detalle=detalle||{};
+  function setPressureOp(score,delays,peakFlights,activeWorkers){
+    score=Math.max(0,Math.min(100,Math.round(score||0)));
     var lvl='Baja',cls='low';
-    if(valor>=90){lvl='Muy alta';cls='very';}
-    else if(valor>=61){lvl='Alta';cls='high';}
-    else if(valor>=31){lvl='Moderada';cls='mid';}
+    if(score>=90){lvl='Muy alta';cls='very';}
+    else if(score>=61){lvl='Alta';cls='high';}
+    else if(score>=31){lvl='Moderada';cls='mid';}
     var le=g('op-pressure-level');if(le){le.textContent=lvl;le.className='op-pressure-level '+cls;}
-    var pctNode=g('op-pressure-pct');if(pctNode){pctNode.textContent=valor+'/100';pctNode.className='op-pressure-pct '+cls;}
-    var bar=g('op-pressure-bar');if(bar)bar.style.width=valor+'%';
-    setTextOp('op-pressure-note','Salidas '+(detalle.salidas||0)+' · Llegadas '+(detalle.llegadas||0)+' · Escala '+(detalle.escala||0)+' · Retrasos '+(detalle.retrasos||0)+' · Operarios '+(detalle.operarios||0)+'.');
-    setTextOp('op-load-lack',valor>=90?'Sí':'No');
+    var pctNode=g('op-pressure-pct');if(pctNode){pctNode.textContent=score+'/100';pctNode.className='op-pressure-pct '+cls;}
+    var bar=g('op-pressure-bar');if(bar)bar.style.width=score+'%';
+    setTextOp('op-pressure-note','Índice 0-100 con vuelos activos, aviones en escala, retrasos y operarios trabajando ahora.');
+    setTextOp('op-load-lack',score>=75?'Sí':'No');
   }
   setTextOp('op-load-workers',total||'—');
   setTextOp('op-load-flights','—');
@@ -4273,7 +4287,7 @@ window.renderOperativa=function(){
   setTextOp('op-now-arrivals','—');
   setTextOp('op-now-departures','—');
   setTextOp('op-now-delays','—');
-  setPressureOp(total?25:0,{salidas:0,llegadas:0,escala:0,retrasos:0,operarios:total||0});
+  setPressureOp(0,0,0,wNow||0);
 
   // Flights
   if(typeof liveData==="undefined")return;
@@ -4308,6 +4322,8 @@ window.renderOperativa=function(){
   function flMin(v){return typeof hToMin==="function"?hToMin(v.horaReal||v.horaProg||""):null;}
   var allH=lH.concat(sH).filter(function(v){return (v.estadoClass||"")!=="e-cancelled";});
   function inWindowCount(arr,a,b){return arr.filter(function(v){var tm=flMin(v);return tm!==null&&tm>=a&&tm<b;}).length;}
+  var hourCounts=Array(24).fill(0);
+  allH.forEach(function(v){var tm=flMin(v);if(tm!==null)hourCounts[Math.floor(tm/60)%24]++;});
   var windows=[
     {label:'05:00 - 07:00',a:300,b:420},
     {label:'10:00 - 12:00',a:600,b:720},
@@ -4324,11 +4340,14 @@ window.renderOperativa=function(){
   function opSaveAndRenderHistory(todayCounts){var key='cta_historial_operativa_vuelos_v1';var y=now.getFullYear(),m=('0'+(now.getMonth()+1)).slice(-2),d0=('0'+now.getDate()).slice(-2);var ds=y+'-'+m+'-'+d0;var data={};try{data=JSON.parse(localStorage.getItem(key)||'{}');}catch(e){data={};}if(!data[ds])data[ds]={hours:Array(24).fill(0),dow:(now.getDay()+6)%7};data[ds].hours=data[ds].hours.map(function(v,i){return Math.max(v||0,todayCounts[i]||0);});try{localStorage.setItem(key,JSON.stringify(data));}catch(e){}var hourTotals=Array(24).fill(0),dayTotals=Array(7).fill(0),heat={};Object.keys(data).forEach(function(date){var rec=data[date]||{},arr=rec.hours||[],dow=(rec.dow!==undefined)?rec.dow:0;for(var i=0;i<24;i++){var v=arr[i]||0;hourTotals[i]+=v;dayTotals[dow]+=v;if(!heat[dow])heat[dow]=Array(24).fill(0);heat[dow][i]+=v;}});var maxH=Math.max.apply(null,hourTotals.concat([1]));var hb=g('op-history-hour-bars');if(hb)hb.innerHTML=opBars24Html(hourTotals,maxH,'vuelos');var maxD=Math.max.apply(null,dayTotals.concat([1]));var db=g('op-history-day-bars');if(db)db.innerHTML=opBars7Html(dayTotals,maxD);var hg=g('op-history-heat');if(hg){var labs=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];var maxCell=1;for(var dd=0;dd<7;dd++){var row=heat[dd]||Array(24).fill(0);for(var hh2=0;hh2<24;hh2++)maxCell=Math.max(maxCell,row[hh2]||0);}var html='<div></div>'+Array.from({length:24},function(_,h){return '<div class="op-heat-head">'+('0'+h).slice(-2)+'</div>';}).join('');for(var dd2=0;dd2<7;dd2++){html+='<div class="op-heat-day">'+labs[dd2]+'</div>';var row2=heat[dd2]||Array(24).fill(0);for(var h2=0;h2<24;h2++){var v=row2[h2]||0;var ratio=maxCell?v/maxCell:0;var bg=v===0?'rgba(255,255,255,.025)':('rgba('+(ratio>.55?'239,68,68':'34,197,94')+','+(0.10+ratio*0.35).toFixed(2)+')');var border=v===0?'rgba(255,255,255,.06)':(ratio>.55?'rgba(239,68,68,.35)':'rgba(34,197,94,.35)');html+='<div class="op-heat-cell" style="background:'+bg+';border-color:'+border+'" title="'+labs[dd2]+' '+('0'+h2).slice(-2)+':00 · '+v+' vuelos">'+(v||'')+'</div>';}}hg.innerHTML=html;}}
 
   var pl=g('op-peaks-list');
-  if(pl)pl.innerHTML=windows.map(function(w){var l=lvlFor(w.count);return '<div class="op-peak-row"><span>'+w.label+' <small style="color:rgba(255,255,255,.35)">('+w.count+' vuelos)</small></span><b class="op-pill '+l.cls+'">'+l.txt+'</b></div>';}).join('');
-  var peakWin=windows.slice().sort(function(a,b){return b.count-a.count;})[0]||null;
-  setTextOp('op-load-workers',total||'—');
+  var maxHourFlights=Math.max.apply(null,hourCounts.concat([1]));
+  if(pl)pl.innerHTML=opBars24Html(hourCounts,maxHourFlights,'vuelos');
+  if(typeof opSaveAndRenderHistory==='function')opSaveAndRenderHistory(hourCounts);
+  var peakHour=hourCounts.reduce(function(best,c,h){return c>(best.count||0)?{hour:h,count:c}:best;},{hour:0,count:0});
+  var peakWin=peakHour.count>0?{label:(('0'+peakHour.hour).slice(-2)+':00 - '+('0'+((peakHour.hour+1)%24)).slice(-2)+':00'),count:peakHour.count}:null;
+  setTextOp('op-load-workers',wNow||'—');
   setTextOp('op-load-flights',cH>0?cH:'—');
-  setTextOp('op-load-ratio',(total&&cH)?(total/cH).toFixed(2).replace('.',','):'—');
+  setTextOp('op-load-ratio','—');
   setTextOp('op-load-peak',peakWin&&peakWin.count>0?peakWin.label:'—');
 
   var hrList=g('op-hourly-ratio-list');
@@ -4339,7 +4358,8 @@ window.renderOperativa=function(){
       var cls='low';
       if(ratio===null)cls='low'; else if(ratio<3)cls='very'; else if(ratio<4)cls='high'; else if(ratio<6)cls='mid'; else cls='low';
       var val=ratio===null?'—':ratio.toFixed(1).replace('.',',');
-      return '<div class="op-hour-chip '+cls+'"><div class="op-hour-top"><span class="op-hour-h">'+('0'+h).slice(-2)+':00</span><span class="op-hour-r '+cls+'">'+val+'</span></div><div class="op-hour-meta">'+people+' pers. / '+fc+' vuelos</div></div>';
+      var hPct=(ratio===null?2:Math.max(2,Math.min(100,Math.round((ratio/8)*100))));
+      return '<div class="op-hour-chip '+cls+'" style="--h:'+hPct+'%" onclick="this.classList.toggle(&quot;show&quot;)" title="'+('0'+h).slice(-2)+':00 · '+people+' pers. / '+fc+' vuelos"><div class="op-hour-top"><span class="op-hour-h">'+('0'+h).slice(-2)+':00</span><span class="op-hour-r '+cls+'">'+val+'</span></div><div class="op-hour-meta">'+people+' pers. / '+fc+' vuelos</div></div>';
     }).join('');
   }
 
@@ -4360,13 +4380,15 @@ window.renderOperativa=function(){
   function arrActive(v){var tm=flMin(v);if(tm===null)return false;return nowMin>=tm&&nowMin<=tm+45;}
   var salidasActivas=sH.filter(function(v){return (v.estadoClass||'')!=='e-cancelled'&&depActive(v);}).length;
   var llegadasActivas=lH.filter(function(v){return (v.estadoClass||'')!=='e-cancelled'&&arrActive(v);}).length;
-  var avionesEnEscala=activeFlights||0;
-  var retrasosActivos=delays||0;
+  var avionesEnEscala=allH.filter(function(v){var c=v.estadoClass||'';return c==='e-active'||c==='e-boarding'||c==='e-gate'||c==='e-taxiing';}).length;
   var operariosActivosAhora=wNow||0;
-  var cargaBruta=(salidasActivas*1.2)+(llegadasActivas*1.0)+(avionesEnEscala*1.4)+(retrasosActivos*0.3)-(operariosActivosAhora*0.18);
-  var presionOperativa=Math.max(0,Math.min(100,cargaBruta*10));
-  setPressureOp(presionOperativa,{salidas:salidasActivas,llegadas:llegadasActivas,escala:avionesEnEscala,retrasos:retrasosActivos,operarios:operariosActivosAhora});
-  var pf=g('op-pressure-formula');if(pf)pf.textContent='Fórmula: (salidas '+salidasActivas+'×1,2) + (llegadas '+llegadasActivas+'×1,0) + (escala '+avionesEnEscala+'×1,4) + (retrasos '+retrasosActivos+'×0,3) − (operarios '+operariosActivosAhora+'×0,18), ajustado a escala 0-100 = '+Math.round(presionOperativa)+'/100.';
+  var cargaBruta=(salidasActivas*1.2)+(llegadasActivas*1.0)+(avionesEnEscala*1.4)+(delays*0.3)-(operariosActivosAhora*0.18);
+  var pressureScore=Math.max(0,Math.min(100,cargaBruta*10));
+  setPressureOp(pressureScore,delays,peakWin?peakWin.count:0,operariosActivosAhora);
+  setTextOp('op-load-workers',operariosActivosAhora||'—');
+  var vuelosRatio=activeFlights||salidasActivas+llegadasActivas;
+  setTextOp('op-load-ratio',(operariosActivosAhora&&vuelosRatio)?(operariosActivosAhora/vuelosRatio).toFixed(2).replace('.',','):'—');
+  var pf=g('op-pressure-formula');if(pf)pf.textContent='Fórmula: (salidas '+salidasActivas+'×1,2) + (llegadas '+llegadasActivas+'×1,0) + (escala '+avionesEnEscala+'×1,4) + (retrasos '+delays+'×0,3) - (operarios '+operariosActivosAhora+'×0,18), todo ×10 = '+Math.round(pressureScore)+'/100.';
 
   if(!card)return;
   ["state-working","state-pausa","state-rest","state-next"].forEach(function(c){card.classList.remove(c);});
