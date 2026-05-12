@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<!-- CTA_OPERATIVA_V24_FIX_DETALLES_OPERATIVA_2026-05-12 -->
+<!-- CTA_OPERATIVA_V25_LLEGADAS_FINALIZADAS_30MIN_2026-05-12 -->
 <meta charset="UTF-8">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -1683,6 +1683,16 @@ function hToMin(h){
   return hh*60+mm;
 }
 
+function llegadaFinalizada30(v,refMin){
+  var tm=hToMin((v&& (v.horaReal||v.horaProg))||"");
+  if(tm===null)return false;
+  var nowM=(typeof refMin==="number")?refMin:(new Date().getHours()*60+new Date().getMinutes());
+  var diff=nowM-tm;
+  // Si la diferencia es negativa, ese vuelo aún no ha llegado o pertenece a mañana.
+  // En llegadas de hoy, a partir de 30 minutos desde la hora real/programada se da por terminado.
+  return diff>=30;
+}
+
 function getLiveCutoffsFromTurnoHoy(){
   var now=new Date();
   var meses=["ENERO","FEBRERO","MARZO","ABRIL","MAYO","JUNIO","JULIO","AGOSTO","SEPTIEMBRE","OCTUBRE","NOVIEMBRE","DICIEMBRE"];
@@ -1716,7 +1726,10 @@ function renderLive(){
   if(liveFiltro){
     data=data.filter(function(v){
       var s=v.estadoClass||"";
-      if(liveMode==="llegadas") return s!=="e-landed"&&s!=="e-final"&&s!=="e-taxiing"&&s!=="e-boarding"&&s!=="e-gate";
+      if(liveMode==="llegadas"){
+        if(llegadaFinalizada30(v))return false;
+        return s!=="e-landed"&&s!=="e-final"&&s!=="e-taxiing"&&s!=="e-boarding"&&s!=="e-gate";
+      }
       else return s!=="e-active"&&s!=="e-final";
     });
   }
@@ -4275,7 +4288,7 @@ window.renderOperativa=function(){
     var le=g('op-pressure-level');if(le){le.textContent=lvl;le.className='op-pressure-level '+cls;}
     var pctNode=g('op-pressure-pct');if(pctNode){pctNode.textContent=score+'/100';pctNode.className='op-pressure-pct '+cls;}
     var bar=g('op-pressure-bar');if(bar)bar.style.width=score+'%';
-    setTextOp('op-pressure-note','Índice 0-100 con vuelos activos, aviones en escala, retrasos y operarios trabajando ahora.');
+    setTextOp('op-pressure-note','Índice 0-100. Las llegadas dejan de contar 30 min después de su hora real.');
     setTextOp('op-load-lack',score>=75?'Sí':'No');
   }
   setTextOp('op-load-workers',total||'—');
@@ -4320,7 +4333,11 @@ window.renderOperativa=function(){
 
   // ─ Panel operativo ampliado: picos, ahora, carga/plantilla y presión ─
   function flMin(v){return typeof hToMin==="function"?hToMin(v.horaReal||v.horaProg||""):null;}
+  function arrDone30(v){return typeof llegadaFinalizada30==="function"&&llegadaFinalizada30(v,nowMin);}
+  var lHOperativa=lH.filter(function(v){return (v.estadoClass||"")!=="e-cancelled"&&!arrDone30(v);});
+  var sHOperativa=sH.filter(function(v){return (v.estadoClass||"")!=="e-cancelled";});
   var allH=lH.concat(sH).filter(function(v){return (v.estadoClass||"")!=="e-cancelled";});
+  var allHOperativa=lHOperativa.concat(sHOperativa);
   function inWindowCount(arr,a,b){return arr.filter(function(v){var tm=flMin(v);return tm!==null&&tm>=a&&tm<b;}).length;}
   var hourCounts=Array(24).fill(0);
   allH.forEach(function(v){var tm=flMin(v);if(tm!==null)hourCounts[Math.floor(tm/60)%24]++;});
@@ -4365,11 +4382,11 @@ window.renderOperativa=function(){
 
   function isDelay(v){var e=(v.estadoClass||'')+' '+(v.estado||'');return /delay|retras/i.test(e);}
   function inNext(v,min){var tm=flMin(v);if(tm===null)return false;var dd=tm-nowMin;if(dd<0)dd+=1440;return dd>=0&&dd<=min;}
-  var activeFlights=allH.filter(function(v){var c=v.estadoClass||'';return c==='e-active'||c==='e-boarding'||c==='e-gate'||c==='e-taxiing'||inNext(v,10);}).length;
-  var arr30=lH.filter(function(v){return (v.estadoClass||'')!=='e-cancelled'&&inNext(v,30);}).length;
-  var dep30=sH.filter(function(v){return (v.estadoClass||'')!=='e-cancelled'&&inNext(v,30);}).length;
-  var delays=allH.filter(isDelay).length;
-  var upcoming=allH.filter(function(v){return inNext(v,180);}).sort(function(a,b){return (flMin(a)||9999)-(flMin(b)||9999);});
+  var activeFlights=allHOperativa.filter(function(v){var c=v.estadoClass||'';return c==='e-active'||c==='e-boarding'||c==='e-gate'||c==='e-taxiing'||inNext(v,10);}).length;
+  var arr30=lHOperativa.filter(function(v){return inNext(v,30);}).length;
+  var dep30=sHOperativa.filter(function(v){return inNext(v,30);}).length;
+  var delays=allHOperativa.filter(isDelay).length;
+  var upcoming=allHOperativa.filter(function(v){return inNext(v,180);}).sort(function(a,b){return (flMin(a)||9999)-(flMin(b)||9999);});
   var critical=upcoming.filter(isDelay)[0]||upcoming[0]||null;
   setTextOp('op-now-active',activeFlights);
   setTextOp('op-now-critical',critical?((critical.numero||'Vuelo')+' - '+(critical.horaReal||critical.horaProg||'--:--')):'—');
@@ -4377,10 +4394,10 @@ window.renderOperativa=function(){
   setTextOp('op-now-departures',dep30);
   setTextOp('op-now-delays',delays);
   function depActive(v){var tm=flMin(v);if(tm===null)return false;var a=tm-35,b=tm;return nowMin>=a&&nowMin<=b;}
-  function arrActive(v){var tm=flMin(v);if(tm===null)return false;return nowMin>=tm&&nowMin<=tm+45;}
-  var salidasActivas=sH.filter(function(v){return (v.estadoClass||'')!=='e-cancelled'&&depActive(v);}).length;
-  var llegadasActivas=lH.filter(function(v){return (v.estadoClass||'')!=='e-cancelled'&&arrActive(v);}).length;
-  var avionesEnEscala=allH.filter(function(v){var c=v.estadoClass||'';return c==='e-active'||c==='e-boarding'||c==='e-gate'||c==='e-taxiing';}).length;
+  function arrActive(v){var tm=flMin(v);if(tm===null)return false;return nowMin>=tm&&nowMin<tm+30;}
+  var salidasActivas=sHOperativa.filter(depActive).length;
+  var llegadasActivas=lHOperativa.filter(arrActive).length;
+  var avionesEnEscala=allHOperativa.filter(function(v){var c=v.estadoClass||'';return c==='e-active'||c==='e-boarding'||c==='e-gate'||c==='e-taxiing';}).length;
   var operariosActivosAhora=wNow||0;
   var cargaBruta=(salidasActivas*1.2)+(llegadasActivas*1.0)+(avionesEnEscala*1.4)+(delays*0.3)-(operariosActivosAhora*0.18);
   var pressureScore=Math.max(0,Math.min(100,cargaBruta*10));
