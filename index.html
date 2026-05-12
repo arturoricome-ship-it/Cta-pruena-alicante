@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<!-- CTA_OPERATIVA_V43_SCROLL_VUELOS_Y_SIN_HISTORIAL_LOCAL_2026-05-12 -->
+<!-- CTA_OPERATIVA_V45_FD_MEZCLADOS_AL_ORDENAR_SALIDA_2026-05-12 -->
 <meta charset="UTF-8">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -3816,8 +3816,10 @@ function procesarGrupoXlsx(file){
       if(lastToken.length>2&&lastToken.length<50&&!/^\d+$/.test(lastToken)){
         categoria=lastToken;
       }
-      // FD detection: check filename AND row2 for "FD"
-      var isFD=/\bFD\b/i.test(file&&file.name||'')||/\bFD\b/i.test(row2)||/\bFD\b/i.test(row2clean);
+      // FD/FDS detection: filename, row2, cleaned header or detected category.
+      // Keeps fixed-discontinuous workers separated at the end instead of mixing them as General.
+      var _fdSource=[file&&file.name||'',row2,row2clean,categoria,lastToken].join(' ');
+      var isFD=/\bFDS?\b|FIJOS?\s+DISCONTINUOS?/i.test(_fdSource);
       if(isFD)categoria='FD';
 
       // Detect month from row 3 or sheet name
@@ -4030,6 +4032,12 @@ function formateaFechaGrupo(baseDate,offsetDias){
   return d.toLocaleDateString('es-ES',{weekday:'short',day:'2-digit',month:'2-digit'});
 }
 
+function normalizaCategoriaGrupo(cat){
+  cat=String(cat||'General').trim();
+  if(/\bFDS?\b|FIJOS?\s+DISCONTINUOS?/i.test(cat))return 'FD';
+  return cat||'General';
+}
+
 function renderCompanerosDia(offsetDias,toggleIfOpen){
   var panel=document.getElementById('grupo-panel');
   if(toggleIfOpen&&panel.classList.contains('open')){panel.classList.remove('open');return;}
@@ -4166,13 +4174,6 @@ function renderCompanerosDia(offsetDias,toggleIfOpen){
   }
 
   var myHorario=(myDay&&myDay.e1)?(myDay.e1+'→'+myDay.s1+(myDay.e2?' / '+myDay.e2+'→'+myDay.s2:'')):'—';
-  // Group by category
-  var cats={};
-  if(window._sortBySalida){
-    cats['_all']=coinciden; // no category grouping when sorted by exit
-  } else {
-    coinciden.forEach(function(c){var cat=c.categoria||'General';if(!cats[cat])cats[cat]=[];cats[cat].push(c);});
-  }
   var html='<div class="grupo-header-sticky">'+navHtml;
   html+='<div class="grupo-title">👥 '+(modoToda?'Toda la plantilla':'Coincidencias')+' · '+coinciden.length+'</div>';
   if(myDay&&myDay.e1){
@@ -4181,30 +4182,45 @@ function renderCompanerosDia(offsetDias,toggleIfOpen){
     html+='<div class="grupo-item" style="opacity:.6"><div class="grupo-solapamiento" style="background:var(--gray)"></div><div class="grupo-nombre" style="color:var(--gray);font-size:12px">Tú · Libre</div><div class="grupo-horario" style="color:var(--gray)">—</div></div>';
   }
   html+='</div>';
-  // Sort categories: FD always last, rest alphabetical
-  var catKeys=Object.keys(cats).sort(function(a,b){
-    if(a==='_all')return 0;
-    if(a==='FD')return 1;
-    if(b==='FD')return -1;
-    return a.localeCompare(b,'es');
-  });
-  catKeys.forEach(function(cat){
-    if(cat==='FD'){
-      html+='<div style="font-size:9px;letter-spacing:.8px;text-transform:uppercase;padding:7px 0 3px;border-top:2px dashed rgba(255,255,255,.1);margin-top:6px;display:flex;align-items:center;gap:6px"><span style="background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.3);border-radius:6px;color:#fbbf24;font-size:8px;font-weight:700;padding:1px 6px">FD</span><span style="color:var(--gray)">Fijos Discontinuos</span></div>';
-    } else if(cat!=='_all'){
-      html+='<div style="font-size:9px;color:var(--gray);letter-spacing:.6px;text-transform:uppercase;padding:6px 0 2px;border-top:1px solid rgba(255,255,255,.05);margin-top:2px">'+cat+'</div>';
-    }
-    cats[cat].forEach(function(c){
-      var _dot=c.overnight?'#fb923c':'#60a5fa';
-      var _nameExtra=c.overnight?' 🌙':'';
-      var _nameColor=c.overnight?'color:#fb923c;':''
-      var _hor=buildHorarioHtml(c);
-      html+='<div class="grupo-item'+(c.operativoAhora?' grupo-item-operativo':'')+'"'+(c.futuraNoche?' data-futura-noche="1"':'')+'>'+
-        '<div class="grupo-solapamiento" style="background:'+_dot+'"></div>'+
-        '<div class="grupo-nombre'+((c.noVieneInterrogacion||c.disponibilidadNoConfirmada)?' grupo-no-viene':'')+'" style="'+_nameColor+'">'+c.nombre+_nameExtra+(c.disponibilidadNoConfirmada?'<span class="grupo-exclamacion grupo-clickable" onclick="showDisponibilidadCartel()">  !</span>':'')+'</div>'+
-        '<div class="grupo-horario" style="'+_nameColor+'">'+_hor+'</div></div>';
+
+  function renderGrupoPersona(c, extraStyle){
+    var _dot=c.overnight?'#fb923c':'#60a5fa';
+    var _nameExtra=c.overnight?' 🌙':'';
+    var _nameColor=c.overnight?'color:#fb923c;':'';
+    var _hor=buildHorarioHtml(c);
+    return '<div class="grupo-item'+(c.operativoAhora?' grupo-item-operativo':'')+'" '+(extraStyle?'style="'+extraStyle+'"':'')+(c.futuraNoche?' data-futura-noche="1"':'')+'>'+ 
+      '<div class="grupo-solapamiento" style="background:'+_dot+'"></div>'+
+      '<div class="grupo-nombre'+((c.noVieneInterrogacion||c.disponibilidadNoConfirmada)?' grupo-no-viene':'')+'" style="'+_nameColor+'">'+c.nombre+_nameExtra+(c.disponibilidadNoConfirmada?'<span class="grupo-exclamacion grupo-clickable" onclick="showDisponibilidadCartel()">  !</span>':'')+'</div>'+ 
+      '<div class="grupo-horario" style="'+_nameColor+'">'+_hor+'</div></div>';
+  }
+
+  if(window._sortBySalida){
+    // When sorting by exit time, FD/FDS must be mixed with everyone else and ordered only by exit time.
+    coinciden.forEach(function(c){ html+=renderGrupoPersona(c,''); });
+  } else {
+    // Normal view: group by category and keep FD/FDS separated at the end.
+    var cats={};
+    coinciden.forEach(function(c){
+      var cat=normalizaCategoriaGrupo(c.categoria||'General');
+      if(!cats[cat])cats[cat]=[];
+      cats[cat].push(c);
     });
-  });
+    var catKeys=Object.keys(cats).sort(function(a,b){
+      var afd=normalizaCategoriaGrupo(a)==='FD';
+      var bfd=normalizaCategoriaGrupo(b)==='FD';
+      if(afd&&!bfd)return 1;
+      if(!afd&&bfd)return -1;
+      return a.localeCompare(b,'es');
+    });
+    catKeys.forEach(function(cat){
+      if(cat==='FD'){
+        html+='<div style="font-size:9px;letter-spacing:.8px;text-transform:uppercase;padding:7px 0 3px;border-top:2px dashed rgba(255,255,255,.1);margin-top:6px;display:flex;align-items:center;gap:6px"><span style="background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.3);border-radius:6px;color:#fbbf24;font-size:8px;font-weight:700;padding:1px 6px">FD</span><span style="color:var(--gray)">Fijos Discontinuos</span></div>';
+      } else if(cat!=='_all'){
+        html+='<div style="font-size:9px;color:var(--gray);letter-spacing:.6px;text-transform:uppercase;padding:6px 0 2px;border-top:1px solid rgba(255,255,255,.05);margin-top:2px">'+cat+'</div>';
+      }
+      cats[cat].forEach(function(c){ html+=renderGrupoPersona(c,''); });
+    });
+  }
   // Add "Ya salieron" section if any
   if(window._sortBySalida&&window._yaSalieron&&window._yaSalieron.length>0){
     html+='<div style="font-size:9px;color:var(--gray);letter-spacing:.6px;text-transform:uppercase;padding:8px 0 4px;border-top:1px solid rgba(255,255,255,.08);margin-top:4px;opacity:.7">✓ Ya salieron · '+window._yaSalieron.length+'</div>';
