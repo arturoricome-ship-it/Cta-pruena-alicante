@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<!-- CTA_OPERATIVA_V25_LLEGADAS_FINALIZADAS_30MIN_2026-05-12 -->
+<!-- CTA_OPERATIVA_V26_SOLO_TIERRA_SIN_COUNTDOWN_EN_VUELO_2026-05-12 -->
 <meta charset="UTF-8">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -693,7 +693,7 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
               <div id="op-pressure-pct" class="op-pressure-pct">—</div>
               <div class="op-pressure-bar-bg"><div id="op-pressure-bar" class="op-pressure-bar" style="width:0%"></div></div>
             </div>
-            <div id="op-pressure-note" class="op-mini-note">Calculada con aviones activos y personal activo ahora.</div>
+            <div id="op-pressure-note" class="op-mini-note">Calculada solo con vuelos en tierra y personal activo ahora.</div>
             <div id="op-pressure-formula" class="op-pressure-formula">Fórmula: ((salidas×1,2)+(llegadas×1,0)+(escala×1,4)+(retrasos×0,3)-(operarios×0,18)) × 10, limitado a 0-100.</div>
           </div>
 
@@ -1786,10 +1786,14 @@ function renderLive(){
     if(cortesE[idx])row.classList.add("vuelo-corte-e");
     if(rowStyle)row.style.cssText=rowStyle;
     var horaEfectiva=v.horaReal||v.horaProg||"";
+    var esEnVueloSalida=esS&&(v.estadoClass||"")=="e-active";
     row.setAttribute("data-hora",horaEfectiva);
+    row.setAttribute("data-live-mode",esS?"salidas":"llegadas");
+    row.setAttribute("data-estado-class",v.estadoClass||"");
+    var countdownAttr=esEnVueloSalida?"":(" data-hora='"+(horaEfectiva||"")+"'");
     row.innerHTML="<div><div class='vuelo-num'>"+num+"</div>"+(extraLabel?"<div class='vuelo-puerta'>"+extraLabel+"</div>":"")+"</div>"
       +"<div style='min-width:0'><div class='vuelo-dest'>"+ciudad+"</div><div class='vuelo-hora'>"+horaStr+"</div></div>"
-      +"<div style='display:flex;flex-direction:column;align-items:flex-end;gap:3px'><div class='vuelo-estado "+(v.estadoClass||"e-scheduled")+"'>"+(v.estado||"Programado")+"</div><div class='vuelo-countdown' data-hora='"+(horaEfectiva||"")+"'>—</div></div>";
+      +"<div style='display:flex;flex-direction:column;align-items:flex-end;gap:3px'><div class='vuelo-estado "+(v.estadoClass||"e-scheduled")+"'>"+(v.estado||"Programado")+"</div><div class='vuelo-countdown'"+countdownAttr+">"+(esEnVueloSalida?"":"—")+"</div></div>";
     container.appendChild(row);
   });
   // Update countdowns immediately after every render
@@ -1799,7 +1803,12 @@ function renderLive(){
 
 function updateFlightCountdowns(){
   var now=new Date(),nowMin=now.getHours()*60+now.getMinutes();
-  document.querySelectorAll('.vuelo-countdown[data-hora]').forEach(function(el){
+  document.querySelectorAll('.vuelo-countdown').forEach(function(el){
+    var row=el.closest?el.closest('.vuelo-row'):null;
+    var mode=row?row.getAttribute('data-live-mode'):'';
+    var estado=row?row.getAttribute('data-estado-class'):'';
+    // En salidas, cuando el vuelo ya está "En vuelo", no se muestra ningún tiempo restante.
+    if(mode==='salidas'&&estado==='e-active'){el.textContent='';el.className='vuelo-countdown';return;}
     var h=el.getAttribute('data-hora');
     if(!h||h==='--:--'){el.textContent='';return;}
     var p=h.split(':'),flMin=(+p[0]||0)*60+(+p[1]||0);
@@ -4382,22 +4391,26 @@ window.renderOperativa=function(){
 
   function isDelay(v){var e=(v.estadoClass||'')+' '+(v.estado||'');return /delay|retras/i.test(e);}
   function inNext(v,min){var tm=flMin(v);if(tm===null)return false;var dd=tm-nowMin;if(dd<0)dd+=1440;return dd>=0&&dd<=min;}
-  var activeFlights=allHOperativa.filter(function(v){var c=v.estadoClass||'';return c==='e-active'||c==='e-boarding'||c==='e-gate'||c==='e-taxiing'||inNext(v,10);}).length;
-  var arr30=lHOperativa.filter(function(v){return inNext(v,30);}).length;
-  var dep30=sHOperativa.filter(function(v){return inNext(v,30);}).length;
-  var delays=allHOperativa.filter(isDelay).length;
-  var upcoming=allHOperativa.filter(function(v){return inNext(v,180);}).sort(function(a,b){return (flMin(a)||9999)-(flMin(b)||9999);});
+  function isEnVuelo(v){var c=(v.estadoClass||'');var e=String(v.estado||'').toLowerCase();return c==='e-active'||e.indexOf('en vuelo')>=0||e.indexOf('en route')>=0;}
+  function depActive(v){var tm=flMin(v);if(tm===null||isEnVuelo(v))return false;var a=tm-35,b=tm;return nowMin>=a&&nowMin<=b;}
+  function arrActive(v){var tm=flMin(v);if(tm===null||isEnVuelo(v))return false;return nowMin>=tm&&nowMin<tm+30;}
+  var salidasActivasList=sHOperativa.filter(depActive);
+  var llegadasActivasList=lHOperativa.filter(arrActive);
+  var salidasActivas=salidasActivasList.length;
+  var llegadasActivas=llegadasActivasList.length;
+  var activeFlights=salidasActivas+llegadasActivas;
+  var arr30=lHOperativa.filter(function(v){return !isEnVuelo(v)&&inNext(v,30);}).length;
+  var dep30=sHOperativa.filter(function(v){return !isEnVuelo(v)&&inNext(v,30);}).length;
+  var vuelosActivosTierra=salidasActivasList.concat(llegadasActivasList);
+  var delays=vuelosActivosTierra.filter(isDelay).length;
+  var upcoming=allHOperativa.filter(function(v){return !isEnVuelo(v)&&inNext(v,180);}).sort(function(a,b){return (flMin(a)||9999)-(flMin(b)||9999);});
   var critical=upcoming.filter(isDelay)[0]||upcoming[0]||null;
   setTextOp('op-now-active',activeFlights);
   setTextOp('op-now-critical',critical?((critical.numero||'Vuelo')+' - '+(critical.horaReal||critical.horaProg||'--:--')):'—');
   setTextOp('op-now-arrivals',arr30);
   setTextOp('op-now-departures',dep30);
   setTextOp('op-now-delays',delays);
-  function depActive(v){var tm=flMin(v);if(tm===null)return false;var a=tm-35,b=tm;return nowMin>=a&&nowMin<=b;}
-  function arrActive(v){var tm=flMin(v);if(tm===null)return false;return nowMin>=tm&&nowMin<tm+30;}
-  var salidasActivas=sHOperativa.filter(depActive).length;
-  var llegadasActivas=lHOperativa.filter(arrActive).length;
-  var avionesEnEscala=allHOperativa.filter(function(v){var c=v.estadoClass||'';return c==='e-active'||c==='e-boarding'||c==='e-gate'||c==='e-taxiing';}).length;
+  var avionesEnEscala=allHOperativa.filter(function(v){var c=v.estadoClass||'';return !isEnVuelo(v)&&(c==='e-boarding'||c==='e-gate'||c==='e-taxiing'||c==='e-landed'||depActive(v)||arrActive(v));}).length;
   var operariosActivosAhora=wNow||0;
   var cargaBruta=(salidasActivas*1.2)+(llegadasActivas*1.0)+(avionesEnEscala*1.4)+(delays*0.3)-(operariosActivosAhora*0.18);
   var pressureScore=Math.max(0,Math.min(100,cargaBruta*10));
