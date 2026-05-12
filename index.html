@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<!-- CTA_OPERATIVA_V41_MANANA_DESDE_HISTORICO_SHEETS_2026-05-12 -->
+<!-- CTA_OPERATIVA_V42_LIMPIA_HISTORIAL_LOCAL_VUELOS_2026-05-12 -->
 <meta charset="UTF-8">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -1142,6 +1142,20 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 </div>
 
 <script>
+// CTA V42: limpieza única del histórico local antiguo de vuelos.
+// Borra solo los datos locales de "Historial operativa vuelos" para evitar mezclarlo con Sheets.
+try {
+  var _ctaResetHistKey = "cta_reset_historial_vuelos_v42";
+  if (localStorage.getItem(_ctaResetHistKey) !== "ok") {
+    Object.keys(localStorage).forEach(function(k) {
+      if (k && k.indexOf("cta_historial_operativa_vuelos") === 0) {
+        localStorage.removeItem(k);
+      }
+    });
+    localStorage.setItem(_ctaResetHistKey, "ok");
+  }
+} catch(e) {}
+
 var API_KEY="AIzaSyBK2GCTdfHt7PPhl-OBa3DTvCdZEQ5mprc";
 var ROOT_ID="1TS5vDO29JBTqd4JsGvO3a39YUIC7stbz";
 var DRIVE_API="https://www.googleapis.com/drive/v3";
