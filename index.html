@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<!-- CTA_OPERATIVA_V48_EXCLUSION_ARTURO_14_MAYO_2026-05-12 -->
+<!-- CTA_OPERATIVA_V49_HFUN_OVERLAY_030_2026-05-12 -->
 <meta charset="UTF-8">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -3563,7 +3563,7 @@ function mcEditDay(day,e){
   var ptEl=document.getElementById('mc-peren-total');
   if(ptEl)ptEl.value=dayObj.perenDur||'';
   var hfEl=document.getElementById('mc-hfun-total');
-  if(hfEl)hfEl.value=dayObj.hfunDur||'';
+  if(hfEl)hfEl.value=dayObj.hfunDur||'0:30';
   // Auto-show correct section
   var showTimesEl=document.getElementById('mc-edit-times');
   var showPerenEl=document.getElementById('mc-edit-peren');
@@ -3610,6 +3610,15 @@ function mcEditSave(){
       perenTipo:tipoVal // 'perentorias' or 'cp'
     });
     // If day was libre, mark as trabajado so shift shows
+    if(!ue[month][day].tipo||ue[month][day].tipo==='libre')ue[month][day].tipo='trabajado';
+  } else if(tipoVal==='hfun'){
+    // Overlay on existing day: keep shift, add H. Función.
+    // Igual que perentorias, pero en morado y por defecto +0:30.
+    var hfunTxt=(document.getElementById('mc-hfun-total').value.trim()||'0:30');
+    ue[month][day]=Object.assign({},existingDay,{
+      hfunDur:hfunTxt
+    });
+    // If day was libre, mark as trabajado so the day keeps visible data.
     if(!ue[month][day].tipo||ue[month][day].tipo==='libre')ue[month][day].tipo='trabajado';
   } else {
     // Update tipo and SAVE the edited times from the modal.
@@ -3662,6 +3671,8 @@ function mcTipoSel(btn){
     showTimes.style.display='none';
     showPeren.style.display='none';
     if(showHfun)showHfun.style.display='block';
+    var hf=document.getElementById('mc-hfun-total');
+    if(hf&&!hf.value.trim())hf.value='0:30';
   } else {
     showTimes.style.display='none';
     showPeren.style.display='none';
@@ -3734,7 +3745,7 @@ document.addEventListener('DOMContentLoaded',function(){
     </div>
   </div>
   <div class="mc-edit-hfun" id="mc-edit-hfun" style="display:none;margin-bottom:12px">
-    <div style="font-size:11px;color:var(--gray);margin-bottom:8px">Horas de H. Función realizadas (no cuentan para contador ni total)</div>
+    <div style="font-size:11px;color:var(--gray);margin-bottom:8px">Horas de H. Función realizadas</div>
     <div style="display:flex;align-items:center;gap:10px">
       <div style="flex:1">
         <label style="font-size:10px;color:var(--gray);display:block;margin-bottom:4px">Total (hh:mm)</label>
