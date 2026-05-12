@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<!-- CTA_OPERATIVA_V47_SELECTOR_HOY_MANANA_DETALLES_2026-05-12 -->
+<!-- CTA_OPERATIVA_V48_EXCLUSION_ARTURO_14_MAYO_2026-05-12 -->
 <meta charset="UTF-8">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -3767,6 +3767,27 @@ var _GRUPO_KEY='cta_grupo_2026';
 var _GRUPO_MONTHS=['ENERO','FEBRERO','MARZO','ABRIL','MAYO','JUNIO','JULIO','AGOSTO','SEPTIEMBRE','OCTUBRE','NOVIEMBRE','DICIEMBRE'];
 
 
+// Exclusiones manuales de plantilla por fecha.
+// Prueba: Arturo Rico no aparece ni computa el 14/05/2026.
+var _EXCLUSIONES_PLANTILLA_MANUAL={
+  '2026-05-14':['ARTURO RICO']
+};
+function _normPlantillaNombre(v){
+  return String(v||'').toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,' ').trim();
+}
+function _fechaISOPlantilla(d){
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function _estaExcluidoPlantilla(nombre,fechaISO){
+  var lista=_EXCLUSIONES_PLANTILLA_MANUAL[fechaISO]||[];
+  var n=_normPlantillaNombre(nombre);
+  return lista.some(function(x){
+    var e=_normPlantillaNombre(x);
+    return n===e||n.indexOf(e)>=0||e.indexOf(n)>=0;
+  });
+}
+
+
 function resetGrupo(){
   if(!confirm('¿Borrar todos los datos del grupo importados?'))return;
   localStorage.removeItem(_GRUPO_KEY+'_map');
@@ -4074,6 +4095,11 @@ function renderCompanerosDia(offsetDias,toggleIfOpen){
       if(_dias)empleados.push({nomina:_emp.nomina,nombre:_emp.nombre,categoria:_emp.categoria,dias:_dias});
     }
   }
+  var fechaISOGrupo=_fechaISOPlantilla(target);
+  empleados=empleados.filter(function(emp){
+    return !_estaExcluidoPlantilla(emp.nombre||emp.nomina,fechaISOGrupo);
+  });
+
   if(!empleados.length){
     panel.innerHTML='<div class="grupo-empty">📋 Importa el Excel del grupo primero</div>';
     panel.classList.add('open');return;
@@ -4434,6 +4460,7 @@ window.renderOperativa=function(){
   var mE2o=d&&d.e2?toM(d.e2):null,mS2o=d&&d.s2?toM(d.s2):null;
   Object.keys(gmap).forEach(function(nom){
     var emp=gmap[nom],dias=(emp.meses&&emp.meses[mK])||null;
+    if(_estaExcluidoPlantilla((emp&&emp.nombre)||nom,_fechaISOPlantilla(now)))return;
     if(!dias)return;
     var t=dias[todayNum];if(!t||!t.e1)return;
     var excl=!!(t.noVieneInterrogacion||t.disponibilidadNoConfirmada);if(excl)return;
@@ -4453,7 +4480,7 @@ window.renderOperativa=function(){
   function opTrabajadoresFecha(dateObj){
     var mk=MESES[dateObj.getMonth()],dn=dateObj.getDate(),out=[];
     Object.keys(gmap).forEach(function(nom){
-      var emp=gmap[nom],dias=(emp.meses&&emp.meses[mk])||null;if(!dias)return;
+      var emp=gmap[nom],dias=(emp.meses&&emp.meses[mk])||null;if(_estaExcluidoPlantilla((emp&&emp.nombre)||nom,_fechaISOPlantilla(dateObj)))return;if(!dias)return;
       var t=dias[dn];if(!t||!t.e1)return;
       var excl=!!(t.noVieneInterrogacion||t.disponibilidadNoConfirmada);if(excl)return;
       out.push({nombre:nom,e1:toM(t.e1),s1:toM(t.s1),e2:t.e2?toM(t.e2):null,s2:t.s2?toM(t.s2):null});
