@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<!-- CTA_OPERATIVA_V23_FIX_DATOS_OPERATIVA_2026-05-11 -->
+<!-- CTA_OPERATIVA_V24_PRESION_INDICE_0_100_2026-05-12 -->
 <meta charset="UTF-8">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -679,7 +679,7 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
               <div class="op-pressure-bar-bg"><div id="op-pressure-bar" class="op-pressure-bar" style="width:0%"></div></div>
             </div>
             <div id="op-pressure-note" class="op-mini-note">Calculada con aviones activos y personal activo ahora.</div>
-            <div id="op-pressure-formula" class="op-pressure-formula">Fórmula: operarios necesarios ahora ÷ operarios activos ahora × 100.</div>
+            <div id="op-pressure-formula" class="op-pressure-formula">Fórmula: índice 0-100 = ((salidas×1,2)+(llegadas×1,0)+(escala×1,4)+(retrasos×0,3)-(operarios×0,18)) × 10.</div>
           </div>
 
           <div class="op-now-card">
@@ -4251,17 +4251,18 @@ window.renderOperativa=function(){
 
 
   function setTextOp(id,val){var el=g(id);if(el)el.textContent=val;}
-  function setPressureOp(pct,delays,peakFlights){
-    pct=Math.max(0,Math.round(pct||0));var barPct=Math.min(100,pct);
+  function setPressureOp(valor,detalle){
+    valor=Math.max(0,Math.min(100,Math.round(valor||0)));
+    detalle=detalle||{};
     var lvl='Baja',cls='low';
-    if(pct>=80){lvl='Muy alta';cls='very';}
-    else if(pct>=60){lvl='Alta';cls='high';}
-    else if(pct>=35){lvl='Media';cls='mid';}
+    if(valor>=90){lvl='Muy alta';cls='very';}
+    else if(valor>=61){lvl='Alta';cls='high';}
+    else if(valor>=31){lvl='Moderada';cls='mid';}
     var le=g('op-pressure-level');if(le){le.textContent=lvl;le.className='op-pressure-level '+cls;}
-    var pctNode=g('op-pressure-pct');if(pctNode){pctNode.textContent=pct+'%';pctNode.className='op-pressure-pct '+cls;}
-    var bar=g('op-pressure-bar');if(bar)bar.style.width=pct+'%';
-    setTextOp('op-pressure-note','Vuelos + pico '+(peakFlights||0)+' + retrasos '+(delays||0)+' + plantilla '+total+'.');
-    setTextOp('op-load-lack',pct>=75?'Sí':'No');
+    var pctNode=g('op-pressure-pct');if(pctNode){pctNode.textContent=valor+'/100';pctNode.className='op-pressure-pct '+cls;}
+    var bar=g('op-pressure-bar');if(bar)bar.style.width=valor+'%';
+    setTextOp('op-pressure-note','Salidas '+(detalle.salidas||0)+' · Llegadas '+(detalle.llegadas||0)+' · Escala '+(detalle.escala||0)+' · Retrasos '+(detalle.retrasos||0)+' · Operarios '+(detalle.operarios||0)+'.');
+    setTextOp('op-load-lack',valor>=90?'Sí':'No');
   }
   setTextOp('op-load-workers',total||'—');
   setTextOp('op-load-flights','—');
@@ -4272,7 +4273,7 @@ window.renderOperativa=function(){
   setTextOp('op-now-arrivals','—');
   setTextOp('op-now-departures','—');
   setTextOp('op-now-delays','—');
-  setPressureOp(total?25:0,0,0);
+  setPressureOp(total?25:0,{salidas:0,llegadas:0,escala:0,retrasos:0,operarios:total||0});
 
   // Flights
   if(typeof liveData==="undefined")return;
@@ -4357,13 +4358,15 @@ window.renderOperativa=function(){
   setTextOp('op-now-delays',delays);
   function depActive(v){var tm=flMin(v);if(tm===null)return false;var a=tm-35,b=tm;return nowMin>=a&&nowMin<=b;}
   function arrActive(v){var tm=flMin(v);if(tm===null)return false;return nowMin>=tm&&nowMin<=tm+45;}
-  var depNeed=sH.filter(function(v){return (v.estadoClass||'')!=='e-cancelled'&&depActive(v);}).reduce(function(sum,v){var tm=flMin(v)||0;return sum+(tm<720?3:4);},0);
-  var arrNeed=lH.filter(function(v){return (v.estadoClass||'')!=='e-cancelled'&&arrActive(v);}).reduce(function(sum,v){var tm=flMin(v)||0;return sum+(tm>=1200?3:4);},0);
-  var neededNow=depNeed+arrNeed;
-  var activeWorkers=wNow||0;
-  var pressurePct=activeWorkers>0?Math.round(neededNow/activeWorkers*100):0;
-  setPressureOp(pressurePct,delays,peakWin?peakWin.count:0);
-  var pf=g('op-pressure-formula');if(pf)pf.textContent='Fórmula: '+neededNow+' operarios necesarios ahora ÷ '+activeWorkers+' operarios activos ahora × 100 = '+pressurePct+'%.';
+  var salidasActivas=sH.filter(function(v){return (v.estadoClass||'')!=='e-cancelled'&&depActive(v);}).length;
+  var llegadasActivas=lH.filter(function(v){return (v.estadoClass||'')!=='e-cancelled'&&arrActive(v);}).length;
+  var avionesEnEscala=activeFlights||0;
+  var retrasosActivos=delays||0;
+  var operariosActivosAhora=wNow||0;
+  var cargaBruta=(salidasActivas*1.2)+(llegadasActivas*1.0)+(avionesEnEscala*1.4)+(retrasosActivos*0.3)-(operariosActivosAhora*0.18);
+  var presionOperativa=Math.max(0,Math.min(100,cargaBruta*10));
+  setPressureOp(presionOperativa,{salidas:salidasActivas,llegadas:llegadasActivas,escala:avionesEnEscala,retrasos:retrasosActivos,operarios:operariosActivosAhora});
+  var pf=g('op-pressure-formula');if(pf)pf.textContent='Fórmula: (salidas '+salidasActivas+'×1,2) + (llegadas '+llegadasActivas+'×1,0) + (escala '+avionesEnEscala+'×1,4) + (retrasos '+retrasosActivos+'×0,3) − (operarios '+operariosActivosAhora+'×0,18), ajustado a escala 0-100 = '+Math.round(presionOperativa)+'/100.';
 
   if(!card)return;
   ["state-working","state-pausa","state-rest","state-next"].forEach(function(c){card.classList.remove(c);});
