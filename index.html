@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<!-- CTA_OPERATIVA_V30_FESTIVOS_FIX_Y_PRESION_PORCENTAJE_2026-05-12 -->
+<!-- CTA_OPERATIVA_V31_PRESION_PERSONAL_NECESARIO_2026-05-12 -->
 <meta charset="UTF-8">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -497,6 +497,9 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 .op-pressure-level.max{background:rgba(168,85,247,.16);color:#c084fc;border:1px solid rgba(168,85,247,.42);box-shadow:0 0 14px rgba(168,85,247,.16)}
 .op-pressure-pct.low{color:#4ade80}.op-pressure-pct.mid{color:#fbbf24}.op-pressure-pct.high{color:#fb923c}.op-pressure-pct.very{color:#f87171}.op-pressure-pct.max{color:#c084fc}
 .op-pressure-bar.low{background:#4ade80}.op-pressure-bar.mid{background:#fbbf24}.op-pressure-bar.high{background:#fb923c}.op-pressure-bar.very{background:#f87171}.op-pressure-bar.max{background:#c084fc;box-shadow:0 0 10px rgba(168,85,247,.45)}
+.op-pressure-level.ok{background:rgba(96,165,250,.12);color:#60a5fa;border:1px solid rgba(96,165,250,.28)}
+.op-pressure-pct.ok{color:#60a5fa}
+.op-pressure-bar.ok{background:#60a5fa}
 .op-pressure-main{display:flex;align-items:center;gap:12px;margin:8px 0}
 .op-pressure-pct{font-size:34px;font-weight:900;line-height:1;color:var(--gold)}
 .op-pressure-bar-bg{flex:1;height:8px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden}
@@ -700,7 +703,7 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
               <div class="op-pressure-bar-bg"><div id="op-pressure-bar" class="op-pressure-bar" style="width:0%"></div></div>
             </div>
             <div id="op-pressure-note" class="op-mini-note">Calculada solo con vuelos en tierra y personal activo ahora.</div>
-            <div id="op-pressure-formula" class="op-pressure-formula">Fórmula: ((salidas×1,2)+(llegadas×1,0)+(escala×1,4)+(retrasos×0,3)-(operarios×0,18)) × 10, limitado a 0-100%.</div>
+            <div id="op-pressure-formula" class="op-pressure-formula">Resumen: necesarios / disponibles para vuelos. 50% = equilibrio.</div>
           </div>
 
           <div class="op-now-card">
@@ -4376,18 +4379,19 @@ window.renderOperativa=function(){
 
 
   function setTextOp(id,val){var el=g(id);if(el)el.textContent=val;}
-  function setPressureOp(score,delays,peakFlights,activeWorkers){
+  function setPressureOp(score,necesarios,disponiblesVuelos){
     score=Math.max(0,Math.min(100,Math.round(score||0)));
-    var lvl='Baja',cls='low';
-    if(score>=90){lvl='Muy alta';cls='max';}
-    else if(score>=75){lvl='Alta';cls='very';}
-    else if(score>=61){lvl='Alta';cls='high';}
-    else if(score>=31){lvl='Moderada';cls='mid';}
+    var lvl='Muy holgado',cls='low';
+    if(score>=90){lvl='Crítica';cls='max';}
+    else if(score>=70){lvl='Alta';cls='very';}
+    else if(score>=51){lvl='Ajustada';cls='high';}
+    else if(score===50){lvl='Equilibrio';cls='mid';}
+    else if(score>=30){lvl='Holgada';cls='ok';}
     var le=g('op-pressure-level');if(le){le.textContent=lvl;le.className='op-pressure-level '+cls;}
     var pctNode=g('op-pressure-pct');if(pctNode){pctNode.textContent=score+'%';pctNode.className='op-pressure-pct '+cls;}
     var bar=g('op-pressure-bar');if(bar){bar.style.width=score+'%';bar.className='op-pressure-bar '+cls;}
-    setTextOp('op-pressure-note','Presión operativa 0-100%. Solo vuelos en tierra; llegadas finalizan a los 30 min.');
-    setTextOp('op-load-lack',score>=75?'Sí':'No');
+    setTextOp('op-pressure-note','50% = equilibrio. La presión compara personal necesario contra disponibles para vuelos.');
+    setTextOp('op-load-lack',score>=70?'Sí':'No');
   }
   setTextOp('op-load-workers',total||'—');
   setTextOp('op-load-flights','—');
@@ -4499,15 +4503,24 @@ window.renderOperativa=function(){
   setTextOp('op-now-arrivals',arr30);
   setTextOp('op-now-departures',dep30);
   setTextOp('op-now-delays',delays);
-  var avionesEnEscala=allHOperativa.filter(function(v){var c=v.estadoClass||'';return !isEnVuelo(v)&&(c==='e-boarding'||c==='e-gate'||c==='e-taxiing'||c==='e-landed'||depActive(v)||arrActive(v));}).length;
+  function isScaleGround(v){var c=v.estadoClass||'';return !isEnVuelo(v)&&(c==='e-boarding'||c==='e-gate'||c==='e-taxiing'||c==='e-landed');}
+  var avionesEnEscalaList=allHOperativa.filter(isScaleGround);
+  var avionesEnEscala=avionesEnEscalaList.length;
+  var soloLlegadasActivas=llegadasActivasList.filter(function(v){return !isScaleGround(v);}).length;
+  var soloSalidasActivas=salidasActivasList.filter(function(v){return !isScaleGround(v);}).length;
   var operariosActivosAhora=wNow||0;
-  var cargaBruta=(salidasActivas*1.2)+(llegadasActivas*1.0)+(avionesEnEscala*1.4)+(delays*0.3)-(operariosActivosAhora*0.18);
-  var pressureScore=Math.max(0,Math.min(100,cargaBruta*10));
-  setPressureOp(pressureScore,delays,peakWin?peakWin.count:0,operariosActivosAhora);
+  var puestosFijos=4; // 2 jardineras + 2 patios. No cuentan para aviones.
+  var operariosDisponiblesVuelos=Math.max(0,operariosActivosAhora-puestosFijos);
+  var genteNecesaria=(avionesEnEscala*4)+(soloLlegadasActivas*3)+(soloSalidasActivas*3);
+  var pressureScore=0;
+  if(genteNecesaria>0&&operariosDisponiblesVuelos===0){pressureScore=100;}
+  else if(operariosDisponiblesVuelos>0){pressureScore=(genteNecesaria/operariosDisponiblesVuelos)*50;}
+  pressureScore=Math.max(0,Math.min(100,pressureScore));
+  setPressureOp(pressureScore,genteNecesaria,operariosDisponiblesVuelos);
   setTextOp('op-load-workers',operariosActivosAhora||'—');
-  var vuelosRatio=activeFlights||salidasActivas+llegadasActivas;
-  setTextOp('op-load-ratio',(operariosActivosAhora&&vuelosRatio)?(operariosActivosAhora/vuelosRatio).toFixed(2).replace('.',','):'—');
-  var pf=g('op-pressure-formula');if(pf)pf.textContent='Fórmula: (salidas '+salidasActivas+'×1,2) + (llegadas '+llegadasActivas+'×1,0) + (escala '+avionesEnEscala+'×1,4) + (retrasos '+delays+'×0,3) - (operarios '+operariosActivosAhora+'×0,18), todo ×10 = '+Math.round(pressureScore)+'%.';
+  var vuelosRatio=activeFlights||soloSalidasActivas+soloLlegadasActivas+avionesEnEscala;
+  setTextOp('op-load-ratio',(operariosDisponiblesVuelos&&vuelosRatio)?(operariosDisponiblesVuelos/vuelosRatio).toFixed(2).replace('.',','):'—');
+  var pf=g('op-pressure-formula');if(pf)pf.textContent='Resumen: '+genteNecesaria+' necesarios / '+operariosDisponiblesVuelos+' disponibles para vuelos. Fijos no computan: 2 jardineras + 2 patios.';
 
   if(!card)return;
   ["state-working","state-pausa","state-rest","state-next"].forEach(function(c){card.classList.remove(c);});
