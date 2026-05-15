@@ -681,10 +681,8 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
         <div class="op-tc-times" id="op-tc-times"><span style="color:var(--gray);font-size:11px">Cargando...</span></div>
         <div class="op-tc-meta">
           <div class="op-tc-sub" id="op-tc-sub">—</div>
-          <button class="tw-manana-btn" onclick="event.stopPropagation();if(typeof twShowManana==='function')twShowManana()">MAÑANA ›</button>
         </div>
-        <div class="op-tc-spacer"></div>
-        <div>
+        <div style="margin-top:auto;padding-top:10px">
           <div class="op-tc-pct-row">
             <div class="op-tc-pct" id="op-tc-pct">—</div>
             <div class="op-tc-rem" id="op-tc-rem"></div>
@@ -4988,7 +4986,7 @@ window.renderOperativa=function(){
     for(var ddF=1;ddF<=30;ddF++){
       var nDF=new Date(now.getFullYear(),now.getMonth(),now.getDate()+ddF);
       var nMdF=(ue[MESES[nDF.getMonth()]]||{})[nDF.getDate()];
-      if(nMdF&&nMdF.e1&&nMdF.tipo&&ANXTF.indexOf(nMdF.tipo)>=0){nxtMinF=toM(nMdF.e1);nxtStrF=nMdF.e1+(nMdF.s1?" → "+(nMdF.s2||nMdF.s1):"");nxtDaysF=ddF;break;}
+      if(nMdF&&nMdF.e1&&nMdF.tipo&&ANXTF.indexOf(nMdF.tipo)>=0){nxtMinF=toM(nMdF.e1);nxtStrF=nMdF.e1+(nMdF.s1?" → "+nMdF.s1:"")+(nMdF.e2&&nMdF.s2?"  ·  "+nMdF.e2+" → "+nMdF.s2:"");nxtDaysF=ddF;break;}
     }
     var restMF=nxtMinF!==null?(nxtDaysF*1440+nxtMinF-nowMin):null;
     function fmtRestF(m){
@@ -5077,7 +5075,7 @@ window.renderOperativa=function(){
     for(var dd2=1;dd2<=30;dd2++){
       var nD=new Date(now.getFullYear(),now.getMonth(),now.getDate()+dd2);
       var nMd=(ue[MESES[nD.getMonth()]]||{})[nD.getDate()];
-      if(nMd&&nMd.e1&&nMd.tipo&&ANXT.indexOf(nMd.tipo)>=0){nxtMin=toM(nMd.e1);nxtStr=nMd.e1+(nMd.s1?" → "+(nMd.s2||nMd.s1):"");nxtDays=dd2;break;}
+      if(nMd&&nMd.e1&&nMd.tipo&&ANXT.indexOf(nMd.tipo)>=0){nxtMin=toM(nMd.e1);nxtStr=nMd.e1+(nMd.s1?" → "+nMd.s1:"")+(nMd.e2&&nMd.s2?"  ·  "+nMd.e2+" → "+nMd.s2:"");nxtDays=dd2;break;}
     }
     // Calculate total minutes remaining (including full days)
     var restM=nxtMin!==null?(nxtDays*1440+nxtMin-nowMin):null;
@@ -5110,7 +5108,7 @@ window.renderOperativa=function(){
   } else if(notYet){
     card.classList.add("state-next");
     if(g("op-tc-times"))g("op-tc-times").innerHTML=th;
-    if(g("op-tc-sub"))g("op-tc-sub").textContent="Próximo turno · "+d.e1+(d.s1?" → "+(d.s2||d.s1):"");
+    if(g("op-tc-sub"))g("op-tc-sub").textContent="Próximo turno · "+d.e1+(d.s1?" → "+d.s1:"")+(d.e2&&d.s2?"  ·  "+d.e2+" → "+d.s2:"");
     if(g("op-tc-pct"))g("op-tc-pct").textContent="0%";
     if(g("op-tc-rem"))g("op-tc-rem").textContent="Empieza en "+fmtT(e1-nowMin);
     if(g("op-tc-bar"))g("op-tc-bar").style.width="0%";
