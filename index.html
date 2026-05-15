@@ -683,16 +683,7 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
           <div class="op-tc-sub" id="op-tc-sub">—</div>
           <button class="tw-manana-btn" onclick="event.stopPropagation();if(typeof twShowManana==='function')twShowManana()">MAÑANA ›</button>
         </div>
-        <div id="op-tc-vuelos-mini" style="display:flex;gap:6px;margin-top:8px">
-          <div style="flex:1;background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.18);border-radius:8px;padding:5px 7px;text-align:center">
-            <div style="font-size:16px;font-weight:800;color:#93c5fd;line-height:1" id="op-tc-mini-total">—</div>
-            <div style="font-size:7px;color:var(--gray);margin-top:1px">vuelos hoy</div>
-          </div>
-          <div style="flex:1;background:rgba(96,165,250,.04);border:1px solid rgba(96,165,250,.12);border-radius:8px;padding:5px 7px;text-align:center">
-            <div style="font-size:16px;font-weight:800;color:#60a5fa;line-height:1" id="op-tc-mini-turno">—</div>
-            <div style="font-size:7px;color:var(--gray);margin-top:1px">mi turno</div>
-          </div>
-        </div>
+        <div class="op-tc-spacer"></div>
         <div>
           <div class="op-tc-pct-row">
             <div class="op-tc-pct" id="op-tc-pct">—</div>
@@ -4697,9 +4688,6 @@ window.renderOperativa=function(){
   var _liveEmpty=(lH.length===0&&sH.length===0);
   var iH=(mE1o!==null&&!_shDone&&!_liveEmpty)?cntSh(lH.concat(sH),mE1o,mS1o,mE2o,mS2o):0;
   if(g("op-v-turno"))g("op-v-turno").textContent=(_shDone||_liveEmpty)?"—":String(iH);
-  // Espejo en mini-card dentro de Mi Jornada
-  if(g("op-tc-mini-total"))g("op-tc-mini-total").textContent=cH>0?String(cH):"—";
-  if(g("op-tc-mini-turno"))g("op-tc-mini-turno").textContent=(_shDone||_liveEmpty)?"—":String(iH);
   var dT=(ue[MESES[tom.getMonth()]]||{})[tom.getDate()]||null;
   var tE1=dT&&dT.e1?toM(dT.e1):null,tS1=dT&&dT.s1?toM(dT.s1):null;
   var tE2=dT&&dT.e2?toM(dT.e2):null,tS2=dT&&dT.s2?toM(dT.s2):null;
@@ -5000,7 +4988,7 @@ window.renderOperativa=function(){
     for(var ddF=1;ddF<=30;ddF++){
       var nDF=new Date(now.getFullYear(),now.getMonth(),now.getDate()+ddF);
       var nMdF=(ue[MESES[nDF.getMonth()]]||{})[nDF.getDate()];
-      if(nMdF&&nMdF.e1&&nMdF.tipo&&ANXTF.indexOf(nMdF.tipo)>=0){nxtMinF=toM(nMdF.e1);nxtStrF=nMdF.e1;nxtDaysF=ddF;break;}
+      if(nMdF&&nMdF.e1&&nMdF.tipo&&ANXTF.indexOf(nMdF.tipo)>=0){nxtMinF=toM(nMdF.e1);nxtStrF=nMdF.e1+(nMdF.s1?" → "+(nMdF.s2||nMdF.s1):"");nxtDaysF=ddF;break;}
     }
     var restMF=nxtMinF!==null?(nxtDaysF*1440+nxtMinF-nowMin):null;
     function fmtRestF(m){
@@ -5035,7 +5023,6 @@ window.renderOperativa=function(){
     if(g("op-tc-pct"))g("op-tc-pct").textContent=restMF!==null?restRemPctF+"%":"";
     if(g("op-tc-rem"))g("op-tc-rem").textContent="";
     if(g("op-tc-bar"))g("op-tc-bar").style.width=restMF!==null?restRemPctF+"%":"0%";
-    if(g("op-tc-vuelos-mini"))g("op-tc-vuelos-mini").style.display="none";
   }
   // Si no hay turno trabajado hoy (libre/festivo/HL/vacaciones o sin datos),
   // ya hemos pintado la tarjeta de descanso arriba. No seguimos, porque d puede ser null
@@ -5090,7 +5077,7 @@ window.renderOperativa=function(){
     for(var dd2=1;dd2<=30;dd2++){
       var nD=new Date(now.getFullYear(),now.getMonth(),now.getDate()+dd2);
       var nMd=(ue[MESES[nD.getMonth()]]||{})[nD.getDate()];
-      if(nMd&&nMd.e1&&nMd.tipo&&ANXT.indexOf(nMd.tipo)>=0){nxtMin=toM(nMd.e1);nxtStr=nMd.e1;nxtDays=dd2;break;}
+      if(nMd&&nMd.e1&&nMd.tipo&&ANXT.indexOf(nMd.tipo)>=0){nxtMin=toM(nMd.e1);nxtStr=nMd.e1+(nMd.s1?" → "+(nMd.s2||nMd.s1):"");nxtDays=dd2;break;}
     }
     // Calculate total minutes remaining (including full days)
     var restM=nxtMin!==null?(nxtDays*1440+nxtMin-nowMin):null;
@@ -5120,11 +5107,10 @@ window.renderOperativa=function(){
     if(g("op-tc-pct"))g("op-tc-pct").textContent=restRemPct+"%";
     if(g("op-tc-rem"))g("op-tc-rem").textContent="";
     if(g("op-tc-bar"))g("op-tc-bar").style.width=restRemPct+"%";
-    if(g("op-tc-vuelos-mini"))g("op-tc-vuelos-mini").style.display="none";
   } else if(notYet){
     card.classList.add("state-next");
     if(g("op-tc-times"))g("op-tc-times").innerHTML=th;
-    if(g("op-tc-sub"))g("op-tc-sub").textContent="Próximo turno";
+    if(g("op-tc-sub"))g("op-tc-sub").textContent="Próximo turno · "+d.e1+(d.s1?" → "+(d.s2||d.s1):"");
     if(g("op-tc-pct"))g("op-tc-pct").textContent="0%";
     if(g("op-tc-rem"))g("op-tc-rem").textContent="Empieza en "+fmtT(e1-nowMin);
     if(g("op-tc-bar"))g("op-tc-bar").style.width="0%";
