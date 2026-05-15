@@ -470,6 +470,18 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 .op-cal-row{display:flex;justify-content:space-between;align-items:center;padding:4px 7px;background:rgba(255,255,255,.04);border-radius:6px}
 .op-cal-rl{font-size:8px;color:var(--gray)}
 .op-cal-rv{font-size:11px;font-weight:700;color:var(--gold)}
+/* Resumen personal dentro de Mi jornada */
+.op-turno-extra{margin-top:11px;padding-top:10px;border-top:1px solid rgba(255,255,255,.07);display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.op-turno-extra.hidden{display:none}
+.op-turno-mini{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:9px;padding:7px 7px;min-width:0}
+.op-turno-mini-lbl{font-size:7px;color:var(--gray);text-transform:uppercase;letter-spacing:.45px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.op-turno-mini-val{font-size:12px;font-weight:800;color:var(--white);margin-top:2px;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.op-turno-mini-val.gold{color:var(--gold)}
+.op-turno-mini-val.blue{color:#60a5fa}
+.op-turno-mini-val.red{color:#f87171}
+.op-turno-mini-val.green{color:#4ade80}
+.op-turno-note{grid-column:1/-1;font-size:7.5px;color:var(--gray);line-height:1.35;margin-top:1px;opacity:.85}
+@media(max-width:380px){.op-turno-extra{grid-template-columns:1fr}.op-turno-mini{padding:6px 7px}}
 .op-comp-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:12px 14px;cursor:pointer;display:flex;align-items:center;gap:12px;-webkit-tap-highlight-color:transparent}
 .op-comp-card:active{transform:scale(.98)}
 .op-comp-num{font-size:36px;font-weight:800;color:#f87171;line-height:1}
@@ -692,6 +704,13 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
             <div class="op-tc-rem" id="op-tc-rem"></div>
           </div>
           <div class="op-tc-bar-bg"><div class="op-tc-bar" id="op-tc-bar" style="width:0%"></div></div>
+          <div class="op-turno-extra hidden" id="op-turno-extra">
+            <div class="op-turno-mini"><div class="op-turno-mini-lbl">Vuelos turno</div><div class="op-turno-mini-val blue" id="op-mi-vuelos">—</div></div>
+            <div class="op-turno-mini"><div class="op-turno-mini-lbl">Pico máximo</div><div class="op-turno-mini-val gold" id="op-mi-pico">—</div></div>
+            <div class="op-turno-mini"><div class="op-turno-mini-lbl">Coinciden</div><div class="op-turno-mini-val green" id="op-mi-comp">—</div></div>
+            <div class="op-turno-mini"><div class="op-turno-mini-lbl">Presión media</div><div class="op-turno-mini-val red" id="op-mi-presion">—</div></div>
+            <div class="op-turno-note" id="op-mi-note">Datos calculados sobre tu franja de turno.</div>
+          </div>
         </div>
       </div>
       <div class="op-cal-card" onclick="switchTab('afiliate',null,document.getElementById('nav-afiliate'))">
@@ -4974,6 +4993,64 @@ window.renderOperativa=function(){
   setTextOp('op-load-flights',opDetalleTotal>0?opDetalleTotal:'—');
   setTextOp('op-load-ratio',(opDetalleTrabajadores.length&&opDetalleTotal)?(opDetalleTrabajadores.length/opDetalleTotal).toFixed(2).replace('.',','):'—');
   var pf=g('op-pressure-formula');if(pf)pf.textContent='Resumen: '+genteNecesaria+' necesarios / '+operariosDisponiblesVuelos+' disponibles para vuelos. Fijos ahora: '+jardinerasFijas+' jardineras + '+patiosFijos+' patios.';
+
+  // Resumen personal de la tarjeta "Mi jornada": vuelos, pico, compañeros y presión media del turno.
+  function opSetMiTurno(id,val,cls){
+    var el=g(id);if(!el)return;
+    el.textContent=val;
+    if(cls)el.className='op-turno-mini-val '+cls;
+  }
+  function opMinTxt(min){var h=Math.floor((min%1440)/60),m=min%60;return (h<10?'0':'')+h+':'+(m<10?'0':'')+m;}
+  function opShiftOverlapsHour(h,e1p,s1p,e2p,s2p){
+    var hs=h*60,he=hs+60;
+    return opSegOverlap(hs,he,e1p,s1p)||opSegOverlap(hs,he,e2p,s2p);
+  }
+  function opWorkersAtHourMid(h){
+    var mid=(h*60+30)%1440;
+    return trabajanHoy.filter(function(e){return isWorkingAt(e,mid);}).length;
+  }
+  function opPressureClass(score){
+    if(score>=90)return 'red';
+    if(score>=70)return 'red';
+    if(score>=51)return 'gold';
+    if(score>=30)return 'green';
+    return 'blue';
+  }
+  (function(){
+    var extra=g('op-turno-extra');
+    if(!extra)return;
+    var hasShift=mE1o!==null&&mS1o!==null&&d&&d.e1&&['festivo','hl','hlp','vacaciones','libre'].indexOf(d.tipo)<0;
+    if(!hasShift){extra.classList.add('hidden');return;}
+    extra.classList.remove('hidden');
+    var recTurno=opHistTurnoCount(recHoy,mE1o,mS1o,mE2o,mS2o);
+    var liveTurno=cntSh(allH,mE1o,mS1o,mE2o,mS2o);
+    var vuelosTurno=Math.max(liveTurno,recTurno);
+    opSetMiTurno('op-mi-vuelos',vuelosTurno>0?String(vuelosTurno):'—','blue');
+
+    var bestH=-1,bestC=-1,shiftHours=[];
+    for(var hh3=0;hh3<24;hh3++){
+      if(opShiftOverlapsHour(hh3,mE1o,mS1o,mE2o,mS2o)){
+        shiftHours.push(hh3);
+        var c3=Number(hourCounts[hh3]||0);
+        if(c3>bestC){bestC=c3;bestH=hh3;}
+      }
+    }
+    opSetMiTurno('op-mi-pico',(bestH>=0&&bestC>0)?(opMinTxt(bestH*60)+'-'+opMinTxt(bestH*60+60)):'—','gold');
+    opSetMiTurno('op-mi-comp',compN>0?(compN+' comp.'):'—','green');
+
+    var scores=[];
+    shiftHours.forEach(function(hh4){
+      var flights=Number(hourCounts[hh4]||0);
+      if(flights<=0)return;
+      var workers=Math.max(0,opWorkersAtHourMid(hh4)-opPatiosFijos(hh4*60)-opJardinerasFijas(hh4*60,sHOperativa));
+      var score=(workers>0)?Math.min(100,(flights*3/workers)*50):100;
+      scores.push(score);
+    });
+    var avg=scores.length?Math.round(scores.reduce(function(a,b){return a+b;},0)/scores.length):0;
+    opSetMiTurno('op-mi-presion',scores.length?(avg+'%'):'—',opPressureClass(avg));
+    var note=g('op-mi-note');
+    if(note)note.textContent=scores.length?'Presión media estimada sobre las horas de tu turno.':'Sin vuelos suficientes para estimar presión en tu turno.';
+  })();
 
   if(!card)return;
   ["state-working","state-pausa","state-rest","state-next"].forEach(function(c){card.classList.remove(c);});
