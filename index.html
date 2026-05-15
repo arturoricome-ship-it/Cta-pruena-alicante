@@ -437,7 +437,8 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 .op-tc-times{display:flex;flex-direction:column;gap:4px;width:100%}
 .op-tc-times span{display:block;width:100%;border-radius:8px;padding:5px 8px;text-align:center;font-size:13px;font-weight:800;color:var(--white)}
 .op-tc-meta{display:flex;align-items:center;justify-content:space-between;margin-top:14px}
-.op-tc-sub{font-size:9px;line-height:1.5}
+.op-tc-sub{font-size:9px;color:var(--gray);line-height:1.5}
+.op-tc-shift{font-size:12px;font-weight:700;margin-top:3px;line-height:1.4}
 .op-tc-spacer{flex:1;min-height:10px}
 .op-tc-pct-row{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:5px}
 .op-tc-pct{font-size:26px;font-weight:800;line-height:1}
@@ -680,7 +681,10 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
         <div class="op-tc-lbl" id="op-tc-lbl">Turno hoy</div>
         <div class="op-tc-times" id="op-tc-times"><span style="color:var(--gray);font-size:11px">Cargando...</span></div>
         <div class="op-tc-meta">
-          <div class="op-tc-sub" id="op-tc-sub">—</div>
+          <div>
+            <div class="op-tc-sub" id="op-tc-sub">—</div>
+            <div class="op-tc-shift" id="op-tc-shift"></div>
+          </div>
         </div>
         <div style="margin-top:14px;padding-top:0">
           <div class="op-tc-pct-row">
@@ -5005,7 +5009,9 @@ window.renderOperativa=function(){
     var cntF=fmtRestF(restMF);
     var isMultiDay=restMF!==null&&Math.floor(restMF/1440)>0;
     if(g("op-tc-times"))g("op-tc-times").innerHTML=isMultiDay?cntF:"<span>"+(cntF||"💤")+"</span>";
-    if(g("op-tc-sub"))g("op-tc-sub").textContent=nxtStrF?"Próximo turno "+nxtStrF:"";
+    if(g("op-tc-sub"))g("op-tc-sub").textContent=nxtStrF?("Próximo turno: "+_DIAS[nDF.getDay()]+" "+nDF.getDate()):"";
+    if(g("op-tc-shift"))g("op-tc-shift").textContent=nxtStrF?(nMdF.e1+(nMdF.s1?" → "+nMdF.s1:"")+(nMdF.e2&&nMdF.s2?"  ·  "+nMdF.e2+" → "+nMdF.s2:"")):"";
+    if(g("op-tc-shift"))g("op-tc-shift").style.color=nxtStrF?"var(--white)":"";
     // % remaining: look back to find when last shift ended
     var lastShiftEnd=null;
     for(var ddB=1;ddB<=30;ddB++){
@@ -5051,6 +5057,7 @@ window.renderOperativa=function(){
     var pct=Math.min(100,Math.round(el2/totMin*100));
     var rem=shEnd-nowMin+(inS1&&e2?Math.max(0,e2-s1):0);
     if(g("op-tc-sub"))g("op-tc-sub").textContent="Trabajando";
+    if(g("op-tc-shift"))g("op-tc-shift").textContent="";
     if(g("op-tc-pct"))g("op-tc-pct").textContent=pct+"%";
     if(g("op-tc-rem"))g("op-tc-rem").textContent="Quedan "+fmtT(Math.max(0,rem));
     if(g("op-tc-bar"))g("op-tc-bar").style.width=pct+"%";
@@ -5098,7 +5105,10 @@ window.renderOperativa=function(){
     // For multi-day: use raw HTML, otherwise wrap in span
     var cntHtml=restM!==null&&Math.floor(restM/1440)>0?cnt:"<span>"+(cnt||"💤")+"</span>";
     if(g("op-tc-times"))g("op-tc-times").innerHTML=cntHtml;
-    if(g("op-tc-sub"))g("op-tc-sub").textContent=nxtStr?"Próximo turno "+nxtStr:"";
+    var _D2=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+    if(g("op-tc-sub"))g("op-tc-sub").textContent=nxtStr?("Próximo turno: "+_D2[nD.getDay()]+" "+nD.getDate()):"";
+    var _shiftHours=nMd?(nMd.e1+(nMd.s1?" → "+nMd.s1:"")+(nMd.e2&&nMd.s2?"  ·  "+nMd.e2+" → "+nMd.s2:"")):"";
+    if(g("op-tc-shift")){g("op-tc-shift").textContent=_shiftHours;g("op-tc-shift").style.color=_shiftHours?"var(--white)":"";}
     // % of rest REMAINING (what's left to enjoy)
     var restElapsed=nowMin-shEnd;if(restElapsed<0)restElapsed+=1440;
     var totalRest=(restElapsed+(restM||0));
@@ -5110,7 +5120,9 @@ window.renderOperativa=function(){
     card.classList.add("state-next");
     if(g("op-tc-times"))g("op-tc-times").innerHTML=th;
     var _D3=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
-    if(g("op-tc-sub"))g("op-tc-sub").textContent="Próximo turno · "+_D3[now.getDay()]+' '+now.getDate()+'  ·  '+d.e1+(d.s1?" → "+d.s1:"")+(d.e2&&d.s2?"  ·  "+d.e2+" → "+d.s2:"");
+    if(g("op-tc-sub"))g("op-tc-sub").textContent="Próximo turno: "+_D3[now.getDay()]+" "+now.getDate();
+    var _shiftH3=d.e1+(d.s1?" → "+d.s1:"")+(d.e2&&d.s2?"  ·  "+d.e2+" → "+d.s2:"");
+    if(g("op-tc-shift")){g("op-tc-shift").textContent=_shiftH3;g("op-tc-shift").style.color="var(--white)";}
     if(g("op-tc-pct"))g("op-tc-pct").textContent="0%";
     if(g("op-tc-rem"))g("op-tc-rem").textContent="Empieza en "+fmtT(e1-nowMin);
     if(g("op-tc-bar"))g("op-tc-bar").style.width="0%";
