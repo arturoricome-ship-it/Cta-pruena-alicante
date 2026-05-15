@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<!-- CTA_OPERATIVA_V60_LIMPIA_LOCAL_MANTIENE_SHEETS_2026-05-12 -->
+<!-- CTA_OPERATIVA_V61_PRESION_FIJOS_DINAMICOS_2026-05-13 -->
 <meta charset="UTF-8">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -442,19 +442,20 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 .op-tc-pct-row{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:5px}
 .op-tc-pct{font-size:26px;font-weight:800;line-height:1}
 .op-tc-rem{font-size:8px}
-.op-tc-bar-bg{background:rgba(255,255,255,.08);border-radius:100px;height:4px;overflow:hidden}
-.op-tc-bar{height:100%;border-radius:100px}
+.op-tc-bar-bg{background:rgba(255,255,255,.08);border-radius:100px;height:8px;overflow:hidden;margin-top:2px}
+.op-tc-bar{height:100%;border-radius:100px;transition:width 1.2s ease}
 .op-turno-card.state-working{background:linear-gradient(160deg,rgba(200,168,75,.08),rgba(200,168,75,.02));border:1px solid rgba(200,168,75,.3)}
 .op-turno-card.state-working .op-tc-times span{border:1px solid rgba(200,168,75,.2)}
 .op-turno-card.state-working .op-tc-sub,.op-turno-card.state-working .op-tc-pct{color:var(--gold)}
-.op-turno-card.state-working .op-tc-bar{background:var(--gold)}
+.op-turno-card.state-working .op-tc-bar{background:linear-gradient(90deg,var(--gold),var(--gold-light));box-shadow:0 0 8px rgba(200,168,75,.5)}
 .op-turno-card.state-working .op-tc-rem{color:var(--gray)}
 .op-turno-card.state-pausa{background:linear-gradient(160deg,rgba(192,132,252,.08),rgba(192,132,252,.02));border:1px solid rgba(192,132,252,.3)}
 .op-turno-card.state-pausa .op-tc-times span{border:1px solid rgba(192,132,252,.2)}
 .op-turno-card.state-pausa .op-tc-sub,.op-turno-card.state-pausa .op-tc-pct{color:#c084fc}
-.op-turno-card.state-pausa .op-tc-bar{background:#c084fc}
+.op-turno-card.state-pausa .op-tc-bar{background:linear-gradient(90deg,#a855f7,#c084fc);box-shadow:0 0 8px rgba(192,132,252,.5)}
 .op-turno-card.state-rest{background:linear-gradient(160deg,rgba(34,197,94,.08),rgba(34,197,94,.02));border:1px solid rgba(34,197,94,.3)}
 .op-turno-card.state-rest .op-tc-times span{border:1px solid rgba(34,197,94,.2);font-size:22px;font-weight:800;color:#4ade80}
+.op-turno-card.state-rest .op-tc-bar{background:linear-gradient(90deg,#22c55e,#4ade80);box-shadow:0 0 8px rgba(74,222,128,.5)}
 .op-turno-card.state-rest .op-tc-pct{color:#4ade80;font-size:22px;font-weight:800}
 .op-turno-card.state-rest .op-tc-rem{color:var(--gold);font-weight:700}
 .op-turno-card.state-next{background:linear-gradient(160deg,rgba(96,165,250,.08),rgba(96,165,250,.02));border:1px solid rgba(96,165,250,.3)}
@@ -682,7 +683,16 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
           <div class="op-tc-sub" id="op-tc-sub">—</div>
           <button class="tw-manana-btn" onclick="event.stopPropagation();if(typeof twShowManana==='function')twShowManana()">MAÑANA ›</button>
         </div>
-        <div class="op-tc-spacer"></div>
+        <div id="op-tc-vuelos-mini" style="display:flex;gap:6px;margin-top:8px">
+          <div style="flex:1;background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.18);border-radius:8px;padding:5px 7px;text-align:center">
+            <div style="font-size:16px;font-weight:800;color:#93c5fd;line-height:1" id="op-tc-mini-total">—</div>
+            <div style="font-size:7px;color:var(--gray);margin-top:1px">vuelos hoy</div>
+          </div>
+          <div style="flex:1;background:rgba(96,165,250,.04);border:1px solid rgba(96,165,250,.12);border-radius:8px;padding:5px 7px;text-align:center">
+            <div style="font-size:16px;font-weight:800;color:#60a5fa;line-height:1" id="op-tc-mini-turno">—</div>
+            <div style="font-size:7px;color:var(--gray);margin-top:1px">mi turno</div>
+          </div>
+        </div>
         <div>
           <div class="op-tc-pct-row">
             <div class="op-tc-pct" id="op-tc-pct">—</div>
@@ -722,8 +732,8 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
       <div id="op-res-now" style="display:none;padding:12px 14px"></div>
     </div>
 
-    <details class="op-details" id="op-details-operativos">
-      <summary onclick="if(event.target.closest('.op-info-btn'))return;if(typeof logActividad==='function')logActividad('detalles_operativos_dia')"><span class="op-summary-title">📊 Detalles operativos del día</span><button type="button" class="op-info-btn" aria-label="Información sobre los datos operativos" onclick="opShowDataInfo(event)">?</button></summary>
+    <details class="op-details">
+      <summary><span class="op-summary-title">📊 Detalles operativos del día</span><button type="button" class="op-info-btn" aria-label="Información sobre los datos operativos" onclick="opShowDataInfo(event)">?</button></summary>
       <div class="op-details-body">
         <div class="op-dashboard">
           <div class="op-pressure-card">
@@ -798,7 +808,7 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
     </details>
 
     <details class="op-history-details" id="op-history-details">
-      <summary onclick="if(event.target.closest('.op-info-btn'))return;if(typeof logActividad==='function')logActividad('historial_operativa_vuelos')"><span class="op-summary-title">📈 Historial operativa vuelos</span><button type="button" class="op-info-btn" aria-label="Información sobre el historial operativo" onclick="opShowDataInfo(event)">?</button></summary>
+      <summary><span class="op-summary-title">📈 Historial operativa vuelos</span><button type="button" class="op-info-btn" aria-label="Información sobre el historial operativo" onclick="opShowDataInfo(event)">?</button></summary>
       <div class="op-history-body">
         <div class="op-history-card">
           <div class="op-history-title">Distribución por hora</div>
@@ -3870,7 +3880,6 @@ function abrirTodaPlantilla(){
   },50);
 }
 function importarGrupo(){
-  if(typeof logActividad==='function')logActividad('importar_companeros');
   document.getElementById('grupo-file-input').click();
 }
 
@@ -4683,10 +4692,14 @@ window.renderOperativa=function(){
   if(remoteTomTotal>cT)cT=remoteTomTotal;
   if(totT>cT){cT=totT;try{localStorage.setItem("op_vt_tom",JSON.stringify({d:tStr2,t:cT}));}catch(e){}}
   if(g("op-v-total-tom"))g("op-v-total-tom").textContent=cT>0?cT:"—";
-  var _shDone=(shEnd!==null&&nowMin>=shEnd);
+  var _shEndH=mS2o!==null?mS2o:mS1o;
+  var _shDone=(_shEndH!==null&&nowMin>=_shEndH);
   var _liveEmpty=(lH.length===0&&sH.length===0);
-  var iH=(e1!==null&&!_shDone&&!_liveEmpty)?cntSh(lH.concat(sH),e1,s1,e2,s2):0;
+  var iH=(mE1o!==null&&!_shDone&&!_liveEmpty)?cntSh(lH.concat(sH),mE1o,mS1o,mE2o,mS2o):0;
   if(g("op-v-turno"))g("op-v-turno").textContent=(_shDone||_liveEmpty)?"—":String(iH);
+  // Espejo en mini-card dentro de Mi Jornada
+  if(g("op-tc-mini-total"))g("op-tc-mini-total").textContent=cH>0?String(cH):"—";
+  if(g("op-tc-mini-turno"))g("op-tc-mini-turno").textContent=(_shDone||_liveEmpty)?"—":String(iH);
   var dT=(ue[MESES[tom.getMonth()]]||{})[tom.getDate()]||null;
   var tE1=dT&&dT.e1?toM(dT.e1):null,tS1=dT&&dT.s1?toM(dT.s1):null;
   var tE2=dT&&dT.e2?toM(dT.e2):null,tS2=dT&&dT.s2?toM(dT.s2):null;
@@ -4854,6 +4867,49 @@ window.renderOperativa=function(){
   function isEnVuelo(v){var c=(v.estadoClass||'');var e=String(v.estado||'').toLowerCase();return c==='e-active'||e.indexOf('en vuelo')>=0||e.indexOf('en route')>=0;}
   function depActive(v){var tm=flMin(v);if(tm===null||isEnVuelo(v))return false;var a=tm-35,b=tm;return nowMin>=a&&nowMin<=b;}
   function arrActive(v){var tm=flMin(v);if(tm===null||isEnVuelo(v))return false;return nowMin>=tm&&nowMin<tm+30;}
+
+  // Puestos fijos dinámicos para el cálculo de presión operativa.
+  // Patios depende de la hora. Jardineras solo descuenta personal cuando hay salidas
+  // por puertas remotas, desde 45 min antes hasta la salida del último vuelo afectado.
+  function opPatiosFijos(nowMinute){
+    // 23:00 - 04:30: no se descuenta nadie para patios.
+    if(nowMinute>=1380||nowMinute<270)return 0;
+    // 04:30 - 07:00: solo se descuenta 1 persona para patios.
+    if(nowMinute>=270&&nowMinute<420)return 1;
+    // Resto del día: se descuentan 2 personas para patios.
+    return 2;
+  }
+  function opNormPuerta(p){
+    return String(p||'')
+      .toUpperCase()
+      .replace(/\s+/g,'')
+      .replace(/^PUERTA/,'')
+      .replace(/^GATE/,'');
+  }
+  function opInMinuteRange(nowMinute,startMinute,endMinute){
+    startMinute=((startMinute%1440)+1440)%1440;
+    endMinute=((endMinute%1440)+1440)%1440;
+    if(startMinute<=endMinute)return nowMinute>=startMinute&&nowMinute<=endMinute;
+    return nowMinute>=startMinute||nowMinute<=endMinute;
+  }
+  function opJardinerasFijas(nowMinute,salidasList){
+    var puertasJardinera=new Set([
+      'C50','C48','C46','C44','C42','C40','C38',
+      'B18','B20','B22',
+      'C20','C22','C24','C26','C28','C30','C32','C34'
+    ]);
+    var activa=false;
+    (salidasList||[]).forEach(function(v){
+      if(activa)return;
+      if(isEnVuelo(v))return;
+      var puerta=opNormPuerta(v.puerta||v.gate||v.embarque||v.puertaEmbarque||v.puertaSalida||'');
+      if(!puertasJardinera.has(puerta))return;
+      var salidaMin=flMin(v);
+      if(salidaMin===null)return;
+      if(opInMinuteRange(nowMinute,salidaMin-45,salidaMin))activa=true;
+    });
+    return activa?2:0;
+  }
   var salidasActivasList=sHOperativa.filter(depActive);
   var llegadasActivasList=lHOperativa.filter(arrActive);
   var salidasActivas=salidasActivasList.length;
@@ -4913,7 +4969,9 @@ window.renderOperativa=function(){
   var soloLlegadasActivas=llegadasActivasList.filter(function(v){return !llegadasUsadasEnEscala.has(v);}).length;
   var soloSalidasActivas=salidasActivasList.filter(function(v){return !salidasUsadasEnEscala.has(v);}).length;
   var operariosActivosAhora=wNow||0;
-  var puestosFijos=4; // 2 jardineras + 2 patios. No cuentan para aviones.
+  var patiosFijos=opPatiosFijos(nowMin);
+  var jardinerasFijas=opJardinerasFijas(nowMin,sHOperativa);
+  var puestosFijos=patiosFijos+jardinerasFijas; // Puestos no disponibles para vuelos ahora mismo.
   var operariosDisponiblesVuelos=Math.max(0,operariosActivosAhora-puestosFijos);
   var genteNecesaria=(avionesEnEscala*4)+(soloLlegadasActivas*3)+(soloSalidasActivas*3);
   var pressureScore=0;
@@ -4925,7 +4983,7 @@ window.renderOperativa=function(){
   setTextOp('op-load-workers',opDetalleTrabajadores.length||'—');
   setTextOp('op-load-flights',opDetalleTotal>0?opDetalleTotal:'—');
   setTextOp('op-load-ratio',(opDetalleTrabajadores.length&&opDetalleTotal)?(opDetalleTrabajadores.length/opDetalleTotal).toFixed(2).replace('.',','):'—');
-  var pf=g('op-pressure-formula');if(pf)pf.textContent='Resumen: '+genteNecesaria+' necesarios / '+operariosDisponiblesVuelos+' disponibles para vuelos. Fijos no computan: 2 jardineras + 2 patios.';
+  var pf=g('op-pressure-formula');if(pf)pf.textContent='Resumen: '+genteNecesaria+' necesarios / '+operariosDisponiblesVuelos+' disponibles para vuelos. Fijos ahora: '+jardinerasFijas+' jardineras + '+patiosFijos+' patios.';
 
   if(!card)return;
   ["state-working","state-pausa","state-rest","state-next"].forEach(function(c){card.classList.remove(c);});
@@ -4977,6 +5035,7 @@ window.renderOperativa=function(){
     if(g("op-tc-pct"))g("op-tc-pct").textContent=restMF!==null?restRemPctF+"%":"";
     if(g("op-tc-rem"))g("op-tc-rem").textContent="";
     if(g("op-tc-bar"))g("op-tc-bar").style.width=restMF!==null?restRemPctF+"%":"0%";
+    if(g("op-tc-vuelos-mini"))g("op-tc-vuelos-mini").style.display="none";
   }
   // Si no hay turno trabajado hoy (libre/festivo/HL/vacaciones o sin datos),
   // ya hemos pintado la tarjeta de descanso arriba. No seguimos, porque d puede ser null
@@ -5061,6 +5120,7 @@ window.renderOperativa=function(){
     if(g("op-tc-pct"))g("op-tc-pct").textContent=restRemPct+"%";
     if(g("op-tc-rem"))g("op-tc-rem").textContent="";
     if(g("op-tc-bar"))g("op-tc-bar").style.width=restRemPct+"%";
+    if(g("op-tc-vuelos-mini"))g("op-tc-vuelos-mini").style.display="none";
   } else if(notYet){
     card.classList.add("state-next");
     if(g("op-tc-times"))g("op-tc-times").innerHTML=th;
