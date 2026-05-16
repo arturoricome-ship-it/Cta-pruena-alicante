@@ -4974,7 +4974,7 @@ window.renderOperativa=function(){
     fl.innerHTML=gaps.map(function(gap){
       var isPast=gap.e<=nowMin,isCurrent=gap.s<=nowMin&&gap.e>nowMin,isShort=gap.dur<20;
       var cls='op-free-chip'+(isPast?' past':isCurrent?' current':isShort?' short':'');
-      var now=isCurrent?'<div class="op-free-now">▶ AHORA</div>':'';
+      var now=isCurrent?'<div class="op-free-now">▶ AHORA · quedan '+fmtDur(gap.e-nowMin)+'</div>':'';
       return '<div class="'+cls+'">'+now+'<div class="op-free-time">'+m2hm(gap.s)+' → '+m2hm(gap.e)+'</div><div class="op-free-dur">'+fmtDur(gap.dur)+'</div></div>';
     }).join('');
   })();
