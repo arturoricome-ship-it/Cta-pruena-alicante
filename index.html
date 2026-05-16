@@ -486,7 +486,7 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 /* ─── Panel operativo ampliado ───────────────────────────── */
 .op-dashboard{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
 @media(max-width:720px){.op-dashboard{grid-template-columns:1fr}}
-.op-pressure-card,.op-now-card,.op-load-card,.op-peaks-card,.op-productivity-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:13px 14px;overflow:hidden}
+.op-pressure-card,.op-now-card,.op-load-card,.op-peaks-card,.op-productivity-card,.op-free-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:13px 14px;overflow:hidden}
 .op-pressure-card{border-color:rgba(200,168,75,.28);background:linear-gradient(160deg,rgba(200,168,75,.08),rgba(200,168,75,.025))}
 .op-productivity-card{border-color:rgba(34,197,94,.22);background:linear-gradient(160deg,rgba(34,197,94,.07),rgba(34,197,94,.02))}
 .op-card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:10px}
@@ -589,6 +589,13 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 
 /* CTA V53: valores de barras persistentes y visibles */
 .op-peaks-card,.op-history-card{overflow:visible!important}
+.op-free-chip{display:flex;flex-direction:column;align-items:center;background:rgba(96,165,250,.07);border:1px solid rgba(96,165,250,.18);border-radius:10px;padding:7px 12px;min-width:96px;gap:1px}
+.op-free-chip.past{opacity:.38}
+.op-free-chip.current{background:rgba(74,222,128,.1);border-color:rgba(74,222,128,.45);box-shadow:0 0 8px rgba(74,222,128,.15)}
+.op-free-chip.short{background:rgba(251,146,60,.06);border-color:rgba(251,146,60,.22)}
+.op-free-time{font-size:11px;font-weight:700;color:var(--white)}
+.op-free-dur{font-size:9px;color:var(--gray)}
+.op-free-now{font-size:8px;color:#4ade80;font-weight:700;letter-spacing:.4px}
 .op-bar-col.show .op-bar-val{display:block!important}
 
 </style>
@@ -795,6 +802,14 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
             <div class="op-card-title">Picos previstos por vuelos</div>
             <div class="op-card-sub">Barras por hora. Toca una barra para ver el número de vuelos.</div>
             <div id="op-peaks-list" class="op-bars-24"></div>
+          </div>
+
+          <div class="op-free-card" style="grid-column:1/-1">
+            <div class="op-card-title">⏱ Tiempos libres del día</div>
+            <div class="op-card-sub">Ventanas sin operativa activa · llegada: −10min+20min · salida: −20min</div>
+            <div id="op-free-list" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px">
+              <div style="font-size:11px;color:var(--gray)">Cargando...</div>
+            </div>
           </div>
         </div>
       </div>
@@ -4940,6 +4955,29 @@ window.renderOperativa=function(){
   setTextOp('op-load-flights',opDetalleTotal>0?opDetalleTotal:'—');
   setTextOp('op-load-ratio',(opDetalleTrabajadores.length&&opDetalleTotal)?(opDetalleTrabajadores.length/opDetalleTotal).toFixed(2).replace('.',','):'—');
   var pf=g('op-pressure-formula');if(pf)pf.textContent='Resumen: '+genteNecesaria+' necesarios / '+operariosDisponiblesVuelos+' disponibles para vuelos. Fijos ahora: '+jardinerasFijas+' jardineras + '+patiosFijos+' patios.';
+
+  // ── Tiempos libres del día ───────────────────────────────────────────────
+  (function(){
+    var fl=g('op-free-list');if(!fl)return;
+    function m2hm(m){m=((m%1440)+1440)%1440;return ('0'+Math.floor(m/60)).slice(-2)+':'+('0'+(m%60)).slice(-2);}
+    function fmtDur(d){var h=Math.floor(d/60),mn=d%60;return h>0?(h+'h'+(mn>0?' '+mn+'m':'')):(mn+'m');}
+    var ivs=[];
+    lHOperativa.forEach(function(v){var tm=flMin(v);if(tm===null)return;ivs.push([tm-10,tm+20]);});
+    sHOperativa.forEach(function(v){var tm=flMin(v);if(tm===null)return;ivs.push([tm-20,tm]);});
+    if(ivs.length===0){fl.innerHTML='<span style="font-size:11px;color:var(--gray)">Sin vuelos cargados</span>';return;}
+    ivs.sort(function(a,b){return a[0]-b[0];});
+    var mg=[ivs[0].slice()];
+    for(var i=1;i<ivs.length;i++){var last=mg[mg.length-1];if(ivs[i][0]<=last[1])last[1]=Math.max(last[1],ivs[i][1]);else mg.push(ivs[i].slice());}
+    var gaps=[];
+    for(var i=0;i<mg.length-1;i++){var gs=mg[i][1],ge=mg[i+1][0],dur=ge-gs;if(dur>=5)gaps.push({s:gs,e:ge,dur:dur});}
+    if(gaps.length===0){fl.innerHTML='<span style="font-size:11px;color:var(--gray)">No hay tiempos libres significativos hoy</span>';return;}
+    fl.innerHTML=gaps.map(function(gap){
+      var isPast=gap.e<=nowMin,isCurrent=gap.s<=nowMin&&gap.e>nowMin,isShort=gap.dur<20;
+      var cls='op-free-chip'+(isPast?' past':isCurrent?' current':isShort?' short':'');
+      var now=isCurrent?'<div class="op-free-now">▶ AHORA</div>':'';
+      return '<div class="'+cls+'">'+now+'<div class="op-free-time">'+m2hm(gap.s)+' → '+m2hm(gap.e)+'</div><div class="op-free-dur">'+fmtDur(gap.dur)+'</div></div>';
+    }).join('');
+  })();
 
   if(!card)return;
   ["state-working","state-pausa","state-rest","state-next"].forEach(function(c){card.classList.remove(c);});
