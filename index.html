@@ -807,7 +807,7 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
           <div class="op-free-card" style="grid-column:1/-1">
             <div class="op-card-title">⏱ Tiempos libres del día</div>
             <div class="op-card-sub">Ventanas sin operativa activa · llegada: −10min+20min · salida: −20min</div>
-            <div id="op-free-list" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px">
+            <div id="op-free-list" style="display:flex;flex-direction:column;gap:5px;margin-top:10px">
               <div style="font-size:11px;color:var(--gray)">Cargando...</div>
             </div>
           </div>
@@ -1778,6 +1778,7 @@ function eLabel(s){
   if(!s)return{t:"Programado",c:"e-scheduled"};
   s=s.toLowerCase();
   if(s==="active"||s==="en route")return{t:"En vuelo",c:"e-active"};
+  if(s==="en tierra"||s==="on ground"||s==="tierra")return{t:"En tierra",c:"e-landed"};
   if(s==="landed")return{t:"Aterrizado",c:"e-landed"};
   if(s==="cancelled")return{t:"Cancelado",c:"e-cancelled"};
   if(s.indexOf("delay")!==-1)return{t:"Retrasado",c:"e-delayed"};
@@ -4869,7 +4870,7 @@ window.renderOperativa=function(){
 
   function isDelay(v){var e=(v.estadoClass||'')+' '+(v.estado||'');return /delay|retras/i.test(e);}
   function inNext(v,min){var tm=flMin(v);if(tm===null)return false;var dd=tm-nowMin;if(dd<0)dd+=1440;return dd>=0&&dd<=min;}
-  function isEnVuelo(v){var c=(v.estadoClass||'');var e=String(v.estado||'').toLowerCase();return c==='e-active'||e.indexOf('en vuelo')>=0||e.indexOf('en route')>=0;}
+  function isEnVuelo(v){var c=(v.estadoClass||'');var e=String(v.estado||'').toLowerCase();if(e.indexOf('tierra')>=0||e.indexOf('aterrizado')>=0||e.indexOf('aterrizó')>=0)return false;return c==='e-active'||e.indexOf('en vuelo')>=0||e.indexOf('en route')>=0;}
   function depActive(v){var tm=flMin(v);if(tm===null||isEnVuelo(v))return false;var a=tm-35,b=tm;return nowMin>=a&&nowMin<=b;}
   function arrActive(v){var tm=flMin(v);if(tm===null||isEnVuelo(v))return false;return nowMin>=tm&&nowMin<tm+30;}
 
@@ -4973,9 +4974,17 @@ window.renderOperativa=function(){
     if(gaps.length===0){fl.innerHTML='<span style="font-size:11px;color:var(--gray)">No hay tiempos libres significativos hoy</span>';return;}
     fl.innerHTML=gaps.map(function(gap){
       var isPast=gap.e<=nowMin,isCurrent=gap.s<=nowMin&&gap.e>nowMin,isShort=gap.dur<20;
-      var cls='op-free-chip'+(isPast?' past':isCurrent?' current':isShort?' short':'');
-      var now=isCurrent?'<div class="op-free-now">▶ AHORA · quedan '+fmtDur(gap.e-nowMin)+'</div>':'';
-      return '<div class="'+cls+'">'+now+'<div class="op-free-time">'+m2hm(gap.s)+' → '+m2hm(gap.e)+'</div><div class="op-free-dur">'+fmtDur(gap.dur)+'</div></div>';
+      var rowBg=isCurrent?'rgba(74,222,128,.07)':isPast?'rgba(255,255,255,.02)':'rgba(96,165,250,.04)';
+      var border=isCurrent?'rgba(74,222,128,.35)':isPast?'rgba(255,255,255,.06)':'rgba(96,165,250,.13)';
+      var timeColor=isCurrent?'#4ade80':isPast?'#555e6e':'var(--white)';
+      var durColor=isCurrent?'#4ade80':isPast?'#3a4150':'#60a5fa';
+      var rem=isCurrent?'<span style="margin-left:auto;font-size:10px;font-weight:700;color:#4ade80">quedan '+fmtDur(gap.e-nowMin)+'</span>':'';
+      var tag=isCurrent?'<span style="font-size:8px;font-weight:800;color:#4ade80;letter-spacing:.5px;background:rgba(74,222,128,.12);border-radius:4px;padding:1px 5px">AHORA</span>':isShort?'<span style="font-size:8px;color:#fb923c;background:rgba(251,146,60,.1);border-radius:4px;padding:1px 5px">CORTO</span>':'';
+      return '<div style="display:flex;align-items:center;gap:8px;background:'+rowBg+';border:1px solid '+border+';border-radius:9px;padding:7px 10px;'+(isPast?'opacity:.45':'')+'">'+
+        '<span style="font-size:12px;font-weight:700;color:'+timeColor+';font-variant-numeric:tabular-nums;min-width:115px">'+m2hm(gap.s)+' → '+m2hm(gap.e)+'</span>'+
+        '<span style="font-size:11px;font-weight:700;color:'+durColor+'">'+fmtDur(gap.dur)+'</span>'+
+        tag+rem+
+        '</div>';
     }).join('');
   })();
 
