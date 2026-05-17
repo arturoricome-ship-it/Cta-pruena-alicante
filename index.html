@@ -5016,9 +5016,37 @@ window.renderOperativa=function(){
     }
     return false;
   };
-  function opBars24Html(counts,max,unit){max=max||Math.max.apply(null,counts.concat([1]));return counts.map(function(c,h){var pct=max>0?Math.max(2,Math.round(c/max*100)):2;var col=opColorFromRatio(c,max);var lab=(h<10?'0':'')+h;return '<div class="op-bar-col" onclick="return opShowOnlyBar(this)" title="'+lab+':00 · '+c+' '+unit+'"><span class="op-bar-val">'+c+' '+unit+'</span><div class="op-bar-fill" style="height:'+pct+'%;background:'+col+';border-color:'+col+'"></div><span class="op-bar-lab">'+lab+'</span></div>';}).join('');}
-  function opBars7Html(counts,max){var labs=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];max=max||Math.max.apply(null,counts.concat([1]));return counts.map(function(c,i){var pct=max>0?Math.max(2,Math.round(c/max*100)):2;var col=opColorFromRatio(c,max);return '<div class="op-bar-col" onclick="return opShowOnlyBar(this)" title="'+labs[i]+' · '+c+' vuelos"><span class="op-bar-val">'+c+' vuelos</span><div class="op-bar-fill" style="height:'+pct+'%;background:'+col+';border-color:'+col+'"></div><span class="op-bar-lab">'+labs[i]+'</span></div>';}).join('');}
-  function opBuildLocalHistory(todayCounts){return {};}
+  function opBarHeightPct(c,counts,max){
+    counts=(counts||[]).map(function(n){return Number(n||0);});
+    max=max||Math.max.apply(null,counts.concat([1]));
+    c=Number(c||0);
+    if(c<=0)return 2;
+    var nonZero=counts.filter(function(n){return n>0;});
+    if(!nonZero.length)return 2;
+    var minNonZero=Math.min.apply(null,nonZero);
+    if(max<=0)return 2;
+    if(max===minNonZero)return 88;
+    var norm=(c-minNonZero)/(max-minNonZero);
+    norm=Math.max(0,Math.min(1,norm));
+    return Math.round(16 + norm*84);
+  }
+  function opBars24Html(counts,max,unit){max=max||Math.max.apply(null,counts.concat([1]));return counts.map(function(c,h){var pct=opBarHeightPct(c,counts,max);var col=opColorFromRatio(c,max);var lab=(h<10?'0':'')+h;return '<div class="op-bar-col" onclick="return opShowOnlyBar(this)" title="'+lab+':00 · '+c+' '+unit+'"><span class="op-bar-val">'+c+' '+unit+'</span><div class="op-bar-fill" style="height:'+pct+'%;background:'+col+';border-color:'+col+'"></div><span class="op-bar-lab">'+lab+'</span></div>';}).join('');}
+  function opBars7Html(counts,max){var labs=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];max=max||Math.max.apply(null,counts.concat([1]));return counts.map(function(c,i){var pct=opBarHeightPct(c,counts,max);var col=opColorFromRatio(c,max);return '<div class="op-bar-col" onclick="return opShowOnlyBar(this)" title="'+labs[i]+' · '+c+' vuelos"><span class="op-bar-val">'+c+' vuelos</span><div class="op-bar-fill" style="height:'+pct+'%;background:'+col+';border-color:'+col+'"></div><span class="op-bar-lab">'+labs[i]+'</span></div>';}).join('');}
+  function opHoursFromFlights(list){var arr=Array(24).fill(0);(list||[]).forEach(function(v){var tm=flMin(v);if(tm!==null)arr[Math.floor(tm/60)%24]++;});return arr;}
+  function opBuildLocalHistory(todayCounts){
+    var out={};
+    var todayArr=(todayCounts||Array(24).fill(0)).concat(Array(24).fill(0)).slice(0,24).map(function(n){return Number(n||0);});
+    var todayTotal=todayArr.reduce(function(a,b){return a+Number(b||0);},0);
+    if(todayTotal>0&&typeof opNowDateKey!=='undefined'&&opNowDateKey){
+      out[opNowDateKey]={hours:todayArr,dow:opDowFromISO(opNowDateKey),total:todayTotal};
+    }
+    var tomorrowArr=opHoursFromFlights((lT||[]).concat(sT||[]));
+    var tomorrowTotal=tomorrowArr.reduce(function(a,b){return a+Number(b||0);},0);
+    if(tomorrowTotal>0&&typeof opTomorrowDateKey!=='undefined'&&opTomorrowDateKey){
+      out[opTomorrowDateKey]={hours:tomorrowArr,dow:opDowFromISO(opTomorrowDateKey),total:tomorrowTotal};
+    }
+    return out;
+  }
   function opParseRemoteHourArray(v){if(Array.isArray(v))return v.map(function(n){return Number(n||0);}).concat(Array(24).fill(0)).slice(0,24);return String(v||'').split(',').map(function(n){return Number(String(n).trim()||0);}).concat(Array(24).fill(0)).slice(0,24);}
   function opDowFromISO(ds){var d=new Date(ds+'T12:00:00');if(isNaN(d.getTime()))return 0;return (d.getDay()+6)%7;}
   function opNormalizeHistRows(payload){var rows=[];if(Array.isArray(payload))rows=payload;else if(payload&&Array.isArray(payload.registros))rows=payload.registros;else if(payload&&Array.isArray(payload.rows))rows=payload.rows;else if(payload&&Array.isArray(payload.data))rows=payload.data;var data={};rows.forEach(function(r){var fecha=String(r.fecha||r.Fecha||'').trim();if(!fecha)return;data[fecha]={hours:opParseRemoteHourArray(r.por_hora||r.porHora||r.hours||r.horas),dow:opDowFromISO(fecha),total:Number(r.total_vuelos||r.total||0),salidas:Number(r.salidas||0),llegadas:Number(r.llegadas||0),estado:String(r.estado||'')};});return data;}
@@ -5029,9 +5057,14 @@ window.renderOperativa=function(){
     var url='https://script.google.com/macros/s/AKfycbz44ZHwMDkVnJ3DRFPLBmqol473EpklTwLMD2kS-SA2ReeFb2XmpyKeo4JuYWfdABMw1A/exec?action=historico';
     if(!url)return;
     var now=Date.now();
-    // Evita parpadeos: no vacía las gráficas antes del fetch y no refetch cada 2-3 segundos.
-    if(window._opHistFetchInFlight)return;
+    var localData=opBuildLocalHistory(todayCounts);
+    // Si ya tenemos histórico remoto reciente, lo reaprovechamos pero SIEMPRE fusionando hoy + mañana.
     if(window._opRemoteHistory && window._opLastHistFetchTs && (now-window._opLastHistFetchTs)<60000){
+      opRenderHistoryData(opMergeHistory(window._opRemoteHistory,localData));
+      return;
+    }
+    if(window._opHistFetchInFlight){
+      if(window._opRemoteHistory)opRenderHistoryData(opMergeHistory(window._opRemoteHistory,localData));
       return;
     }
     window._opHistFetchInFlight=true;
@@ -5040,19 +5073,21 @@ window.renderOperativa=function(){
       .then(function(payload){
         if(payload&&payload.ok===false)return;
         var remoteData=opNormalizeHistRows(payload);
-        var hash='';
-        try{hash=JSON.stringify(remoteData);}catch(e){hash=String(Date.now());}
         window._opRemoteHistory=remoteData;
         window._opLastHistFetchTs=Date.now();
         if(typeof window.opApplyRemoteFlightSummary==='function')window.opApplyRemoteFlightSummary(remoteData);
+        var mergedData=opMergeHistory(remoteData,localData);
+        var hash='';
+        try{hash=JSON.stringify(mergedData);}catch(e){hash=String(Date.now());}
         if(hash!==window._opLastHistRenderHash){
           window._opLastHistRenderHash=hash;
-          opRenderHistoryData(remoteData);
+          opRenderHistoryData(mergedData);
         }
       })
       .catch(function(){
         window._opLastHistFetchTs=Date.now();
-        if(!window._opRemoteHistory)opRenderHistoryData({});
+        if(window._opRemoteHistory)opRenderHistoryData(opMergeHistory(window._opRemoteHistory,localData));
+        else opRenderHistoryData(localData);
       })
       .finally(function(){window._opHistFetchInFlight=false;});
   }
