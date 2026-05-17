@@ -757,9 +757,15 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 #op-free-list .op-free-line{display:block;width:100%;word-break:normal;overflow-wrap:normal;hyphens:none}
 #op-free-list .op-free-line-prefix{color:var(--gray);font-weight:700}
 #op-free-list .op-free-line b{font-weight:900}
-#op-free-list .op-free-between b{color:var(--white);font-weight:900}
-#op-free-list .op-free-between .sal{color:#93c5fd}
-#op-free-list .op-free-between .lle{color:#86efac}
+#op-free-list .op-free-between b{font-weight:900}
+#op-free-list .op-free-line.prev,
+#op-free-list .op-free-line.prev b,
+#op-free-list .op-free-line.prev .sal,
+#op-free-list .op-free-line.prev .lle{color:#cbd5e1!important}
+#op-free-list .op-free-line.next,
+#op-free-list .op-free-line.next b,
+#op-free-list .op-free-line.next .sal,
+#op-free-list .op-free-line.next .lle{color:#e8c96a!important}
 @media(max-width:640px){
   #op-free-list .op-free-head{grid-template-columns:1fr}
   #op-free-list .op-free-main{font-size:21px}
@@ -5185,6 +5191,7 @@ window.renderOperativa=function(){
     var fl=g('op-free-list');if(!fl)return;
     function m2hm(m){m=((m%1440)+1440)%1440;return ('0'+Math.floor(m/60)).slice(-2)+':'+('0'+(m%60)).slice(-2);}
     function fmtDur(d){var h=Math.floor(d/60),mn=d%60;return h>0?(h+'h'+(mn>0?' '+mn+'m':'')):(mn+'m');}
+    function fmtDurParon(d){var h=Math.floor(d/60),mn=d%60;if(h>0&&mn>0)return h+'h'+mn+'min'; if(h>0)return h+'h'; return mn+'min';}
     function opFreeFlightItem(v,tipo,opStart,opEnd){
       var esSalida=tipo==='salida';
       var ciudad=(esSalida?(v.destino||''):(v.origen||v.destino||''))||'--';
@@ -5299,7 +5306,7 @@ window.renderOperativa=function(){
               '<div class="op-free-left">'+
                 '<div class="op-free-main">'+m2hm(gap.s)+' → '+m2hm(gap.e)+'</div>'+
                 '<div class="op-free-cols">'+
-                  '<div class="op-free-cell"><span class="op-free-label paron">Parón</span><span class="op-free-value paron">'+fmtDur(gap.dur)+'</span></div>'+
+                  '<div class="op-free-cell"><span class="op-free-label paron">Parón de:</span><span class="op-free-value paron">'+fmtDurParon(gap.dur)+'</span></div>'+
                   '<div class="op-free-cell"><span class="op-free-label falta">Falta</span><span class="op-free-value falta">'+faltaTxt+'</span></div>'+
                 '</div>'+
               '</div>'+
