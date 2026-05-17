@@ -700,6 +700,13 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 }
 #op-free-list .op-free-chip.current .op-free-value{color:#4ade80}
 #op-free-list .op-free-chip.short .op-free-value{color:#fb923c}
+#op-free-list .op-free-flights{margin-top:8px;display:flex;flex-direction:column;gap:5px}
+#op-free-list .op-free-flight-row{display:flex;align-items:flex-start;gap:6px;font-size:9px;line-height:1.35;color:var(--gray)}
+#op-free-list .op-free-flight-label{min-width:58px;color:rgba(255,255,255,.45);font-weight:800;text-transform:uppercase;letter-spacing:.45px}
+#op-free-list .op-free-flight-items{display:flex;flex-wrap:wrap;gap:4px;min-width:0}
+#op-free-list .op-free-flight-chip{display:inline-flex;align-items:center;gap:4px;border-radius:7px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);padding:3px 6px;color:var(--white);font-size:9px;font-weight:700}
+#op-free-list .op-free-flight-chip.sal{border-color:rgba(96,165,250,.24);color:#93c5fd}
+#op-free-list .op-free-flight-chip.lle{border-color:rgba(74,222,128,.22);color:#86efac}
 
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -5114,41 +5121,74 @@ window.renderOperativa=function(){
     var fl=g('op-free-list');if(!fl)return;
     function m2hm(m){m=((m%1440)+1440)%1440;return ('0'+Math.floor(m/60)).slice(-2)+':'+('0'+(m%60)).slice(-2);}
     function fmtDur(d){var h=Math.floor(d/60),mn=d%60;return h>0?(h+'h'+(mn>0?' '+mn+'m':'')):(mn+'m');}
+    function opFreeFlightItem(v,tipo,opStart,opEnd){
+      var esSalida=tipo==='salida';
+      var ciudad=(esSalida?(v.destino||''):(v.origen||v.destino||''))||'--';
+      ciudad=String(ciudad).split('-')[0].trim()||ciudad;
+      return {tipo:tipo,num:v.numero||'Vuelo',ciudad:ciudad,hora:v.horaReal||v.horaProg||'',opStart:opStart,opEnd:opEnd};
+    }
     function buildIntervals(lList,sList){
       var ivs=[];
       (lList||[]).forEach(function(v){
         if((v.estadoClass||'')==='e-cancelled')return;
         var tm=flMin(v);if(tm===null)return;
-        ivs.push([Math.max(0,tm-10),Math.min(1440,tm+20)]);
+        var a=Math.max(0,tm-10),b=Math.min(1440,tm+20);
+        ivs.push({s:a,e:b,vuelos:[opFreeFlightItem(v,'entrada',a,b)]});
       });
       (sList||[]).forEach(function(v){
         if((v.estadoClass||'')==='e-cancelled')return;
         var tm=flMin(v);if(tm===null)return;
         var ant=opEsPuertaJardinera(v)?45:20;
-        ivs.push([Math.max(0,tm-ant),Math.min(1440,tm)]);
+        var a=Math.max(0,tm-ant),b=Math.min(1440,tm);
+        ivs.push({s:a,e:b,vuelos:[opFreeFlightItem(v,'salida',a,b)]});
       });
       if(ivs.length===0)return [];
-      ivs.sort(function(a,b){return a[0]-b[0];});
-      var mg=[ivs[0].slice()];
+      ivs.sort(function(a,b){return a.s-b.s || a.e-b.e;});
+      var mg=[{s:ivs[0].s,e:ivs[0].e,vuelos:ivs[0].vuelos.slice()}];
       for(var i=1;i<ivs.length;i++){
         var last=mg[mg.length-1];
-        if(ivs[i][0]<=last[1])last[1]=Math.max(last[1],ivs[i][1]);
-        else mg.push(ivs[i].slice());
+        if(ivs[i].s<=last.e){
+          last.e=Math.max(last.e,ivs[i].e);
+          last.vuelos=last.vuelos.concat(ivs[i].vuelos||[]);
+        }else{
+          mg.push({s:ivs[i].s,e:ivs[i].e,vuelos:(ivs[i].vuelos||[]).slice()});
+        }
       }
       return mg;
+    }
+    function opBoundaryFlights(block,side){
+      if(!block||!block.vuelos)return [];
+      var ref=side==='start'?block.s:block.e;
+      var key=side==='start'?'opStart':'opEnd';
+      var out=block.vuelos.filter(function(f){return Math.abs((f[key]||0)-ref)<=1;});
+      if(out.length===0)out=block.vuelos.slice(0,3);
+      var seen={};
+      return out.filter(function(f){var k=f.tipo+'|'+f.num+'|'+f.ciudad; if(seen[k])return false; seen[k]=1; return true;}).slice(0,4);
     }
     function buildGaps(lList,sList,includeDayEdges){
       var mg=buildIntervals(lList,sList);
       if(!mg.length)return null;
       var gaps=[];
-      if(includeDayEdges&&mg[0][0]>=30)gaps.push({s:0,e:mg[0][0],dur:mg[0][0]});
+      if(includeDayEdges&&mg[0].s>=30)gaps.push({s:0,e:mg[0].s,dur:mg[0].s,before:[],after:opBoundaryFlights(mg[0],'start')});
       for(var j=0;j<mg.length-1;j++){
-        var gs=mg[j][1],ge=mg[j+1][0],dur=ge-gs;
-        if(dur>=20)gaps.push({s:gs,e:ge,dur:dur});
+        var gs=mg[j].e,ge=mg[j+1].s,dur=ge-gs;
+        if(dur>=20)gaps.push({s:gs,e:ge,dur:dur,before:opBoundaryFlights(mg[j],'end'),after:opBoundaryFlights(mg[j+1],'start')});
       }
-      var lastEnd=mg[mg.length-1][1];
-      if(includeDayEdges&&1440-lastEnd>=30)gaps.push({s:lastEnd,e:1440,dur:1440-lastEnd});
+      var last=mg[mg.length-1],lastEnd=last.e;
+      if(includeDayEdges&&1440-lastEnd>=30)gaps.push({s:lastEnd,e:1440,dur:1440-lastEnd,before:opBoundaryFlights(last,'end'),after:[]});
       return gaps;
+    }
+    function opFreeFlightsHtml(gap){
+      function row(lbl,arr){
+        if(!arr||!arr.length)return '';
+        return '<div class="op-free-flight-row"><span class="op-free-flight-label">'+lbl+'</span><span class="op-free-flight-items">'+arr.map(function(f){
+          var cls=f.tipo==='salida'?'sal':'lle';
+          var tipo=f.tipo==='salida'?'Salida':'Entrada';
+          return '<span class="op-free-flight-chip '+cls+'">'+tipo+' · '+escH(f.ciudad)+' · '+escH(f.num)+'</span>';
+        }).join('')+'</span></div>';
+      }
+      var html=row('Antes',gap.before)+row('Después',gap.after);
+      return html?'<div class="op-free-flights">'+html+'</div>':'';
     }
     function tomorrowGaps(){return buildGaps(lT,sT,true);}
     // Para HOY también incluimos los bordes del día.
@@ -5191,7 +5231,7 @@ window.renderOperativa=function(){
         '<div class="op-free-cols">'+
           '<div class="op-free-cell"><span class="op-free-label">Parón</span><span class="op-free-value">'+fmtDur(gap.dur)+'</span></div>'+
           '<div class="op-free-cell"><span class="op-free-label">Falta</span><span class="op-free-value">'+faltaTxt+'</span></div>'+
-        '</div>'+
+        '</div>'+opFreeFlightsHtml(gap)+
         '</div>';
     }).join('');
   })();
