@@ -642,6 +642,60 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 }
 
 
+
+/* CTA V69: cada parón muestra hora, duración y cuánto falta */
+#op-free-list .op-free-chip{
+  align-items:stretch!important;
+  justify-content:flex-start!important;
+  text-align:left!important;
+  padding:8px 9px!important;
+  min-height:74px!important;
+  gap:5px!important;
+}
+#op-free-list .op-free-main{
+  font-size:12px;
+  font-weight:900;
+  color:var(--white);
+  text-align:center;
+  line-height:1.15;
+  font-variant-numeric:tabular-nums;
+}
+#op-free-list .op-free-cols{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:5px;
+}
+#op-free-list .op-free-cell{
+  background:rgba(255,255,255,.035);
+  border:1px solid rgba(255,255,255,.055);
+  border-radius:7px;
+  padding:4px 5px;
+  min-width:0;
+}
+#op-free-list .op-free-cell.full{grid-column:1/-1}
+#op-free-list .op-free-label{
+  display:block;
+  font-size:7px;
+  line-height:1;
+  color:var(--gray);
+  text-transform:uppercase;
+  letter-spacing:.45px;
+  margin-bottom:2px;
+  font-weight:800;
+}
+#op-free-list .op-free-value{
+  display:block;
+  font-size:10px;
+  line-height:1.15;
+  color:#60a5fa;
+  font-weight:900;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+#op-free-list .op-free-chip.current .op-free-value{color:#4ade80}
+#op-free-list .op-free-chip.short .op-free-value{color:#fb923c}
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
@@ -5085,7 +5139,10 @@ window.renderOperativa=function(){
       return gaps;
     }
     function tomorrowGaps(){return buildGaps(lT,sT,true);}
-    var gaps=buildGaps(lHOperativa,sHOperativa,false);
+    // Para HOY también incluimos los bordes del día.
+    // Así aparece la ventana 00:00 → primer bloque operativo,
+    // y también el hueco desde el último bloque hasta 24:00 si procede.
+    var gaps=buildGaps(lHOperativa,sHOperativa,true);
     var titulo='Hoy';
     if(gaps===null){
       gaps=tomorrowGaps();titulo='Mañana';
@@ -5106,10 +5163,22 @@ window.renderOperativa=function(){
       var isTomorrow=titulo==='Mañana';
       var isPast=!isTomorrow&&gap.e<=nowMin,isCurrent=!isTomorrow&&gap.s<=nowMin&&gap.e>nowMin,isShort=gap.dur<20;
       var cls='op-free-chip'+(isPast?' past':'')+(isCurrent?' current':'')+(isShort?' short':'');
-      var tag=isCurrent?'<span class="op-free-now">AHORA · quedan '+fmtDur(gap.e-nowMin)+'</span>':isShort?'<span class="op-free-now" style="color:#fb923c">CORTO</span>':'';
+      var faltaTxt='';
+      if(isTomorrow){
+        faltaTxt='Mañana';
+      }else if(isCurrent){
+        faltaTxt='Ahora · queda '+fmtDur(Math.max(0,gap.e-nowMin));
+      }else if(gap.s>nowMin){
+        faltaTxt='En '+fmtDur(gap.s-nowMin);
+      }else{
+        faltaTxt='Pasado';
+      }
       return '<div class="'+cls+'">'+
-        '<div class="op-free-time">'+m2hm(gap.s)+' → '+m2hm(gap.e)+'</div>'+
-        '<div class="op-free-dur">'+fmtDur(gap.dur)+'</div>'+tag+
+        '<div class="op-free-main">'+m2hm(gap.s)+' → '+m2hm(gap.e)+'</div>'+
+        '<div class="op-free-cols">'+
+          '<div class="op-free-cell"><span class="op-free-label">Parón</span><span class="op-free-value">'+fmtDur(gap.dur)+'</span></div>'+
+          '<div class="op-free-cell"><span class="op-free-label">Falta</span><span class="op-free-value">'+faltaTxt+'</span></div>'+
+        '</div>'+
         '</div>';
     }).join('');
   })();
