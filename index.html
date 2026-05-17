@@ -733,25 +733,26 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 #op-free-list .op-free-between{
   height:100%;
   display:flex;
-  flex-wrap:wrap;
-  align-items:center;
+  flex-direction:column;
+  align-items:flex-start;
   justify-content:center;
-  gap:4px 7px;
   text-align:left;
   background:rgba(255,255,255,.035);
   border:1px solid rgba(255,255,255,.06);
   border-radius:12px;
   padding:10px 12px;
-  font-size:13px;
-  line-height:1.28;
+  font-size:12px;
+  line-height:1.25;
   color:var(--gray);
   font-weight:700;
   word-break:normal;
   overflow-wrap:normal;
   hyphens:none;
+  gap:4px;
 }
-#op-free-list .op-free-joiner{color:var(--gray);font-weight:700;white-space:normal}
-#op-free-list .op-free-flight{display:inline-block;word-break:normal;overflow-wrap:normal;hyphens:none}
+#op-free-list .op-free-line{display:block;width:100%;word-break:normal;overflow-wrap:normal;hyphens:none}
+#op-free-list .op-free-line-prefix{color:var(--gray);font-weight:700}
+#op-free-list .op-free-line b{font-weight:900}
 #op-free-list .op-free-between b{color:var(--white);font-weight:900}
 #op-free-list .op-free-between .sal{color:#93c5fd}
 #op-free-list .op-free-between .lle{color:#86efac}
@@ -5253,25 +5254,21 @@ window.renderOperativa=function(){
       var despues=(gap.after&&gap.after[0])?gap.after[0]:null;
       if(antes&&despues){
         return '<div class="op-free-flights"><div class="op-free-between">'+
-          '<span class="op-free-joiner">Entre</span>'+
-          '<span class="op-free-flight">'+vueloTexto(antes)+'</span>'+
-          '<span class="op-free-joiner">y</span>'+
-          '<span class="op-free-flight">'+vueloTexto(despues)+'</span>'+
+          '<div class="op-free-line"><span class="op-free-line-prefix">Entre </span>'+vueloTexto(antes)+'</div>'+
+          '<div class="op-free-line"><span class="op-free-line-prefix">y </span>'+vueloTexto(despues)+'</div>'+
         '</div></div>';
       }
       if(!antes&&despues){
         return '<div class="op-free-flights"><div class="op-free-between">'+
-          '<span class="op-free-joiner">Antes de</span>'+
-          '<span class="op-free-flight">'+vueloTexto(despues)+'</span>'+
+          '<div class="op-free-line"><span class="op-free-line-prefix">Antes de </span>'+vueloTexto(despues)+'</div>'+
         '</div></div>';
       }
       if(antes&&!despues){
         return '<div class="op-free-flights"><div class="op-free-between">'+
-          '<span class="op-free-joiner">Después de</span>'+
-          '<span class="op-free-flight">'+vueloTexto(antes)+'</span>'+
+          '<div class="op-free-line"><span class="op-free-line-prefix">Después de </span>'+vueloTexto(antes)+'</div>'+
         '</div></div>';
       }
-      return '<div class="op-free-flights"><div class="op-free-between">Sin referencia de vuelos límite</div></div>';
+      return '<div class="op-free-flights"><div class="op-free-between"><div class="op-free-line">Sin referencia de vuelos límite</div></div></div>';
     }
     function renderGapSection(titulo,gaps,isTomorrow){
       gaps=(gaps||[]).filter(function(x){return x.dur>=20;});
