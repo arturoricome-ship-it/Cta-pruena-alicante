@@ -718,7 +718,7 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
   display:block;
   font-size:15px;
   line-height:1.1;
-  color:#60a5fa;
+  color:var(--white);
   font-weight:900;
   white-space:normal;
   overflow:visible;
@@ -727,8 +727,12 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
   overflow-wrap:normal;
   hyphens:none;
 }
-#op-free-list .op-free-chip.current .op-free-value{color:#4ade80}
-#op-free-list .op-free-chip.short .op-free-value{color:#fb923c}
+#op-free-list .op-free-label.paron{color:var(--gold)}
+#op-free-list .op-free-value.paron{color:#e8c96a}
+#op-free-list .op-free-label.falta{color:#f6b34d}
+#op-free-list .op-free-value.falta{color:#f59e0b}
+#op-free-list .op-free-chip.current .op-free-value.falta{color:#4ade80}
+#op-free-list .op-free-chip.short .op-free-value.falta{color:#fb923c}
 #op-free-list .op-free-flights{margin-top:0;height:100%}
 #op-free-list .op-free-between{
   height:100%;
@@ -5254,18 +5258,18 @@ window.renderOperativa=function(){
       var despues=(gap.after&&gap.after[0])?gap.after[0]:null;
       if(antes&&despues){
         return '<div class="op-free-flights"><div class="op-free-between">'+
-          '<div class="op-free-line"><span class="op-free-line-prefix">Entre </span>'+vueloTexto(antes)+'</div>'+
-          '<div class="op-free-line"><span class="op-free-line-prefix">y </span>'+vueloTexto(despues)+'</div>'+
+          '<div class="op-free-line prev"><span class="op-free-line-prefix">Entre </span>'+vueloTexto(antes)+'</div>'+
+          '<div class="op-free-line next"><span class="op-free-line-prefix">y </span>'+vueloTexto(despues)+'</div>'+
         '</div></div>';
       }
       if(!antes&&despues){
         return '<div class="op-free-flights"><div class="op-free-between">'+
-          '<div class="op-free-line"><span class="op-free-line-prefix">Antes de </span>'+vueloTexto(despues)+'</div>'+
+          '<div class="op-free-line next"><span class="op-free-line-prefix">Antes de </span>'+vueloTexto(despues)+'</div>'+
         '</div></div>';
       }
       if(antes&&!despues){
         return '<div class="op-free-flights"><div class="op-free-between">'+
-          '<div class="op-free-line"><span class="op-free-line-prefix">Después de </span>'+vueloTexto(antes)+'</div>'+
+          '<div class="op-free-line prev"><span class="op-free-line-prefix">Después de </span>'+vueloTexto(antes)+'</div>'+
         '</div></div>';
       }
       return '<div class="op-free-flights"><div class="op-free-between"><div class="op-free-line">Sin referencia de vuelos límite</div></div></div>';
@@ -5295,8 +5299,8 @@ window.renderOperativa=function(){
               '<div class="op-free-left">'+
                 '<div class="op-free-main">'+m2hm(gap.s)+' → '+m2hm(gap.e)+'</div>'+
                 '<div class="op-free-cols">'+
-                  '<div class="op-free-cell"><span class="op-free-label">Parón</span><span class="op-free-value">'+fmtDur(gap.dur)+'</span></div>'+
-                  '<div class="op-free-cell"><span class="op-free-label">Falta</span><span class="op-free-value">'+faltaTxt+'</span></div>'+
+                  '<div class="op-free-cell"><span class="op-free-label paron">Parón</span><span class="op-free-value paron">'+fmtDur(gap.dur)+'</span></div>'+
+                  '<div class="op-free-cell"><span class="op-free-label falta">Falta</span><span class="op-free-value falta">'+faltaTxt+'</span></div>'+
                 '</div>'+
               '</div>'+
               opFreeFlightsHtml(gap)+
