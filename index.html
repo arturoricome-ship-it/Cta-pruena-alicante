@@ -5072,7 +5072,27 @@ window.renderOperativa=function(){
   function opParseRemoteHourArray(v){if(Array.isArray(v))return v.map(function(n){return Number(n||0);}).concat(Array(24).fill(0)).slice(0,24);return String(v||'').split(',').map(function(n){return Number(String(n).trim()||0);}).concat(Array(24).fill(0)).slice(0,24);}
   function opDowFromISO(ds){var d=new Date(ds+'T12:00:00');if(isNaN(d.getTime()))return 0;return (d.getDay()+6)%7;}
   function opNormalizeHistRows(payload){var rows=[];if(Array.isArray(payload))rows=payload;else if(payload&&Array.isArray(payload.registros))rows=payload.registros;else if(payload&&Array.isArray(payload.rows))rows=payload.rows;else if(payload&&Array.isArray(payload.data))rows=payload.data;var data={};rows.forEach(function(r){var fecha=String(r.fecha||r.Fecha||'').trim();if(!fecha)return;data[fecha]={hours:opParseRemoteHourArray(r.por_hora||r.porHora||r.hours||r.horas),dow:opDowFromISO(fecha),total:Number(r.total_vuelos||r.total||0),salidas:Number(r.salidas||0),llegadas:Number(r.llegadas||0),estado:String(r.estado||'')};});return data;}
-  function opMergeHistory(a,b){var out={};Object.keys(a||{}).forEach(function(k){out[k]={hours:(a[k].hours||Array(24).fill(0)).slice(0,24),dow:a[k].dow!==undefined?a[k].dow:opDowFromISO(k),total:Number(a[k].total||0)};});Object.keys(b||{}).forEach(function(k){var arr=(b[k].hours||Array(24).fill(0)).concat(Array(24).fill(0)).slice(0,24);if(!out[k])out[k]={hours:Array(24).fill(0),dow:b[k].dow!==undefined?b[k].dow:opDowFromISO(k),total:Number(b[k].total||0)};out[k].hours=out[k].hours.map(function(v,i){return Math.max(v||0,arr[i]||0);});out[k].total=Math.max(Number(out[k].total||0),Number(b[k].total||0));});return out;}
+  function opMergeHistory(a,b){
+    var out={};
+    function normRec(r,k){
+      var arr=((r&&r.hours)||Array(24).fill(0)).concat(Array(24).fill(0)).slice(0,24).map(function(n){return Number(n||0);});
+      var sum=arr.reduce(function(x,y){return x+Number(y||0);},0);
+      var total=Math.max(Number((r&&r.total)||0),sum);
+      return {hours:arr,dow:(r&&r.dow!==undefined)?r.dow:opDowFromISO(k),total:total};
+    }
+    Object.keys(a||{}).forEach(function(k){out[k]=normRec(a[k],k);});
+    Object.keys(b||{}).forEach(function(k){
+      var local=normRec(b[k],k);
+      if(!out[k]){out[k]=local;return;}
+      // Misma fecha: no mezclar hora a hora, porque infla el día.
+      // Si el histórico remoto ya tiene ese día, se conserva como registro válido.
+      // Los vuelos locales solo entran cuando la fecha aún no existe en histórico,
+      // por ejemplo mañana cuando AENA ya tiene datos pero Sheets todavía no.
+      var remoteSum=(out[k].hours||[]).reduce(function(x,y){return x+Number(y||0);},0);
+      if(remoteSum<=0&&local.total>0)out[k]=local;
+    });
+    return out;
+  }
   function opRenderHistoryData(data){var hourTotals=Array(24).fill(0),dayTotals=Array(7).fill(0),heat={};Object.keys(data||{}).forEach(function(date){var rec=data[date]||{},arr=rec.hours||[],dow=(rec.dow!==undefined)?rec.dow:opDowFromISO(date);for(var i=0;i<24;i++){var v=Number(arr[i]||0);hourTotals[i]+=v;dayTotals[dow]+=v;if(!heat[dow])heat[dow]=Array(24).fill(0);heat[dow][i]+=v;}});var maxH=Math.max.apply(null,hourTotals.concat([1]));var hb=g('op-history-hour-bars');if(hb)hb.innerHTML=opBars24Html(hourTotals,maxH,'vuelos');var maxD=Math.max.apply(null,dayTotals.concat([1]));var db=g('op-history-day-bars');if(db)db.innerHTML=opBars7Html(dayTotals,maxD);var hg=g('op-history-heat');if(hg){var labs=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];var maxCell=1;for(var dd=0;dd<7;dd++){var row=heat[dd]||Array(24).fill(0);for(var hh2=0;hh2<24;hh2++)maxCell=Math.max(maxCell,row[hh2]||0);}var html='<div></div>'+Array.from({length:24},function(_,h){return '<div class="op-heat-head">'+('0'+h).slice(-2)+'</div>';}).join('');for(var dd2=0;dd2<7;dd2++){html+='<div class="op-heat-day">'+labs[dd2]+'</div>';var row2=heat[dd2]||Array(24).fill(0);for(var h2=0;h2<24;h2++){var v=row2[h2]||0;var ratio=maxCell?v/maxCell:0;var bg=v===0?'rgba(255,255,255,.025)':('rgba('+(ratio>.55?'239,68,68':'34,197,94')+','+(0.10+ratio*0.35).toFixed(2)+')');var border=v===0?'rgba(255,255,255,.06)':(ratio>.55?'rgba(239,68,68,.35)':'rgba(34,197,94,.35)');html+='<div class="op-heat-cell" style="background:'+bg+';border-color:'+border+'" title="'+labs[dd2]+' '+('0'+h2).slice(-2)+':00 · '+v+' vuelos">'+(v||'')+'</div>';}}hg.innerHTML=html;}}
   function opSaveAndRenderHistory(todayCounts){
     try{if(typeof ctaClearLocalFlightHistory==='function')ctaClearLocalFlightHistory();}catch(e){}
