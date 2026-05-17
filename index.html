@@ -663,10 +663,10 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
   align-items:stretch!important;
   justify-content:flex-start!important;
   text-align:left!important;
-  padding:12px 12px!important;
-  min-height:110px!important;
-  gap:10px!important;
-  border-radius:16px!important;
+  padding:10px 10px!important;
+  min-height:92px!important;
+  gap:8px!important;
+  border-radius:14px!important;
   background:rgba(96,165,250,.07);
   border:1px solid rgba(96,165,250,.20);
 }
@@ -674,56 +674,58 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 #op-free-list .op-free-chip.short{background:rgba(251,146,60,.06)!important;border-color:rgba(251,146,60,.22)!important}
 #op-free-list .op-free-head{
   display:grid;
-  grid-template-columns:minmax(220px,260px) 1fr;
-  gap:12px;
+  grid-template-columns:minmax(200px,230px) 1fr;
+  gap:10px;
   align-items:stretch;
 }
 #op-free-list .op-free-left{
   display:flex;
   flex-direction:column;
-  gap:9px;
+  gap:7px;
 }
 #op-free-list .op-free-main{
-  font-size:28px;
+  font-size:22px;
   font-weight:900;
   color:var(--white);
   text-align:center;
   line-height:1;
   font-variant-numeric:tabular-nums;
-  padding:4px 0 2px;
+  padding:2px 0 1px;
 }
 #op-free-list .op-free-cols{
   display:grid;
   grid-template-columns:1fr 1fr;
-  gap:8px;
+  gap:6px;
 }
 #op-free-list .op-free-cell{
   background:rgba(255,255,255,.04);
   border:1px solid rgba(255,255,255,.06);
-  border-radius:14px;
-  padding:10px 12px;
+  border-radius:12px;
+  padding:8px 10px;
   min-width:0;
 }
 #op-free-list .op-free-label{
   display:block;
-  font-size:10px;
+  font-size:9px;
   line-height:1;
   color:var(--gray);
   text-transform:uppercase;
-  letter-spacing:.7px;
-  margin-bottom:6px;
+  letter-spacing:.6px;
+  margin-bottom:5px;
   font-weight:800;
 }
 #op-free-list .op-free-value{
   display:block;
-  font-size:17px;
+  font-size:15px;
   line-height:1.1;
   color:#60a5fa;
   font-weight:900;
   white-space:normal;
   overflow:visible;
   text-overflow:clip;
-  overflow-wrap:anywhere;
+  word-break:normal;
+  overflow-wrap:normal;
+  hyphens:none;
 }
 #op-free-list .op-free-chip.current .op-free-value{color:#4ade80}
 #op-free-list .op-free-chip.short .op-free-value{color:#fb923c}
@@ -731,31 +733,38 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 #op-free-list .op-free-between{
   height:100%;
   display:flex;
+  flex-wrap:wrap;
   align-items:center;
   justify-content:center;
+  gap:4px 7px;
   text-align:left;
   background:rgba(255,255,255,.035);
   border:1px solid rgba(255,255,255,.06);
-  border-radius:14px;
-  padding:12px 14px;
-  font-size:16px;
-  line-height:1.35;
+  border-radius:12px;
+  padding:10px 12px;
+  font-size:13px;
+  line-height:1.28;
   color:var(--gray);
   font-weight:700;
+  word-break:normal;
+  overflow-wrap:normal;
+  hyphens:none;
 }
+#op-free-list .op-free-joiner{color:var(--gray);font-weight:700;white-space:normal}
+#op-free-list .op-free-flight{display:inline-block;word-break:normal;overflow-wrap:normal;hyphens:none}
 #op-free-list .op-free-between b{color:var(--white);font-weight:900}
 #op-free-list .op-free-between .sal{color:#93c5fd}
 #op-free-list .op-free-between .lle{color:#86efac}
 @media(max-width:640px){
   #op-free-list .op-free-head{grid-template-columns:1fr}
-  #op-free-list .op-free-main{font-size:26px}
-  #op-free-list .op-free-between{font-size:14px;min-height:74px}
+  #op-free-list .op-free-main{font-size:21px}
+  #op-free-list .op-free-between{font-size:12.5px;min-height:62px}
 }
 @media(max-width:390px){
   #op-free-list .op-free-cols{grid-template-columns:1fr 1fr}
-  #op-free-list .op-free-main{font-size:22px}
-  #op-free-list .op-free-value{font-size:15px}
-  #op-free-list .op-free-between{font-size:13px;padding:10px 12px}
+  #op-free-list .op-free-main{font-size:19px}
+  #op-free-list .op-free-value{font-size:14px}
+  #op-free-list .op-free-between{font-size:12px;padding:9px 10px}
 }
 
 </style>
@@ -5243,13 +5252,24 @@ window.renderOperativa=function(){
       var antes=(gap.before&&gap.before[0])?gap.before[0]:null;
       var despues=(gap.after&&gap.after[0])?gap.after[0]:null;
       if(antes&&despues){
-        return '<div class="op-free-flights"><div class="op-free-between">Entre '+vueloTexto(antes)+' y '+vueloTexto(despues)+'</div></div>';
+        return '<div class="op-free-flights"><div class="op-free-between">'+
+          '<span class="op-free-joiner">Entre</span>'+
+          '<span class="op-free-flight">'+vueloTexto(antes)+'</span>'+
+          '<span class="op-free-joiner">y</span>'+
+          '<span class="op-free-flight">'+vueloTexto(despues)+'</span>'+
+        '</div></div>';
       }
       if(!antes&&despues){
-        return '<div class="op-free-flights"><div class="op-free-between">Antes de '+vueloTexto(despues)+'</div></div>';
+        return '<div class="op-free-flights"><div class="op-free-between">'+
+          '<span class="op-free-joiner">Antes de</span>'+
+          '<span class="op-free-flight">'+vueloTexto(despues)+'</span>'+
+        '</div></div>';
       }
       if(antes&&!despues){
-        return '<div class="op-free-flights"><div class="op-free-between">Después de '+vueloTexto(antes)+'</div></div>';
+        return '<div class="op-free-flights"><div class="op-free-between">'+
+          '<span class="op-free-joiner">Después de</span>'+
+          '<span class="op-free-flight">'+vueloTexto(antes)+'</span>'+
+        '</div></div>';
       }
       return '<div class="op-free-flights"><div class="op-free-between">Sin referencia de vuelos límite</div></div>';
     }
