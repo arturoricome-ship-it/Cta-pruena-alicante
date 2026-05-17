@@ -648,49 +648,76 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 #op-pressure-note,#op-pressure-formula{display:none!important}
 
 /* CTA V69: cada parón muestra hora, duración y cuánto falta */
+#op-free-list.op-free-grid{grid-template-columns:1fr!important;gap:10px!important}
+#op-free-list .op-free-day{grid-column:1/-1}
+#op-free-list .op-free-day + .op-free-day{margin-top:4px}
+#op-free-list .op-free-title{
+  font-size:10px!important;
+  color:var(--gold)!important;
+  font-weight:900!important;
+  letter-spacing:1px!important;
+  margin:2px 0 2px!important;
+}
 #op-free-list .op-free-chip{
+  width:100%;
   align-items:stretch!important;
   justify-content:flex-start!important;
   text-align:left!important;
-  padding:8px 9px!important;
-  min-height:74px!important;
-  gap:5px!important;
+  padding:12px 12px!important;
+  min-height:110px!important;
+  gap:10px!important;
+  border-radius:16px!important;
+  background:rgba(96,165,250,.07);
+  border:1px solid rgba(96,165,250,.20);
+}
+#op-free-list .op-free-chip.current{background:rgba(74,222,128,.08)!important;border-color:rgba(74,222,128,.35)!important;box-shadow:0 0 12px rgba(74,222,128,.10)}
+#op-free-list .op-free-chip.short{background:rgba(251,146,60,.06)!important;border-color:rgba(251,146,60,.22)!important}
+#op-free-list .op-free-head{
+  display:grid;
+  grid-template-columns:minmax(220px,260px) 1fr;
+  gap:12px;
+  align-items:stretch;
+}
+#op-free-list .op-free-left{
+  display:flex;
+  flex-direction:column;
+  gap:9px;
 }
 #op-free-list .op-free-main{
-  font-size:12px;
+  font-size:28px;
   font-weight:900;
   color:var(--white);
   text-align:center;
-  line-height:1.15;
+  line-height:1;
   font-variant-numeric:tabular-nums;
+  padding:4px 0 2px;
 }
 #op-free-list .op-free-cols{
   display:grid;
   grid-template-columns:1fr 1fr;
-  gap:5px;
+  gap:8px;
 }
 #op-free-list .op-free-cell{
-  background:rgba(255,255,255,.035);
-  border:1px solid rgba(255,255,255,.055);
-  border-radius:7px;
-  padding:4px 5px;
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.06);
+  border-radius:14px;
+  padding:10px 12px;
   min-width:0;
 }
-#op-free-list .op-free-cell.full{grid-column:1/-1}
 #op-free-list .op-free-label{
   display:block;
-  font-size:7px;
+  font-size:10px;
   line-height:1;
   color:var(--gray);
   text-transform:uppercase;
-  letter-spacing:.45px;
-  margin-bottom:2px;
+  letter-spacing:.7px;
+  margin-bottom:6px;
   font-weight:800;
 }
 #op-free-list .op-free-value{
   display:block;
-  font-size:10px;
-  line-height:1.15;
+  font-size:17px;
+  line-height:1.1;
   color:#60a5fa;
   font-weight:900;
   white-space:normal;
@@ -700,11 +727,36 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 }
 #op-free-list .op-free-chip.current .op-free-value{color:#4ade80}
 #op-free-list .op-free-chip.short .op-free-value{color:#fb923c}
-#op-free-list .op-free-flights{margin-top:8px}
-#op-free-list .op-free-between{background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.06);border-radius:8px;padding:6px 7px;font-size:9.5px;line-height:1.35;color:var(--gray);font-weight:700}
+#op-free-list .op-free-flights{margin-top:0;height:100%}
+#op-free-list .op-free-between{
+  height:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:left;
+  background:rgba(255,255,255,.035);
+  border:1px solid rgba(255,255,255,.06);
+  border-radius:14px;
+  padding:12px 14px;
+  font-size:16px;
+  line-height:1.35;
+  color:var(--gray);
+  font-weight:700;
+}
 #op-free-list .op-free-between b{color:var(--white);font-weight:900}
 #op-free-list .op-free-between .sal{color:#93c5fd}
 #op-free-list .op-free-between .lle{color:#86efac}
+@media(max-width:640px){
+  #op-free-list .op-free-head{grid-template-columns:1fr}
+  #op-free-list .op-free-main{font-size:26px}
+  #op-free-list .op-free-between{font-size:14px;min-height:74px}
+}
+@media(max-width:390px){
+  #op-free-list .op-free-cols{grid-template-columns:1fr 1fr}
+  #op-free-list .op-free-main{font-size:22px}
+  #op-free-list .op-free-value{font-size:15px}
+  #op-free-list .op-free-between{font-size:13px;padding:10px 12px}
+}
 
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -5165,7 +5217,7 @@ window.renderOperativa=function(){
     }
     function buildGaps(lList,sList,includeDayEdges){
       var mg=buildIntervals(lList,sList);
-      if(!mg.length)return null;
+      if(!mg.length)return [];
       var gaps=[];
       if(includeDayEdges&&mg[0].s>=30)gaps.push({s:0,e:mg[0].s,dur:mg[0].s,before:[],after:opBoundaryFlights(mg[0],'start')});
       for(var j=0;j<mg.length-1;j++){
@@ -5176,18 +5228,18 @@ window.renderOperativa=function(){
       if(includeDayEdges&&1440-lastEnd>=30)gaps.push({s:lastEnd,e:1440,dur:1440-lastEnd,before:opBoundaryFlights(last,'end'),after:[]});
       return gaps;
     }
+    function capCity(x){
+      x=String(x||'').trim();
+      if(!x)return '--';
+      return x.toLowerCase().replace(/(^|[\s-])([a-záéíóúüñ])/g,function(_,sep,ch){return sep+ch.toUpperCase();});
+    }
+    function vueloTexto(f){
+      if(!f)return '';
+      var cls=f.tipo==='salida'?'sal':'lle';
+      var accion=f.tipo==='salida'?'la salida de':'la llegada de';
+      return '<b class="'+cls+'">'+accion+' '+escH(capCity(f.ciudad))+' '+escH(f.num||'')+'</b>';
+    }
     function opFreeFlightsHtml(gap){
-      function capCity(x){
-        x=String(x||'').trim();
-        if(!x)return '--';
-        return x.toLowerCase().replace(/(^|[\s-])([a-záéíóúüñ])/g,function(_,sep,ch){return sep+ch.toUpperCase();});
-      }
-      function vueloTexto(f){
-        if(!f)return '';
-        var cls=f.tipo==='salida'?'sal':'lle';
-        var accion=f.tipo==='salida'?'la salida de':'la llegada de';
-        return '<b class="'+cls+'">'+accion+' '+escH(capCity(f.ciudad))+' '+escH(f.num||'')+'</b>';
-      }
       var antes=(gap.before&&gap.before[0])?gap.before[0]:null;
       var despues=(gap.after&&gap.after[0])?gap.after[0]:null;
       if(antes&&despues){
@@ -5199,52 +5251,56 @@ window.renderOperativa=function(){
       if(antes&&!despues){
         return '<div class="op-free-flights"><div class="op-free-between">Después de '+vueloTexto(antes)+'</div></div>';
       }
-      return '';
+      return '<div class="op-free-flights"><div class="op-free-between">Sin referencia de vuelos límite</div></div>';
     }
-    function tomorrowGaps(){return buildGaps(lT,sT,true);}
-    // Para HOY también incluimos los bordes del día.
-    // Así aparece la ventana 00:00 → primer bloque operativo,
-    // y también el hueco desde el último bloque hasta 24:00 si procede.
-    var gaps=buildGaps(lHOperativa,sHOperativa,true);
-    var titulo='Hoy';
-    if(gaps===null){
-      gaps=tomorrowGaps();titulo='Mañana';
-    }else{
-      var futuros=gaps.filter(function(x){return x.e>nowMin;});
-      if(futuros.length===0){
-        var gt=tomorrowGaps();
-        if(gt&&gt.length){gaps=gt;titulo='Mañana';}
-        else {gaps=futuros;}
-      }else{gaps=futuros;}
+    function renderGapSection(titulo,gaps,isTomorrow){
+      gaps=(gaps||[]).filter(function(x){return x.dur>=20;});
+      if(!gaps.length)return '';
+      return '<div class="op-free-day">'+
+        '<div class="op-free-title">'+titulo+'</div>'+
+        gaps.map(function(gap){
+          var isPast=!isTomorrow&&gap.e<=nowMin;
+          var isCurrent=!isTomorrow&&gap.s<=nowMin&&gap.e>nowMin;
+          var isShort=gap.dur<20;
+          var cls='op-free-chip'+(isPast?' past':'')+(isCurrent?' current':'')+(isShort?' short':'');
+          var faltaTxt='';
+          if(isTomorrow){
+            faltaTxt='Mañana';
+          }else if(isCurrent){
+            faltaTxt='Queda '+fmtDur(Math.max(0,gap.e-nowMin));
+          }else if(gap.s>nowMin){
+            faltaTxt='En '+fmtDur(gap.s-nowMin);
+          }else{
+            faltaTxt='Pasado';
+          }
+          return '<div class="'+cls+'">'+
+            '<div class="op-free-head">'+
+              '<div class="op-free-left">'+
+                '<div class="op-free-main">'+m2hm(gap.s)+' → '+m2hm(gap.e)+'</div>'+
+                '<div class="op-free-cols">'+
+                  '<div class="op-free-cell"><span class="op-free-label">Parón</span><span class="op-free-value">'+fmtDur(gap.dur)+'</span></div>'+
+                  '<div class="op-free-cell"><span class="op-free-label">Falta</span><span class="op-free-value">'+faltaTxt+'</span></div>'+
+                '</div>'+
+              '</div>'+
+              opFreeFlightsHtml(gap)+
+            '</div>'+
+          '</div>';
+        }).join('')+
+      '</div>';
     }
-    gaps=(gaps||[]).filter(function(x){return x.dur>=20;});
-    if(!gaps||gaps.length===0){
+    // HOY: solo huecos futuros o el actual
+    var gapsHoy=buildGaps(lHOperativa,sHOperativa,true).filter(function(x){return x.e>nowMin;});
+    // MAÑANA: si hay datos, también se muestran
+    var gapsManana=buildGaps(lT,sT,true);
+    var html='';
+    if(gapsHoy.length) html+=renderGapSection('Hoy',gapsHoy,false);
+    if(gapsManana.length) html+=renderGapSection('Mañana',gapsManana,true);
+    if(!html){
       var hayManana=(lT&&lT.length)||(sT&&sT.length);
-      fl.innerHTML='<span style="font-size:11px;color:var(--gray)">'+(hayManana?'Mañana no hay huecos libres significativos entre bloques de vuelos':'Sin vuelos cargados mañana todavía')+'</span>';
+      fl.innerHTML='<span style="font-size:11px;color:var(--gray)">'+(hayManana?'Mañana no hay huecos libres significativos entre bloques de vuelos':'Sin vuelos cargados hoy ni mañana todavía')+'</span>';
       return;
     }
-    fl.innerHTML='<div class="op-free-title">'+titulo+'</div>'+gaps.map(function(gap){
-      var isTomorrow=titulo==='Mañana';
-      var isPast=!isTomorrow&&gap.e<=nowMin,isCurrent=!isTomorrow&&gap.s<=nowMin&&gap.e>nowMin,isShort=gap.dur<20;
-      var cls='op-free-chip'+(isPast?' past':'')+(isCurrent?' current':'')+(isShort?' short':'');
-      var faltaTxt='';
-      if(isTomorrow){
-        faltaTxt='Mañana';
-      }else if(isCurrent){
-        faltaTxt='Queda '+fmtDur(Math.max(0,gap.e-nowMin));
-      }else if(gap.s>nowMin){
-        faltaTxt='En '+fmtDur(gap.s-nowMin);
-      }else{
-        faltaTxt='Pasado';
-      }
-      return '<div class="'+cls+'">'+
-        '<div class="op-free-main">'+m2hm(gap.s)+' → '+m2hm(gap.e)+'</div>'+
-        '<div class="op-free-cols">'+
-          '<div class="op-free-cell"><span class="op-free-label">Parón</span><span class="op-free-value">'+fmtDur(gap.dur)+'</span></div>'+
-          '<div class="op-free-cell"><span class="op-free-label">Falta</span><span class="op-free-value">'+faltaTxt+'</span></div>'+
-        '</div>'+opFreeFlightsHtml(gap)+
-        '</div>';
-    }).join('');
+    fl.innerHTML=html;
   })();
 
   if(!card)return;
