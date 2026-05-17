@@ -850,6 +850,12 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
               <div id="op-pressure-pct" class="op-pressure-pct">—</div>
               <div class="op-pressure-bar-bg"><div id="op-pressure-bar" class="op-pressure-bar" style="width:0%"></div></div>
             </div>
+            <div class="op-metric-list op-pressure-details">
+              <div class="op-metric-row"><span>Necesarios</span><b id="op-pressure-needed">—</b></div>
+              <div class="op-metric-row"><span>Disponibles para vuelos</span><b id="op-pressure-available">—</b></div>
+              <div class="op-metric-row"><span>Jardineras</span><b id="op-pressure-jardineras">—</b></div>
+              <div class="op-metric-row"><span>Patios</span><b id="op-pressure-patios">—</b></div>
+            </div>
           </div>
 
           <div class="op-productivity-card">
@@ -4751,7 +4757,7 @@ window.renderOperativa=function(){
 
 
   function setTextOp(id,val){var el=g(id);if(el)el.textContent=val;}
-  function setPressureOp(score,necesarios,disponiblesVuelos){
+  function setPressureOp(score,necesarios,disponiblesVuelos, jardinerasFijas, patiosFijos){
     // Escala CTA: 0 = muy holgado/sin necesidad, 50 = equilibrio normal.
     // Solo se muestran valores >100 cuando la necesidad supera claramente a los disponibles.
     score=Math.max(0,Math.round(score||0));
@@ -4769,6 +4775,10 @@ window.renderOperativa=function(){
     var pctNode=g('op-pressure-pct');if(pctNode){pctNode.textContent=score+'%';pctNode.className='op-pressure-pct '+cls;}
     var barPct=Math.min(100,score);
     var bar=g('op-pressure-bar');if(bar){bar.style.width=barPct+'%';bar.className='op-pressure-bar '+cls;bar.title=score+'%';}
+    setTextOp('op-pressure-needed',(necesarios||0)+' operarios');
+    setTextOp('op-pressure-available',(disponiblesVuelos||0)+' operarios');
+    setTextOp('op-pressure-jardineras',(jardinerasFijas||0)+' operarios');
+    setTextOp('op-pressure-patios',(patiosFijos||0)+' operarios');
     setTextOp('op-pressure-note',score>100?'Operativa sobrepasada: falta personal respecto a los vuelos activos. 200% queda para el extremo de 0 disponibles.':'0% = sin presión. 50% = equilibrio normal. Más de 100% = falta gente.');
     setTextOp('op-load-lack',score>100?'Sí':'No');
   }
@@ -5092,7 +5102,7 @@ window.renderOperativa=function(){
     }
   }
   pressureScore=Math.max(0,pressureScore);
-  setPressureOp(pressureScore,genteNecesaria,operariosDisponiblesVuelos);
+  setPressureOp(pressureScore,genteNecesaria,operariosDisponiblesVuelos,jardinerasFijas,patiosFijos);
   // Carga/plantilla respeta el selector Hoy/Mañana y el corte operativo de las 03:00.
   setTextOp('op-load-workers',opDetalleTrabajadores.length||'—');
   setTextOp('op-load-flights',opDetalleTotal>0?opDetalleTotal:'—');
