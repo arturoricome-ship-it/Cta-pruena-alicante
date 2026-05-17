@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<!-- CTA_OPERATIVA_V62_FIX_AENA_EQUIPAJES_PRESION_REMOTOS_TIEMPO_LIBRE_2026-05-16 -->
+<!-- CTA_OPERATIVA_V63_TIEMPO_LIBRE_MIN20_PRESION_LIMPIA_2026-05-17 -->
 <meta charset="UTF-8">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -643,6 +643,10 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 
 
 
+
+/* CTA V63: presión operativa sin texto descriptivo */
+#op-pressure-note,#op-pressure-formula{display:none!important}
+
 /* CTA V69: cada parón muestra hora, duración y cuánto falta */
 #op-free-list .op-free-chip{
   align-items:stretch!important;
@@ -689,9 +693,10 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
   line-height:1.15;
   color:#60a5fa;
   font-weight:900;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
+  white-space:normal;
+  overflow:visible;
+  text-overflow:clip;
+  overflow-wrap:anywhere;
 }
 #op-free-list .op-free-chip.current .op-free-value{color:#4ade80}
 #op-free-list .op-free-chip.short .op-free-value{color:#fb923c}
@@ -838,7 +843,6 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
             <div class="op-card-head">
               <div>
                 <div class="op-card-title">Presión operativa en tiempo real</div>
-                <div class="op-card-sub">Estimación interna, no dato oficial</div>
               </div>
               <div id="op-pressure-level" class="op-pressure-level">—</div>
             </div>
@@ -846,8 +850,6 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
               <div id="op-pressure-pct" class="op-pressure-pct">—</div>
               <div class="op-pressure-bar-bg"><div id="op-pressure-bar" class="op-pressure-bar" style="width:0%"></div></div>
             </div>
-            <div id="op-pressure-note" class="op-mini-note">Calculada solo con vuelos en tierra y personal activo ahora.</div>
-            <div id="op-pressure-formula" class="op-pressure-formula">Resumen: necesarios / disponibles para vuelos. 50% = equilibrio; más de 100% = sobrepasado.</div>
           </div>
 
           <div class="op-productivity-card">
@@ -5132,7 +5134,7 @@ window.renderOperativa=function(){
       if(includeDayEdges&&mg[0][0]>=30)gaps.push({s:0,e:mg[0][0],dur:mg[0][0]});
       for(var j=0;j<mg.length-1;j++){
         var gs=mg[j][1],ge=mg[j+1][0],dur=ge-gs;
-        if(dur>=5)gaps.push({s:gs,e:ge,dur:dur});
+        if(dur>=20)gaps.push({s:gs,e:ge,dur:dur});
       }
       var lastEnd=mg[mg.length-1][1];
       if(includeDayEdges&&1440-lastEnd>=30)gaps.push({s:lastEnd,e:1440,dur:1440-lastEnd});
@@ -5154,6 +5156,7 @@ window.renderOperativa=function(){
         else {gaps=futuros;}
       }else{gaps=futuros;}
     }
+    gaps=(gaps||[]).filter(function(x){return x.dur>=20;});
     if(!gaps||gaps.length===0){
       var hayManana=(lT&&lT.length)||(sT&&sT.length);
       fl.innerHTML='<span style="font-size:11px;color:var(--gray)">'+(hayManana?'Mañana no hay huecos libres significativos entre bloques de vuelos':'Sin vuelos cargados mañana todavía')+'</span>';
@@ -5167,7 +5170,7 @@ window.renderOperativa=function(){
       if(isTomorrow){
         faltaTxt='Mañana';
       }else if(isCurrent){
-        faltaTxt='Ahora · queda '+fmtDur(Math.max(0,gap.e-nowMin));
+        faltaTxt='Queda '+fmtDur(Math.max(0,gap.e-nowMin));
       }else if(gap.s>nowMin){
         faltaTxt='En '+fmtDur(gap.s-nowMin);
       }else{
