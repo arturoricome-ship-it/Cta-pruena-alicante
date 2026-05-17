@@ -793,7 +793,7 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
               <div class="op-pressure-bar-bg"><div id="op-pressure-bar" class="op-pressure-bar" style="width:0%"></div></div>
             </div>
             <div id="op-pressure-note" class="op-mini-note">Calculada solo con vuelos en tierra y personal activo ahora.</div>
-            <div id="op-pressure-formula" class="op-pressure-formula">Resumen: necesarios / disponibles para vuelos. 100% = equilibrio.</div>
+            <div id="op-pressure-formula" class="op-pressure-formula">Resumen: necesarios / disponibles para vuelos. 50% = equilibrio; más de 100% = sobrepasado.</div>
           </div>
 
           <div class="op-productivity-card">
@@ -4696,23 +4696,24 @@ window.renderOperativa=function(){
 
   function setTextOp(id,val){var el=g(id);if(el)el.textContent=val;}
   function setPressureOp(score,necesarios,disponiblesVuelos){
-    // La presión NO se limita a 100: por encima de 100% indica que la operativa está sobrepasada.
+    // Escala CTA: 0 = muy holgado/sin necesidad, 50 = equilibrio normal.
+    // Solo se muestran valores >100 cuando la necesidad supera claramente a los disponibles.
     score=Math.max(0,Math.round(score||0));
     var lvl='Muy holgado',cls='low';
-    // Escala intuitiva: 100% = justo lo necesario. Por encima de 100% falta gente.
     if(score>=200){lvl='Desbordada';cls='max';}
     else if(score>=160){lvl='Crítica +';cls='max';}
     else if(score>=130){lvl='Sobrepasada';cls='very';}
-    else if(score>=110){lvl='Crítica';cls='very';}
-    else if(score>100){lvl='Sobrepasada';cls='high';}
-    else if(score===100){lvl='Equilibrio';cls='mid';}
-    else if(score>=75){lvl='Ajustada';cls='high';}
-    else if(score>=50){lvl='Holgada';cls='ok';}
+    else if(score>100){lvl='Sobrepasada';cls='very';}
+    else if(score>=90){lvl='Crítica';cls='very';}
+    else if(score>=70){lvl='Alta';cls='high';}
+    else if(score>50){lvl='Ajustada';cls='high';}
+    else if(score===50){lvl='Equilibrio';cls='mid';}
+    else if(score>=25){lvl='Holgada';cls='ok';}
     var le=g('op-pressure-level');if(le){le.textContent=lvl;le.className='op-pressure-level '+cls;}
     var pctNode=g('op-pressure-pct');if(pctNode){pctNode.textContent=score+'%';pctNode.className='op-pressure-pct '+cls;}
     var barPct=Math.min(100,score);
     var bar=g('op-pressure-bar');if(bar){bar.style.width=barPct+'%';bar.className='op-pressure-bar '+cls;bar.title=score+'%';}
-    setTextOp('op-pressure-note',score>100?'Operativa sobrepasada: hacen falta más operarios de los disponibles para vuelos.':'100% = equilibrio exacto. Más de 100% indica operativa sobrepasada.');
+    setTextOp('op-pressure-note',score>100?'Operativa sobrepasada: falta personal respecto a los vuelos activos. 200% queda para el extremo de 0 disponibles.':'0% = sin presión. 50% = equilibrio normal. Más de 100% = falta gente.');
     setTextOp('op-load-lack',score>100?'Sí':'No');
   }
   setTextOp('op-load-workers',total||'—');
@@ -5022,13 +5023,17 @@ window.renderOperativa=function(){
   var operariosDisponiblesVuelos=Math.max(0,operariosActivosAhora-puestosFijos);
   var genteNecesaria=llegadasActivasList.length*4+salidasActivasList.reduce(function(s,v){return s+depOps(v);},0);
   var pressureScore=0;
-  if(genteNecesaria>0&&operariosDisponiblesVuelos===0){
-    // Sin operarios disponibles para vuelos: se marca como sobrepasado de forma evidente.
-    pressureScore=Math.min(250,150+(genteNecesaria*10));
-  }else if(operariosDisponiblesVuelos>0){
-    // Ratio real de carga: 100% = necesarios y disponibles iguales.
-    // Ejemplo: 4 necesarios / 2 disponibles = 200%.
-    pressureScore=(genteNecesaria/operariosDisponiblesVuelos)*100;
+  if(genteNecesaria>0){
+    if(operariosDisponiblesVuelos>=genteNecesaria){
+      // Escala base CTA: 0 = muy holgado, 50 = equilibrio normal.
+      pressureScore=(genteNecesaria/operariosDisponiblesVuelos)*50;
+    }else{
+      // Sobrecarga progresiva: no dispara 200% solo por tener la mitad de gente.
+      // Ejemplo: 4 necesarios / 2 disponibles = 150%.
+      // 200% queda reservado para el extremo: necesidad real y 0 disponibles para vuelos.
+      var falta=Math.max(0,genteNecesaria-operariosDisponiblesVuelos);
+      pressureScore=100+((falta/genteNecesaria)*100);
+    }
   }
   pressureScore=Math.max(0,pressureScore);
   setPressureOp(pressureScore,genteNecesaria,operariosDisponiblesVuelos);
@@ -5036,7 +5041,7 @@ window.renderOperativa=function(){
   setTextOp('op-load-workers',opDetalleTrabajadores.length||'—');
   setTextOp('op-load-flights',opDetalleTotal>0?opDetalleTotal:'—');
   setTextOp('op-load-ratio',(opDetalleTrabajadores.length&&opDetalleTotal)?(opDetalleTrabajadores.length/opDetalleTotal).toFixed(2).replace('.',','):'—');
-  var pf=g('op-pressure-formula');if(pf)pf.textContent='Resumen: '+genteNecesaria+' necesarios / '+operariosDisponiblesVuelos+' disponibles para vuelos. Fijos ahora: '+jardinerasFijas+' jardineras + '+patiosFijos+' patios.';
+  var pf=g('op-pressure-formula');if(pf)pf.textContent='Resumen: '+genteNecesaria+' necesarios / '+operariosDisponiblesVuelos+' disponibles. 50% = equilibrio; >100% = falta gente; 200% = extremo sin disponibles. Fijos: '+jardinerasFijas+' jardineras + '+patiosFijos+' patios.';
 
   // ── Tiempos libres del día ───────────────────────────────────────────────
   (function(){
