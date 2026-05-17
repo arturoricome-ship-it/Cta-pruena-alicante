@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<!-- CTA_OPERATIVA_V63_TIEMPO_LIBRE_MIN20_PRESION_LIMPIA_2026-05-17 -->
+<!-- CTA_OPERATIVA_V70_PARON_ENTRE_VUELOS_2026-05-17 -->
 <meta charset="UTF-8">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -700,13 +700,11 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 }
 #op-free-list .op-free-chip.current .op-free-value{color:#4ade80}
 #op-free-list .op-free-chip.short .op-free-value{color:#fb923c}
-#op-free-list .op-free-flights{margin-top:8px;display:flex;flex-direction:column;gap:5px}
-#op-free-list .op-free-flight-row{display:flex;align-items:flex-start;gap:6px;font-size:9px;line-height:1.35;color:var(--gray)}
-#op-free-list .op-free-flight-label{min-width:58px;color:rgba(255,255,255,.45);font-weight:800;text-transform:uppercase;letter-spacing:.45px}
-#op-free-list .op-free-flight-items{display:flex;flex-wrap:wrap;gap:4px;min-width:0}
-#op-free-list .op-free-flight-chip{display:inline-flex;align-items:center;gap:4px;border-radius:7px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);padding:3px 6px;color:var(--white);font-size:9px;font-weight:700}
-#op-free-list .op-free-flight-chip.sal{border-color:rgba(96,165,250,.24);color:#93c5fd}
-#op-free-list .op-free-flight-chip.lle{border-color:rgba(74,222,128,.22);color:#86efac}
+#op-free-list .op-free-flights{margin-top:8px}
+#op-free-list .op-free-between{background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.06);border-radius:8px;padding:6px 7px;font-size:9.5px;line-height:1.35;color:var(--gray);font-weight:700}
+#op-free-list .op-free-between b{color:var(--white);font-weight:900}
+#op-free-list .op-free-between .sal{color:#93c5fd}
+#op-free-list .op-free-between .lle{color:#86efac}
 
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -5179,16 +5177,29 @@ window.renderOperativa=function(){
       return gaps;
     }
     function opFreeFlightsHtml(gap){
-      function row(lbl,arr){
-        if(!arr||!arr.length)return '';
-        return '<div class="op-free-flight-row"><span class="op-free-flight-label">'+lbl+'</span><span class="op-free-flight-items">'+arr.map(function(f){
-          var cls=f.tipo==='salida'?'sal':'lle';
-          var tipo=f.tipo==='salida'?'Salida':'Entrada';
-          return '<span class="op-free-flight-chip '+cls+'">'+tipo+' · '+escH(f.ciudad)+' · '+escH(f.num)+'</span>';
-        }).join('')+'</span></div>';
+      function capCity(x){
+        x=String(x||'').trim();
+        if(!x)return '--';
+        return x.toLowerCase().replace(/(^|[\s-])([a-záéíóúüñ])/g,function(_,sep,ch){return sep+ch.toUpperCase();});
       }
-      var html=row('Antes',gap.before)+row('Después',gap.after);
-      return html?'<div class="op-free-flights">'+html+'</div>':'';
+      function vueloTexto(f){
+        if(!f)return '';
+        var cls=f.tipo==='salida'?'sal':'lle';
+        var accion=f.tipo==='salida'?'la salida de':'la llegada de';
+        return '<b class="'+cls+'">'+accion+' '+escH(capCity(f.ciudad))+' '+escH(f.num||'')+'</b>';
+      }
+      var antes=(gap.before&&gap.before[0])?gap.before[0]:null;
+      var despues=(gap.after&&gap.after[0])?gap.after[0]:null;
+      if(antes&&despues){
+        return '<div class="op-free-flights"><div class="op-free-between">Entre '+vueloTexto(antes)+' y '+vueloTexto(despues)+'</div></div>';
+      }
+      if(!antes&&despues){
+        return '<div class="op-free-flights"><div class="op-free-between">Antes de '+vueloTexto(despues)+'</div></div>';
+      }
+      if(antes&&!despues){
+        return '<div class="op-free-flights"><div class="op-free-between">Después de '+vueloTexto(antes)+'</div></div>';
+      }
+      return '';
     }
     function tomorrowGaps(){return buildGaps(lT,sT,true);}
     // Para HOY también incluimos los bordes del día.
