@@ -2246,17 +2246,40 @@ function normalizarVueloAenaCliente(v,tipo){
   }
   return v;
 }
+function fetchLiveEndpoint(tipo){
+  // Primero usa el endpoint del index del comedor: /vuelos-tv.
+  // Si ese endpoint no existe en el despliegue de Railway, cae al endpoint antiguo /vuelos.
+  var urls=[RAILWAY+"/vuelos-tv?tipo="+tipo, RAILWAY+"/vuelos?tipo="+tipo];
+  function tryUrl(i,lastErr){
+    if(i>=urls.length)return Promise.reject(lastErr||new Error("Sin respuesta de Railway"));
+    return fetch(urls[i],{cache:"no-store"})
+      .then(function(r){
+        if(!r.ok)throw new Error("HTTP "+r.status+" en "+urls[i]);
+        return r.text().then(function(t){
+          try{return JSON.parse(t);}
+          catch(e){throw new Error("Respuesta no JSON en "+urls[i]+": "+t.slice(0,120));}
+        });
+      })
+      .then(function(j){
+        if(j&&j.ok===false)throw new Error(j.error||("Railway ok=false en "+urls[i]));
+        return j;
+      })
+      .catch(function(e){return tryUrl(i+1,e);});
+  }
+  return tryUrl(0);
+}
+
 function loadLive(){
   liveLoaded=true;
   var container=document.getElementById("live-container");
   container.innerHTML="<div class='spinner-wrap'><div class='spinner'></div><div class='spinner-label'>Cargando vuelos...</div></div>";
   var pad=function(n){return String(n).padStart(2,"0");};
-  // Peticiones secuenciales para evitar bloqueo de AENA
-  fetch(RAILWAY+"/vuelos?tipo=llegadas")
-    .then(function(r){return r.json();})
+  // Peticiones secuenciales para evitar bloqueo de AENA.
+  // Cambio clave: usar /vuelos-tv, que es el endpoint que usa el index del comedor.
+  fetchLiveEndpoint("llegadas")
     .then(function(resLle){
       liveData.lle=extractLiveVuelos(resLle,"llegadas");
-      return fetch(RAILWAY+"/vuelos?tipo=salidas").then(function(r){return r.json();});
+      return fetchLiveEndpoint("salidas");
     })
     .then(function(resSal){
       liveData.sal=extractLiveVuelos(resSal,"salidas");
@@ -2270,11 +2293,12 @@ function loadLive(){
       }
       setTimeout(updateFlightCountdowns,100);
     })
-    .catch(function(){
+    .catch(function(err){
       liveData.lle=[];
       liveData.sal=[];
       liveLastServerEmpty=true;
-      container.innerHTML="<div class='error-box'>Error al cargar vuelos desde Railway/AENA. Pulsa ↻ para reintentar.</div>";
+      var msg=(err&&err.message)?err.message:"error desconocido";
+      container.innerHTML="<div class='error-box'>Error al cargar vuelos desde Railway/AENA.<br><small style='color:var(--gray)'>"+String(msg).replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];})+"</small><br>Pulsa ↻ para reintentar.</div>";
       liveLoaded=false;
       if(typeof window.renderOperativa==='function')setTimeout(window.renderOperativa,100);
     });
@@ -2298,7 +2322,7 @@ document.getElementById("live-refresh").addEventListener("click",function(){
   var timeout=setTimeout(function(){
     btn.style.opacity="1";btn.style.pointerEvents="auto";
   }, 10000);
-  fetch(RAILWAY+"/refresh").finally(function(){
+  fetch(RAILWAY+"/refresh",{cache:"no-store"}).catch(function(){}).finally(function(){
     clearTimeout(timeout);
     liveLoaded=false;
     loadLive();
