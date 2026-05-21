@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<!-- CTA_OPERATIVA_V70_PARON_ENTRE_VUELOS_2026-05-17 -->
+<!-- CTA_OPERATIVA_V71_EXCLUSION_ARTURO_29MAYO_LIVE_TV_2026-05-21 -->
 <meta charset="UTF-8">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -70,6 +70,26 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 .e-final{background:rgba(120,120,140,.2);color:#9090b0}
 .live-tab{flex:1;padding:9px;background:transparent;border:none;color:var(--gray);font-family:"Outfit",sans-serif;font-size:12px;font-weight:600;cursor:pointer}
 .live-tab.active{background:rgba(200,168,75,.15);color:var(--gold)}
+/* V71: pantalla de vuelos en tiempo real estilo TV/comedor */
+#live-panel{height:96vh;max-height:96vh;border-radius:18px 18px 0 0;background:#09111d}
+#live-body{padding:0 10px calc(28px + env(safe-area-inset-bottom))}
+.live-tabs-old{display:none!important}
+.live-tv-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:start}
+.live-tv-board{background:#1a2437;border:1px solid rgba(255,255,255,.08);border-radius:15px;overflow:hidden;box-shadow:0 12px 26px rgba(0,0,0,.22)}
+.live-tv-head{height:46px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 14px;border-bottom:1px solid rgba(255,255,255,.08);background:#1b2539}
+.live-tv-title{font-family:"Bebas Neue",sans-serif;font-size:26px;letter-spacing:1.7px;color:#f0eee8;line-height:1;display:flex;align-items:center;gap:8px;text-transform:uppercase}
+.live-tv-count{font-size:12px;font-weight:900;color:var(--gold);border:1px solid rgba(200,168,75,.45);background:rgba(200,168,75,.09);border-radius:999px;padding:5px 9px;white-space:nowrap}
+.live-tv-list{display:flex;flex-direction:column}
+.live-tv-row{min-height:43px;background:#1a2437;border-bottom:1px solid rgba(255,255,255,.075);padding:6px 10px;display:grid;grid-template-columns:74px 1fr auto;gap:10px;align-items:center}
+.live-tv-row:last-child{border-bottom:none}
+.live-tv-row.vuelo-corte-s{box-shadow:inset 0 -2px 0 rgba(239,68,68,.55)}
+.live-tv-row.vuelo-corte-e{box-shadow:inset 0 2px 0 rgba(34,197,94,.55)}
+.live-tv-flight{min-width:0}.live-tv-num{font-family:"Bebas Neue",sans-serif;font-size:22px;color:var(--gold);letter-spacing:1px;line-height:1}.live-tv-small{font-size:7.5px;color:#8a93a8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+.live-tv-city{font-size:15px;font-weight:900;letter-spacing:.2px;color:#f0eee8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.live-tv-time{font-size:9px;color:#b5bdcf;margin-top:2px;white-space:nowrap}
+.live-tv-side{display:flex;flex-direction:column;align-items:flex-end;gap:4px;min-width:74px}.live-tv-badge{font-size:7.5px;font-weight:900;padding:3px 7px;border-radius:999px;white-space:nowrap;max-width:96px;overflow:hidden;text-overflow:ellipsis}.live-tv-extra{font-size:7.5px;font-weight:800;color:#8a93a8;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.065);border-radius:999px;padding:2px 6px;white-space:nowrap}.live-tv-countdown{font-size:9px;font-weight:900;color:#f0eee8;white-space:nowrap;line-height:1}
+.live-tv-empty{padding:28px 12px;color:#8a93a8;text-align:center;font-size:12px}.live-tv-section{display:flex;align-items:center;gap:8px;margin:8px 4px 4px;color:var(--gold);font-size:10px;font-weight:900;letter-spacing:1px;text-transform:uppercase}.live-tv-section:before,.live-tv-section:after{content:"";height:1px;flex:1;background:rgba(200,168,75,.28)}
+@media(max-width:760px){.live-tv-grid{grid-template-columns:1fr}.live-tv-title{font-size:22px}.live-tv-row{grid-template-columns:68px 1fr auto}.live-tv-city{font-size:14px}}
+
 #breadcrumb{display:flex;align-items:center;gap:3px;font-size:11px;color:var(--gray);overflow-x:auto;scrollbar-width:none;white-space:nowrap;flex:1}
 #breadcrumb::-webkit-scrollbar{display:none}
 .bc-item{cursor:pointer;transition:color .2s;flex-shrink:0}.bc-item:hover{color:var(--gold-light)}.bc-item.active{color:var(--white);font-weight:600}
@@ -1340,7 +1360,7 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
       </div>
     </div>
     <div style="font-size:11px;color:var(--gray);margin-bottom:10px" id="live-hora"></div>
-    <div style="display:flex;border:1px solid var(--border);border-radius:10px;overflow:hidden">
+    <div class="live-tabs-old" style="display:flex;border:1px solid var(--border);border-radius:10px;overflow:hidden">
       <button class="live-tab active" id="live-tab-llegadas" onclick="switchLive('llegadas')">🛬 Llegadas</button>
       <button class="live-tab" id="live-tab-salidas" onclick="switchLive('salidas')">🛫 Salidas</button>
     </div>
@@ -1961,8 +1981,8 @@ function eLabel(s){
   if(!s)return{t:"Programado",c:"e-scheduled"};
   s=String(s).toLowerCase();
   // AENA puede devolver textos de llegadas ya en tierra como "Entrega de equipajes".
-  // Eso NO debe pintarse ni tratarse como "En vuelo".
-  if(/entrega|equipaje|baggage|reclaim|cinta|belt/.test(s))return{t:"Entrega equipajes",c:"e-equip"};
+  // OJO: tener cinta asignada no significa que ya esté entregando equipajes.
+  if(/entrega|equipaje|baggage|reclaim/.test(s))return{t:"Entrega equipajes",c:"e-equip"};
   if(/aterriz|landed|arrived|llegad/.test(s))return{t:"Aterrizado",c:"e-landed"};
   if(s==="en tierra"||s==="on ground"||s==="tierra")return{t:"En tierra",c:"e-landed"};
   if(s==="active"||s==="en route")return{t:"En vuelo",c:"e-active"};
@@ -2031,101 +2051,109 @@ function getLiveCutoffsFromTurnoHoy(){
 
 function renderLive(){
   var container=document.getElementById("live-container");
-  var data=(liveMode==="salidas"?liveData.sal:liveData.lle).slice();
-  var esS=liveMode==="salidas";
-
-  if(liveFiltro){
-    data=data.filter(function(v){
-      var s=v.estadoClass||"";
-      // V54: los vuelos de mañana no se pueden evaluar contra la hora actual de hoy.
-      // Se mantienen bajo su separador y no se descartan por haber "pasado" su hora.
-      if(v.esManana){
-        return s!=="e-cancelled"&&s!=="e-final";
-      }
-      if(liveMode==="llegadas"){
-        if(llegadaFinalizada30(v))return false;
-        return s!=="e-landed"&&s!=="e-final"&&s!=="e-taxiing"&&s!=="e-boarding"&&s!=="e-gate";
-      }
-      else return s!=="e-active"&&s!=="e-final";
-    });
-  }
-
-  if(!data.length){
-    if(!liveFiltro&&liveLastServerEmpty){
-      container.innerHTML="<div class='empty-box'>No se han recibido vuelos del servidor en esta actualización.<br><span style='font-size:11px;color:var(--gray)'>Pulsa ↻. Si sigue igual, probablemente Railway/AENA está devolviendo la lista vacía.</span></div>";
-    }else{
-      container.innerHTML="<div class='empty-box'>Sin vuelos"+(liveFiltro?" activos":"")+" en este momento</div>";
-    }
-    return;
-  }
-  container.innerHTML="";
-
-  var cortesS={};  // idx → red bottom line (last flight in shift window)
-  var cortesE={};  // idx → green top line (first flight in shift window)
+  if(!container)return;
   var cutoffs=getLiveCutoffsFromTurnoHoy();
-  // For each shift window [eN, sN]: find first and last flight WITHIN that window
-  (cutoffs.windows||[]).forEach(function(win){
-    var winE=win[0],winS=win[1];
-    var firstIdx=-1,firstMin=99999,lastIdx=-1,lastMin=-1;
-    for(var i=0;i<data.length;i++){
-      var vv=data[i];
-      if((vv.estadoClass||"")==="e-cancelled")continue;
-      var vm=hToMin(vv.horaReal||vv.horaProg||"");
-      if(vm===null)continue;
-      if(vm>=winE&&vm<=winS){
-        if(vm<firstMin){firstMin=vm;firstIdx=i;}
-        if(vm>lastMin||(vm===lastMin&&i>lastIdx)){lastMin=vm;lastIdx=i;}
-      }
-    }
-    if(firstIdx>=0)cortesE[firstIdx]=true;  // green top
-    if(lastIdx>=0)cortesS[lastIdx]=true;    // red bottom
-  });
 
-  var separadorPuesto=false;
-  data.forEach(function(v,idx){
-    if(v.esManana&&!separadorPuesto){
-      separadorPuesto=true;
-      var sep=document.createElement("div");sep.className="separador-manana";
-      var dm=new Date();dm.setDate(dm.getDate()+1);
-      var ms=["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
-      sep.textContent="Mañana "+dm.getDate()+" "+ms[dm.getMonth()];
-      container.appendChild(sep);
+  function filtraData(mode){
+    var data=(mode==="salidas"?liveData.sal:liveData.lle).slice();
+    if(liveFiltro){
+      data=data.filter(function(v){
+        var s=v.estadoClass||"";
+        if(v.esManana){
+          return s!=="e-cancelled"&&s!=="e-final";
+        }
+        if(mode==="llegadas"){
+          if(llegadaFinalizada30(v))return false;
+          return s!=="e-landed"&&s!=="e-final"&&s!=="e-taxiing"&&s!=="e-boarding"&&s!=="e-gate";
+        }
+        return s!=="e-active"&&s!=="e-final";
+      });
     }
-    var num=v.numero||"VY---";
-    var _ciu=esS?(v.destino||"--"):(v.origen||"--");
-    var ciudad=_ciu.split("-")[0].trim()||_ciu;
-    var horaStr=v.horaProg||"--:--";
-    if(v.horaReal&&v.horaReal!==v.horaProg){
-      horaStr='<span style="color:#f0a070;text-decoration:line-through;margin-right:4px">'+v.horaProg+"</span>"+v.horaReal;
+    return data;
+  }
+
+  function htmlEsc(x){
+    return String(x==null?"":x).replace(/[&<>"']/g,function(ch){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch];});
+  }
+
+  function getExtraLabel(v,esS){
+    var parking=v.parking||v.parkingStand||v.stand||v.standParking||v.posicion||v.posicionParking||v.parkingCode||"";
+    var labels=[];
+    if(esS&&parking)labels.push("Parking "+String(parking).replace(/^parking\s*/i,""));
+    if(esS&&v.puerta)labels.push("Puerta "+v.puerta);
+    if(!esS&&v.cinta)labels.push("Cinta "+v.cinta);
+    if(!esS&&!v.cinta&&v.sala)labels.push("Sala "+v.sala);
+    return labels.join(" · ");
+  }
+
+  function getCortes(data){
+    var cortesS={},cortesE={};
+    (cutoffs.windows||[]).forEach(function(win){
+      var winE=win[0],winS=win[1];
+      var firstIdx=-1,firstMin=99999,lastIdx=-1,lastMin=-1;
+      for(var i=0;i<data.length;i++){
+        var vv=data[i];
+        if((vv.estadoClass||"")==="e-cancelled")continue;
+        var vm=hToMin(vv.horaReal||vv.horaProg||"");
+        if(vm===null)continue;
+        if(vm>=winE&&vm<=winS){
+          if(vm<firstMin){firstMin=vm;firstIdx=i;}
+          if(vm>lastMin||(vm===lastMin&&i>lastIdx)){lastMin=vm;lastIdx=i;}
+        }
+      }
+      if(firstIdx>=0)cortesE[firstIdx]=true;
+      if(lastIdx>=0)cortesS[lastIdx]=true;
+    });
+    return {s:cortesS,e:cortesE};
+  }
+
+  function renderBoard(mode,title,icon){
+    var esS=mode==="salidas";
+    var data=filtraData(mode);
+    var cortes=getCortes(data);
+    var out="<section class='live-tv-board'><div class='live-tv-head'><div class='live-tv-title'><span>"+icon+"</span> "+title+"</div><div class='live-tv-count'>"+data.length+" restante"+(data.length===1?"":"s")+"</div></div><div class='live-tv-list'>";
+    if(!data.length){
+      var msg=(liveFiltro&&!liveLastServerEmpty)?"Sin vuelos activos en este momento":"No se han recibido vuelos en esta actualización";
+      out+="<div class='live-tv-empty'>"+msg+"</div></div></section>";
+      return out;
     }
-    var extraLabel="";
-    if(esS&&v.puerta)extraLabel="Puerta "+v.puerta;
-    if(!esS&&v.cinta)extraLabel="Cinta "+v.cinta;
-    if(!esS&&!v.cinta&&v.sala)extraLabel="Sala "+v.sala;
-    var cancelado=v.estadoClass==="e-cancelled";
-    var rowStyle=cancelado?"opacity:.6;border-color:rgba(230,80,70,.3)":"";
-    var row=document.createElement("div");row.className="vuelo-row";
-    if(cortesS[idx])row.classList.add("vuelo-corte-s");
-    if(cortesE[idx])row.classList.add("vuelo-corte-e");
-    if(rowStyle)row.style.cssText=rowStyle;
-    var horaEfectiva=v.horaReal||v.horaProg||"";
-    var esEnVueloSalida=esS&&(v.estadoClass||"")=="e-active";
-    row.setAttribute("data-hora",horaEfectiva);
-    row.setAttribute("data-live-mode",esS?"salidas":"llegadas");
-    row.setAttribute("data-estado-class",v.estadoClass||"");
-    row.setAttribute("data-es-manana",v.esManana?"1":"0");
-    var countdownAttr=esEnVueloSalida?"":(" data-hora='"+(horaEfectiva||"")+"' data-es-manana='"+(v.esManana?"1":"0")+"'");
-    row.innerHTML="<div><div class='vuelo-num'>"+num+"</div>"+(extraLabel?"<div class='vuelo-puerta'>"+extraLabel+"</div>":"")+"</div>"
-      +"<div style='min-width:0'><div class='vuelo-dest'>"+ciudad+"</div><div class='vuelo-hora'>"+horaStr+"</div></div>"
-      +"<div style='display:flex;flex-direction:column;align-items:flex-end;gap:3px'><div class='vuelo-estado "+(v.estadoClass||"e-scheduled")+"'>"+(v.estado||"Programado")+"</div><div class='vuelo-countdown'"+countdownAttr+">"+(esEnVueloSalida?"":"—")+"</div></div>";
-    container.appendChild(row);
-  });
-  // Update countdowns immediately after every render
+    var separadorPuesto=false;
+    data.forEach(function(v,idx){
+      if(v.esManana&&!separadorPuesto){
+        separadorPuesto=true;
+        var dm=new Date();dm.setDate(dm.getDate()+1);
+        var ms=["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
+        out+="<div class='live-tv-section'>Mañana "+dm.getDate()+" "+ms[dm.getMonth()]+"</div>";
+      }
+      var num=htmlEsc(v.numero||"VY---");
+      var _ciu=esS?(v.destino||"--"):(v.origen||"--");
+      var ciudad=htmlEsc((_ciu.split("-")[0].trim()||_ciu));
+      var horaStr=htmlEsc(v.horaProg||"--:--");
+      if(v.horaReal&&v.horaReal!==v.horaProg){
+        horaStr='<span style="color:#f0a070;text-decoration:line-through;margin-right:4px">'+htmlEsc(v.horaProg||"")+'</span>'+htmlEsc(v.horaReal);
+      }
+      var extraLabel=htmlEsc(getExtraLabel(v,esS));
+      var cancelado=v.estadoClass==="e-cancelled";
+      var rowCls="live-tv-row vuelo-row"+(cortesS[idx]?" vuelo-corte-s":"")+(cortesE[idx]?" vuelo-corte-e":"");
+      var horaEfectiva=v.horaReal||v.horaProg||"";
+      var esEnVueloSalida=esS&&(v.estadoClass||"")=="e-active";
+      var countdownAttr=esEnVueloSalida?"":(" data-hora='"+htmlEsc(horaEfectiva||"")+"' data-es-manana='"+(v.esManana?"1":"0")+"'");
+      out+="<div class='"+rowCls+"' style='"+(cancelado?"opacity:.6;border-color:rgba(230,80,70,.3)":"")+"' data-hora='"+htmlEsc(horaEfectiva)+"' data-live-mode='"+(esS?"salidas":"llegadas")+"' data-estado-class='"+htmlEsc(v.estadoClass||"")+"' data-es-manana='"+(v.esManana?"1":"0")+"'>"+
+        "<div class='live-tv-flight'><div class='live-tv-num'>"+num+"</div>"+(extraLabel?"<div class='live-tv-small'>"+extraLabel+"</div>":"")+"</div>"+
+        "<div style='min-width:0'><div class='live-tv-city'>"+ciudad+"</div><div class='live-tv-time'>"+horaStr+"</div></div>"+
+        "<div class='live-tv-side'><div class='live-tv-badge "+htmlEsc(v.estadoClass||"e-scheduled")+"'>"+htmlEsc(v.estado||"Programado")+"</div>"+(extraLabel?"<div class='live-tv-extra'>"+extraLabel+"</div>":"")+"<div class='live-tv-countdown vuelo-countdown'"+countdownAttr+">"+(esEnVueloSalida?"":"—")+"</div></div>"+
+        "</div>";
+    });
+    out+="</div></section>";
+    return out;
+  }
+
+  container.innerHTML="<div class='live-tv-grid'>"+renderBoard("llegadas","Llegadas","🛬")+renderBoard("salidas","Salidas","🛫")+"</div>";
   if(typeof updateFlightCountdowns==='function')setTimeout(updateFlightCountdowns,0);
 }
 
 
-function updateFlightCountdowns(){
+function updateFlightCountdowns()function updateFlightCountdowns(){
   var now=new Date(),nowMin=now.getHours()*60+now.getMinutes();
   document.querySelectorAll('.vuelo-countdown').forEach(function(el){
     var row=el.closest?el.closest('.vuelo-row'):null;
@@ -2184,10 +2212,34 @@ function extractLiveVuelos(res,tipo){
 function normalizarVueloAenaCliente(v,tipo){
   v=v||{};
   var txt=[v.estado,v.estadoAena,v.status,v.rawStatus,v.situacion,v.observaciones,v.info,v.remark,v.remarkPublic,v.descripcion].map(function(x){return x||'';}).join(' ').toLowerCase();
-  // Corrección defensiva: si AENA indica entrega de equipajes, cinta o sala, la llegada está en tierra.
-  // Evita que una clase antigua e-active siga mostrando "En vuelo".
-  if(tipo==='llegadas'&&(/entrega|equipaje|baggage|reclaim|cinta|belt/.test(txt)||v.cinta||v.sala)){
-    if((v.estadoClass||'')==='e-active'||/entrega|equipaje|baggage|reclaim|cinta|belt/.test(txt)){
+
+  // Corrección importante para llegadas:
+  // AENA puede publicar la cinta/sala antes de que el avión aterrice.
+  // Por eso, tener v.cinta o v.sala NO debe convertir el vuelo en "Entrega equipajes".
+  // Solo se muestra "Entrega equipajes" si AENA lo indica explícitamente o si la hora real/programada ya pasó.
+  if(tipo==='llegadas'){
+    var explicitEquip=/entrega|equipaje|baggage|reclaim/.test(txt);
+    var scheduledMin=hToMin(v.horaReal||v.horaProg||v.hora||'');
+    var nowObj=new Date();
+    var nowM=nowObj.getHours()*60+nowObj.getMinutes();
+    var diff=(scheduledMin===null)?99999:(scheduledMin-nowM);
+    if(v.esManana)diff+=1440;
+
+    if(explicitEquip){
+      v.estado='Entrega equipajes';
+      v.estadoClass='e-equip';
+    }else if((v.estadoClass||'')==='e-active'){
+      // Si todavía falta para la llegada, se mantiene como "En vuelo", aunque ya tenga cinta asignada.
+      if(diff>0){
+        v.estado='En vuelo';
+        v.estadoClass='e-active';
+      }
+      // Si ya pasó la hora real/estimada y hay cinta/sala, entonces sí tiene sentido mostrar equipajes.
+      else if(diff>=-45&&(v.cinta||v.sala)){
+        v.estado='Entrega equipajes';
+        v.estadoClass='e-equip';
+      }
+    }else if((v.estadoClass||'')==='e-landed'&&(v.cinta||v.sala)&&diff<=0&&diff>=-60){
       v.estado='Entrega equipajes';
       v.estadoClass='e-equip';
     }
@@ -3119,7 +3171,7 @@ var _NOTA_TIPO={
   'V':'vacaciones','V-':'vacaciones','V+':'vacaciones',
   'AL':'perentorias','H6':'h6','HL':'hl','HLP':'hlp','HFUN8':'hfun',
   'B0':'baja','B1':'baja','B2':'baja','B4':'baja','B6':'baja','AC':'baja','ACI':'baja',
-  'BP':'bp','BL':'bp','PP':'nh','NH':'nh','MA':'libre','FM':'libre','FY':'libre','RM':'rm'
+  'BP':'bp','BL':'bp','PP':'nh','NH':'nh','DL':'libre','MA':'libre','FM':'libre','FY':'libre','RM':'rm'
 };
 
 function openTrypImport(){
@@ -3362,31 +3414,74 @@ function tiCellVal(sheet,row,col){
   var v=cell.w||cell.v;if(v===null||v===undefined)return null;
   return String(v).trim();
 }
-function tiColorToTipo(sheet,row,col){
+function tiCellRgb(sheet,row,col){
   var addr=XLSX.utils.encode_cell({r:row,c:col});
   var cell=sheet[addr];
-  if(!cell||!cell.s)return null;
-  var fg=cell.s.fgColor;if(!fg)return null;
+  if(!cell||!cell.s)return '';
+  var fg=cell.s.fgColor||(cell.s.fill&&cell.s.fill.fgColor);
+  if(!fg)return '';
   var rgb=fg.rgb||fg.argb||'';
   if(rgb.length===8)rgb=rgb.slice(2);
-  rgb=rgb.toUpperCase();
+  return String(rgb||'').toUpperCase();
+}
+function tiColorEsGris(sheet,row,col){
+  var rgb=tiCellRgb(sheet,row,col);
+  if(!rgb)return false;
+  if(['D9D9D9','BFBFBF','C0C0C0','E7E6E6','F2F2F2','EDEDED','CCCCCC','808080','A6A6A6'].indexOf(rgb)>=0)return true;
+  if(/^[0-9A-F]{6}$/.test(rgb)){
+    var r=parseInt(rgb.slice(0,2),16),g=parseInt(rgb.slice(2,4),16),b=parseInt(rgb.slice(4,6),16);
+    return Math.max(r,g,b)-Math.min(r,g,b)<=8 && r>=90;
+  }
+  return false;
+}
+function tiColorToTipo(sheet,row,col){
+  var rgb=tiCellRgb(sheet,row,col);
+  if(!rgb)return null;
   if(rgb==='A9D0F5')return'baja'; // azul → Baja por defecto
   if(rgb==='AEFC04')return'vacaciones';
   return null;
 }
-function tiParseCell(raw){
-  if(!raw||raw==='')return null;
-  var s=raw.split('\n').join('').trim();
-  if(!s||s===' ')return null;
-  if(s==='DL')return{tipo:'libre',e1:'',s1:'',e2:'',s2:''};
-  var times=s.match(/[0-9]{2}:[0-9]{2}/g)||[];
+function tiNormalizeImportText(raw){
+  return String(raw||'')
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .replace(/\u00A0/g,' ')
+    .replace(/\r/g,'\n')
+    .toUpperCase()
+    .trim();
+}
+function tiLooksLibreText(raw){
+  var s=tiNormalizeImportText(raw);
+  var compact=s.replace(/[\s.\-_/\\"']/g,'');
+  return compact==='DL'||compact==='DIALIBRE'||compact==='LIBRE'||compact==='DESCANSO'||compact==='DESCANSOSEMANA';
+}
+function tiParseCell(raw,isGreyCell){
+  if(raw===null||raw===undefined||raw==='')return null;
+  var s=tiNormalizeImportText(raw).split('\n').map(function(x){return x.trim();}).filter(Boolean).join(' ');
+  if(!s)return null;
+  var times=s.match(/[0-9]{1,2}:[0-9]{2}/g)||[];
+  times=times.map(function(t){var p=t.split(':');return String(p[0]).padStart(2,'0')+':'+p[1];});
+
+  // Regla nueva: si la celda es gris y pone DL o parecido, sin turno, se considera libre.
+  // Además, DL con espacios, puntos o caracteres invisibles también se considera libre.
+  if(times.length===0 && tiLooksLibreText(raw)){
+    return{tipo:'libre',e1:'',s1:'',e2:'',s2:''};
+  }
+
   var notes=s.match(/\(([^)]+)\)/g)||[];
   var noteVals=notes.map(function(n){return n.replace(/[()]/g,'').toUpperCase().trim();});
+  Object.keys(_NOTA_TIPO).forEach(function(k){
+    var esc=k.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+    var re=new RegExp('(^|\\s|\\(|\\)|-|/)'+esc+'($|\\s|\\(|\\)|-|/)');
+    if(re.test(s)&&noteVals.indexOf(k)<0)noteVals.push(k);
+  });
   var tipo='trabajado';
   for(var i=0;i<noteVals.length;i++){if(_NOTA_TIPO[noteVals[i]]){tipo=_NOTA_TIPO[noteVals[i]];break;}}
   var perenMode=null;
   if(noteVals.indexOf('7N')>=0)perenMode='librar';
   if(noteVals.indexOf('7D')>=0)perenMode='cobrar';
+
+  if(times.length===0 && isGreyCell && tiLooksLibreText(raw))return{tipo:'libre',e1:'',s1:'',e2:'',s2:'',perenMode:perenMode};
+
   if(times.length===0)return{tipo:tipo,e1:'',s1:'',e2:'',s2:'',perenMode:perenMode};
   if(times.length>=4)return{tipo:tipo,e1:times[0],s1:times[1],e2:times[2],s2:times[3],perenMode:perenMode};
   if(times.length>=2)return{tipo:tipo,e1:times[0],s1:times[1],e2:'',s2:'',perenMode:perenMode};
@@ -3403,6 +3498,7 @@ function tiParseSheet(sheet,filename){
     for(var col=1;col<=31;col++){
       var raw=tiCellVal(sheet,row,col);
       var colorTipo=tiColorToTipo(sheet,row,col);
+      var isGreyCell=tiColorEsGris(sheet,row,col);
       var isEmpty=!raw||raw.split(' ').join('').split(String.fromCharCode(10)).join('')==='';
       if(isEmpty){
         if(colorTipo){
@@ -3411,7 +3507,7 @@ function tiParseSheet(sheet,filename){
         }else{cE++;}
         continue;
       }
-      var parsed=tiParseCell(raw);
+      var parsed=tiParseCell(raw,isGreyCell);
       if(!parsed){cE++;continue;}
       if(colorTipo&&parsed.tipo==='trabajado')parsed.tipo=colorTipo;
       if(parsed.tipo==='libre')cL++;else cW++;
@@ -4042,13 +4138,13 @@ var _GRUPO_MONTHS=['ENERO','FEBRERO','MARZO','ABRIL','MAYO','JUNIO','JULIO','AGO
 
 
 // Exclusiones manuales de plantilla por fecha.
-// Arturo Rico no aparece ni computa en estos días de mayo de 2026.
+// Arturo Rico Vicente no aparece ni computa en la operativa de estos días de mayo de 2026.
 var _EXCLUSIONES_PLANTILLA_MANUAL={
-  '2026-05-14':['ARTURO RICO'],
-  '2026-05-20':['ARTURO RICO'],
-  '2026-05-26':['ARTURO RICO'],
-  '2026-05-27':['ARTURO RICO'],
-  '2026-05-29':['ARTURO RICO']
+  '2026-05-14':['ARTURO RICO VICENTE'],
+  '2026-05-20':['ARTURO RICO VICENTE'],
+  '2026-05-26':['ARTURO RICO VICENTE'],
+  '2026-05-27':['ARTURO RICO VICENTE'],
+  '2026-05-29':['ARTURO RICO VICENTE']
 };
 function _normPlantillaNombre(v){
   return String(v||'').toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,' ').trim();
