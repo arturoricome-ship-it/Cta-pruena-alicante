@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<!-- CTA_OPERATIVA_V71_SPLIT_VUELOS_2026-05-21 -->
+<!-- CTA_OPERATIVA_V72_GATE_LABEL_2026-05-21 -->
 <meta charset="UTF-8">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -78,21 +78,22 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 .live-col-title{font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:.8px;display:flex;align-items:center;gap:5px;white-space:nowrap;color:var(--white)}
 .live-col-badge{font-size:8px;font-weight:700;padding:2px 6px;border-radius:100px;background:rgba(200,168,75,.12);color:var(--gold);border:1px solid rgba(200,168,75,.3);margin-left:auto;flex-shrink:0}
 .live-col-body{overflow-y:auto;overflow-x:hidden;flex:1;min-height:0;padding:5px 6px 90px;-webkit-overflow-scrolling:touch;touch-action:pan-y;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.08) transparent}
-/* Filas compactas de vuelo */
-.vcr{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:7px 7px 6px;margin-bottom:5px;position:relative}
+/* Filas compactas de vuelo — layout 3 columnas: info | parking | estado */
+.vcr{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:8px 9px;margin-bottom:5px;display:grid;grid-template-columns:1fr auto auto;gap:4px 8px;align-items:center}
 .vcr.vcr-corte-s{box-shadow:inset 0 -2px 0 rgba(239,68,68,.5)}
 .vcr.vcr-corte-e{box-shadow:inset 0 2px 0 rgba(34,197,94,.5)}
-.vcr-head{display:flex;justify-content:space-between;align-items:flex-start;gap:3px}
-.vcr-left{min-width:0;flex:1}
-.vcr-num{font-family:'Bebas Neue',sans-serif;font-size:13px;color:var(--gold);letter-spacing:.8px;line-height:1}
-.vcr-tag{font-size:8px;color:var(--gray);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:90px}
-.vcr-dest{font-size:11px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:4px}
-.vcr-hora{font-size:10px;color:var(--gray);margin-top:1px}
+.vcr-info{min-width:0}
+.vcr-topline{display:flex;align-items:baseline;gap:5px;min-width:0}
+.vcr-num{font-family:'Bebas Neue',sans-serif;font-size:14px;color:var(--gold);letter-spacing:.8px;flex-shrink:0;line-height:1}
+.vcr-dest{font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1}
+.vcr-hora{font-size:10px;color:var(--gray);margin-top:2px}
+.vcr-tag{font-size:8px;color:var(--gray);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vcr-mid{display:flex;align-items:center;justify-content:center}
+.vcr-park-lbl{font-size:8px;font-weight:700;color:#8a93a8;letter-spacing:.4px;white-space:nowrap;text-transform:uppercase}
+.vcr-remoto-lbl{font-size:8px;font-weight:700;color:#f0a070;background:rgba(240,160,100,.12);border:1px solid rgba(240,160,100,.3);border-radius:4px;padding:1px 5px;white-space:nowrap}
 .vcr-right{display:flex;flex-direction:column;align-items:flex-end;gap:2px;flex-shrink:0}
-.vcr-park{font-size:8px;color:#8a93a8;letter-spacing:.2px;white-space:nowrap;text-align:right}
-.vcr-remoto{font-size:7px;font-weight:700;color:#f0a070;background:rgba(240,160,100,.12);border:1px solid rgba(240,160,100,.3);border-radius:4px;padding:1px 4px;white-space:nowrap}
 .vcr-estado{font-size:8px;font-weight:700;padding:2px 5px;border-radius:100px;white-space:nowrap;text-align:center}
-.vcr-cnt{font-size:9px;color:var(--gray);text-align:right;min-height:12px}
+.vcr-cnt{font-size:10px;font-weight:700;color:var(--gold);text-align:right;min-height:12px;white-space:nowrap}
 .vcr-cnt.ct-soon{color:#f07070}.vcr-cnt.ct-now{color:#ffb432}
 #breadcrumb{display:flex;align-items:center;gap:3px;font-size:11px;color:var(--gray);overflow-x:auto;scrollbar-width:none;white-space:nowrap;flex:1}
 #breadcrumb::-webkit-scrollbar{display:none}
@@ -2059,11 +2060,21 @@ function getLiveCutoffsFromTurnoHoy(){
   return {s:s,e:e,windows:windows};
 }
 
-// ── SPLIT VIEW: renderiza LLEGADAS y SALIDAS en paralelo ──────────────────
-var _PUERTAS_JARDINERA=new Set(['C50','C48','C46','C44','C42','C40','C38','B18','B20','B22','C20','C22','C24','C26','C28','C30','C32','C34']);
-
-function _normPuertaSplit(p){
-  return String(p||'').toUpperCase().replace(/\s+/g,'').replace(/^PUERTA/,'').replace(/^GATE/,'');
+// ── Etiqueta operacional de puerta: "Parking X" o "Remoto" ─────────────────
+function gateOperationalLabel(puerta){
+  var raw=String(puerta||'').toUpperCase().trim();
+  if(!raw)return null;
+  var m=raw.match(/([BC])\s*[- ]?\s*(\d{1,2})/);
+  if(!m)return null;
+  var num=m[2];
+  var gate=m[1]+String(parseInt(num,10)).padStart(2,'0');
+  var remoteSet=new Set([
+    'C50','C48','C46','C44','C42','C40','C38',
+    'B18','B20','B22',
+    'C20','C22','C24','C26','C28','C30','C32','C34'
+  ]);
+  if(remoteSet.has(gate))return {text:'Remoto',cls:'remote'};
+  return {text:'Parking '+String(parseInt(num,10)),cls:'parking'};
 }
 
 function renderLive(){
@@ -2147,20 +2158,14 @@ function renderLiveCol(container,data,esS){
       horaHtml='<span style="color:#f0a070;text-decoration:line-through;margin-right:2px">'+v.horaProg+'</span>'+v.horaReal;
     }
 
-    // Etiqueta puerta/cinta/sala
+    // Etiqueta puerta/cinta/sala (tag pequeño)
     var tag='';
     if(esS&&v.puerta)tag='Puerta '+v.puerta;
     if(!esS&&v.cinta)tag='Cinta '+v.cinta;
     if(!esS&&!v.cinta&&v.sala)tag='Sala '+v.sala;
 
-    // Parking / posición del avión (campo extra de AENA)
-    var parking=v.posicion||v.parking||v.puesto||v.puestoAparcamiento||'';
-
-    // Remoto: la puerta está en zona de jardinera
-    var remoto=false;
-    if(esS&&v.puerta){
-      remoto=_PUERTAS_JARDINERA.has(_normPuertaSplit(v.puerta));
-    }
+    // Parking o Remoto: derivado de la puerta usando gateOperationalLabel
+    var gateLabel=esS?gateOperationalLabel(v.puerta):null;
 
     var cancelado=v.estadoClass==='e-cancelled';
     var estadoClass=v.estadoClass||'e-scheduled';
@@ -2177,25 +2182,34 @@ function renderLiveCol(container,data,esS){
     row.setAttribute('data-estado-class',estadoClass);
     row.setAttribute('data-es-manana',v.esManana?'1':'0');
 
-    var parkHtml=parking?'<div class="vcr-park">'+parking+'</div>':'';
-    var remotoHtml=remoto?'<div class="vcr-remoto">REMOTO</div>':'';
+    // Columna centro: etiqueta parking o remoto
+    var midHtml='';
+    if(gateLabel){
+      if(gateLabel.cls==='remote'){
+        midHtml='<div class="vcr-mid"><span class="vcr-remoto-lbl">Remoto</span></div>';
+      }else{
+        midHtml='<div class="vcr-mid"><span class="vcr-park-lbl">'+gateLabel.text+'</span></div>';
+      }
+    }else{
+      midHtml='<div class="vcr-mid"></div>';
+    }
+
     var cntAttr=esEnVuelo?'':' data-hora="'+(horaEfectiva||'')+'" data-es-manana="'+(v.esManana?'1':'0')+'"';
 
     row.innerHTML=
-      '<div class="vcr-head">'+
-        '<div class="vcr-left">'+
-          '<div class="vcr-num">'+num+'</div>'+
-          (tag?'<div class="vcr-tag">'+tag+'</div>':'')+
+      '<div class="vcr-info">'+
+        '<div class="vcr-topline">'+
+          '<span class="vcr-num">'+num+'</span>'+
+          '<span class="vcr-dest">'+ciudad+'</span>'+
         '</div>'+
-        '<div class="vcr-right">'+
-          parkHtml+
-          remotoHtml+
-          '<div class="vcr-estado '+estadoClass+'">'+(v.estado||'Programado')+'</div>'+
-          '<div class="vcr-cnt vuelo-countdown"'+cntAttr+'>'+(esEnVuelo?'':'&mdash;')+'</div>'+
-        '</div>'+
+        '<div class="vcr-hora">'+horaHtml+'</div>'+
+        (tag?'<div class="vcr-tag">'+tag+'</div>':'')+
       '</div>'+
-      '<div class="vcr-dest">'+ciudad+'</div>'+
-      '<div class="vcr-hora">'+horaHtml+'</div>';
+      midHtml+
+      '<div class="vcr-right">'+
+        '<div class="vcr-estado '+estadoClass+'">'+(v.estado||'Programado')+'</div>'+
+        '<div class="vcr-cnt vuelo-countdown"'+cntAttr+'>'+(esEnVuelo?'':'&mdash;')+'</div>'+
+      '</div>';
 
     container.appendChild(row);
   });
@@ -5335,13 +5349,9 @@ window.renderOperativa=function(){
       .replace(/^GATE/,'');
   }
   function opEsPuertaJardinera(v){
-    var puertasJardinera=new Set([
-      'C50','C48','C46','C44','C42','C40','C38',
-      'B18','B20','B22',
-      'C20','C22','C24','C26','C28','C30','C32','C34'
-    ]);
-    var puerta=opNormPuerta(v&& (v.puerta||v.gate||v.embarque||v.puertaEmbarque||v.puertaSalida||''));
-    return puertasJardinera.has(puerta);
+    var rawPuerta=v&&(v.puerta||v.gate||v.embarque||v.puertaEmbarque||v.puertaSalida||'');
+    var lbl=typeof gateOperationalLabel==='function'?gateOperationalLabel(rawPuerta):null;
+    return lbl&&lbl.cls==='remote';
   }
   function opInMinuteRange(nowMinute,startMinute,endMinute){
     startMinute=((startMinute%1440)+1440)%1440;
