@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<!-- CTA_OPERATIVA_V71_EXCLUSION_ARTURO_29MAYO_LIVE_TV_2026-05-21 -->
+<!-- CTA_OPERATIVA_V71_SPLIT_VUELOS_2026-05-21 -->
 <meta charset="UTF-8">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -70,26 +70,30 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 .e-final{background:rgba(120,120,140,.2);color:#9090b0}
 .live-tab{flex:1;padding:9px;background:transparent;border:none;color:var(--gray);font-family:"Outfit",sans-serif;font-size:12px;font-weight:600;cursor:pointer}
 .live-tab.active{background:rgba(200,168,75,.15);color:var(--gold)}
-/* V71: pantalla de vuelos en tiempo real estilo TV/comedor */
-#live-panel{height:96vh;max-height:96vh;border-radius:18px 18px 0 0;background:#09111d}
-#live-body{padding:0 10px calc(28px + env(safe-area-inset-bottom))}
-.live-tabs-old{display:none!important}
-.live-tv-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:start}
-.live-tv-board{background:#1a2437;border:1px solid rgba(255,255,255,.08);border-radius:15px;overflow:hidden;box-shadow:0 12px 26px rgba(0,0,0,.22)}
-.live-tv-head{height:46px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 14px;border-bottom:1px solid rgba(255,255,255,.08);background:#1b2539}
-.live-tv-title{font-family:"Bebas Neue",sans-serif;font-size:26px;letter-spacing:1.7px;color:#f0eee8;line-height:1;display:flex;align-items:center;gap:8px;text-transform:uppercase}
-.live-tv-count{font-size:12px;font-weight:900;color:var(--gold);border:1px solid rgba(200,168,75,.45);background:rgba(200,168,75,.09);border-radius:999px;padding:5px 9px;white-space:nowrap}
-.live-tv-list{display:flex;flex-direction:column}
-.live-tv-row{min-height:43px;background:#1a2437;border-bottom:1px solid rgba(255,255,255,.075);padding:6px 10px;display:grid;grid-template-columns:74px 1fr auto;gap:10px;align-items:center}
-.live-tv-row:last-child{border-bottom:none}
-.live-tv-row.vuelo-corte-s{box-shadow:inset 0 -2px 0 rgba(239,68,68,.55)}
-.live-tv-row.vuelo-corte-e{box-shadow:inset 0 2px 0 rgba(34,197,94,.55)}
-.live-tv-flight{min-width:0}.live-tv-num{font-family:"Bebas Neue",sans-serif;font-size:22px;color:var(--gold);letter-spacing:1px;line-height:1}.live-tv-small{font-size:7.5px;color:#8a93a8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
-.live-tv-city{font-size:15px;font-weight:900;letter-spacing:.2px;color:#f0eee8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.live-tv-time{font-size:9px;color:#b5bdcf;margin-top:2px;white-space:nowrap}
-.live-tv-side{display:flex;flex-direction:column;align-items:flex-end;gap:4px;min-width:74px}.live-tv-badge{font-size:7.5px;font-weight:900;padding:3px 7px;border-radius:999px;white-space:nowrap;max-width:96px;overflow:hidden;text-overflow:ellipsis}.live-tv-extra{font-size:7.5px;font-weight:800;color:#8a93a8;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.065);border-radius:999px;padding:2px 6px;white-space:nowrap}.live-tv-countdown{font-size:9px;font-weight:900;color:#f0eee8;white-space:nowrap;line-height:1}
-.live-tv-empty{padding:28px 12px;color:#8a93a8;text-align:center;font-size:12px}.live-tv-section{display:flex;align-items:center;gap:8px;margin:8px 4px 4px;color:var(--gold);font-size:10px;font-weight:900;letter-spacing:1px;text-transform:uppercase}.live-tv-section:before,.live-tv-section:after{content:"";height:1px;flex:1;background:rgba(200,168,75,.28)}
-@media(max-width:760px){.live-tv-grid{grid-template-columns:1fr}.live-tv-title{font-size:22px}.live-tv-row{grid-template-columns:68px 1fr auto}.live-tv-city{font-size:14px}}
-
+/* ── SPLIT VIEW (llegadas + salidas en paralelo) ── */
+#live-split{display:grid;grid-template-columns:1fr 1fr;flex:1;min-height:0;overflow:hidden}
+.live-col{display:flex;flex-direction:column;min-height:0;overflow:hidden;border-right:1px solid var(--border)}
+.live-col:last-child{border-right:none}
+.live-col-head{padding:7px 8px 5px;background:rgba(13,22,35,.95);position:sticky;top:0;z-index:2;flex-shrink:0;border-bottom:1px solid var(--border)}
+.live-col-title{font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:.8px;display:flex;align-items:center;gap:5px;white-space:nowrap;color:var(--white)}
+.live-col-badge{font-size:8px;font-weight:700;padding:2px 6px;border-radius:100px;background:rgba(200,168,75,.12);color:var(--gold);border:1px solid rgba(200,168,75,.3);margin-left:auto;flex-shrink:0}
+.live-col-body{overflow-y:auto;overflow-x:hidden;flex:1;min-height:0;padding:5px 6px 90px;-webkit-overflow-scrolling:touch;touch-action:pan-y;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.08) transparent}
+/* Filas compactas de vuelo */
+.vcr{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:7px 7px 6px;margin-bottom:5px;position:relative}
+.vcr.vcr-corte-s{box-shadow:inset 0 -2px 0 rgba(239,68,68,.5)}
+.vcr.vcr-corte-e{box-shadow:inset 0 2px 0 rgba(34,197,94,.5)}
+.vcr-head{display:flex;justify-content:space-between;align-items:flex-start;gap:3px}
+.vcr-left{min-width:0;flex:1}
+.vcr-num{font-family:'Bebas Neue',sans-serif;font-size:13px;color:var(--gold);letter-spacing:.8px;line-height:1}
+.vcr-tag{font-size:8px;color:var(--gray);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:90px}
+.vcr-dest{font-size:11px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:4px}
+.vcr-hora{font-size:10px;color:var(--gray);margin-top:1px}
+.vcr-right{display:flex;flex-direction:column;align-items:flex-end;gap:2px;flex-shrink:0}
+.vcr-park{font-size:8px;color:#8a93a8;letter-spacing:.2px;white-space:nowrap;text-align:right}
+.vcr-remoto{font-size:7px;font-weight:700;color:#f0a070;background:rgba(240,160,100,.12);border:1px solid rgba(240,160,100,.3);border-radius:4px;padding:1px 4px;white-space:nowrap}
+.vcr-estado{font-size:8px;font-weight:700;padding:2px 5px;border-radius:100px;white-space:nowrap;text-align:center}
+.vcr-cnt{font-size:9px;color:var(--gray);text-align:right;min-height:12px}
+.vcr-cnt.ct-soon{color:#f07070}.vcr-cnt.ct-now{color:#ffb432}
 #breadcrumb{display:flex;align-items:center;gap:3px;font-size:11px;color:var(--gray);overflow-x:auto;scrollbar-width:none;white-space:nowrap;flex:1}
 #breadcrumb::-webkit-scrollbar{display:none}
 .bc-item{cursor:pointer;transition:color .2s;flex-shrink:0}.bc-item:hover{color:var(--gold-light)}.bc-item.active{color:var(--white);font-weight:600}
@@ -1351,22 +1355,30 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 <div id="live-overlay"></div>
 <div id="live-panel">
   <div class="live-handle"></div>
-  <div style="padding:0 14px 10px">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;display:flex;align-items:center;gap:8px"><span class="live-dot"></span>Vueling · Alicante</div><div id="live-fecha-panel" style="font-size:11px;color:var(--gold);letter-spacing:1px;margin-top:2px"></div>
-      <div style="display:flex;gap:6px">
-        <button id="live-filtro" style="background:rgba(60,180,100,.2);border:1px solid rgba(60,180,100,.3);border-radius:8px;color:#5dd88a;font-size:11px;font-weight:700;padding:5px 10px;cursor:pointer;font-family:'Outfit',sans-serif">Activos</button>
-        <button id="live-refresh" style="background:rgba(200,168,75,.15);border:1px solid rgba(200,168,75,.3);border-radius:8px;color:var(--gold);font-size:15px;padding:5px 10px;cursor:pointer">↻</button>
+  <div style="padding:0 12px 7px;flex-shrink:0">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:4px">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1px;display:flex;align-items:center;gap:7px;white-space:nowrap"><span class="live-dot"></span>Vueling · Alicante</div>
+      <div style="display:flex;gap:5px;align-items:center;flex-shrink:0">
+        <div id="live-fecha-panel" style="font-size:9px;color:var(--gold);letter-spacing:.8px"></div>
+        <button id="live-filtro" style="background:rgba(60,180,100,.2);border:1px solid rgba(60,180,100,.3);border-radius:8px;color:#5dd88a;font-size:10px;font-weight:700;padding:4px 8px;cursor:pointer;font-family:'Outfit',sans-serif">Activos</button>
+        <button id="live-refresh" style="background:rgba(200,168,75,.15);border:1px solid rgba(200,168,75,.3);border-radius:8px;color:var(--gold);font-size:14px;padding:4px 8px;cursor:pointer">&#8635;</button>
       </div>
     </div>
-    <div style="font-size:11px;color:var(--gray);margin-bottom:10px" id="live-hora"></div>
-    <div class="live-tabs-old" style="display:flex;border:1px solid var(--border);border-radius:10px;overflow:hidden">
-      <button class="live-tab active" id="live-tab-llegadas" onclick="switchLive('llegadas')">🛬 Llegadas</button>
-      <button class="live-tab" id="live-tab-salidas" onclick="switchLive('salidas')">🛫 Salidas</button>
-    </div>
+    <div style="font-size:10px;color:var(--gray)" id="live-hora"></div>
   </div>
-  <div id="live-body">
-    <div id="live-container"></div>
+  <div id="live-split">
+    <div class="live-col">
+      <div class="live-col-head">
+        <div class="live-col-title">&#128748; LLEGADAS <span class="live-col-badge" id="live-cnt-lle">&mdash;</span></div>
+      </div>
+      <div class="live-col-body" id="live-container-lle"></div>
+    </div>
+    <div class="live-col">
+      <div class="live-col-head">
+        <div class="live-col-title">&#128747; SALIDAS <span class="live-col-badge" id="live-cnt-sal">&mdash;</span></div>
+      </div>
+      <div class="live-col-body" id="live-container-sal"></div>
+    </div>
   </div>
 </div>
 
@@ -2000,9 +2012,7 @@ function isIB(v){
 }
 
 function switchLive(mode){
-  liveMode=mode;
-  document.getElementById("live-tab-llegadas").classList.toggle("active",mode==="llegadas");
-  document.getElementById("live-tab-salidas").classList.toggle("active",mode==="salidas");
+  liveMode=mode; // mantenemos por compatibilidad; el split view muestra ambas columnas siempre
   renderLive();
 }
 
@@ -2049,119 +2059,159 @@ function getLiveCutoffsFromTurnoHoy(){
   return {s:s,e:e,windows:windows};
 }
 
+// ── SPLIT VIEW: renderiza LLEGADAS y SALIDAS en paralelo ──────────────────
+var _PUERTAS_JARDINERA=new Set(['C50','C48','C46','C44','C42','C40','C38','B18','B20','B22','C20','C22','C24','C26','C28','C30','C32','C34']);
+
+function _normPuertaSplit(p){
+  return String(p||'').toUpperCase().replace(/\s+/g,'').replace(/^PUERTA/,'').replace(/^GATE/,'');
+}
+
 function renderLive(){
-  var container=document.getElementById("live-container");
-  if(!container)return;
-  var cutoffs=getLiveCutoffsFromTurnoHoy();
-
-  function filtraData(mode){
-    var data=(mode==="salidas"?liveData.sal:liveData.lle).slice();
-    if(liveFiltro){
-      data=data.filter(function(v){
-        var s=v.estadoClass||"";
-        if(v.esManana){
-          return s!=="e-cancelled"&&s!=="e-final";
-        }
-        if(mode==="llegadas"){
-          if(llegadaFinalizada30(v))return false;
-          return s!=="e-landed"&&s!=="e-final"&&s!=="e-taxiing"&&s!=="e-boarding"&&s!=="e-gate";
-        }
-        return s!=="e-active"&&s!=="e-final";
-      });
-    }
-    return data;
-  }
-
-  function htmlEsc(x){
-    return String(x==null?"":x).replace(/[&<>"']/g,function(ch){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch];});
-  }
-
-  function getExtraLabel(v,esS){
-    var parking=v.parking||v.parkingStand||v.stand||v.standParking||v.posicion||v.posicionParking||v.parkingCode||"";
-    var labels=[];
-    if(esS&&parking)labels.push("Parking "+String(parking).replace(/^parking\s*/i,""));
-    if(esS&&v.puerta)labels.push("Puerta "+v.puerta);
-    if(!esS&&v.cinta)labels.push("Cinta "+v.cinta);
-    if(!esS&&!v.cinta&&v.sala)labels.push("Sala "+v.sala);
-    return labels.join(" · ");
-  }
-
-  function getCortes(data){
-    var cortesS={},cortesE={};
-    (cutoffs.windows||[]).forEach(function(win){
-      var winE=win[0],winS=win[1];
-      var firstIdx=-1,firstMin=99999,lastIdx=-1,lastMin=-1;
-      for(var i=0;i<data.length;i++){
-        var vv=data[i];
-        if((vv.estadoClass||"")==="e-cancelled")continue;
-        var vm=hToMin(vv.horaReal||vv.horaProg||"");
-        if(vm===null)continue;
-        if(vm>=winE&&vm<=winS){
-          if(vm<firstMin){firstMin=vm;firstIdx=i;}
-          if(vm>lastMin||(vm===lastMin&&i>lastIdx)){lastMin=vm;lastIdx=i;}
-        }
-      }
-      if(firstIdx>=0)cortesE[firstIdx]=true;
-      if(lastIdx>=0)cortesS[lastIdx]=true;
-    });
-    return {s:cortesS,e:cortesE};
-  }
-
-  function renderBoard(mode,title,icon){
-    var esS=mode==="salidas";
-    var data=filtraData(mode);
-    var cortes=getCortes(data);
-    var out="<section class='live-tv-board'><div class='live-tv-head'><div class='live-tv-title'><span>"+icon+"</span> "+title+"</div><div class='live-tv-count'>"+data.length+" restante"+(data.length===1?"":"s")+"</div></div><div class='live-tv-list'>";
-    if(!data.length){
-      var msg=(liveFiltro&&!liveLastServerEmpty)?"Sin vuelos activos en este momento":"No se han recibido vuelos en esta actualización";
-      out+="<div class='live-tv-empty'>"+msg+"</div></div></section>";
-      return out;
-    }
-    var separadorPuesto=false;
-    data.forEach(function(v,idx){
-      if(v.esManana&&!separadorPuesto){
-        separadorPuesto=true;
-        var dm=new Date();dm.setDate(dm.getDate()+1);
-        var ms=["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
-        out+="<div class='live-tv-section'>Mañana "+dm.getDate()+" "+ms[dm.getMonth()]+"</div>";
-      }
-      var num=htmlEsc(v.numero||"VY---");
-      var _ciu=esS?(v.destino||"--"):(v.origen||"--");
-      var ciudad=htmlEsc((_ciu.split("-")[0].trim()||_ciu));
-      var horaStr=htmlEsc(v.horaProg||"--:--");
-      if(v.horaReal&&v.horaReal!==v.horaProg){
-        horaStr='<span style="color:#f0a070;text-decoration:line-through;margin-right:4px">'+htmlEsc(v.horaProg||"")+'</span>'+htmlEsc(v.horaReal);
-      }
-      var extraLabel=htmlEsc(getExtraLabel(v,esS));
-      var cancelado=v.estadoClass==="e-cancelled";
-      var rowCls="live-tv-row vuelo-row"+(cortesS[idx]?" vuelo-corte-s":"")+(cortesE[idx]?" vuelo-corte-e":"");
-      var horaEfectiva=v.horaReal||v.horaProg||"";
-      var esEnVueloSalida=esS&&(v.estadoClass||"")=="e-active";
-      var countdownAttr=esEnVueloSalida?"":(" data-hora='"+htmlEsc(horaEfectiva||"")+"' data-es-manana='"+(v.esManana?"1":"0")+"'");
-      out+="<div class='"+rowCls+"' style='"+(cancelado?"opacity:.6;border-color:rgba(230,80,70,.3)":"")+"' data-hora='"+htmlEsc(horaEfectiva)+"' data-live-mode='"+(esS?"salidas":"llegadas")+"' data-estado-class='"+htmlEsc(v.estadoClass||"")+"' data-es-manana='"+(v.esManana?"1":"0")+"'>"+
-        "<div class='live-tv-flight'><div class='live-tv-num'>"+num+"</div>"+(extraLabel?"<div class='live-tv-small'>"+extraLabel+"</div>":"")+"</div>"+
-        "<div style='min-width:0'><div class='live-tv-city'>"+ciudad+"</div><div class='live-tv-time'>"+horaStr+"</div></div>"+
-        "<div class='live-tv-side'><div class='live-tv-badge "+htmlEsc(v.estadoClass||"e-scheduled")+"'>"+htmlEsc(v.estado||"Programado")+"</div>"+(extraLabel?"<div class='live-tv-extra'>"+extraLabel+"</div>":"")+"<div class='live-tv-countdown vuelo-countdown'"+countdownAttr+">"+(esEnVueloSalida?"":"—")+"</div></div>"+
-        "</div>";
-    });
-    out+="</div></section>";
-    return out;
-  }
-
-  container.innerHTML="<div class='live-tv-grid'>"+renderBoard("llegadas","Llegadas","🛬")+renderBoard("salidas","Salidas","🛫")+"</div>";
+  renderLiveCol(
+    document.getElementById('live-container-lle'),
+    liveData.lle.slice(),
+    false
+  );
+  renderLiveCol(
+    document.getElementById('live-container-sal'),
+    liveData.sal.slice(),
+    true
+  );
   if(typeof updateFlightCountdowns==='function')setTimeout(updateFlightCountdowns,0);
 }
+
+function renderLiveCol(container,data,esS){
+  if(!container)return;
+  var cntEl=document.getElementById(esS?'live-cnt-sal':'live-cnt-lle');
+
+  if(liveFiltro){
+    data=data.filter(function(v){
+      var s=v.estadoClass||'';
+      if(v.esManana)return s!=='e-cancelled'&&s!=='e-final';
+      if(!esS){
+        if(llegadaFinalizada30(v))return false;
+        return s!=='e-landed'&&s!=='e-final'&&s!=='e-taxiing'&&s!=='e-boarding'&&s!=='e-gate';
+      }
+      return s!=='e-active'&&s!=='e-final';
+    });
+  }
+
+  if(cntEl)cntEl.textContent=data.length+' restantes';
+
+  if(!data.length){
+    if(!liveFiltro&&liveLastServerEmpty&&!esS){
+      container.innerHTML="<div class='empty-box' style='font-size:11px;padding:18px 8px'>Sin datos.<br><span style='font-size:10px;color:var(--gray)'>Pulsa \u21bb</span></div>";
+    }else{
+      container.innerHTML="<div class='empty-box' style='font-size:11px;padding:18px 8px'>Sin vuelos"+(liveFiltro?' activos':'')+"</div>";
+    }
+    return;
+  }
+  container.innerHTML='';
+
+  // Marcadores de ventana de turno (línea roja/verde)
+  var cortesS={},cortesE={};
+  var cutoffs=getLiveCutoffsFromTurnoHoy();
+  (cutoffs.windows||[]).forEach(function(win){
+    var winE=win[0],winS=win[1];
+    var firstIdx=-1,firstMin=99999,lastIdx=-1,lastMin=-1;
+    for(var i=0;i<data.length;i++){
+      var vv=data[i];
+      if((vv.estadoClass||'')==='e-cancelled')continue;
+      var vm=hToMin(vv.horaReal||vv.horaProg||'');
+      if(vm===null)continue;
+      if(vm>=winE&&vm<=winS){
+        if(vm<firstMin){firstMin=vm;firstIdx=i;}
+        if(vm>lastMin||(vm===lastMin&&i>lastIdx)){lastMin=vm;lastIdx=i;}
+      }
+    }
+    if(firstIdx>=0)cortesE[firstIdx]=true;
+    if(lastIdx>=0)cortesS[lastIdx]=true;
+  });
+
+  var separadorPuesto=false;
+  data.forEach(function(v,idx){
+    if(v.esManana&&!separadorPuesto){
+      separadorPuesto=true;
+      var sep=document.createElement('div');sep.className='separador-manana';
+      sep.style.cssText='font-size:9px;margin:6px 0 4px';
+      var dm=new Date();dm.setDate(dm.getDate()+1);
+      var ms=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+      sep.textContent='Ma\xf1ana '+dm.getDate()+' '+ms[dm.getMonth()];
+      container.appendChild(sep);
+    }
+
+    var num=v.numero||'VY---';
+    var ciudad=(esS?(v.destino||'--'):(v.origen||'--')).split('-')[0].trim();
+    var horaHtml=v.horaProg||'--:--';
+    if(v.horaReal&&v.horaReal!==v.horaProg){
+      horaHtml='<span style="color:#f0a070;text-decoration:line-through;margin-right:2px">'+v.horaProg+'</span>'+v.horaReal;
+    }
+
+    // Etiqueta puerta/cinta/sala
+    var tag='';
+    if(esS&&v.puerta)tag='Puerta '+v.puerta;
+    if(!esS&&v.cinta)tag='Cinta '+v.cinta;
+    if(!esS&&!v.cinta&&v.sala)tag='Sala '+v.sala;
+
+    // Parking / posición del avión (campo extra de AENA)
+    var parking=v.posicion||v.parking||v.puesto||v.puestoAparcamiento||'';
+
+    // Remoto: la puerta está en zona de jardinera
+    var remoto=false;
+    if(esS&&v.puerta){
+      remoto=_PUERTAS_JARDINERA.has(_normPuertaSplit(v.puerta));
+    }
+
+    var cancelado=v.estadoClass==='e-cancelled';
+    var estadoClass=v.estadoClass||'e-scheduled';
+    var horaEfectiva=v.horaReal||v.horaProg||'';
+    var esEnVuelo=esS&&estadoClass==='e-active';
+
+    var row=document.createElement('div');
+    row.className='vcr';
+    if(cortesS[idx])row.classList.add('vcr-corte-s');
+    if(cortesE[idx])row.classList.add('vcr-corte-e');
+    if(cancelado)row.style.opacity='.55';
+    row.setAttribute('data-hora',horaEfectiva);
+    row.setAttribute('data-live-mode',esS?'salidas':'llegadas');
+    row.setAttribute('data-estado-class',estadoClass);
+    row.setAttribute('data-es-manana',v.esManana?'1':'0');
+
+    var parkHtml=parking?'<div class="vcr-park">'+parking+'</div>':'';
+    var remotoHtml=remoto?'<div class="vcr-remoto">REMOTO</div>':'';
+    var cntAttr=esEnVuelo?'':' data-hora="'+(horaEfectiva||'')+'" data-es-manana="'+(v.esManana?'1':'0')+'"';
+
+    row.innerHTML=
+      '<div class="vcr-head">'+
+        '<div class="vcr-left">'+
+          '<div class="vcr-num">'+num+'</div>'+
+          (tag?'<div class="vcr-tag">'+tag+'</div>':'')+
+        '</div>'+
+        '<div class="vcr-right">'+
+          parkHtml+
+          remotoHtml+
+          '<div class="vcr-estado '+estadoClass+'">'+(v.estado||'Programado')+'</div>'+
+          '<div class="vcr-cnt vuelo-countdown"'+cntAttr+'>'+(esEnVuelo?'':'&mdash;')+'</div>'+
+        '</div>'+
+      '</div>'+
+      '<div class="vcr-dest">'+ciudad+'</div>'+
+      '<div class="vcr-hora">'+horaHtml+'</div>';
+
+    container.appendChild(row);
+  });
+}
+
 
 
 function updateFlightCountdowns(){
   var now=new Date(),nowMin=now.getHours()*60+now.getMinutes();
   document.querySelectorAll('.vuelo-countdown').forEach(function(el){
-    var row=el.closest?el.closest('.vuelo-row'):null;
+    var row=el.closest?el.closest('.vuelo-row,.vcr'):null;
     var mode=row?row.getAttribute('data-live-mode'):'';
     var estado=row?row.getAttribute('data-estado-class'):'';
     var esManana=(el.getAttribute('data-es-manana')==='1')||(row&&row.getAttribute('data-es-manana')==='1');
     // En salidas, cuando el vuelo ya está "En vuelo", no se muestra ningún tiempo restante.
-    if(mode==='salidas'&&estado==='e-active'){el.textContent='';el.className='vuelo-countdown';return;}
+    if(mode==='salidas'&&estado==='e-active'){el.textContent='';el.className='vcr-cnt vuelo-countdown';return;}
     var h=el.getAttribute('data-hora');
     if(!h||h==='--:--'){el.textContent='';return;}
     var p=h.split(':'),flMin=(+p[0]||0)*60+(+p[1]||0);
@@ -2246,40 +2296,20 @@ function normalizarVueloAenaCliente(v,tipo){
   }
   return v;
 }
-function fetchLiveEndpoint(tipo){
-  // Primero usa el endpoint del index del comedor: /vuelos-tv.
-  // Si ese endpoint no existe en el despliegue de Railway, cae al endpoint antiguo /vuelos.
-  var urls=[RAILWAY+"/vuelos-tv?tipo="+tipo, RAILWAY+"/vuelos?tipo="+tipo];
-  function tryUrl(i,lastErr){
-    if(i>=urls.length)return Promise.reject(lastErr||new Error("Sin respuesta de Railway"));
-    return fetch(urls[i],{cache:"no-store"})
-      .then(function(r){
-        if(!r.ok)throw new Error("HTTP "+r.status+" en "+urls[i]);
-        return r.text().then(function(t){
-          try{return JSON.parse(t);}
-          catch(e){throw new Error("Respuesta no JSON en "+urls[i]+": "+t.slice(0,120));}
-        });
-      })
-      .then(function(j){
-        if(j&&j.ok===false)throw new Error(j.error||("Railway ok=false en "+urls[i]));
-        return j;
-      })
-      .catch(function(e){return tryUrl(i+1,e);});
-  }
-  return tryUrl(0);
-}
-
 function loadLive(){
   liveLoaded=true;
-  var container=document.getElementById("live-container");
-  container.innerHTML="<div class='spinner-wrap'><div class='spinner'></div><div class='spinner-label'>Cargando vuelos...</div></div>";
+  var spinner="<div class='spinner-wrap'><div class='spinner'></div><div class='spinner-label' style='font-size:11px'>Cargando...</div></div>";
+  var lleC=document.getElementById('live-container-lle');
+  var salC=document.getElementById('live-container-sal');
+  if(lleC)lleC.innerHTML=spinner;
+  if(salC)salC.innerHTML=spinner;
   var pad=function(n){return String(n).padStart(2,"0");};
-  // Peticiones secuenciales para evitar bloqueo de AENA.
-  // Cambio clave: usar /vuelos-tv, que es el endpoint que usa el index del comedor.
-  fetchLiveEndpoint("llegadas")
+  // Peticiones secuenciales para evitar bloqueo de AENA
+  fetch(RAILWAY+"/vuelos?tipo=llegadas")
+    .then(function(r){return r.json();})
     .then(function(resLle){
       liveData.lle=extractLiveVuelos(resLle,"llegadas");
-      return fetchLiveEndpoint("salidas");
+      return fetch(RAILWAY+"/vuelos?tipo=salidas").then(function(r){return r.json();});
     })
     .then(function(resSal){
       liveData.sal=extractLiveVuelos(resSal,"salidas");
@@ -2293,12 +2323,14 @@ function loadLive(){
       }
       setTimeout(updateFlightCountdowns,100);
     })
-    .catch(function(err){
+    .catch(function(){
       liveData.lle=[];
       liveData.sal=[];
       liveLastServerEmpty=true;
-      var msg=(err&&err.message)?err.message:"error desconocido";
-      container.innerHTML="<div class='error-box'>Error al cargar vuelos desde Railway/AENA.<br><small style='color:var(--gray)'>"+String(msg).replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];})+"</small><br>Pulsa ↻ para reintentar.</div>";
+      var lleC=document.getElementById('live-container-lle');
+      var salC=document.getElementById('live-container-sal');
+      if(lleC)lleC.innerHTML="<div class='error-box' style='font-size:11px;padding:14px'>Error al cargar vuelos.<br>Pulsa \u21bb para reintentar.</div>";
+      if(salC)salC.innerHTML='';
       liveLoaded=false;
       if(typeof window.renderOperativa==='function')setTimeout(window.renderOperativa,100);
     });
@@ -2322,7 +2354,7 @@ document.getElementById("live-refresh").addEventListener("click",function(){
   var timeout=setTimeout(function(){
     btn.style.opacity="1";btn.style.pointerEvents="auto";
   }, 10000);
-  fetch(RAILWAY+"/refresh",{cache:"no-store"}).catch(function(){}).finally(function(){
+  fetch(RAILWAY+"/refresh").finally(function(){
     clearTimeout(timeout);
     liveLoaded=false;
     loadLive();
@@ -4162,13 +4194,14 @@ var _GRUPO_MONTHS=['ENERO','FEBRERO','MARZO','ABRIL','MAYO','JUNIO','JULIO','AGO
 
 
 // Exclusiones manuales de plantilla por fecha.
-// Arturo Rico Vicente no aparece ni computa en la operativa de estos días de mayo de 2026.
+// Arturo Rico no aparece ni computa en estos días de mayo de 2026.
 var _EXCLUSIONES_PLANTILLA_MANUAL={
-  '2026-05-14':['ARTURO RICO VICENTE'],
-  '2026-05-20':['ARTURO RICO VICENTE'],
-  '2026-05-26':['ARTURO RICO VICENTE'],
-  '2026-05-27':['ARTURO RICO VICENTE'],
-  '2026-05-29':['ARTURO RICO VICENTE']
+  '2026-05-14':['ARTURO RICO'],
+  '2026-05-20':['ARTURO RICO'],
+  '2026-05-26':['ARTURO RICO'],
+  '2026-05-27':['ARTURO RICO'],
+  '2026-05-28':['ARTURO RICO'],
+  '2026-05-29':['ARTURO RICO']
 };
 function _normPlantillaNombre(v){
   return String(v||'').toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,' ').trim();
