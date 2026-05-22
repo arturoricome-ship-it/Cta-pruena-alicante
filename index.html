@@ -133,8 +133,8 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 .live-col-title{font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:.8px;display:flex;align-items:center;gap:5px;white-space:nowrap;color:var(--white)}
 .live-col-badge{font-size:8px;font-weight:700;padding:2px 6px;border-radius:100px;background:rgba(200,168,75,.12);color:var(--gold);border:1px solid rgba(200,168,75,.3);margin-left:auto;flex-shrink:0}
 .live-col-body{overflow-y:auto;overflow-x:hidden;flex:1;min-height:0;padding:5px 6px 90px;-webkit-overflow-scrolling:touch;touch-action:pan-y;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.08) transparent}
-/* Filas compactas de vuelo — layout 3 columnas: info | parking | estado */
-.vcr{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:8px 9px;margin-bottom:5px;display:grid;grid-template-columns:1fr auto;gap:4px 8px;align-items:center}
+/* Filas compactas de vuelo — layout: info | estado, badge centrado absoluto */
+.vcr{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:8px 9px;margin-bottom:5px;display:grid;grid-template-columns:1fr auto;gap:4px 8px;align-items:center;position:relative}
 .vcr.vcr-corte-s{box-shadow:inset 0 -2px 0 rgba(239,68,68,.5)}
 .vcr.vcr-corte-e{box-shadow:inset 0 2px 0 rgba(34,197,94,.5)}
 .vcr-info{min-width:0}
@@ -143,13 +143,15 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 .vcr-dest{font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1}
 .vcr-hora{font-size:10px;color:var(--gray);margin-top:2px}
 .vcr-tag{font-size:8px;color:var(--gray);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:4px}
-.vcr-mid{display:none}
+.vcr-mid{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;align-items:center;justify-content:center;pointer-events:none}
 .vcr-park-lbl{font-size:7px;font-weight:700;color:#8a93a8;letter-spacing:.3px;white-space:nowrap;text-transform:uppercase;background:rgba(138,147,168,.08);border:1px solid rgba(138,147,168,.16);border-radius:4px;padding:1px 4px}
 .vcr-remoto-lbl{font-size:7px;font-weight:700;color:#f0a070;background:rgba(240,160,100,.10);border:1px solid rgba(240,160,100,.28);border-radius:4px;padding:1px 4px;white-space:nowrap}
 .vcr-right{display:flex;flex-direction:column;align-items:flex-end;gap:2px;flex-shrink:0}
 .vcr-estado{font-size:8px;font-weight:700;padding:2px 5px;border-radius:100px;white-space:nowrap;text-align:center}
 .vcr-cnt{font-size:10px;font-weight:700;color:var(--gold);text-align:right;min-height:12px;white-space:nowrap}
 .vcr-cnt.ct-soon{color:#f07070}.vcr-cnt.ct-now{color:#ffb432}
+/* Ocultar número en botones de pestaña, el contador queda solo en la cabecera */
+#live-seg .seg-cnt{display:none}
 #breadcrumb{display:flex;align-items:center;gap:3px;font-size:11px;color:var(--gray);overflow-x:auto;scrollbar-width:none;white-space:nowrap;flex:1}
 #breadcrumb::-webkit-scrollbar{display:none}
 .bc-item{cursor:pointer;transition:color .2s;flex-shrink:0}.bc-item:hover{color:var(--gold-light)}.bc-item.active{color:var(--white);font-weight:600}
@@ -2175,7 +2177,7 @@ function renderLiveCol(container,data,esS){
     });
   }
 
-  if(cntEl)cntEl.textContent=data.length;
+  if(cntEl)cntEl.textContent=data.length+' restantes';
 
   if(!data.length){
     if(!liveFiltro&&liveLastServerEmpty&&!esS){
@@ -2258,6 +2260,14 @@ function renderLiveCol(container,data,esS){
 
     var cntAttr=esEnVuelo?'':' data-hora="'+(horaEfectiva||'')+'" data-es-manana="'+(v.esManana?'1':'0')+'"';
 
+    // Badge centrado (absoluto) — solo si hay parking o remoto
+    var midHtml='';
+    if(gateLabel){
+      midHtml=gateLabel.cls==='remote'
+        ?'<div class="vcr-mid"><span class="vcr-remoto-lbl">Remoto</span></div>'
+        :'<div class="vcr-mid"><span class="vcr-park-lbl">'+gateLabel.text+'</span></div>';
+    }
+
     row.innerHTML=
       '<div class="vcr-info">'+
         '<div class="vcr-topline">'+
@@ -2265,8 +2275,9 @@ function renderLiveCol(container,data,esS){
           '<span class="vcr-dest">'+ciudad+'</span>'+
         '</div>'+
         '<div class="vcr-hora">'+horaHtml+'</div>'+
-        (tag||gateBadge?'<div class="vcr-tag">'+(tag?'<span>'+tag+'</span>':'')+gateBadge+'</div>':'')+
+        (tag?'<div class="vcr-tag"><span>'+tag+'</span></div>':'')+
       '</div>'+
+      midHtml+
       '<div class="vcr-right">'+
         '<div class="vcr-estado '+estadoClass+'">'+(v.estado||'Programado')+'</div>'+
         '<div class="vcr-cnt vuelo-countdown"'+cntAttr+'>'+(esEnVuelo?'':'&mdash;')+'</div>'+
