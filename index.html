@@ -2175,7 +2175,7 @@ function renderLiveCol(container,data,esS){
     });
   }
 
-  if(cntEl)cntEl.textContent=data.length+' restantes';
+  if(cntEl)cntEl.textContent=data.length;
 
   if(!data.length){
     if(!liveFiltro&&liveLastServerEmpty&&!esS){
@@ -2255,18 +2255,6 @@ function renderLiveCol(container,data,esS){
     row.setAttribute('data-live-mode',esS?'salidas':'llegadas');
     row.setAttribute('data-estado-class',estadoClass);
     row.setAttribute('data-es-manana',v.esManana?'1':'0');
-
-    // Columna centro: etiqueta parking o remoto
-    var midHtml='';
-    if(gateLabel){
-      if(gateLabel.cls==='remote'){
-        midHtml='<div class="vcr-mid"><span class="vcr-remoto-lbl">Remoto</span></div>';
-      }else{
-        midHtml='<div class="vcr-mid"><span class="vcr-park-lbl">'+gateLabel.text+'</span></div>';
-      }
-    }else{
-      midHtml='<div class="vcr-mid"></div>';
-    }
 
     var cntAttr=esEnVuelo?'':' data-hora="'+(horaEfectiva||'')+'" data-es-manana="'+(v.esManana?'1':'0')+'"';
 
