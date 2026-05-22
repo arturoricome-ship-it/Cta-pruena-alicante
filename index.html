@@ -71,39 +71,60 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 .live-tab{flex:1;padding:9px;background:transparent;border:none;color:var(--gray);font-family:"Outfit",sans-serif;font-size:12px;font-weight:600;cursor:pointer}
 .live-tab.active{background:rgba(200,168,75,.15);color:var(--gold)}
 
-/* === Toggle vista: dividida vs pestañas === */
+/* === Sistema de vistas vuelos === */
+/* Toggle ⬛⬛ / lado a lado */
 #live-view-toggle{
   display:flex;align-items:center;gap:2px;
-  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.10);
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.10);
   border-radius:9px;padding:2px;flex-shrink:0;
 }
 .lv-btn{
-  border:none;border-radius:7px;padding:4px 8px;
-  font:700 9px "Outfit",sans-serif;cursor:pointer;
-  background:transparent;color:var(--gray);white-space:nowrap;
-  transition:all .15s;
-}
-.lv-btn.active{background:rgba(200,168,75,.22);color:var(--gold);}
-
-/* Barra de pestañas: solo visible en modo tabs */
-#live-tab-bar{
-  display:none;flex-shrink:0;
-  border-bottom:1px solid var(--border);
-}
-#live-split.mode-tabs #live-tab-bar{display:flex;}
-#live-tab-bar .ltab{
-  flex:1;padding:9px 6px;border:none;border-bottom:2px solid transparent;
+  border:none;border-radius:7px;padding:5px 9px;
+  font:700 11px "Outfit",sans-serif;cursor:pointer;
   background:transparent;color:var(--gray);
-  font:700 12px "Outfit",sans-serif;cursor:pointer;
-  font-family:"Bebas Neue",sans-serif;font-size:14px;letter-spacing:.6px;
-  transition:all .2s;
+  transition:all .15s;line-height:1;
 }
-#live-tab-bar .ltab.active{color:var(--gold);border-bottom-color:var(--gold);}
+.lv-btn.active{background:rgba(200,168,75,.25);color:var(--gold);}
 
-/* Modo tabs: una sola columna ocupa todo */
+/* Selector Llegadas / Salidas — idéntico a la captura */
+#live-seg{
+  display:none; /* oculto en modo junto */
+  flex-shrink:0;
+  margin:0 12px 8px;
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:12px;
+  padding:3px;
+  gap:3px;
+}
+#live-seg.visible{display:flex;}
+#live-seg .seg-btn{
+  flex:1;border:none;border-radius:9px;
+  padding:9px 8px;
+  font-family:'Bebas Neue',sans-serif;
+  font-size:15px;letter-spacing:.8px;
+  cursor:pointer;background:transparent;
+  color:var(--gray);transition:all .2s;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+}
+#live-seg .seg-btn.active{
+  background:linear-gradient(135deg,var(--gold),var(--gold-light,#e8c96a));
+  color:var(--navy,#1a2744);
+  box-shadow:0 3px 10px rgba(200,168,75,.30);
+}
+#live-seg .seg-cnt{
+  font-family:'Outfit',sans-serif;
+  font-size:10px;font-weight:700;
+  background:rgba(0,0,0,.15);
+  border-radius:999px;padding:1px 6px;
+  min-width:20px;text-align:center;
+}
+
+/* Modo solo llegadas / solo salidas */
 #live-split.mode-tabs{grid-template-columns:1fr!important;}
 #live-split.mode-tabs .live-col{display:none;}
-#live-split.mode-tabs .live-col.tab-active{display:flex;}
+#live-split.mode-tabs .live-col.tab-visible{display:flex;}
 /* ── SPLIT VIEW (llegadas + salidas en paralelo) ── */
 #live-split{display:grid;grid-template-columns:1fr 1fr;flex:1;min-height:0;overflow:hidden}
 .live-col{display:flex;flex-direction:column;min-height:0;overflow:hidden;border-right:1px solid var(--border)}
@@ -113,7 +134,7 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 .live-col-badge{font-size:8px;font-weight:700;padding:2px 6px;border-radius:100px;background:rgba(200,168,75,.12);color:var(--gold);border:1px solid rgba(200,168,75,.3);margin-left:auto;flex-shrink:0}
 .live-col-body{overflow-y:auto;overflow-x:hidden;flex:1;min-height:0;padding:5px 6px 90px;-webkit-overflow-scrolling:touch;touch-action:pan-y;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.08) transparent}
 /* Filas compactas de vuelo — layout 3 columnas: info | parking | estado */
-.vcr{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:8px 9px;margin-bottom:5px;display:grid;grid-template-columns:1fr auto auto;gap:4px 8px;align-items:center}
+.vcr{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:8px 9px;margin-bottom:5px;display:grid;grid-template-columns:1fr auto;gap:4px 8px;align-items:center}
 .vcr.vcr-corte-s{box-shadow:inset 0 -2px 0 rgba(239,68,68,.5)}
 .vcr.vcr-corte-e{box-shadow:inset 0 2px 0 rgba(34,197,94,.5)}
 .vcr-info{min-width:0}
@@ -121,10 +142,10 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 .vcr-num{font-family:'Bebas Neue',sans-serif;font-size:14px;color:var(--gold);letter-spacing:.8px;flex-shrink:0;line-height:1}
 .vcr-dest{font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1}
 .vcr-hora{font-size:10px;color:var(--gray);margin-top:2px}
-.vcr-tag{font-size:8px;color:var(--gray);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.vcr-mid{display:flex;align-items:center;justify-content:center}
-.vcr-park-lbl{font-size:8px;font-weight:700;color:#8a93a8;letter-spacing:.4px;white-space:nowrap;text-transform:uppercase}
-.vcr-remoto-lbl{font-size:8px;font-weight:700;color:#f0a070;background:rgba(240,160,100,.12);border:1px solid rgba(240,160,100,.3);border-radius:4px;padding:1px 5px;white-space:nowrap}
+.vcr-tag{font-size:8px;color:var(--gray);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:4px}
+.vcr-mid{display:none}
+.vcr-park-lbl{font-size:7px;font-weight:700;color:#8a93a8;letter-spacing:.3px;white-space:nowrap;text-transform:uppercase;background:rgba(138,147,168,.08);border:1px solid rgba(138,147,168,.16);border-radius:4px;padding:1px 4px}
+.vcr-remoto-lbl{font-size:7px;font-weight:700;color:#f0a070;background:rgba(240,160,100,.10);border:1px solid rgba(240,160,100,.28);border-radius:4px;padding:1px 4px;white-space:nowrap}
 .vcr-right{display:flex;flex-direction:column;align-items:flex-end;gap:2px;flex-shrink:0}
 .vcr-estado{font-size:8px;font-weight:700;padding:2px 5px;border-radius:100px;white-space:nowrap;text-align:center}
 .vcr-cnt{font-size:10px;font-weight:700;color:var(--gold);text-align:right;min-height:12px;white-space:nowrap}
@@ -1395,8 +1416,8 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
       <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1px;display:flex;align-items:center;gap:7px;white-space:nowrap"><span class="live-dot"></span>Vueling · Alicante</div>
       <div style="display:flex;gap:5px;align-items:center;flex-shrink:0">
         <div id="live-view-toggle" title="Cambiar vista">
-          <button class="lv-btn active" id="lv-split" onclick="setLiveViewMode('split')">⬛⬛</button>
-          <button class="lv-btn" id="lv-tabs" onclick="setLiveViewMode('tabs')">☰</button>
+          <button class="lv-btn" id="lv-tabs" onclick="setLiveViewMode('tabs')" title="Llegadas / Salidas separados">☰</button>
+          <button class="lv-btn active" id="lv-split" onclick="setLiveViewMode('split')" title="Llegadas y Salidas juntos">⬛⬛</button>
         </div>
         <div id="live-fecha-panel" style="font-size:9px;color:var(--gold);letter-spacing:.8px"></div>
         <button id="live-filtro" style="background:rgba(60,180,100,.2);border:1px solid rgba(60,180,100,.3);border-radius:8px;color:#5dd88a;font-size:10px;font-weight:700;padding:4px 8px;cursor:pointer;font-family:'Outfit',sans-serif">Activos</button>
@@ -1405,18 +1426,23 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
     </div>
     <div style="font-size:10px;color:var(--gray)" id="live-hora"></div>
   </div>
+  <!-- Selector Llegadas / Salidas: visible solo en modo tabs -->
+  <div id="live-seg">
+    <button class="seg-btn active" id="seg-lle" onclick="setLiveActiveTab('lle')">
+      🛬 LLEGADAS <span class="seg-cnt" id="seg-cnt-lle">—</span>
+    </button>
+    <button class="seg-btn" id="seg-sal" onclick="setLiveActiveTab('sal')">
+      🛫 SALIDAS <span class="seg-cnt" id="seg-cnt-sal">—</span>
+    </button>
+  </div>
   <div id="live-split">
-    <div id="live-tab-bar">
-      <button class="ltab active" id="ltab-lle" onclick="setLiveActiveTab('lle')">🛬 LLEGADAS <span id="ltab-cnt-lle"></span></button>
-      <button class="ltab" id="ltab-sal" onclick="setLiveActiveTab('sal')">🛫 SALIDAS <span id="ltab-cnt-sal"></span></button>
-    </div>
-    <div class="live-col tab-active" id="live-col-lle">
+    <div class="live-col tab-visible" id="live-col-lle">
       <div class="live-col-head">
         <div class="live-col-title">&#128748; LLEGADAS <span class="live-col-badge" id="live-cnt-lle">&mdash;</span></div>
       </div>
       <div class="live-col-body" id="live-container-lle"></div>
     </div>
-    <div class="live-col" id="live-col-sal">
+    <div class="live-col tab-visible" id="live-col-sal">
       <div class="live-col-head">
         <div class="live-col-title">&#128747; SALIDAS <span class="live-col-badge" id="live-cnt-sal">&mdash;</span></div>
       </div>
@@ -2208,6 +2234,12 @@ function renderLiveCol(container,data,esS){
 
     // Parking o Remoto: derivado de la puerta usando gateOperationalLabel
     var gateLabel=esS?gateOperationalLabel(v.puerta):null;
+    var gateBadge='';
+    if(gateLabel){
+      gateBadge=gateLabel.cls==='remote'
+        ?'<span class="vcr-remoto-lbl">Remoto</span>'
+        :'<span class="vcr-park-lbl">'+gateLabel.text+'</span>';
+    }
 
     var cancelado=v.estadoClass==='e-cancelled';
     var estadoClass=v.estadoClass||'e-scheduled';
@@ -2245,9 +2277,8 @@ function renderLiveCol(container,data,esS){
           '<span class="vcr-dest">'+ciudad+'</span>'+
         '</div>'+
         '<div class="vcr-hora">'+horaHtml+'</div>'+
-        (tag?'<div class="vcr-tag">'+tag+'</div>':'')+
+        (tag||gateBadge?'<div class="vcr-tag">'+(tag?'<span>'+tag+'</span>':'')+gateBadge+'</div>':'')+
       '</div>'+
-      midHtml+
       '<div class="vcr-right">'+
         '<div class="vcr-estado '+estadoClass+'">'+(v.estado||'Programado')+'</div>'+
         '<div class="vcr-cnt vuelo-countdown"'+cntAttr+'>'+(esEnVuelo?'':'&mdash;')+'</div>'+
@@ -5847,70 +5878,74 @@ document.addEventListener('click',function(e){
 </script>
 
 <script>
-/* === Vista vuelos: dividida (split) vs pestañas (tabs) === */
-var LIVE_VIEW_KEY='cta_live_view_mode_v1';
-var LIVE_TAB_KEY='cta_live_active_tab_v1';
-var _liveViewMode='split';
-var _liveActiveTab='lle';
+/* === VISTAS VUELOS: tabs (llegadas|salidas separados) vs split (juntos) === */
+var LIVE_VIEW_KEY='cta_live_view_v1';
+var LIVE_TAB_KEY='cta_live_tab_v1';
+var _liveView='tabs';   // 'tabs' = separados (default), 'split' = juntos
+var _liveTab='lle';
 
 function setLiveViewMode(mode){
-  _liveViewMode=mode;
+  _liveView=mode;
   try{localStorage.setItem(LIVE_VIEW_KEY,mode);}catch(e){}
   var split=document.getElementById('live-split');
+  var seg=document.getElementById('live-seg');
   if(mode==='tabs'){
     split.classList.add('mode-tabs');
-    setLiveActiveTab(_liveActiveTab);
+    seg.classList.add('visible');
+    // mostrar solo la pestaña activa
+    setLiveActiveTab(_liveTab);
   }else{
     split.classList.remove('mode-tabs');
-    document.getElementById('live-col-lle').classList.add('tab-active');
-    document.getElementById('live-col-sal').classList.add('tab-active');
+    seg.classList.remove('visible');
+    // ambas columnas visibles
+    document.getElementById('live-col-lle').classList.add('tab-visible');
+    document.getElementById('live-col-sal').classList.add('tab-visible');
   }
-  document.getElementById('lv-split').classList.toggle('active', mode==='split');
   document.getElementById('lv-tabs').classList.toggle('active', mode==='tabs');
+  document.getElementById('lv-split').classList.toggle('active', mode==='split');
 }
 
 function setLiveActiveTab(tab){
-  _liveActiveTab=tab;
+  _liveTab=tab;
   try{localStorage.setItem(LIVE_TAB_KEY,tab);}catch(e){}
   ['lle','sal'].forEach(function(t){
     var col=document.getElementById('live-col-'+t);
-    if(col)col.classList.toggle('tab-active', t===tab);
-    var btn=document.getElementById('ltab-'+t);
+    if(col)col.classList.toggle('tab-visible', t===tab);
+    var btn=document.getElementById('seg-'+t);
     if(btn)btn.classList.toggle('active', t===tab);
   });
-  syncLiveTabCounts();
+  syncSegCounts();
 }
 
-function syncLiveTabCounts(){
+function syncSegCounts(){
   ['lle','sal'].forEach(function(t){
     var badge=document.getElementById('live-cnt-'+t);
-    var mini=document.getElementById('ltab-cnt-'+t);
-    if(badge&&mini)mini.textContent=badge.textContent;
+    var mini=document.getElementById('seg-cnt-'+t);
+    if(badge&&mini)mini.textContent=badge.textContent||'—';
   });
 }
 
 function initLiveViewMode(){
-  var savedMode='split';
+  var savedView='tabs';
   var savedTab='lle';
-  try{savedMode=localStorage.getItem(LIVE_VIEW_KEY)||'split';}catch(e){}
+  try{savedView=localStorage.getItem(LIVE_VIEW_KEY)||'tabs';}catch(e){}
   try{savedTab=localStorage.getItem(LIVE_TAB_KEY)||'lle';}catch(e){}
-  _liveActiveTab=savedTab;
-  setLiveViewMode(savedMode);
+  _liveTab=savedTab;
+  setLiveViewMode(savedView);
 }
 
-// Sincronizar contadores del mini tab bar tras cada render de vuelos
+// Sincronizar contadores automáticamente cuando cambien los badges
 (function(){
-  var _origRender=window.renderVuelosList||window.renderVuelos;
-  var checkInterval=setInterval(function(){
-    if(document.getElementById('live-cnt-lle')){
-      var obs=new MutationObserver(syncLiveTabCounts);
-      ['live-cnt-lle','live-cnt-sal'].forEach(function(id){
-        var el=document.getElementById(id);
-        if(el)obs.observe(el,{childList:true,characterData:true,subtree:true});
-      });
-      clearInterval(checkInterval);
-    }
-  },500);
+  var ready=setInterval(function(){
+    var el=document.getElementById('live-cnt-lle');
+    if(!el)return;
+    clearInterval(ready);
+    var obs=new MutationObserver(syncSegCounts);
+    ['live-cnt-lle','live-cnt-sal'].forEach(function(id){
+      var e=document.getElementById(id);
+      if(e)obs.observe(e,{childList:true,characterData:true,subtree:true});
+    });
+  },400);
 })();
 </script>
 
