@@ -143,14 +143,18 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 .vcr-dest{font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1}
 .vcr-hora{font-size:10px;color:var(--gray);margin-top:2px}
 .vcr-tag{font-size:8px;color:var(--gray);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:4px}
-.vcr-mid{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;align-items:center;justify-content:center;pointer-events:none}
+/* Badge centrado horizontal, a la altura de la línea "Puerta" (abajo) */
+.vcr-mid{position:absolute;left:50%;bottom:9px;transform:translateX(-50%);display:flex;align-items:center;justify-content:center;pointer-events:none}
 .vcr-park-lbl{font-size:7px;font-weight:700;color:#8a93a8;letter-spacing:.3px;white-space:nowrap;text-transform:uppercase;background:rgba(138,147,168,.08);border:1px solid rgba(138,147,168,.16);border-radius:4px;padding:1px 4px}
 .vcr-remoto-lbl{font-size:7px;font-weight:700;color:#f0a070;background:rgba(240,160,100,.10);border:1px solid rgba(240,160,100,.28);border-radius:4px;padding:1px 4px;white-space:nowrap}
 .vcr-right{display:flex;flex-direction:column;align-items:flex-end;gap:2px;flex-shrink:0}
 .vcr-estado{font-size:8px;font-weight:700;padding:2px 5px;border-radius:100px;white-space:nowrap;text-align:center}
 .vcr-cnt{font-size:10px;font-weight:700;color:var(--gold);text-align:right;min-height:12px;white-space:nowrap}
 .vcr-cnt.ct-soon{color:#f07070}.vcr-cnt.ct-now{color:#ffb432}
-/* Ocultar número en botones de pestaña, el contador queda solo en la cabecera */
+/* Vista simple: badge más grande */
+#live-split.mode-tabs .vcr-park-lbl{font-size:9px!important;padding:2px 7px!important;letter-spacing:.4px!important}
+#live-split.mode-tabs .vcr-remoto-lbl{font-size:9px!important;padding:2px 7px!important}
+/* Sin número en botones de pestaña */
 #live-seg .seg-cnt{display:none}
 #breadcrumb{display:flex;align-items:center;gap:3px;font-size:11px;color:var(--gray);overflow-x:auto;scrollbar-width:none;white-space:nowrap;flex:1}
 #breadcrumb::-webkit-scrollbar{display:none}
@@ -2258,15 +2262,15 @@ function renderLiveCol(container,data,esS){
     row.setAttribute('data-estado-class',estadoClass);
     row.setAttribute('data-es-manana',v.esManana?'1':'0');
 
-    var cntAttr=esEnVuelo?'':' data-hora="'+(horaEfectiva||'')+'" data-es-manana="'+(v.esManana?'1':'0')+'"';
-
-    // Badge centrado (absoluto) — solo si hay parking o remoto
+    // Columna centro: etiqueta parking o remoto (centrado absoluto a la altura de Puerta)
     var midHtml='';
     if(gateLabel){
       midHtml=gateLabel.cls==='remote'
         ?'<div class="vcr-mid"><span class="vcr-remoto-lbl">Remoto</span></div>'
         :'<div class="vcr-mid"><span class="vcr-park-lbl">'+gateLabel.text+'</span></div>';
     }
+
+    var cntAttr=esEnVuelo?'':' data-hora="'+(horaEfectiva||'')+'" data-es-manana="'+(v.esManana?'1':'0')+'"';
 
     row.innerHTML=
       '<div class="vcr-info">'+
