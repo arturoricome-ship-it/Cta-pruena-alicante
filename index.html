@@ -143,7 +143,7 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 .vcr-dest{font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1}
 .vcr-hora{font-size:12px;color:var(--gray);margin-top:3px}
 .vcr-tag{font-size:10px;color:var(--gray);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:4px}
-/* Badge Parking/Remoto: centrado horizontal, alineado a la última línea (Puerta) — tamaño sin tocar */
+/* Badge Parking/Remoto: centrado horizontal, a la altura de la línea Puerta */
 .vcr-mid{position:absolute;left:50%;bottom:11px;transform:translateX(-50%);display:flex;align-items:center;justify-content:center;pointer-events:none}
 .vcr-park-lbl{font-size:7px;font-weight:700;color:#8a93a8;letter-spacing:.3px;white-space:nowrap;text-transform:uppercase;background:rgba(138,147,168,.08);border:1px solid rgba(138,147,168,.16);border-radius:4px;padding:1px 4px}
 .vcr-remoto-lbl{font-size:7px;font-weight:700;color:#f0a070;background:rgba(240,160,100,.10);border:1px solid rgba(240,160,100,.28);border-radius:4px;padding:1px 4px;white-space:nowrap}
@@ -2181,7 +2181,7 @@ function renderLiveCol(container,data,esS){
     });
   }
 
-  if(cntEl)cntEl.textContent=data.length+' restantes';
+  if(cntEl)cntEl.textContent=data.filter(function(v){return !v.esManana;}).length+' restantes';
 
   if(!data.length){
     if(!liveFiltro&&liveLastServerEmpty&&!esS){
@@ -2262,7 +2262,7 @@ function renderLiveCol(container,data,esS){
     row.setAttribute('data-estado-class',estadoClass);
     row.setAttribute('data-es-manana',v.esManana?'1':'0');
 
-    // Columna centro: etiqueta parking o remoto (centrado absoluto a la altura de Puerta)
+    // Badge parking/remoto centrado absoluto a la altura de "Puerta"
     var midHtml='';
     if(gateLabel){
       midHtml=gateLabel.cls==='remote'
