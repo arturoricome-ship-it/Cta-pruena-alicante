@@ -2147,7 +2147,7 @@ function getLiveCutoffsFromTurnoHoy(){
 function gateOperationalLabel(puerta){
   var raw=String(puerta||'').toUpperCase().trim();
   if(!raw)return null;
-  var m=raw.match(/([BC])\s*[- ]?\s*(\d{1,2})/);
+  var m=raw.match(/([BC])\s*[- ]?\s*(\d+)/);
   if(!m)return null;
   var num=m[2];
   var gate=m[1]+String(parseInt(num,10)).padStart(2,'0');
