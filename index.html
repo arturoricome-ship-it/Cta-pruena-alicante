@@ -2149,15 +2149,17 @@ function gateOperationalLabel(puerta){
   if(!raw)return null;
   var m=raw.match(/([BC])\s*[- ]?\s*(\d+)/);
   if(!m)return null;
-  var num=m[2];
-  var gate=m[1]+String(parseInt(num,10)).padStart(2,'0');
+  var gate=m[1]+String(parseInt(m[2],10)).padStart(2,'0');
   var remoteSet=new Set([
-    'C50','C48','C46','C44','C42','C40','C38',
-    'B18','B20','B22','B24','B26','B28','B30','B32','B34',
-    'C20','C22'
+    'B18','B19','B20','B22','B24','B26','B28','B30','B32','B34',
+    'C38','C40','C42','C44','C46','C48','C50'
   ]);
   if(remoteSet.has(gate))return {text:'Remoto',cls:'remote'};
-  return {text:'Parking '+String(parseInt(num,10)),cls:'parking'};
+  var parkingSet=new Set([
+    'C35','C36','C37','C39','C41','C43','C45','C47','C49'
+  ]);
+  if(parkingSet.has(gate))return {text:'Parking '+String(parseInt(m[2],10)),cls:'parking'};
+  return null;
 }
 
 function renderLive(){
