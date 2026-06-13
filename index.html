@@ -699,7 +699,7 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
   z-index:100001!important;
   bottom:0!important;
   max-height:calc(100vh - 72px)!important;
-  padding-bottom:calc(20px + env(safe-area-inset-bottom))!important;
+  padding-bottom:calc(110px + env(safe-area-inset-bottom))!important;
   overscroll-behavior:contain;
 }
 #mc-edit-panel.open{transform:translateY(0)!important}
@@ -4108,10 +4108,12 @@ function mcEditDay(day,e){
   }
   document.getElementById('mc-edit-bg').style.display='block';
   setTimeout(function(){document.getElementById('mc-edit-panel').classList.add('open');},10);
+  var bcb=document.getElementById('btn-buscar-cambio');if(bcb)bcb.style.display='block';
 }
 function mcEditClose(){
   document.getElementById('mc-edit-panel').classList.remove('open');
   setTimeout(function(){document.getElementById('mc-edit-bg').style.display='none';},280);
+  var bcb=document.getElementById('btn-buscar-cambio');if(bcb)bcb.style.display='none';
 }
 function mcEditSave(){
   var tipo=document.querySelector('.mc-tipo-btn.sel');
@@ -4311,10 +4313,11 @@ document.addEventListener('DOMContentLoaded',function(){
     </div>
   </div>
   <button class="mc-edit-save" onclick="mcEditSave()">✅ Guardar cambios</button>
-  <button id="btn-buscar-cambio" class="mc-edit-save" ontouchend="event.preventDefault();abrirBuscadorCambio();" onclick="abrirBuscadorCambio()" style="background:rgba(96,165,250,.15);border-color:rgba(96,165,250,.4);color:#60a5fa;touch-action:manipulation;-webkit-tap-highlight-color:rgba(96,165,250,.3)">🔄 Buscar cambio de turno</button>
   <button class="mc-edit-cancel" onclick="mcEditClose()">Cancelar</button>
 </div>
 
+<!-- BOTÓN CAMBIO TURNO FIJO -->
+<button id="btn-buscar-cambio" onclick="abrirBuscadorCambio()" style="display:none;position:fixed;bottom:calc(76px + env(safe-area-inset-bottom));left:16px;right:16px;background:rgba(96,165,250,.2);border:1px solid rgba(96,165,250,.5);border-radius:12px;padding:13px;font-family:'Outfit',sans-serif;font-size:14px;font-weight:700;color:#60a5fa;cursor:pointer;z-index:100002;text-align:center">🔄 Buscar cambio de turno</button>
 
 <!-- PANEL BUSCADOR CAMBIO -->
 <div id="cambio-bg" onclick="cerrarBuscadorCambio()"></div>
@@ -6130,32 +6133,21 @@ function abrirBuscadorCambio(){
   _cambioDay=_mcEditDay;
   _cambioMonth=_mcEditMonth;
   _cambioYear=_mcEditYear;
-  // Guardar contenido original del panel para poder volver
-  var panel=document.getElementById('mc-edit-panel');
-  _mcEditPanelOriginal=panel.innerHTML;
-  // Sustituir contenido del panel por el buscador
-  var dname=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'][(new Date(_cambioYear,_cambioMonth,_cambioDay).getDay()+6)%7];
-  var titleDia=dname+' '+_cambioDay+' '+_MC_NAMES[_cambioMonth];
-  panel.innerHTML=
-    '<div class="mc-edit-handle"></div>'+
-    '<div class="mc-edit-title-bar">🔄 Cambios · '+titleDia+'</div>'+
-    '<div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">'+
-      '<input id="cambio-ia-input" type="text" placeholder="Ej: tarde el lunes, salir antes 14h..." style="flex:1;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:12px;color:#f0eee8;font-family:Outfit,sans-serif;font-size:12px;padding:9px 12px;outline:none" onkeydown="if(event.key==='Enter')filtrarConIA()">'+
-      '<button ontouchend="event.preventDefault();filtrarConIA()" onclick="filtrarConIA()" style="background:rgba(200,168,75,.15);border:1px solid rgba(200,168,75,.3);border-radius:10px;padding:9px 12px;color:#c8a84b;font-size:13px;cursor:pointer;touch-action:manipulation">✨</button>'+
-      '<button ontouchend="event.preventDefault();limpiarFiltroIA()" onclick="limpiarFiltroIA()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:9px 10px;color:#8a93a8;font-size:11px;cursor:pointer;touch-action:manipulation">↺</button>'+
-    '</div>'+
-    '<div id="cambio-ia-estado" style="font-size:10px;color:#c8a84b;margin-bottom:8px;min-height:14px"></div>'+
-    '<div id="cambio-body" style="overflow-y:auto;flex:1"></div>'+
-    '<button ontouchend="event.preventDefault();cerrarBuscadorCambio()" onclick="cerrarBuscadorCambio()" style="width:100%;background:none;border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px;font-family:Outfit,sans-serif;font-size:13px;color:#8a93a8;cursor:pointer;margin-top:8px;touch-action:manipulation">✕ Cerrar</button>';
-  calcularCambios();
-}
-
-var _mcEditPanelOriginal='';
-
-function cerrarBuscadorCambio(){
-  var panel=document.getElementById('mc-edit-panel');
-  if(_mcEditPanelOriginal)panel.innerHTML=_mcEditPanelOriginal;
-  _mcEditPanelOriginal='';
+  if(_cambioDay===null||_cambioDay===undefined){alert('Error: no hay día seleccionado');return;}
+  // Cerrar panel edición
+  var ep=document.getElementById('mc-edit-panel');
+  var eb=document.getElementById('mc-edit-bg');
+  if(ep)ep.classList.remove('open');
+  if(eb)setTimeout(function(){eb.style.display='none';},280);
+  // Abrir panel cambio
+  setTimeout(function(){
+    var bg=document.getElementById('cambio-bg');
+    var panel=document.getElementById('cambio-panel');
+    if(!bg||!panel){alert('Error: panel cambio no encontrado');return;}
+    bg.style.display='block';
+    setTimeout(function(){panel.classList.add('open');},10);
+    calcularCambios();
+  },320);
 }
 
 function cerrarBuscadorCambio(){
