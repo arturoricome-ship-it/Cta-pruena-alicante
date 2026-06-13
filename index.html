@@ -4310,8 +4310,8 @@ document.addEventListener('DOMContentLoaded',function(){
       <button onclick="mcResetPeren()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:9px 12px;color:var(--gray);font-family:'Outfit',sans-serif;font-size:12px;cursor:pointer;white-space:nowrap;margin-top:18px">↺ Reset</button>
     </div>
   </div>
-  <button class="mc-edit-save" onclick="mcEditSave()">✅ Guardar</button>
   <button class="mc-edit-save" style="background:rgba(96,165,250,.15);border-color:rgba(96,165,250,.4);color:#60a5fa;margin-bottom:8px" onclick="abrirBuscadorCambio()">🔄 Buscar cambio de turno</button>
+  <button class="mc-edit-save" onclick="mcEditSave()">✅ Guardar cambios</button>
   <button class="mc-edit-cancel" onclick="mcEditClose()">Cancelar</button>
 </div>
 
@@ -6129,10 +6129,19 @@ function abrirBuscadorCambio(){
   _cambioDay=_mcEditDay;
   _cambioMonth=_mcEditMonth;
   _cambioYear=_mcEditYear;
-  mcEditClose();
+  if(_cambioDay===null||_cambioDay===undefined){alert('Error: no hay día seleccionado');return;}
+  // Cerrar panel edición
+  var ep=document.getElementById('mc-edit-panel');
+  var eb=document.getElementById('mc-edit-bg');
+  if(ep)ep.classList.remove('open');
+  if(eb)setTimeout(function(){eb.style.display='none';},280);
+  // Abrir panel cambio
   setTimeout(function(){
-    document.getElementById('cambio-bg').style.display='block';
-    setTimeout(function(){document.getElementById('cambio-panel').classList.add('open');},10);
+    var bg=document.getElementById('cambio-bg');
+    var panel=document.getElementById('cambio-panel');
+    if(!bg||!panel){alert('Error: panel cambio no encontrado');return;}
+    bg.style.display='block';
+    setTimeout(function(){panel.classList.add('open');},10);
     calcularCambios();
   },320);
 }
