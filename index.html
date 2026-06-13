@@ -4264,7 +4264,7 @@ document.addEventListener('DOMContentLoaded',function(){
 <div id="mc-edit-panel">
   <div class="mc-edit-handle"></div>
   <div class="mc-edit-title-bar" id="mc-edit-title">Editar día</div>
-  <button onclick="alert('día:'+_mcEditDay+' mes:'+_mcEditMonth);abrirBuscadorCambio();" style="width:100%;background:rgba(96,165,250,.15);border:1px solid rgba(96,165,250,.4);border-radius:12px;padding:11px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:700;color:#60a5fa;cursor:pointer;margin-bottom:10px">🔄 Buscar cambio de turno</button>
+  <button onclick="abrirBuscadorCambio()" style="width:100%;background:rgba(96,165,250,.15);border:1px solid rgba(96,165,250,.4);border-radius:12px;padding:11px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:700;color:#60a5fa;cursor:pointer;margin-bottom:10px">🔄 Buscar cambio de turno</button>
   <div class="mc-tipo-grid" id="mc-tipo-grid">
     <button class="mc-tipo-btn" data-tipo="trabajado" onclick="mcTipoSel(this)"><span class="t-ico">⚙️</span><span class="t-lbl">Trabajado</span></button>
     <button class="mc-tipo-btn" data-tipo="vacaciones" onclick="mcTipoSel(this)"><span class="t-ico">🏖️</span><span class="t-lbl">Vacaciones</span></button>
@@ -6126,12 +6126,15 @@ function abrirBuscadorCambio(){
   _cambioDay=_mcEditDay;
   _cambioMonth=_mcEditMonth;
   _cambioYear=_mcEditYear;
-  mcEditClose();
+  // Cerrar panel edición inmediatamente sin animación
+  document.getElementById('mc-edit-panel').classList.remove('open');
+  document.getElementById('mc-edit-bg').style.display='none';
+  // Abrir panel cambio
+  document.getElementById('cambio-bg').style.display='block';
   setTimeout(function(){
-    document.getElementById('cambio-bg').style.display='block';
-    setTimeout(function(){document.getElementById('cambio-panel').classList.add('open');},10);
+    document.getElementById('cambio-panel').classList.add('open');
     calcularCambios();
-  },320);
+  },50);
 }
 
 function cerrarBuscadorCambio(){
