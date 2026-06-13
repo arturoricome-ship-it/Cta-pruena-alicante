@@ -699,7 +699,7 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
   z-index:100001!important;
   bottom:0!important;
   max-height:calc(100vh - 72px)!important;
-  padding-bottom:calc(20px + env(safe-area-inset-bottom))!important;
+  padding-bottom:calc(110px + env(safe-area-inset-bottom))!important;
   overscroll-behavior:contain;
 }
 #mc-edit-panel.open{transform:translateY(0)!important}
@@ -4108,10 +4108,12 @@ function mcEditDay(day,e){
   }
   document.getElementById('mc-edit-bg').style.display='block';
   setTimeout(function(){document.getElementById('mc-edit-panel').classList.add('open');},10);
+  var bcb=document.getElementById('btn-buscar-cambio');if(bcb)bcb.style.display='block';
 }
 function mcEditClose(){
   document.getElementById('mc-edit-panel').classList.remove('open');
   setTimeout(function(){document.getElementById('mc-edit-bg').style.display='none';},280);
+  var bcb=document.getElementById('btn-buscar-cambio');if(bcb)bcb.style.display='none';
 }
 function mcEditSave(){
   var tipo=document.querySelector('.mc-tipo-btn.sel');
@@ -4311,10 +4313,11 @@ document.addEventListener('DOMContentLoaded',function(){
     </div>
   </div>
   <button class="mc-edit-save" onclick="mcEditSave()">✅ Guardar cambios</button>
-  <button id="btn-buscar-cambio" class="mc-edit-save" ontouchend="event.preventDefault();abrirBuscadorCambio();" onclick="abrirBuscadorCambio()" style="background:rgba(96,165,250,.15);border-color:rgba(96,165,250,.4);color:#60a5fa;touch-action:manipulation;-webkit-tap-highlight-color:rgba(96,165,250,.3)">🔄 Buscar cambio de turno</button>
   <button class="mc-edit-cancel" onclick="mcEditClose()">Cancelar</button>
 </div>
 
+<!-- BOTÓN CAMBIO TURNO FIJO -->
+<button id="btn-buscar-cambio" onclick="abrirBuscadorCambio()" style="display:none;position:fixed;bottom:calc(76px + env(safe-area-inset-bottom));left:16px;right:16px;background:rgba(96,165,250,.2);border:1px solid rgba(96,165,250,.5);border-radius:12px;padding:13px;font-family:'Outfit',sans-serif;font-size:14px;font-weight:700;color:#60a5fa;cursor:pointer;z-index:100002;text-align:center">🔄 Buscar cambio de turno</button>
 
 <!-- PANEL BUSCADOR CAMBIO -->
 <div id="cambio-bg" onclick="cerrarBuscadorCambio()"></div>
@@ -6130,32 +6133,21 @@ function abrirBuscadorCambio(){
   _cambioDay=_mcEditDay;
   _cambioMonth=_mcEditMonth;
   _cambioYear=_mcEditYear;
-  // Guardar contenido original del panel para poder volver
-  var panel=document.getElementById('mc-edit-panel');
-  _mcEditPanelOriginal=panel.innerHTML;
-  // Sustituir contenido del panel por el buscador
-  var dname=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'][(new Date(_cambioYear,_cambioMonth,_cambioDay).getDay()+6)%7];
-  var titleDia=dname+' '+_cambioDay+' '+_MC_NAMES[_cambioMonth];
-  panel.innerHTML=
-    '<div class="mc-edit-handle"></div>'+
-    '<div class="mc-edit-title-bar">🔄 Cambios · '+titleDia+'</div>'+
-    '<div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">'+
-      '<input id="cambio-ia-input" type="text" placeholder="Ej: tarde el lunes, salir antes 14h..." style="flex:1;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:12px;color:#f0eee8;font-family:Outfit,sans-serif;font-size:12px;padding:9px 12px;outline:none" onkeydown="if(event.key==='Enter')filtrarConIA()">'+
-      '<button ontouchend="event.preventDefault();filtrarConIA()" onclick="filtrarConIA()" style="background:rgba(200,168,75,.15);border:1px solid rgba(200,168,75,.3);border-radius:10px;padding:9px 12px;color:#c8a84b;font-size:13px;cursor:pointer;touch-action:manipulation">✨</button>'+
-      '<button ontouchend="event.preventDefault();limpiarFiltroIA()" onclick="limpiarFiltroIA()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:9px 10px;color:#8a93a8;font-size:11px;cursor:pointer;touch-action:manipulation">↺</button>'+
-    '</div>'+
-    '<div id="cambio-ia-estado" style="font-size:10px;color:#c8a84b;margin-bottom:8px;min-height:14px"></div>'+
-    '<div id="cambio-body" style="overflow-y:auto;flex:1"></div>'+
-    '<button ontouchend="event.preventDefault();cerrarBuscadorCambio()" onclick="cerrarBuscadorCambio()" style="width:100%;background:none;border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px;font-family:Outfit,sans-serif;font-size:13px;color:#8a93a8;cursor:pointer;margin-top:8px;touch-action:manipulation">✕ Cerrar</button>';
-  calcularCambios();
-}
-
-var _mcEditPanelOriginal='';
-
-function cerrarBuscadorCambio(){
-  var panel=document.getElementById('mc-edit-panel');
-  if(_mcEditPanelOriginal)panel.innerHTML=_mcEditPanelOriginal;
-  _mcEditPanelOriginal='';
+  if(_cambioDay===null||_cambioDay===undefined){alert('Error: no hay día seleccionado');return;}
+  // Cerrar panel edición
+  var ep=document.getElementById('mc-edit-panel');
+  var eb=document.getElementById('mc-edit-bg');
+  if(ep)ep.classList.remove('open');
+  if(eb)setTimeout(function(){eb.style.display='none';},280);
+  // Abrir panel cambio
+  setTimeout(function(){
+    var bg=document.getElementById('cambio-bg');
+    var panel=document.getElementById('cambio-panel');
+    if(!bg||!panel){alert('Error: panel cambio no encontrado');return;}
+    bg.style.display='block';
+    setTimeout(function(){panel.classList.add('open');},10);
+    calcularCambios();
+  },320);
 }
 
 function cerrarBuscadorCambio(){
@@ -6330,133 +6322,82 @@ function calcularCambios(){
 
     // El compañero ese día
     var compTurnoMiDia=compDias[day]||null;
-    var compE1=compTurnoMiDia&&compTurnoMiDia.e1?_toMin(compTurnoMiDia.e1):null;
-    var compS1=compTurnoMiDia&&compTurnoMiDia.s1?_toMin(compTurnoMiDia.s1):null;
+    var compE1=compTurnoMiDia?_toMin(compTurnoMiDia.e1):null;
+    var compS1=compTurnoMiDia?_toMin(compTurnoMiDia.s1):null;
     var compE2=compTurnoMiDia&&compTurnoMiDia.e2?_toMin(compTurnoMiDia.e2):null;
     var compS2=compTurnoMiDia&&compTurnoMiDia.s2?_toMin(compTurnoMiDia.s2):null;
     var compLibreMiDia=(compE1===null);
 
-    // CASO A: Intercambio mismo día — ambos tienen turno
-    // Yo hago el turno del comp, el comp hace el mío
-    if(!esLibre && !compLibreMiDia && !_esPasado(day,monthKey,year)){
+    // CASO A: Ambos tienen turno ese día → intercambio directo
+    if(!esLibre&&!compLibreMiDia&&!_esPasado(day,monthKey,year)){
       var errA=[];
-      var valA_yo=_validarTurno(compE1,compS1,compE2,compS2);
-      var valA_comp=_validarTurno(myE1,myS1,myE2,myS2);
-      errA=valA_yo.errores.concat(valA_comp.errores);
-      var myCatA=_parseCategoria(myCat), compCatA=_parseCategoria(comp.categoria||'');
-      if(myCatA.tipo!=='FIJO'){var hA=_horasLVSemana(myRaw[monthKey]||{},monthKey,day,compE1,compS1,compE2,compS2);if(hA>2160)errA.push('Yo supero 36h esa semana ('+(hA/60).toFixed(1)+'h)');}
-      if(compCatA.tipo!=='FIJO'){var hAc=_horasLVSemana(compDias,monthKey,day,myE1,myS1,myE2,myS2);if(hAc>2160)errA.push('Comp supera 36h esa semana ('+(hAc/60).toFixed(1)+'h)');}
+      errA=errA.concat(_validarTurno(compE1,compS1,compE2,compS2).errores);
+      errA=errA.concat(_validarTurno(myE1,myS1,myE2,myS2).errores);
+      var myCatA=_parseCategoria(myCat),ccA=_parseCategoria(comp.categoria||'');
+      if(myCatA.tipo!=='FIJO'){var hA=_horasLVSemana(myRaw[monthKey]||{},monthKey,day,compE1,compS1,compE2,compS2);if(hA>2160)errA.push('Yo supero 36h L-V ('+(hA/60).toFixed(1)+'h)');}
+      if(ccA.tipo!=='FIJO'){var hAc=_horasLVSemana(compDias,monthKey,day,myE1,myS1,myE2,myS2);if(hAc>2160)errAc=errA.push(comp.nombre.split(' ')[0]+' supera 36h L-V ('+(hAc/60).toFixed(1)+'h)');}
       resultados.push({
-        nombre:comp.nombre, cat:comp.categoria||'',
-        tipo:'mismo_dia',
-        diaOrigen:day, labelOrigen:titleDia,
-        diaDestino:day, labelDestino:titleDia,
-        // Yo hago turno del comp ese día
-        turnoYoHace:_fmtTurno(compE1,compS1,compE2,compS2),
-        // Comp hace mi turno ese día
-        turnoCompHace:_fmtTurno(myE1,myS1,myE2,myS2),
-        ok:errA.length===0, errores:errA, directo:true
+        nombre:comp.nombre,cat:comp.categoria||'',tipo:'mismo_dia',
+        labelDia:titleDia,
+        turnoYo:_fmtTurno(myE1,myS1,myE2,myS2),
+        turnoComp:_fmtTurno(compE1,compS1,compE2,compS2),
+        ok:errA.length===0,errores:errA
       });
     }
 
-    // CASO B: Yo tengo turno el día señalado, comp libra ese día
-    // → Comp viene a trabajar MI turno el día señalado
-    // → A cambio, yo trabajo UN DÍA FUTURO donde comp trabaja y yo libro
-    if(!esLibre && compLibreMiDia && !_esPasado(day,monthKey,year)){
-      // El comp haría mi turno el día señalado
-      var valB_comp=_validarTurno(myE1,myS1,myE2,myS2);
-      var compCatB=_parseCategoria(comp.categoria||'');
-      var errB_comp=valB_comp.errores.slice();
-      if(compCatB.tipo!=='FIJO'){var hBc=_horasLVSemana(compDias,monthKey,day,myE1,myS1,myE2,myS2);if(hBc>2160)errB_comp.push('Comp supera 36h esa semana ('+(hBc/60).toFixed(1)+'h)');}
-
-      // Buscar días FUTUROS donde yo libro y comp trabaja
+    // CASO B: Yo tengo turno, comp libra ese día
+    // Comp trabaja MI turno. A cambio yo trabajo un día futuro del comp.
+    if(!esLibre&&compLibreMiDia&&!_esPasado(day,monthKey,year)){
+      var errBbase=_validarTurno(myE1,myS1,myE2,myS2).errores.slice();
+      var ccB=_parseCategoria(comp.categoria||'');
+      if(ccB.tipo!=='FIJO'){var hBc=_horasLVSemana(compDias,monthKey,day,myE1,myS1,myE2,myS2);if(hBc>2160)errBbase.push(comp.nombre.split(' ')[0]+' supera 36h L-V ('+(hBc/60).toFixed(1)+'h)');}
       for(var d2=1;d2<=31;d2++){
-        if(d2===day)continue;
-        if(_esPasado(d2,monthKey,year))continue;
+        if(d2===day||_esPasado(d2,monthKey,year))continue;
         var myT2=(myRaw[monthKey]||{})[d2];
-        var myLibreD2=(!myT2||!myT2.e1||myT2.tipo==='libre'||myT2.tipo==='vacaciones');
-        if(!myLibreD2)continue; // ese día yo tengo que librar
-        var compT2=compDias[d2];
-        if(!compT2||!compT2.e1)continue; // el comp tiene que trabajar ese día
-        // Yo haría el turno del comp en d2
-        var cT2E1=_toMin(compT2.e1),cT2S1=_toMin(compT2.s1);
-        var cT2E2=compT2.e2?_toMin(compT2.e2):null,cT2S2=compT2.s2?_toMin(compT2.s2):null;
-        var valB_yo=_validarTurno(cT2E1,cT2S1,cT2E2,cT2S2);
-        var errB=errB_comp.concat(valB_yo.errores);
+        if(myT2&&myT2.e1)continue; // yo debo librar ese día
+        var cT2=compDias[d2];
+        if(!cT2||!cT2.e1)continue; // comp debe trabajar ese día
+        var cE1=_toMin(cT2.e1),cS1=_toMin(cT2.s1),cE2=cT2.e2?_toMin(cT2.e2):null,cS2=cT2.s2?_toMin(cT2.s2):null;
+        var errB=errBbase.concat(_validarTurno(cE1,cS1,cE2,cS2).errores);
         var myCatB=_parseCategoria(myCat);
-        if(myCatB.tipo!=='FIJO'){var hBy=_horasLVSemana(myRaw[monthKey]||{},monthKey,d2,cT2E1,cT2S1,cT2E2,cT2S2);if(hBy>2160)errB.push('Yo supero 36h esa semana ('+(hBy/60).toFixed(1)+'h)');}
-        var d2name=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'][(new Date(year,_cambioMonth,d2).getDay()+6)%7];
+        if(myCatB.tipo!=='FIJO'){var hBy=_horasLVSemana(myRaw[monthKey]||{},monthKey,d2,cE1,cS1,cE2,cS2);if(hBy>2160)errB.push('Yo supero 36h L-V ('+(hBy/60).toFixed(1)+'h)');}
+        var dn2=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'][(new Date(year,_cambioMonth,d2).getDay()+6)%7];
         resultados.push({
-          nombre:comp.nombre, cat:comp.categoria||'',
-          tipo:'yo_libro_dia',
-          diaOrigen:day, labelOrigen:titleDia,
-          diaDestino:d2, labelDestino:d2name+' '+d2+' '+_MC_NAMES[_cambioMonth],
-          // Yo libro el día señalado, comp trabaja mi turno
-          turnoYoHace:_fmtTurno(cT2E1,cT2S1,cT2E2,cT2S2), // yo trabajo en d2
-          turnoCompHace:_fmtTurno(myE1,myS1,myE2,myS2),    // comp trabaja mi turno el día señalado
-          ok:errB.length===0, errores:errB
+          nombre:comp.nombre,cat:comp.categoria||'',tipo:'yo_libro',
+          labelDia:titleDia,labelComp:dn2+' '+d2+' '+_MC_NAMES[_cambioMonth],
+          turnoYo:_fmtTurno(myE1,myS1,myE2,myS2),   // comp hace esto el día señalado
+          turnoComp:_fmtTurno(cE1,cS1,cE2,cS2),      // yo hago esto en d2
+          ok:errB.length===0,errores:errB
         });
       }
     }
 
-    // CASO C: Yo libro el día señalado, comp trabaja ese día
-    // → Yo trabajo el turno del comp el día señalado
-    // → A cambio, comp libra UN DÍA FUTURO donde yo trabajo y comp libra
-    if(esLibre && !compLibreMiDia && !_esPasado(day,monthKey,year)){
-      // Yo haría el turno del comp el día señalado
-      var valC_yo=_validarTurno(compE1,compS1,compE2,compS2);
+    // CASO C: Yo libro ese día, comp trabaja
+    // Yo trabajo turno del comp. A cambio comp trabaja mi turno un día futuro.
+    if(esLibre&&!compLibreMiDia&&!_esPasado(day,monthKey,year)){
+      var errCbase=_validarTurno(compE1,compS1,compE2,compS2).errores.slice();
       var myCatC=_parseCategoria(myCat);
-      var errC_yo=valC_yo.errores.slice();
-      if(myCatC.tipo!=='FIJO'){var hCy=_horasLVSemana(myRaw[monthKey]||{},monthKey,day,compE1,compS1,compE2,compS2);if(hCy>2160)errC_yo.push('Yo supero 36h esa semana ('+(hCy/60).toFixed(1)+'h)');}
-
-      // Buscar días FUTUROS donde comp libra y yo trabajo
+      if(myCatC.tipo!=='FIJO'){var hCy=_horasLVSemana(myRaw[monthKey]||{},monthKey,day,compE1,compS1,compE2,compS2);if(hCy>2160)errCbase.push('Yo supero 36h L-V ('+(hCy/60).toFixed(1)+'h)');}
       for(var d3=1;d3<=31;d3++){
-        if(d3===day)continue;
-        if(_esPasado(d3,monthKey,year))continue;
-        var compT3=compDias[d3];
-        var compLibreD3=(!compT3||!compT3.e1);
-        if(!compLibreD3)continue; // comp tiene que librar ese día
+        if(d3===day||_esPasado(d3,monthKey,year))continue;
         var myT3=(myRaw[monthKey]||{})[d3];
-        if(!myT3||!myT3.e1)continue; // yo tengo que trabajar ese día
-        // Comp haría mi turno en d3
-        var myT3E1=_toMin(myT3.e1),myT3S1=_toMin(myT3.s1);
-        var myT3E2=myT3.e2?_toMin(myT3.e2):null,myT3S2=myT3.s2?_toMin(myT3.s2):null;
-        var valC_comp=_validarTurno(myT3E1,myT3S1,myT3E2,myT3S2);
-        var errC=errC_yo.concat(valC_comp.errores);
-        var compCatC=_parseCategoria(comp.categoria||'');
-        if(compCatC.tipo!=='FIJO'){var hCc=_horasLVSemana(compDias,monthKey,d3,myT3E1,myT3S1,myT3E2,myT3S2);if(hCc>2160)errC.push('Comp supera 36h esa semana ('+(hCc/60).toFixed(1)+'h)');}
-        var d3name=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'][(new Date(year,_cambioMonth,d3).getDay()+6)%7];
+        if(!myT3||!myT3.e1)continue; // yo debo trabajar ese día
+        var cT3=compDias[d3];
+        if(cT3&&cT3.e1)continue; // comp debe librar ese día
+        var mE1=_toMin(myT3.e1),mS1=_toMin(myT3.s1),mE2=myT3.e2?_toMin(myT3.e2):null,mS2=myT3.s2?_toMin(myT3.s2):null;
+        var errC=errCbase.concat(_validarTurno(mE1,mS1,mE2,mS2).errores);
+        var ccC=_parseCategoria(comp.categoria||'');
+        if(ccC.tipo!=='FIJO'){var hCc=_horasLVSemana(compDias,monthKey,d3,mE1,mS1,mE2,mS2);if(hCc>2160)errC.push(comp.nombre.split(' ')[0]+' supera 36h L-V ('+(hCc/60).toFixed(1)+'h)');}
+        var dn3=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'][(new Date(year,_cambioMonth,d3).getDay()+6)%7];
         resultados.push({
-          nombre:comp.nombre, cat:comp.categoria||'',
-          tipo:'comp_libro_dia',
-          diaOrigen:day, labelOrigen:titleDia,
-          diaDestino:d3, labelDestino:d3name+' '+d3+' '+_MC_NAMES[_cambioMonth],
-          // Yo trabajo turno comp el día señalado, comp trabaja mi turno en d3
-          turnoYoHace:_fmtTurno(compE1,compS1,compE2,compS2),  // yo trabajo el día señalado
-          turnoCompHace:_fmtTurno(myT3E1,myT3S1,myT3E2,myT3S2), // comp trabaja en d3
-          ok:errC.length===0, errores:errC
+          nombre:comp.nombre,cat:comp.categoria||'',tipo:'comp_libro',
+          labelDia:titleDia,labelComp:dn3+' '+d3+' '+_MC_NAMES[_cambioMonth],
+          turnoYo:_fmtTurno(compE1,compS1,compE2,compS2),   // yo trabajo el día señalado
+          turnoComp:_fmtTurno(mE1,mS1,mE2,mS2),             // comp trabaja en d3
+          ok:errC.length===0,errores:errC
         });
       }
     }
-
-    // CASO D (placeholder para mantener estructura — eliminado el caso 3 antiguo)
-    if(false){
-        var d3name2=''; // nunca ejecutado
-        resultados.push({
-          nombre:comp.nombre,
-          cat:comp.categoria||'',
-          diaOrigen:day,
-          labelOrigen:titleDia,
-          turnoOrigen:'Libre',
-          diaDestino:0,
-          labelDestino:d3name2,
-          turnoDestino:_fmtTurno(myT3E1,myT3S1,myT3E2,myT3S2),
-          ok:err3.length===0,
-          errores:err3
-        });
-      }
-    }
-  });
 
   // Ordenar: válidos primero, luego por nombre
   resultados.sort(function(a,b){
@@ -6638,36 +6579,22 @@ function _renderCambioCard(r,ok){
   var nom=r.nombre.split(' ')[0];
   var html='<div class="cambio-card '+(ok?'valido':'invalido')+'">';
   html+='<div class="cambio-card-nombre">'+r.nombre+'<span style="font-size:9px;color:var(--gray);font-weight:400;margin-left:6px">'+r.cat+'</span></div>';
-
   if(r.tipo==='mismo_dia'){
-    // Ambos tienen turno el mismo día, se intercambian
-    html+='<div class="cambio-card-row"><span class="cambio-card-lbl">Día:</span><span class="cambio-card-val">'+r.labelOrigen+'</span></div>';
-    html+='<div class="cambio-card-row"><span class="cambio-card-lbl">Tú harías:</span><span class="cambio-card-val el">'+r.turnoYoHace+'</span></div>';
-    html+='<div class="cambio-card-row"><span class="cambio-card-lbl">'+nom+' haría:</span><span class="cambio-card-val yo">'+r.turnoCompHace+'</span></div>';
-
-  } else if(r.tipo==='yo_libro_dia'){
-    // Yo libro el día señalado, comp trabaja mi turno. Yo trabajo un día futuro de comp.
-    html+='<div class="cambio-card-row"><span class="cambio-card-lbl">Tú libras:</span><span class="cambio-card-val el">'+r.labelOrigen+'</span></div>';
-    html+='<div class="cambio-card-row"><span class="cambio-card-lbl">'+nom+' trabaja:</span><span class="cambio-card-val yo">'+r.labelOrigen+' · '+r.turnoCompHace+'</span></div>';
+    html+='<div class="cambio-card-row"><span class="cambio-card-lbl">Día:</span><span class="cambio-card-val">'+r.labelDia+'</span></div>';
+    html+='<div class="cambio-card-row"><span class="cambio-card-lbl">Tú harías:</span><span class="cambio-card-val el">'+r.turnoComp+'</span></div>';
+    html+='<div class="cambio-card-row"><span class="cambio-card-lbl">'+nom+' haría:</span><span class="cambio-card-val yo">'+r.turnoYo+'</span></div>';
+  } else if(r.tipo==='yo_libro'){
+    html+='<div class="cambio-card-row"><span class="cambio-card-lbl">Tú libras:</span><span class="cambio-card-val el">'+r.labelDia+'</span></div>';
+    html+='<div class="cambio-card-row"><span class="cambio-card-lbl">'+nom+' trabaja:</span><span class="cambio-card-val yo">'+r.labelDia+' · '+r.turnoYo+'</span></div>';
     html+='<div style="border-top:1px solid rgba(255,255,255,.06);margin:6px 0"></div>';
-    html+='<div class="cambio-card-row"><span class="cambio-card-lbl">A cambio:</span><span class="cambio-card-val el">Tú trabajas '+r.labelDestino+' · '+r.turnoYoHace+'</span></div>';
-
-  } else if(r.tipo==='comp_libro_dia'){
-    // Yo trabajo el día señalado (turno del comp), comp libra. Comp trabajará un día futuro mío.
-    html+='<div class="cambio-card-row"><span class="cambio-card-lbl">Tú trabajas:</span><span class="cambio-card-val el">'+r.labelOrigen+' · '+r.turnoYoHace+'</span></div>';
-    html+='<div class="cambio-card-row"><span class="cambio-card-lbl">'+nom+' libra:</span><span class="cambio-card-val yo">'+r.labelOrigen+'</span></div>';
+    html+='<div class="cambio-card-row"><span class="cambio-card-lbl">A cambio:</span><span class="cambio-card-val el">Tú trabajas '+r.labelComp+' · '+r.turnoComp+'</span></div>';
+  } else if(r.tipo==='comp_libro'){
+    html+='<div class="cambio-card-row"><span class="cambio-card-lbl">Tú trabajas:</span><span class="cambio-card-val el">'+r.labelDia+' · '+r.turnoYo+'</span></div>';
+    html+='<div class="cambio-card-row"><span class="cambio-card-lbl">'+nom+' libra:</span><span class="cambio-card-val yo">'+r.labelDia+'</span></div>';
     html+='<div style="border-top:1px solid rgba(255,255,255,.06);margin:6px 0"></div>';
-    html+='<div class="cambio-card-row"><span class="cambio-card-lbl">A cambio:</span><span class="cambio-card-val el">'+nom+' trabaja '+r.labelDestino+' · '+r.turnoCompHace+'</span></div>';
-
-  } else {
-    // Fallback legacy
-    html+='<div class="cambio-card-row"><span class="cambio-card-lbl">Tú libras:</span><span class="cambio-card-val yo">'+r.labelOrigen+'</span></div>';
-    html+='<div class="cambio-card-row"><span class="cambio-card-lbl">Tú trabajas:</span><span class="cambio-card-val el">'+r.labelDestino+'</span></div>';
+    html+='<div class="cambio-card-row"><span class="cambio-card-lbl">A cambio:</span><span class="cambio-card-val el">'+nom+' trabaja '+r.labelComp+' · '+r.turnoComp+'</span></div>';
   }
-
-  if(!ok&&r.errores&&r.errores.length){
-    html+='<div class="cambio-error">'+r.errores.join('<br>')+'</div>';
-  }
+  if(!ok&&r.errores&&r.errores.length)html+='<div class="cambio-error">'+r.errores.join('<br>')+'</div>';
   html+='</div>';
   return html;
 }
