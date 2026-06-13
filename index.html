@@ -4322,6 +4322,16 @@ document.addEventListener('DOMContentLoaded',function(){
   <div class="cambio-header">
     <div class="cambio-title">🔄 Buscar cambio de turno</div>
     <div class="cambio-sub" id="cambio-sub-txt">Calculando opciones...</div>
+    <div style="margin-top:10px;display:flex;gap:8px;align-items:center">
+      <div style="flex:1;position:relative">
+        <input id="cambio-ia-input" type="text" placeholder="¿Qué buscas? Ej: tarde el lunes, salir antes de las 14h..." 
+          style="width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:12px;color:var(--white);font-family:'Outfit',sans-serif;font-size:12px;padding:10px 40px 10px 12px;outline:none"
+          onkeydown="if(event.key==='Enter')filtrarConIA()">
+        <button onclick="filtrarConIA()" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;padding:0;line-height:1" id="cambio-ia-btn">✨</button>
+      </div>
+      <button onclick="limpiarFiltroIA()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:9px 10px;color:var(--gray);font-family:'Outfit',sans-serif;font-size:11px;cursor:pointer;white-space:nowrap;flex-shrink:0">↺ Todo</button>
+    </div>
+    <div id="cambio-ia-estado" style="font-size:10px;color:var(--gold);margin-top:6px;min-height:14px"></div>
   </div>
   <div id="cambio-body"></div>
 </div>
@@ -6112,6 +6122,8 @@ function initLiveViewMode(){
 // ============================================================
 
 var _cambioDay=null, _cambioMonth=null, _cambioYear=null;
+var _todosResultados=[];
+var _filtroIA=null;
 
 function abrirBuscadorCambio(){
   _cambioDay=_mcEditDay;
@@ -6230,6 +6242,14 @@ function calcularCambios(){
   body.innerHTML='<div class="cambio-empty">⏳ Calculando...</div>';
 
   var day=_cambioDay, monthKey=_MC_MONTHS[_cambioMonth], year=_cambioYear;
+  // Hoy para filtrar días pasados
+  var _hoy=new Date(); _hoy.setHours(0,0,0,0);
+  function _esPasado(d, mk, y){
+    var idx=_GRUPO_MONTHS.indexOf(mk);
+    if(idx<0)return false;
+    var f=new Date(y,idx,d); f.setHours(0,0,0,0);
+    return f<_hoy;
+  }
 
   // Mi turno ese día
   var myRaw;try{myRaw=JSON.parse(localStorage.getItem('cta_ed_'+year)||'{}')}catch(e){myRaw={};}
@@ -6312,6 +6332,7 @@ function calcularCambios(){
       // Buscar días donde yo tengo libre y comp trabaja ese día
       for(var d2=1;d2<=31;d2++){
         if(d2===day)continue;
+        if(_esPasado(d2,monthKey,year))continue; // no buscar días pasados
         var myT2=(myRaw[monthKey]||{})[d2];
         var myLibreD2=(!myT2||!myT2.e1||myT2.tipo==='libre'||myT2.tipo==='vacaciones');
         if(!myLibreD2)continue;
@@ -6346,7 +6367,7 @@ function calcularCambios(){
     }
 
     // Caso 2: Yo tengo turno, comp tiene turno ese día → intercambio directo
-    if(!esLibre&&!compLibreMiDia){
+    if(!esLibre&&!compLibreMiDia&&!_esPasado(day,monthKey,year)){
       // Yo haría el turno del comp mi día, comp haría el mío
       var valYoDirec=_validarTurno(compE1,compS1,compE2,compS2);
       var valCompDirec=_validarTurno(myE1,myS1,myE2,myS2);
@@ -6382,6 +6403,7 @@ function calcularCambios(){
       // Buscar días libres del comp donde yo trabajo
       for(var d3=1;d3<=31;d3++){
         if(d3===day)continue;
+        if(_esPasado(d3,monthKey,year))continue; // no buscar días pasados
         var compT3=compDias[d3];
         var compLibreD3=(!compT3||!compT3.e1);
         if(!compLibreD3)continue;
@@ -6431,13 +6453,28 @@ function calcularCambios(){
     return a.nombre.localeCompare(b.nombre);
   });
 
+  _todosResultados=resultados;
+  _filtroIA=null;
+  document.getElementById('cambio-ia-input').value='';
+  document.getElementById('cambio-ia-estado').textContent='';
+  renderResultadosCambio(resultados, titleDia);
+}
+
+function renderResultadosCambio(resultados, titleDia){
+  var body=document.getElementById('cambio-body');
+  var subTxt=document.getElementById('cambio-sub-txt');
+  if(!titleDia){
+    var day=_cambioDay,monthKey=_MC_MONTHS[_cambioMonth];
+    var dname=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'][(new Date(_cambioYear,_cambioMonth,day).getDay()+6)%7];
+    titleDia=dname+' '+day+' '+_MC_NAMES[_cambioMonth];
+  }
   var validos=resultados.filter(function(r){return r.ok;});
   var invalidos=resultados.filter(function(r){return!r.ok;});
 
-  subTxt.textContent=validos.length+' opciones válidas · '+titleDia;
+  subTxt.textContent=validos.length+' opciones válidas · '+titleDia+(_filtroIA?' · Filtro activo':'');
 
   if(!resultados.length){
-    body.innerHTML='<div class="cambio-empty">😕 No hay opciones de cambio este mes<br><small style="font-size:10px">Comprueba que tienes el Excel del grupo importado</small></div><button class="cambio-close-btn" id="cambio-close-btn" onclick="cerrarBuscadorCambio()">Cerrar</button>';
+    body.innerHTML='<div class="cambio-empty">😕 No hay opciones'+((_filtroIA)?' con ese criterio':'en este mes')+'<br><small style="font-size:10px">'+(_filtroIA?'Prueba con otra búsqueda':'Comprueba que tienes el Excel del grupo importado')+'</small></div><button onclick="cerrarBuscadorCambio()" style="width:100%;background:none;border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px;font-family:'Outfit',sans-serif;font-size:13px;color:var(--gray);cursor:pointer;margin-top:8px">Cerrar</button>';
     return;
   }
 
@@ -6450,8 +6487,132 @@ function calcularCambios(){
     html+='<div class="cambio-seccion" style="margin-top:18px;color:var(--gray)">⚠️ No válidas ('+invalidos.length+')</div>';
     invalidos.forEach(function(r){html+=_renderCambioCard(r,false);});
   }
-  html+='<button id="cambio-close-btn" onclick="cerrarBuscadorCambio()" style="width:100%;background:none;border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px;font-family:\'Outfit\',sans-serif;font-size:13px;color:var(--gray);cursor:pointer;margin-top:8px">Cerrar</button>';
+  html+='<button onclick="cerrarBuscadorCambio()" style="width:100%;background:none;border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px;font-family:'Outfit',sans-serif;font-size:13px;color:var(--gray);cursor:pointer;margin-top:8px">Cerrar</button>';
   body.innerHTML=html;
+}
+
+async function filtrarConIA(){
+  var input=document.getElementById('cambio-ia-input');
+  var estado=document.getElementById('cambio-ia-estado');
+  var btn=document.getElementById('cambio-ia-btn');
+  var texto=input.value.trim();
+  if(!texto){limpiarFiltroIA();return;}
+  if(!_todosResultados.length){estado.textContent='Primero hay que calcular las opciones';return;}
+
+  estado.textContent='✨ Interpretando...';
+  btn.textContent='⏳';
+  btn.disabled=true;
+
+  // Construir resumen de resultados para que Claude entienda el contexto
+  var diasDisponibles=[];
+  _todosResultados.forEach(function(r){
+    if(r.ok&&diasDisponibles.indexOf(r.labelDestino)<0)diasDisponibles.push(r.labelDestino);
+  });
+
+  var prompt='Eres un filtro de turnos de trabajo. El usuario quiere encontrar un cambio de turno.
+'+
+    'Definiciones: MAÑANA=entrada antes de 12:00 y salida antes de 15:00. TARDE=salida hasta las 20:00. NOCHE=resto hasta las 03:00.
+'+
+    'El usuario escribe en lenguaje natural y tú debes devolver SOLO un objeto JSON con los filtros a aplicar.
+'+
+    'Propiedades posibles del JSON:
+'+
+    '- turnoTipo: "mañana"|"tarde"|"noche"|null
+'+
+    '- diaSemana: "lunes"|"martes"|"miércoles"|"jueves"|"viernes"|"sábado"|"domingo"|null
+'+
+    '- diaNumero: número del día del mes o null
+'+
+    '- entradaDespuesDe: "HH:MM" o null (el turno que yo trabajo empieza después de esta hora)
+'+
+    '- entradaAntesDe: "HH:MM" o null
+'+
+    '- salidaDespuesDe: "HH:MM" o null
+'+
+    '- salidaAntesDe: "HH:MM" o null
+'+
+    '- nombre: string parcial del nombre del compañero o null
+'+
+    'IMPORTANTE: devuelve SOLO el JSON, sin texto adicional, sin markdown.
+'+
+    'Consulta del usuario: "'+texto+'"';
+
+  try{
+    var resp=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-6',
+        max_tokens:200,
+        messages:[{role:'user',content:prompt}]
+      })
+    });
+    var data=await resp.json();
+    var raw=data.content&&data.content[0]&&data.content[0].text||'{}';
+    raw=raw.replace(/```json|```/g,'').trim();
+    var filtro=JSON.parse(raw);
+    _filtroIA=filtro;
+
+    // Aplicar filtro
+    var filtrados=_todosResultados.filter(function(r){
+      if(!r.ok)return false; // solo válidos en modo filtro
+      // Filtro por nombre compañero
+      if(filtro.nombre&&r.nombre.toLowerCase().indexOf(filtro.nombre.toLowerCase())<0)return false;
+      // Filtro por día semana del destino
+      if(filtro.diaSemana){
+        var dias=['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+        var idx=_GRUPO_MONTHS.indexOf(_MC_MONTHS[_cambioMonth]);
+        var fDest=new Date(_cambioYear,idx,r.diaDestino);
+        var nomDia=dias[fDest.getDay()];
+        if(nomDia!==filtro.diaSemana)return false;
+      }
+      // Filtro por día número
+      if(filtro.diaNumero&&r.diaDestino!==filtro.diaNumero)return false;
+      // El turno que YO haría es turnoDestino (e1/s1 del compañero en diaDestino)
+      // Necesitamos las horas reales — las tenemos en el card de texto, parseamos del nominaMap
+      var compDiasF={};
+      var nm2;try{nm2=JSON.parse(localStorage.getItem(_GRUPO_KEY+'_map')||'{}')}catch(e){nm2={};}
+      for(var nkf in nm2){
+        if(nm2[nkf].nombre===r.nombre){
+          var mkf=_MC_MONTHS[_cambioMonth];
+          compDiasF=(nm2[nkf].meses&&nm2[nkf].meses[mkf])||{};
+          break;
+        }
+      }
+      var tF=r.directo?(compDiasF[r.diaOrigen]||null):(compDiasF[r.diaDestino]||null);
+      // Si es caso 1 (yo libre, comp trabaja mi día) el turno que YO hago es el del comp en diaOrigen
+      // Si es caso intercambio el turno que hago es compDias[diaDestino]
+      var tE1=tF&&tF.e1?_toMin(tF.e1):null;
+      var tS1=tF&&tF.s1?_toMin(tF.s1):null;
+
+      if(filtro.turnoTipo){
+        if(tE1===null)return false;
+        if(filtro.turnoTipo==='mañana'&&(tE1>=720||tS1>900))return false;
+        if(filtro.turnoTipo==='tarde'&&(tS1===null||tS1>1200||tE1<720))return false;
+        if(filtro.turnoTipo==='noche'&&(tE1===null||tE1<1200&&tE1>180))return false;
+      }
+      if(filtro.entradaDespuesDe&&tE1!==null&&tE1<_toMin(filtro.entradaDespuesDe))return false;
+      if(filtro.entradaAntesDe&&tE1!==null&&tE1>=_toMin(filtro.entradaAntesDe))return false;
+      if(filtro.salidaDespuesDe&&tS1!==null&&tS1<_toMin(filtro.salidaDespuesDe))return false;
+      if(filtro.salidaAntesDe&&tS1!==null&&tS1>=_toMin(filtro.salidaAntesDe))return false;
+      return true;
+    });
+
+    estado.textContent='✅ Filtro: "'+texto+'" → '+filtrados.length+' resultados';
+    renderResultadosCambio(filtrados);
+  }catch(err){
+    estado.textContent='⚠️ Error al interpretar. Prueba de nuevo.';
+    console.error(err);
+  }
+  btn.textContent='✨';
+  btn.disabled=false;
+}
+
+function limpiarFiltroIA(){
+  _filtroIA=null;
+  document.getElementById('cambio-ia-input').value='';
+  document.getElementById('cambio-ia-estado').textContent='';
+  renderResultadosCambio(_todosResultados);
 }
 
 function _fmtTurno(e1,s1,e2,s2){
