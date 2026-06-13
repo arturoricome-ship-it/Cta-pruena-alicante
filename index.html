@@ -699,7 +699,7 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
   z-index:100001!important;
   bottom:0!important;
   max-height:calc(100vh - 72px)!important;
-  padding-bottom:calc(110px + env(safe-area-inset-bottom))!important;
+  padding-bottom:calc(20px + env(safe-area-inset-bottom))!important;
   overscroll-behavior:contain;
 }
 #mc-edit-panel.open{transform:translateY(0)!important}
@@ -4108,12 +4108,10 @@ function mcEditDay(day,e){
   }
   document.getElementById('mc-edit-bg').style.display='block';
   setTimeout(function(){document.getElementById('mc-edit-panel').classList.add('open');},10);
-  var bcb=document.getElementById('btn-buscar-cambio');if(bcb)bcb.style.display='block';
 }
 function mcEditClose(){
   document.getElementById('mc-edit-panel').classList.remove('open');
   setTimeout(function(){document.getElementById('mc-edit-bg').style.display='none';},280);
-  var bcb=document.getElementById('btn-buscar-cambio');if(bcb)bcb.style.display='none';
 }
 function mcEditSave(){
   var tipo=document.querySelector('.mc-tipo-btn.sel');
@@ -4313,11 +4311,10 @@ document.addEventListener('DOMContentLoaded',function(){
     </div>
   </div>
   <button class="mc-edit-save" onclick="mcEditSave()">✅ Guardar cambios</button>
+  <button id="btn-buscar-cambio" class="mc-edit-save" onclick="abrirBuscadorCambio()" style="background:rgba(96,165,250,.15);border-color:rgba(96,165,250,.4);color:#60a5fa">🔄 Buscar cambio de turno</button>
   <button class="mc-edit-cancel" onclick="mcEditClose()">Cancelar</button>
 </div>
 
-<!-- BOTÓN CAMBIO TURNO FIJO -->
-<button id="btn-buscar-cambio" onclick="abrirBuscadorCambio()" style="display:none;position:fixed;bottom:calc(160px + env(safe-area-inset-bottom));left:16px;right:16px;background:rgba(96,165,250,.2);border:1px solid rgba(96,165,250,.5);border-radius:12px;padding:13px;font-family:'Outfit',sans-serif;font-size:14px;font-weight:700;color:#60a5fa;cursor:pointer;z-index:100002;text-align:center">🔄 Buscar cambio de turno</button>
 
 <!-- PANEL BUSCADOR CAMBIO -->
 <div id="cambio-bg" onclick="cerrarBuscadorCambio()"></div>
