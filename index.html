@@ -6131,20 +6131,17 @@ function abrirBuscadorCambio(){
   _cambioMonth=_mcEditMonth;
   _cambioYear=_mcEditYear;
   if(_cambioDay===null||_cambioDay===undefined){alert('Error: no hay día seleccionado');return;}
-  // Cerrar panel edición
+  // Cerrar panel edición INMEDIATAMENTE sin animación
   var ep=document.getElementById('mc-edit-panel');
   var eb=document.getElementById('mc-edit-bg');
-  if(ep)ep.classList.remove('open');
-  if(eb)setTimeout(function(){eb.style.display='none';},280);
-  // Abrir panel cambio
-  setTimeout(function(){
-    var bg=document.getElementById('cambio-bg');
-    var panel=document.getElementById('cambio-panel');
-    if(!bg||!panel){alert('Error: panel cambio no encontrado');return;}
-    bg.style.display='block';
-    setTimeout(function(){panel.classList.add('open');},10);
-    calcularCambios();
-  },320);
+  if(ep){ep.style.transition='none';ep.classList.remove('open');ep.style.transform='translateY(100%)';}
+  if(eb){eb.style.display='none';}
+  // Abrir panel cambio inmediatamente
+  var bg=document.getElementById('cambio-bg');
+  var panel=document.getElementById('cambio-panel');
+  if(!bg||!panel){alert('Error: panel cambio no encontrado');return;}
+  bg.style.display='block';
+  setTimeout(function(){panel.classList.add('open');calcularCambios();},30);
 }
 
 function cerrarBuscadorCambio(){
