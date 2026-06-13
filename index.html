@@ -6245,6 +6245,36 @@ function _horasLVSemana(empDias, monthKey, dia, e1nuevo, s1nuevo, e2nuevo, s2nue
   return total; // en minutos
 }
 
+// Comprueba el descanso de 10h entre el turno nuevo de un dia y los dias adyacentes.
+function _validarDescanso10h(empDias, monthKey, dia, e1n, s1n, e2n, s2n, etiqueta){
+  var errores=[];
+  var DESC_MIN=600; // 10h
+  if(e1n===null)return errores; // ese dia libra
+  var miEntrada=e1n;
+  var miSalida=(e2n!==null&&s2n!==null)?s2n:s1n;
+  if(miSalida<miEntrada)miSalida+=1440; // turno nocturno: salida al dia siguiente
+  function turnoDe(d){
+    var t=empDias[d];
+    if(!t||!t.e1)return null;
+    var e1=_toMin(t.e1), s1=_toMin(t.s1);
+    var e2=t.e2?_toMin(t.e2):null, s2=t.s2?_toMin(t.s2):null;
+    var sal=(e2!==null&&s2!==null)?s2:s1;
+    if(sal<e1)sal+=1440;
+    return {entrada:e1, salida:sal};
+  }
+  var ant=turnoDe(dia-1);
+  if(ant){
+    var descAntes=(1440-ant.salida)+miEntrada;
+    if(descAntes<DESC_MIN)errores.push((etiqueta||'')+'Menos de 10h con el dia anterior ('+(descAntes/60).toFixed(1)+'h)');
+  }
+  var sig=turnoDe(dia+1);
+  if(sig){
+    var descDespues=(1440-miSalida)+sig.entrada;
+    if(descDespues<DESC_MIN)errores.push((etiqueta||'')+'Menos de 10h con el dia siguiente ('+(descDespues/60).toFixed(1)+'h)');
+  }
+  return errores;
+}
+
 function calcularCambios(){
   var body=document.getElementById('cambio-body');
   var subTxt=document.getElementById('cambio-sub-txt');
@@ -6332,6 +6362,9 @@ function calcularCambios(){
       var myCatA=_parseCategoria(myCat),ccA=_parseCategoria(comp.categoria||'');
       if(myCatA.tipo!=='FIJO'){var hA=_horasLVSemana(myRaw[monthKey]||{},monthKey,day,compE1,compS1,compE2,compS2);if(hA>2160)errA.push('Yo supero 36h L-V ('+(hA/60).toFixed(1)+'h)');}
       if(ccA.tipo!=='FIJO'){var hAc=_horasLVSemana(compDias,monthKey,day,myE1,myS1,myE2,myS2);if(hAc>2160)errA.push(comp.nombre.split(' ')[0]+' supera 36h L-V ('+(hAc/60).toFixed(1)+'h)');}
+      // Descanso 10h: yo hago turno del comp ese dia; comp hace el mio
+      errA=errA.concat(_validarDescanso10h(myRaw[monthKey]||{},monthKey,day,compE1,compS1,compE2,compS2,''));
+      errA=errA.concat(_validarDescanso10h(compDias,monthKey,day,myE1,myS1,myE2,myS2,comp.nombre.split(' ')[0]+': '));
       resultados.push({
         nombre:comp.nombre,cat:comp.categoria||'',tipo:'mismo_dia',
         labelDia:titleDia,
@@ -6347,6 +6380,8 @@ function calcularCambios(){
       var errBbase=_validarTurno(myE1,myS1,myE2,myS2).errores.slice();
       var ccB=_parseCategoria(comp.categoria||'');
       if(ccB.tipo!=='FIJO'){var hBc=_horasLVSemana(compDias,monthKey,day,myE1,myS1,myE2,myS2);if(hBc>2160)errBbase.push(comp.nombre.split(' ')[0]+' supera 36h L-V ('+(hBc/60).toFixed(1)+'h)');}
+      // Descanso 10h del comp al hacer MI turno el dia senalado
+      errBbase=errBbase.concat(_validarDescanso10h(compDias,monthKey,day,myE1,myS1,myE2,myS2,comp.nombre.split(' ')[0]+': '));
       for(var d2=1;d2<=31;d2++){
         if(d2===day||_esPasado(d2,monthKey,year))continue;
         var myT2=(myRaw[monthKey]||{})[d2];
@@ -6357,6 +6392,8 @@ function calcularCambios(){
         var errB=errBbase.concat(_validarTurno(cE1,cS1,cE2,cS2).errores);
         var myCatB=_parseCategoria(myCat);
         if(myCatB.tipo!=='FIJO'){var hBy=_horasLVSemana(myRaw[monthKey]||{},monthKey,d2,cE1,cS1,cE2,cS2);if(hBy>2160)errB.push('Yo supero 36h L-V ('+(hBy/60).toFixed(1)+'h)');}
+        // Descanso 10h: yo trabajo el turno del comp en d2
+        errB=errB.concat(_validarDescanso10h(myRaw[monthKey]||{},monthKey,d2,cE1,cS1,cE2,cS2,''));
         var dn2=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'][(new Date(year,_cambioMonth,d2).getDay()+6)%7];
         resultados.push({
           nombre:comp.nombre,cat:comp.categoria||'',tipo:'yo_libro',
@@ -6374,6 +6411,8 @@ function calcularCambios(){
       var errCbase=_validarTurno(compE1,compS1,compE2,compS2).errores.slice();
       var myCatC=_parseCategoria(myCat);
       if(myCatC.tipo!=='FIJO'){var hCy=_horasLVSemana(myRaw[monthKey]||{},monthKey,day,compE1,compS1,compE2,compS2);if(hCy>2160)errCbase.push('Yo supero 36h L-V ('+(hCy/60).toFixed(1)+'h)');}
+      // Descanso 10h: yo trabajo el turno del comp el dia senalado
+      errCbase=errCbase.concat(_validarDescanso10h(myRaw[monthKey]||{},monthKey,day,compE1,compS1,compE2,compS2,''));
       for(var d3=1;d3<=31;d3++){
         if(d3===day||_esPasado(d3,monthKey,year))continue;
         var myT3=(myRaw[monthKey]||{})[d3];
@@ -6384,6 +6423,8 @@ function calcularCambios(){
         var errC=errCbase.concat(_validarTurno(mE1,mS1,mE2,mS2).errores);
         var ccC=_parseCategoria(comp.categoria||'');
         if(ccC.tipo!=='FIJO'){var hCc=_horasLVSemana(compDias,monthKey,d3,mE1,mS1,mE2,mS2);if(hCc>2160)errC.push(comp.nombre.split(' ')[0]+' supera 36h L-V ('+(hCc/60).toFixed(1)+'h)');}
+        // Descanso 10h: el comp trabaja mi turno en d3
+        errC=errC.concat(_validarDescanso10h(compDias,monthKey,d3,mE1,mS1,mE2,mS2,comp.nombre.split(' ')[0]+': '));
         var dn3=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'][(new Date(year,_cambioMonth,d3).getDay()+6)%7];
         resultados.push({
           nombre:comp.nombre,cat:comp.categoria||'',tipo:'comp_libro',
@@ -6441,6 +6482,71 @@ function renderResultadosCambio(resultados, titleDia){
   body.innerHTML=html;
 }
 
+// Interpreta la consulta localmente sin IA (respaldo si la API falla)
+function _interpretarLocal(texto){
+  var t=String(texto||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  var f={turnoTipo:null,diaSemana:null,diaNumero:null,entradaDespuesDe:null,entradaAntesDe:null,salidaDespuesDe:null,salidaAntesDe:null,nombre:null};
+  if(/\bmanana\b|\bmananas\b/.test(t))f.turnoTipo='manana';
+  else if(/\btarde\b|\btardes\b/.test(t))f.turnoTipo='tarde';
+  else if(/\bnoche\b|\bnoches\b|\bnocturno\b/.test(t))f.turnoTipo='noche';
+  var dias={lunes:'lunes',martes:'martes',miercoles:'miercoles',jueves:'jueves',viernes:'viernes',sabado:'sabado',domingo:'domingo'};
+  for(var k in dias){if(t.indexOf(k)>=0){f.diaSemana=dias[k];break;}}
+  var mDia=t.match(/\bdia\s+(\d{1,2})\b|\bel\s+(\d{1,2})\b/);
+  if(mDia)f.diaNumero=parseInt(mDia[1]||mDia[2]);
+  var mSalAntes=t.match(/salir?\s+antes\s+(?:de\s+las?\s+)?(\d{1,2})(?::(\d{2}))?/);
+  if(mSalAntes)f.salidaAntesDe=(mSalAntes[1].length<2?'0':'')+mSalAntes[1]+':'+(mSalAntes[2]||'00');
+  var mEntDespues=t.match(/entrar?\s+despues\s+(?:de\s+las?\s+)?(\d{1,2})(?::(\d{2}))?/);
+  if(mEntDespues)f.entradaDespuesDe=(mEntDespues[1].length<2?'0':'')+mEntDespues[1]+':'+(mEntDespues[2]||'00');
+  var mEntAntes=t.match(/entrar?\s+antes\s+(?:de\s+las?\s+)?(\d{1,2})(?::(\d{2}))?/);
+  if(mEntAntes)f.entradaAntesDe=(mEntAntes[1].length<2?'0':'')+mEntAntes[1]+':'+(mEntAntes[2]||'00');
+  return f;
+}
+
+// Aplica un objeto filtro a _todosResultados y renderiza
+function _aplicarFiltro(filtro,texto,estado){
+  _filtroIA=filtro;
+  function turnoMioDe(r){
+    if(r.tipo==='mismo_dia')return r.turnoComp;
+    if(r.tipo==='comp_libro')return r.turnoYo;
+    if(r.tipo==='yo_libro')return r.turnoComp;
+    return r.turnoYo;
+  }
+  function diaRelevante(r){return r.tipo==='yo_libro'?r.labelComp:r.labelDia;}
+  function norm(s){return String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');}
+  var filtrados=_todosResultados.filter(function(r){
+    if(!r.ok)return false;
+    if(filtro.nombre&&norm(r.nombre).indexOf(norm(filtro.nombre))<0)return false;
+    var lbl=diaRelevante(r);
+    var numMatch=lbl.match(/\b(\d{1,2})\b/);
+    var diaNum=numMatch?parseInt(numMatch[1]):null;
+    if(filtro.diaNumero&&diaNum!==filtro.diaNumero)return false;
+    if(filtro.diaSemana){
+      var nd=norm(lbl).slice(0,3);
+      var mapa={lun:'lunes',mar:'martes',mie:'miercoles',jue:'jueves',vie:'viernes',sab:'sabado',dom:'domingo'};
+      if(mapa[nd]!==norm(filtro.diaSemana))return false;
+    }
+    var tt2=turnoMioDe(r);
+    if(tt2==='Libre')return false;
+    var p=tt2.split(' / ')[0];
+    var tE1=_toMin(p.split('\u2192')[0]);
+    var tS1=_toMin(p.split('\u2192')[1]);
+    if(filtro.turnoTipo){
+      var tt=norm(filtro.turnoTipo);
+      if(tE1===null)return false;
+      if(tt==='manana'&&(tE1>=720||tS1>900))return false;
+      if(tt==='tarde'&&(tS1===null||tS1>1200||tE1<720))return false;
+      if(tt==='noche'&&(tE1>=300&&tE1<1200))return false;
+    }
+    if(filtro.entradaDespuesDe&&tE1!==null&&tE1<_toMin(filtro.entradaDespuesDe))return false;
+    if(filtro.entradaAntesDe&&tE1!==null&&tE1>=_toMin(filtro.entradaAntesDe))return false;
+    if(filtro.salidaDespuesDe&&tS1!==null&&tS1<_toMin(filtro.salidaDespuesDe))return false;
+    if(filtro.salidaAntesDe&&tS1!==null&&tS1>=_toMin(filtro.salidaAntesDe))return false;
+    return true;
+  });
+  if(estado)estado.textContent='\u2705 '+filtrados.length+' resultados para "'+texto+'"';
+  renderResultadosCambio(filtrados);
+}
+
 async function filtrarConIA(){
   var input=document.getElementById('cambio-ia-input');
   var estado=document.getElementById('cambio-ia-estado');
@@ -6464,75 +6570,19 @@ async function filtrarConIA(){
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:300,messages:[{role:'user',content:prompt}]})
     });
+    if(!resp.ok)throw new Error('API '+resp.status);
     var data=await resp.json();
     var raw=(data.content&&data.content[0]&&data.content[0].text)||'{}';
     raw=raw.replace(/```json|```/g,'').trim();
     var filtro=JSON.parse(raw);
-    _filtroIA=filtro;
-
-    // Para cada resultado, el turno que YO trabajaria:
-    // tipo mismo_dia  -> turnoComp (lo hago el dia senalado)
-    // tipo comp_libro -> turnoYo  (lo hago el dia senalado)
-    // tipo yo_libro   -> turnoComp (lo hago en labelComp, dia futuro)
-    function turnoMioDe(r){
-      if(r.tipo==='mismo_dia')return r.turnoComp;
-      if(r.tipo==='comp_libro')return r.turnoYo;
-      if(r.tipo==='yo_libro')return r.turnoComp;
-      return r.turnoYo;
-    }
-    function diaRelevante(r){
-      // dia que importa para filtrar por dia/semana
-      if(r.tipo==='yo_libro')return r.labelComp;
-      return r.labelDia;
-    }
-
-    var dias=['domingo','lunes','martes','miercoles','jueves','viernes','sabado'];
-    function norm(s){return String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');}
-
-    var filtrados=_todosResultados.filter(function(r){
-      if(!r.ok)return false;
-      if(filtro.nombre&&norm(r.nombre).indexOf(norm(filtro.nombre))<0)return false;
-
-      // dia semana / numero a partir del label relevante
-      var lbl=diaRelevante(r);
-      var numMatch=lbl.match(/\b(\d{1,2})\b/);
-      var diaNum=numMatch?parseInt(numMatch[1]):null;
-      if(filtro.diaNumero&&diaNum!==filtro.diaNumero)return false;
-      if(filtro.diaSemana){
-        var nd=norm(lbl).slice(0,3);
-        var mapa={lun:'lunes',mar:'martes',mie:'miercoles',jue:'jueves',vie:'viernes',sab:'sabado',dom:'domingo'};
-        if(mapa[nd]!==norm(filtro.diaSemana))return false;
-      }
-
-      // turno mio
-      var t=turnoMioDe(r);
-      if(t==='Libre')return false;
-      var p=t.split(' / ')[0];
-      var tE1=_toMin(p.split('\u2192')[0]);
-      var tS1=_toMin(p.split('\u2192')[1]);
-
-      if(filtro.turnoTipo){
-        var tt=norm(filtro.turnoTipo);
-        if(tE1===null)return false;
-        if(tt==='manana'&&(tE1>=720||tS1>900))return false;
-        if(tt==='tarde'&&(tS1===null||tS1>1200||tE1<720))return false;
-        if(tt==='noche'&&(tE1>=300&&tE1<1200))return false;
-      }
-      if(filtro.entradaDespuesDe&&tE1!==null&&tE1<_toMin(filtro.entradaDespuesDe))return false;
-      if(filtro.entradaAntesDe&&tE1!==null&&tE1>=_toMin(filtro.entradaAntesDe))return false;
-      if(filtro.salidaDespuesDe&&tS1!==null&&tS1<_toMin(filtro.salidaDespuesDe))return false;
-      if(filtro.salidaAntesDe&&tS1!==null&&tS1>=_toMin(filtro.salidaAntesDe))return false;
-      return true;
-    });
-
-    if(estado)estado.textContent='\u2705 '+filtrados.length+' resultados para "'+texto+'"';
-    renderResultadosCambio(filtrados);
+    _aplicarFiltro(filtro,texto,estado);
   }catch(err){
-    if(estado)estado.textContent='\u26a0\ufe0f Error al interpretar. Prueba de nuevo.';
-    console.error('filtrarConIA error:',err);
+    // Si la API falla, usar interprete local
+    console.warn('IA no disponible, usando interprete local:',err);
+    var filtroLocal=_interpretarLocal(texto);
+    _aplicarFiltro(filtroLocal,texto,estado);
   }
 }
-
 function limpiarFiltroIA(){
   _filtroIA=null;
   document.getElementById('cambio-ia-input').value='';
