@@ -4311,7 +4311,7 @@ document.addEventListener('DOMContentLoaded',function(){
     </div>
   </div>
   <button class="mc-edit-save" onclick="mcEditSave()">✅ Guardar cambios</button>
-  <button id="btn-buscar-cambio" class="mc-edit-save" onclick="abrirBuscadorCambio()" style="background:rgba(96,165,250,.15);border-color:rgba(96,165,250,.4);color:#60a5fa">🔄 Buscar cambio de turno</button>
+  <button id="btn-buscar-cambio" class="mc-edit-save" ontouchend="event.preventDefault();abrirBuscadorCambio();" onclick="abrirBuscadorCambio()" style="background:rgba(96,165,250,.15);border-color:rgba(96,165,250,.4);color:#60a5fa;touch-action:manipulation;-webkit-tap-highlight-color:rgba(96,165,250,.3)">🔄 Buscar cambio de turno</button>
   <button class="mc-edit-cancel" onclick="mcEditClose()">Cancelar</button>
 </div>
 
