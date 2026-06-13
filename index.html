@@ -6315,129 +6315,120 @@ function calcularCambios(){
     var compS2=compTurnoMiDia&&compTurnoMiDia.s2?_toMin(compTurnoMiDia.s2):null;
     var compLibreMiDia=(compE1===null);
 
-    // Caso 1: Yo tengo turno, comp libre → comp viene mi día, yo voy día libre del comp
-    // Buscar días donde yo libre y comp trabaja
-    if(!esLibre&&compLibreMiDia){
-      // Comp viene mi día: comp haría mi turno → validar reglas para comp
-      var valComp=_validarTurno(myE1,myS1,myE2,myS2);
-      // Comprobar 36h semanal comp (FTP/FD/EVENTUAL)
-      var compCat=_parseCategoria(comp.categoria||'');
-      var errores36Comp=[];
-      if(compCat.tipo!=='FIJO'){
-        var horasComp=_horasLVSemana(compDias,monthKey,day,myE1,myS1,myE2,myS2);
-        if(horasComp>2160)errores36Comp.push('Comp supera 36h esa semana ('+(horasComp/60).toFixed(1)+'h)');
-      }
-      var todosErrComp=valComp.errores.concat(errores36Comp);
+    // CASO A: Intercambio mismo día — ambos tienen turno
+    // Yo hago el turno del comp, el comp hace el mío
+    if(!esLibre && !compLibreMiDia && !_esPasado(day,monthKey,year)){
+      var errA=[];
+      var valA_yo=_validarTurno(compE1,compS1,compE2,compS2);
+      var valA_comp=_validarTurno(myE1,myS1,myE2,myS2);
+      errA=valA_yo.errores.concat(valA_comp.errores);
+      var myCatA=_parseCategoria(myCat), compCatA=_parseCategoria(comp.categoria||'');
+      if(myCatA.tipo!=='FIJO'){var hA=_horasLVSemana(myRaw[monthKey]||{},monthKey,day,compE1,compS1,compE2,compS2);if(hA>2160)errA.push('Yo supero 36h esa semana ('+(hA/60).toFixed(1)+'h)');}
+      if(compCatA.tipo!=='FIJO'){var hAc=_horasLVSemana(compDias,monthKey,day,myE1,myS1,myE2,myS2);if(hAc>2160)errA.push('Comp supera 36h esa semana ('+(hAc/60).toFixed(1)+'h)');}
+      resultados.push({
+        nombre:comp.nombre, cat:comp.categoria||'',
+        tipo:'mismo_dia',
+        diaOrigen:day, labelOrigen:titleDia,
+        diaDestino:day, labelDestino:titleDia,
+        // Yo hago turno del comp ese día
+        turnoYoHace:_fmtTurno(compE1,compS1,compE2,compS2),
+        // Comp hace mi turno ese día
+        turnoCompHace:_fmtTurno(myE1,myS1,myE2,myS2),
+        ok:errA.length===0, errores:errA, directo:true
+      });
+    }
 
-      // Buscar días donde yo tengo libre y comp trabaja ese día
+    // CASO B: Yo tengo turno el día señalado, comp libra ese día
+    // → Comp viene a trabajar MI turno el día señalado
+    // → A cambio, yo trabajo UN DÍA FUTURO donde comp trabaja y yo libro
+    if(!esLibre && compLibreMiDia && !_esPasado(day,monthKey,year)){
+      // El comp haría mi turno el día señalado
+      var valB_comp=_validarTurno(myE1,myS1,myE2,myS2);
+      var compCatB=_parseCategoria(comp.categoria||'');
+      var errB_comp=valB_comp.errores.slice();
+      if(compCatB.tipo!=='FIJO'){var hBc=_horasLVSemana(compDias,monthKey,day,myE1,myS1,myE2,myS2);if(hBc>2160)errB_comp.push('Comp supera 36h esa semana ('+(hBc/60).toFixed(1)+'h)');}
+
+      // Buscar días FUTUROS donde yo libro y comp trabaja
       for(var d2=1;d2<=31;d2++){
         if(d2===day)continue;
-        if(_esPasado(d2,monthKey,year))continue; // no buscar días pasados
+        if(_esPasado(d2,monthKey,year))continue;
         var myT2=(myRaw[monthKey]||{})[d2];
         var myLibreD2=(!myT2||!myT2.e1||myT2.tipo==='libre'||myT2.tipo==='vacaciones');
-        if(!myLibreD2)continue;
+        if(!myLibreD2)continue; // ese día yo tengo que librar
         var compT2=compDias[d2];
-        if(!compT2||!compT2.e1)continue;
-        // Yo iría día d2 con el turno del comp
+        if(!compT2||!compT2.e1)continue; // el comp tiene que trabajar ese día
+        // Yo haría el turno del comp en d2
         var cT2E1=_toMin(compT2.e1),cT2S1=_toMin(compT2.s1);
         var cT2E2=compT2.e2?_toMin(compT2.e2):null,cT2S2=compT2.s2?_toMin(compT2.s2):null;
-        var valYo=_validarTurno(cT2E1,cT2S1,cT2E2,cT2S2);
-        var errores36Yo=[];
-        var myCatP=_parseCategoria(myCat);
-        if(myCatP.tipo!=='FIJO'){
-          var horasYo=_horasLVSemana(myRaw[monthKey]||{},monthKey,d2,cT2E1,cT2S1,cT2E2,cT2S2);
-          if(horasYo>2160)errores36Yo.push('Yo supero 36h esa semana ('+(horasYo/60).toFixed(1)+'h)');
-        }
-        var todosErrYo=valYo.errores.concat(errores36Yo);
-        var todosErr=todosErrComp.concat(todosErrYo);
+        var valB_yo=_validarTurno(cT2E1,cT2S1,cT2E2,cT2S2);
+        var errB=errB_comp.concat(valB_yo.errores);
+        var myCatB=_parseCategoria(myCat);
+        if(myCatB.tipo!=='FIJO'){var hBy=_horasLVSemana(myRaw[monthKey]||{},monthKey,d2,cT2E1,cT2S1,cT2E2,cT2S2);if(hBy>2160)errB.push('Yo supero 36h esa semana ('+(hBy/60).toFixed(1)+'h)');}
         var d2name=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'][(new Date(year,_cambioMonth,d2).getDay()+6)%7];
         resultados.push({
-          nombre:comp.nombre,
-          cat:comp.categoria||'',
-          diaOrigen:day,
-          labelOrigen:titleDia,
-          turnoOrigen:compLibreMiDia?'Libre':_fmtTurno(compE1,compS1,compE2,compS2),
-          diaDestino:d2,
-          labelDestino:d2name+' '+d2+' '+_MC_NAMES[_cambioMonth],
-          turnoDestino:_fmtTurno(cT2E1,cT2S1,cT2E2,cT2S2),
-          ok:todosErr.length===0,
-          errores:todosErr
+          nombre:comp.nombre, cat:comp.categoria||'',
+          tipo:'yo_libro_dia',
+          diaOrigen:day, labelOrigen:titleDia,
+          diaDestino:d2, labelDestino:d2name+' '+d2+' '+_MC_NAMES[_cambioMonth],
+          // Yo libro el día señalado, comp trabaja mi turno
+          turnoYoHace:_fmtTurno(cT2E1,cT2S1,cT2E2,cT2S2), // yo trabajo en d2
+          turnoCompHace:_fmtTurno(myE1,myS1,myE2,myS2),    // comp trabaja mi turno el día señalado
+          ok:errB.length===0, errores:errB
         });
       }
     }
 
-    // Caso 2: Yo tengo turno, comp tiene turno ese día → intercambio directo
-    if(!esLibre&&!compLibreMiDia&&!_esPasado(day,monthKey,year)){
-      // Yo haría el turno del comp mi día, comp haría el mío
-      var valYoDirec=_validarTurno(compE1,compS1,compE2,compS2);
-      var valCompDirec=_validarTurno(myE1,myS1,myE2,myS2);
-      var errDirec=valYoDirec.errores.concat(valCompDirec.errores);
-      // 36h
-      var myCatD=_parseCategoria(myCat);
-      var compCatD=_parseCategoria(comp.categoria||'');
-      if(myCatD.tipo!=='FIJO'){
-        var hYoD=_horasLVSemana(myRaw[monthKey]||{},monthKey,day,compE1,compS1,compE2,compS2);
-        if(hYoD>2160)errDirec.push('Yo supero 36h esa semana ('+(hYoD/60).toFixed(1)+'h)');
-      }
-      if(compCatD.tipo!=='FIJO'){
-        var hCD=_horasLVSemana(compDias,monthKey,day,myE1,myS1,myE2,myS2);
-        if(hCD>2160)errDirec.push('Comp supera 36h esa semana ('+(hCD/60).toFixed(1)+'h)');
-      }
-      resultados.push({
-        nombre:comp.nombre,
-        cat:comp.categoria||'',
-        diaOrigen:day,
-        labelOrigen:titleDia,
-        turnoOrigen:_fmtTurno(myE1,myS1,myE2,myS2),
-        diaDestino:day,
-        labelDestino:titleDia,
-        turnoDestino:_fmtTurno(compE1,compS1,compE2,compS2),
-        ok:errDirec.length===0,
-        errores:errDirec,
-        directo:true
-      });
-    }
+    // CASO C: Yo libro el día señalado, comp trabaja ese día
+    // → Yo trabajo el turno del comp el día señalado
+    // → A cambio, comp libra UN DÍA FUTURO donde yo trabajo y comp libra
+    if(esLibre && !compLibreMiDia && !_esPasado(day,monthKey,year)){
+      // Yo haría el turno del comp el día señalado
+      var valC_yo=_validarTurno(compE1,compS1,compE2,compS2);
+      var myCatC=_parseCategoria(myCat);
+      var errC_yo=valC_yo.errores.slice();
+      if(myCatC.tipo!=='FIJO'){var hCy=_horasLVSemana(myRaw[monthKey]||{},monthKey,day,compE1,compS1,compE2,compS2);if(hCy>2160)errC_yo.push('Yo supero 36h esa semana ('+(hCy/60).toFixed(1)+'h)');}
 
-    // Caso 3: Yo libre ese día, comp trabaja → yo trabajo su día libre
-    if(esLibre&&!compLibreMiDia){
-      // Buscar días libres del comp donde yo trabajo
+      // Buscar días FUTUROS donde comp libra y yo trabajo
       for(var d3=1;d3<=31;d3++){
         if(d3===day)continue;
-        if(_esPasado(d3,monthKey,year))continue; // no buscar días pasados
+        if(_esPasado(d3,monthKey,year))continue;
         var compT3=compDias[d3];
         var compLibreD3=(!compT3||!compT3.e1);
-        if(!compLibreD3)continue;
+        if(!compLibreD3)continue; // comp tiene que librar ese día
         var myT3=(myRaw[monthKey]||{})[d3];
-        if(!myT3||!myT3.e1)continue;
-        // Comp trabaja mi turno d3, yo trabajo turno comp del día day
-        var cT3E1=compTurnoMiDia?_toMin(compTurnoMiDia.e1):null;
-        var cT3S1=compTurnoMiDia?_toMin(compTurnoMiDia.s1):null;
-        var cT3E2=compTurnoMiDia&&compTurnoMiDia.e2?_toMin(compTurnoMiDia.e2):null;
-        var cT3S2=compTurnoMiDia&&compTurnoMiDia.s2?_toMin(compTurnoMiDia.s2):null;
+        if(!myT3||!myT3.e1)continue; // yo tengo que trabajar ese día
+        // Comp haría mi turno en d3
         var myT3E1=_toMin(myT3.e1),myT3S1=_toMin(myT3.s1);
         var myT3E2=myT3.e2?_toMin(myT3.e2):null,myT3S2=myT3.s2?_toMin(myT3.s2):null;
-        var valYo3=_validarTurno(cT3E1,cT3S1,cT3E2,cT3S2);
-        var valComp3=_validarTurno(myT3E1,myT3S1,myT3E2,myT3S2);
-        var err3=valYo3.errores.concat(valComp3.errores);
-        var myCatE=_parseCategoria(myCat);
-        var compCatE=_parseCategoria(comp.categoria||'');
-        if(myCatE.tipo!=='FIJO'&&cT3E1!==null){
-          var hYo3=_horasLVSemana(myRaw[monthKey]||{},monthKey,day,cT3E1,cT3S1,cT3E2,cT3S2);
-          if(hYo3>2160)err3.push('Yo supero 36h esa semana ('+(hYo3/60).toFixed(1)+'h)');
-        }
-        if(compCatE.tipo!=='FIJO'){
-          var hComp3=_horasLVSemana(compDias,monthKey,d3,myT3E1,myT3S1,myT3E2,myT3S2);
-          if(hComp3>2160)err3.push('Comp supera 36h esa semana ('+(hComp3/60).toFixed(1)+'h)');
-        }
+        var valC_comp=_validarTurno(myT3E1,myT3S1,myT3E2,myT3S2);
+        var errC=errC_yo.concat(valC_comp.errores);
+        var compCatC=_parseCategoria(comp.categoria||'');
+        if(compCatC.tipo!=='FIJO'){var hCc=_horasLVSemana(compDias,monthKey,d3,myT3E1,myT3S1,myT3E2,myT3S2);if(hCc>2160)errC.push('Comp supera 36h esa semana ('+(hCc/60).toFixed(1)+'h)');}
         var d3name=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'][(new Date(year,_cambioMonth,d3).getDay()+6)%7];
+        resultados.push({
+          nombre:comp.nombre, cat:comp.categoria||'',
+          tipo:'comp_libro_dia',
+          diaOrigen:day, labelOrigen:titleDia,
+          diaDestino:d3, labelDestino:d3name+' '+d3+' '+_MC_NAMES[_cambioMonth],
+          // Yo trabajo turno comp el día señalado, comp trabaja mi turno en d3
+          turnoYoHace:_fmtTurno(compE1,compS1,compE2,compS2),  // yo trabajo el día señalado
+          turnoCompHace:_fmtTurno(myT3E1,myT3S1,myT3E2,myT3S2), // comp trabaja en d3
+          ok:errC.length===0, errores:errC
+        });
+      }
+    }
+
+    // CASO D (placeholder para mantener estructura — eliminado el caso 3 antiguo)
+    if(false){
+        var d3name2=''; // nunca ejecutado
         resultados.push({
           nombre:comp.nombre,
           cat:comp.categoria||'',
           diaOrigen:day,
           labelOrigen:titleDia,
           turnoOrigen:'Libre',
-          diaDestino:d3,
-          labelDestino:d3name+' '+d3+' '+_MC_NAMES[_cambioMonth],
+          diaDestino:0,
+          labelDestino:d3name2,
           turnoDestino:_fmtTurno(myT3E1,myT3S1,myT3E2,myT3S2),
           ok:err3.length===0,
           errores:err3
@@ -6623,18 +6614,37 @@ function _fmtTurno(e1,s1,e2,s2){
 }
 
 function _renderCambioCard(r,ok){
-  var directo=!!r.directo;
+  var nom=r.nombre.split(' ')[0];
   var html='<div class="cambio-card '+(ok?'valido':'invalido')+'">';
   html+='<div class="cambio-card-nombre">'+r.nombre+'<span style="font-size:9px;color:var(--gray);font-weight:400;margin-left:6px">'+r.cat+'</span></div>';
-  if(directo){
-    html+='<div class="cambio-card-row"><span class="cambio-card-lbl">Intercambio:</span><span class="cambio-card-val yo">Tú: '+r.turnoOrigen+'</span></div>';
-    html+='<div class="cambio-card-row"><span class="cambio-card-lbl">&nbsp;</span><span class="cambio-card-val el">'+r.nombre.split(' ')[0]+': '+r.turnoDestino+'</span></div>';
-    html+='<div class="cambio-card-row" style="margin-top:4px"><span class="cambio-card-lbl">Día:</span><span class="cambio-card-val">'+r.labelOrigen+' (mismo día)</span></div>';
+
+  if(r.tipo==='mismo_dia'){
+    // Ambos tienen turno el mismo día, se intercambian
+    html+='<div class="cambio-card-row"><span class="cambio-card-lbl">Día:</span><span class="cambio-card-val">'+r.labelOrigen+'</span></div>';
+    html+='<div class="cambio-card-row"><span class="cambio-card-lbl">Tú harías:</span><span class="cambio-card-val el">'+r.turnoYoHace+'</span></div>';
+    html+='<div class="cambio-card-row"><span class="cambio-card-lbl">'+nom+' haría:</span><span class="cambio-card-val yo">'+r.turnoCompHace+'</span></div>';
+
+  } else if(r.tipo==='yo_libro_dia'){
+    // Yo libro el día señalado, comp trabaja mi turno. Yo trabajo un día futuro de comp.
+    html+='<div class="cambio-card-row"><span class="cambio-card-lbl">Tú libras:</span><span class="cambio-card-val el">'+r.labelOrigen+'</span></div>';
+    html+='<div class="cambio-card-row"><span class="cambio-card-lbl">'+nom+' trabaja:</span><span class="cambio-card-val yo">'+r.labelOrigen+' · '+r.turnoCompHace+'</span></div>';
+    html+='<div style="border-top:1px solid rgba(255,255,255,.06);margin:6px 0"></div>';
+    html+='<div class="cambio-card-row"><span class="cambio-card-lbl">A cambio:</span><span class="cambio-card-val el">Tú trabajas '+r.labelDestino+' · '+r.turnoYoHace+'</span></div>';
+
+  } else if(r.tipo==='comp_libro_dia'){
+    // Yo trabajo el día señalado (turno del comp), comp libra. Comp trabajará un día futuro mío.
+    html+='<div class="cambio-card-row"><span class="cambio-card-lbl">Tú trabajas:</span><span class="cambio-card-val el">'+r.labelOrigen+' · '+r.turnoYoHace+'</span></div>';
+    html+='<div class="cambio-card-row"><span class="cambio-card-lbl">'+nom+' libra:</span><span class="cambio-card-val yo">'+r.labelOrigen+'</span></div>';
+    html+='<div style="border-top:1px solid rgba(255,255,255,.06);margin:6px 0"></div>';
+    html+='<div class="cambio-card-row"><span class="cambio-card-lbl">A cambio:</span><span class="cambio-card-val el">'+nom+' trabaja '+r.labelDestino+' · '+r.turnoCompHace+'</span></div>';
+
   } else {
-    html+='<div class="cambio-card-row"><span class="cambio-card-lbl">Tú libras:</span><span class="cambio-card-val yo">'+r.labelOrigen+' · '+r.turnoOrigen+'</span></div>';
-    html+='<div class="cambio-card-row"><span class="cambio-card-lbl">Tú trabajas:</span><span class="cambio-card-val el">'+r.labelDestino+' · '+r.turnoDestino+'</span></div>';
+    // Fallback legacy
+    html+='<div class="cambio-card-row"><span class="cambio-card-lbl">Tú libras:</span><span class="cambio-card-val yo">'+r.labelOrigen+'</span></div>';
+    html+='<div class="cambio-card-row"><span class="cambio-card-lbl">Tú trabajas:</span><span class="cambio-card-val el">'+r.labelDestino+'</span></div>';
   }
-  if(!ok&&r.errores.length){
+
+  if(!ok&&r.errores&&r.errores.length){
     html+='<div class="cambio-error">'+r.errores.join('<br>')+'</div>';
   }
   html+='</div>';
