@@ -6428,8 +6428,8 @@ function calcularCambios(){
       errA=errA.concat(_validarTurno(compE1,compS1,compE2,compS2).errores);
       errA=errA.concat(_validarTurno(myE1,myS1,myE2,myS2).errores);
       var myCatA=_parseCategoria(myCat),ccA=_parseCategoria(comp.categoria||'');
-      if(myCatA.tipo!=='FIJO'){var hA=_horasLVSemana(myRaw[monthKey]||{},monthKey,day,compE1,compS1,compE2,compS2);if(hA>2160)errA.push('Yo supero 36h semana ('+(hA/60).toFixed(1)+'h)');}
-      if(ccA.tipo!=='FIJO'){var hAc=_horasLVSemana(compDias,monthKey,day,myE1,myS1,myE2,myS2);if(hAc>2160)errA.push(comp.nombre.split(' ')[0]+' supera 36h semana ('+(hAc/60).toFixed(1)+'h)');}
+      var limA=myCatA.tipo==='FIJO'?3000:2160;var hA=_horasLVSemana(myRaw[monthKey]||{},monthKey,day,compE1,compS1,compE2,compS2);if(hA>limA)errA.push('Yo supero '+(myCatA.tipo==='FIJO'?'50':'36')+'h semana ('+(hA/60).toFixed(1)+'h)');
+      var limAc=ccA.tipo==='FIJO'?3000:2160;var hAc=_horasLVSemana(compDias,monthKey,day,myE1,myS1,myE2,myS2);if(hAc>limAc)errA.push(comp.nombre.split(' ')[0]+' supera '+(ccA.tipo==='FIJO'?'50':'36')+'h semana ('+(hAc/60).toFixed(1)+'h)');
       // Descanso 10h: yo hago turno del comp ese dia; comp hace el mio
       errA=errA.concat(_validarDescanso10h(myRaw[monthKey]||{},monthKey,day,compE1,compS1,compE2,compS2,''));
       errA=errA.concat(_validarDescanso10h(compDias,monthKey,day,myE1,myS1,myE2,myS2,comp.nombre.split(' ')[0]+': '));
@@ -6452,7 +6452,7 @@ function calcularCambios(){
     if(!esLibre&&compLibreMiDia&&!_esPasado(day,monthKey,year)){
       var errBbase=_validarTurno(myE1,myS1,myE2,myS2).errores.slice();
       var ccB=_parseCategoria(comp.categoria||'');
-      if(ccB.tipo!=='FIJO'){var hBc=_horasLVSemana(compDias,monthKey,day,myE1,myS1,myE2,myS2);if(hBc>2160)errBbase.push(comp.nombre.split(' ')[0]+' supera 36h semana ('+(hBc/60).toFixed(1)+'h)');}
+      var limBc=ccB.tipo==='FIJO'?3000:2160;var hBc=_horasLVSemana(compDias,monthKey,day,myE1,myS1,myE2,myS2);if(hBc>limBc)errBbase.push(comp.nombre.split(' ')[0]+' supera '+(ccB.tipo==='FIJO'?'50':'36')+'h semana ('+(hBc/60).toFixed(1)+'h)');
       // Descanso 10h del comp al hacer MI turno el dia senalado
       errBbase=errBbase.concat(_validarDescanso10h(compDias,monthKey,day,myE1,myS1,myE2,myS2,comp.nombre.split(' ')[0]+': '));
       errBbase=errBbase.concat(_validarLibreSemana(compDias,monthKey,day,myE1,comp.nombre.split(' ')[0]+': '));
@@ -6466,7 +6466,7 @@ function calcularCambios(){
         var cE1=_toMin(cT2.e1),cS1=_toMin(cT2.s1),cE2=cT2.e2?_toMin(cT2.e2):null,cS2=cT2.s2?_toMin(cT2.s2):null;
         var errB=errBbase.concat(_validarTurno(cE1,cS1,cE2,cS2).errores);
         var myCatB=_parseCategoria(myCat);
-        if(myCatB.tipo!=='FIJO'){var hBy=_horasLVSemana(myRaw[monthKey]||{},monthKey,d2,cE1,cS1,cE2,cS2);if(hBy>2160)errB.push('Yo supero 36h semana ('+(hBy/60).toFixed(1)+'h)');}
+        var limBy=myCatB.tipo==='FIJO'?3000:2160;var hBy=_horasLVSemana(myRaw[monthKey]||{},monthKey,d2,cE1,cS1,cE2,cS2);if(hBy>limBy)errB.push('Yo supero '+(myCatB.tipo==='FIJO'?'50':'36')+'h semana ('+(hBy/60).toFixed(1)+'h)');
         // Descanso 10h: yo trabajo el turno del comp en d2
         errB=errB.concat(_validarDescanso10h(myRaw[monthKey]||{},monthKey,d2,cE1,cS1,cE2,cS2,''));
         errB=errB.concat(_validarLibreSemana(myRaw[monthKey]||{},monthKey,d2,cE1,''));
@@ -6487,7 +6487,7 @@ function calcularCambios(){
     if(esLibre&&!compLibreMiDia&&!_esPasado(day,monthKey,year)){
       var errCbase=_validarTurno(compE1,compS1,compE2,compS2).errores.slice();
       var myCatC=_parseCategoria(myCat);
-      if(myCatC.tipo!=='FIJO'){var hCy=_horasLVSemana(myRaw[monthKey]||{},monthKey,day,compE1,compS1,compE2,compS2);if(hCy>2160)errCbase.push('Yo supero 36h semana ('+(hCy/60).toFixed(1)+'h)');}
+      var limCy=myCatC.tipo==='FIJO'?3000:2160;var hCy=_horasLVSemana(myRaw[monthKey]||{},monthKey,day,compE1,compS1,compE2,compS2);if(hCy>limCy)errCbase.push('Yo supero '+(myCatC.tipo==='FIJO'?'50':'36')+'h semana ('+(hCy/60).toFixed(1)+'h)');
       // Descanso 10h: yo trabajo el turno del comp el dia senalado
       errCbase=errCbase.concat(_validarDescanso10h(myRaw[monthKey]||{},monthKey,day,compE1,compS1,compE2,compS2,''));
       errCbase=errCbase.concat(_validarLibreSemana(myRaw[monthKey]||{},monthKey,day,compE1,''));
@@ -6501,7 +6501,7 @@ function calcularCambios(){
         var mE1=_toMin(myT3.e1),mS1=_toMin(myT3.s1),mE2=myT3.e2?_toMin(myT3.e2):null,mS2=myT3.s2?_toMin(myT3.s2):null;
         var errC=errCbase.concat(_validarTurno(mE1,mS1,mE2,mS2).errores);
         var ccC=_parseCategoria(comp.categoria||'');
-        if(ccC.tipo!=='FIJO'){var hCc=_horasLVSemana(compDias,monthKey,d3,mE1,mS1,mE2,mS2);if(hCc>2160)errC.push(comp.nombre.split(' ')[0]+' supera 36h semana ('+(hCc/60).toFixed(1)+'h)');}
+        var limCc=ccC.tipo==='FIJO'?3000:2160;var hCc=_horasLVSemana(compDias,monthKey,d3,mE1,mS1,mE2,mS2);if(hCc>limCc)errC.push(comp.nombre.split(' ')[0]+' supera '+(ccC.tipo==='FIJO'?'50':'36')+'h semana ('+(hCc/60).toFixed(1)+'h)');
         // Descanso 10h: el comp trabaja mi turno en d3
         errC=errC.concat(_validarDescanso10h(compDias,monthKey,d3,mE1,mS1,mE2,mS2,comp.nombre.split(' ')[0]+': '));
         errC=errC.concat(_validarLibreSemana(compDias,monthKey,d3,mE1,comp.nombre.split(' ')[0]+': '));
@@ -6607,8 +6607,8 @@ function calcularCambios(){
         errP=errP.concat(validarResultante(compRes.e1,compRes.s1,compRes.e2,compRes.s2,compDias,comp.nombre.split(' ')[0]+': '));
         // 36h semanales
         var myCatP2=_parseCategoria(myCat),ccP=_parseCategoria(comp.categoria||'');
-        if(myCatP2.tipo!=='FIJO'){var hP=_horasLVSemana(myRaw[monthKey]||{},monthKey,day,miRes.e1,miRes.s1,miRes.e2,miRes.s2);if(hP>2160)errP.push('Yo supero 36h semana ('+(hP/60).toFixed(1)+'h)');}
-        if(ccP.tipo!=='FIJO'){var hPc=_horasLVSemana(compDias,monthKey,day,compRes.e1,compRes.s1,compRes.e2,compRes.s2);if(hPc>2160)errP.push(comp.nombre.split(' ')[0]+' supera 36h semana ('+(hPc/60).toFixed(1)+'h)');}
+        var limP=myCatP2.tipo==='FIJO'?3000:2160;var hP=_horasLVSemana(myRaw[monthKey]||{},monthKey,day,miRes.e1,miRes.s1,miRes.e2,miRes.s2);if(hP>limP)errP.push('Yo supero '+(myCatP2.tipo==='FIJO'?'50':'36')+'h semana ('+(hP/60).toFixed(1)+'h)');
+        var limPc=ccP.tipo==='FIJO'?3000:2160;var hPc=_horasLVSemana(compDias,monthKey,day,compRes.e1,compRes.s1,compRes.e2,compRes.s2);if(hPc>limPc)errP.push(comp.nombre.split(' ')[0]+' supera '+(ccP.tipo==='FIJO'?'50':'36')+'h semana ('+(hPc/60).toFixed(1)+'h)');
 
         errP=errP.concat(_validarLibreSemana(myRaw[monthKey]||{},monthKey,day,miRes.e1,''));
         errP=errP.concat(_validarLibreSemana(compDias,monthKey,day,compRes.e1,comp.nombre.split(' ')[0]+': '));
