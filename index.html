@@ -6556,6 +6556,22 @@ function calcularCambios(){
           ok:errB.length===0,errores:errB
         });
       }
+
+      // CESIÓN TOTAL sin contrapartida: comp libra ese día, coge mi turno entero, yo libro
+      var errCesion=_validarTurno(myE1,myS1,myE2,myS2).errores.slice();
+      var ccCes=_parseCategoria(comp.categoria||'');
+      var limCes=ccCes.tipo==='FIJO'?3000:2160;
+      var hCes=_horasLVSemana(compDias,monthKey,day,myE1,myS1,myE2,myS2);
+      if(hCes>limCes)errCesion.push(comp.nombre.split(' ')[0]+' supera '+(ccCes.tipo==='FIJO'?'50':'36')+'h semana ('+(hCes/60).toFixed(1)+'h)');
+      errCesion=errCesion.concat(_validarDescanso10h(compDias,monthKey,day,myE1,myS1,myE2,myS2,comp.nombre.split(' ')[0]+': '));
+      errCesion=errCesion.concat(_validarLibreSemana(compDias,monthKey,day,myE1,comp.nombre.split(' ')[0]+': '));
+      errCesion=errCesion.concat(_validarDescansoSemanal(compDias,monthKey,day,myE1,myS1,myE2,myS2,comp.nombre.split(' ')[0]+': '));
+      resultados.push({
+        nombre:comp.nombre,cat:comp.categoria||'',tipo:'cesion_total',
+        labelDia:titleDia,
+        turnoYo:_fmtTurno(myE1,myS1,myE2,myS2),  // lo que cede (mi turno entero)
+        ok:errCesion.length===0,errores:errCesion
+      });
     }
 
     // CASO C: Yo libro ese día, comp trabaja
@@ -6707,6 +6723,45 @@ function calcularCambios(){
     });
   });
 
+  // CESIÓN PARCIAL sin contrapartida: yo turno partido, comp libra ese día
+  // Le cedo UNA parte de mi turno, él la trabaja, yo me quedo con el resto
+  empleados.forEach(function(comp){
+    if(myNombre&&comp.nombre===myNombre)return;
+    if(!_sonCompatibles(myCat,comp.categoria||''))return;
+    if(esLibre||_esPasado(day,monthKey,year))return;
+    var compDias2=(comp.meses&&comp.meses[monthKey])||{};
+    var compT2c=compDias2[day]||null;
+    var compLibre2=!compT2c||!compT2c.e1||compT2c.tipo==='libre';
+    if(!compLibre2)return; // solo si el comp libra ese día
+    if(myE2===null||myS2===null)return; // solo si mi turno es partido
+
+    var ccCP=_parseCategoria(comp.categoria||'');
+    var partesCesibles=[
+      {e1:myE1,s1:myS1,resto:{e1:myE2,s1:myS2},label:'parte 1 ('+_fmtMin(myE1)+'→'+_fmtMin(myS1)+')'},
+      {e1:myE2,s1:myS2,resto:{e1:myE1,s1:myS1},label:'parte 2 ('+_fmtMin(myE2)+'→'+_fmtMin(myS2)+')'}
+    ];
+    partesCesibles.forEach(function(pc){
+      // Comp trabaja la parte cedida (turno simple)
+      var errCP=_validarTurno(pc.e1,pc.s1,null,null).errores.slice();
+      var limCP=ccCP.tipo==='FIJO'?3000:2160;
+      var hCP=_horasLVSemana(compDias2,monthKey,day,pc.e1,pc.s1,null,null);
+      if(hCP>limCP)errCP.push(comp.nombre.split(' ')[0]+' supera '+(ccCP.tipo==='FIJO'?'50':'36')+'h semana ('+(hCP/60).toFixed(1)+'h)');
+      errCP=errCP.concat(_validarDescanso10h(compDias2,monthKey,day,pc.e1,pc.s1,null,null,comp.nombre.split(' ')[0]+': '));
+      errCP=errCP.concat(_validarLibreSemana(compDias2,monthKey,day,pc.e1,comp.nombre.split(' ')[0]+': '));
+      errCP=errCP.concat(_validarDescansoSemanal(compDias2,monthKey,day,pc.e1,pc.s1,null,null,comp.nombre.split(' ')[0]+': '));
+      // Yo me quedo con el resto (turno simple)
+      errCP=errCP.concat(_validarTurno(pc.resto.e1,pc.resto.s1,null,null).errores);
+      parciales.push({
+        nombre:comp.nombre,cat:comp.categoria||'',tipo:'cesion_parcial',
+        labelDia:titleDia,
+        pMiaLabel:pc.label,
+        turnoYoRes:_fmtTurno(pc.resto.e1,pc.resto.s1,null,null), // lo que me quedo
+        turnoCompRes:_fmtTurno(pc.e1,pc.s1,null,null),           // lo que trabaja el comp
+        ok:errCP.length===0,errores:errCP
+      });
+    });
+  });
+
   parciales.sort(function(a,b){if(a.ok&&!b.ok)return -1;if(!a.ok&&b.ok)return 1;return a.nombre.localeCompare(b.nombre);});
 
   // Ordenar: válidos primero, luego por nombre
@@ -6821,9 +6876,12 @@ function _aplicarFiltro(filtro,texto,estado){
     if(r.tipo==='mismo_dia')return r.turnoComp;    // intercambio mismo dia: yo hago el turno del comp
     if(r.tipo==='comp_libro')return r.turnoYo;      // yo trabajo el turno del comp el dia senalado
     if(r.tipo==='yo_libro')return r.turnoComp;      // yo trabajo el turno del comp en el dia futuro
+    if(r.tipo==='cesion_total')return 'Libre';      // yo libro, no trabajo
+    if(r.tipo==='cesion_parcial')return r.turnoYoRes; // me quedo con parte
+    if(r.tipo==='parcial')return r.turnoYoRes;
     return r.turnoYo;
   }
-  function yoLibraElDia(r){return r.tipo==='yo_libro';} // solo yo_libro significa que yo libra el dia senalado
+  function yoLibraElDia(r){return r.tipo==='yo_libro'||r.tipo==='cesion_total';} // tipos donde yo libra el dia señalado completo
   function diaRelevante(r){return r.tipo==='yo_libro'?r.labelComp:r.labelDia;}
   function norm(s){return String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');}
   var filtrados=_todosResultados.filter(function(r){
@@ -6942,6 +7000,17 @@ function _renderCambioCard(r,ok){
     html+='<div style="border-top:1px solid rgba(255,255,255,.06);margin:6px 0"></div>';
     html+='<div class="cambio-card-row"><span class="cambio-card-lbl">Tú quedas:</span><span class="cambio-card-val el">'+r.turnoYoRes+'</span></div>';
     html+='<div class="cambio-card-row"><span class="cambio-card-lbl">'+nom+' queda:</span><span class="cambio-card-val el">'+r.turnoCompRes+'</span></div>';
+  } else if(r.tipo==='cesion_total'){
+    html+='<div class="cambio-card-row"><span class="cambio-card-lbl">Día:</span><span class="cambio-card-val">'+r.labelDia+'</span></div>';
+    html+='<div class="cambio-card-row"><span class="cambio-card-lbl">Tú libras:</span><span class="cambio-card-val el">'+r.labelDia+' (cedes el turno)</span></div>';
+    html+='<div class="cambio-card-row"><span class="cambio-card-lbl">'+nom+' trabaja:</span><span class="cambio-card-val yo">'+r.turnoYo+'</span></div>';
+    html+='<div style="font-size:9px;color:var(--gray);margin-top:4px">Cesión sin contrapartida</div>';
+  } else if(r.tipo==='cesion_parcial'){
+    html+='<div class="cambio-card-row"><span class="cambio-card-lbl">Día:</span><span class="cambio-card-val">'+r.labelDia+'</span></div>';
+    html+='<div class="cambio-card-row"><span class="cambio-card-lbl">Tú cedes:</span><span class="cambio-card-val el">'+r.pMiaLabel+'</span></div>';
+    html+='<div class="cambio-card-row"><span class="cambio-card-lbl">'+nom+' trabaja:</span><span class="cambio-card-val yo">'+r.turnoCompRes+'</span></div>';
+    html+='<div class="cambio-card-row"><span class="cambio-card-lbl">Tú quedas:</span><span class="cambio-card-val el">'+r.turnoYoRes+'</span></div>';
+    html+='<div style="font-size:9px;color:var(--gray);margin-top:4px">Cesión sin contrapartida</div>';
   }
   if(!ok&&r.errores&&r.errores.length)html+='<div class="cambio-error">'+r.errores.join('<br>')+'</div>';
   html+='</div>';
