@@ -4777,17 +4777,7 @@ function renderCompanerosDia(offsetDias,toggleIfOpen){
   empleados.forEach(function(emp){
     // Today's shift
     var turno=emp.dias[day];
-
-    // FIX DL/libre: un DL importado crea objeto {tipo:'libre', e1:''}.
-    // Eso NO debe tratarse como turno trabajado, porque acababa generando horario "→".
-    var turnoLibreDia=(!turno||!turno.e1||turno.tipo==='libre');
-    if(turnoLibreDia){
-      // DL/libre no debe salir en ninguna vista de compañeros.
-      // "Toda la plantilla" queda como: toda la plantilla QUE TRABAJA ese día.
-      return;
-    }
-
-    if(turno){
+    if(turno&&turno.e1&&turno.tipo!=='libre'){
       var grE1=toMinG(turno.e1),grS1=toMinG(turno.s1);
       var grE2=turno.e2?toMinG(turno.e2):null,grS2=turno.s2?toMinG(turno.s2):null;
       var solapa=turnosSeSuperponen(myE1,myS1,myE2,myS2,grE1,grS1,grE2,grS2);
@@ -4862,11 +4852,7 @@ function renderCompanerosDia(offsetDias,toggleIfOpen){
     coinciden=activos; // activos first in main array
     window._yaSalieron=yaSalieron;
   } else {
-    coinciden.sort(function(a,b){
-      if(a.libre&&!b.libre)return 1;
-      if(!a.libre&&b.libre)return -1;
-      return (a.e1===null?9999:a.e1)-(b.e1===null?9999:b.e1);
-    });
+    coinciden.sort(function(a,b){return a.e1-b.e1;});
     window._yaSalieron=[];
   }
 
@@ -4875,6 +4861,8 @@ function renderCompanerosDia(offsetDias,toggleIfOpen){
   html+='<div class="grupo-title">👥 '+(modoToda?'Toda la plantilla':'Coincidencias')+' · '+coinciden.length+'</div>';
   if(myDay&&myDay.e1){
     html+='<div class="grupo-item" style="opacity:.6"><div class="grupo-solapamiento" style="background:var(--gold)"></div><div class="grupo-nombre" style="color:var(--gold);font-size:12px">Tú</div><div class="grupo-horario" style="color:var(--gold)">'+myHorario+'</div></div>';
+  } else {
+    html+='<div class="grupo-item" style="opacity:.6"><div class="grupo-solapamiento" style="background:var(--gray)"></div><div class="grupo-nombre" style="color:var(--gray);font-size:12px">Tú · Libre</div><div class="grupo-horario" style="color:var(--gray)">—</div></div>';
   }
   html+='</div>';
 
@@ -6228,7 +6216,6 @@ function cerrarBuscadorCambio(){
 function _toMin(t){if(!t)return null;var p=String(t).split(':');return +p[0]*60+ +p[1];}
 function _fmtMin(m){if(m===null||m===undefined)return'--';var h=Math.floor(((m%1440)+1440)%1440/60),mm=((m%1440)+1440)%1440%60;return(h<10?'0':'')+h+':'+(mm<10?'0':'')+mm;}
 function _durMin(e,s){if(e===null||s===null)return 0;return s<e?s+1440-e:s-e;}
-function _esLibreCambio(t){return !t||!t.e1||t.tipo==='libre';}
 
 // Detectar tipo contrato y rol desde categoria del grupo
 function _parseCategoria(cat){
@@ -6449,7 +6436,7 @@ function calcularCambios(){
   var myS1=myDayObj&&myDayObj.s1?_toMin(myDayObj.s1):null;
   var myE2=myDayObj&&myDayObj.e2?_toMin(myDayObj.e2):null;
   var myS2=myDayObj&&myDayObj.s2?_toMin(myDayObj.s2):null;
-  var esLibre=_esLibreCambio(myDayObj);
+  var esLibre=(myE1===null);
 
   // Mi categoría
   var nominaMap;try{nominaMap=JSON.parse(localStorage.getItem(_GRUPO_KEY+'_map')||'{}')}catch(e){nominaMap={};}
@@ -6500,11 +6487,13 @@ function calcularCambios(){
 
     // El compañero ese día
     var compTurnoMiDia=compDias[day]||null;
+    // Día libre: turno con tipo libre o e1 vacío
+    if(compTurnoMiDia&&(!compTurnoMiDia.e1||compTurnoMiDia.tipo==='libre'))compTurnoMiDia=null;
     var compE1=compTurnoMiDia?_toMin(compTurnoMiDia.e1):null;
     var compS1=compTurnoMiDia?_toMin(compTurnoMiDia.s1):null;
     var compE2=compTurnoMiDia&&compTurnoMiDia.e2?_toMin(compTurnoMiDia.e2):null;
     var compS2=compTurnoMiDia&&compTurnoMiDia.s2?_toMin(compTurnoMiDia.s2):null;
-    var compLibreMiDia=_esLibreCambio(compTurnoMiDia);
+    var compLibreMiDia=(compE1===null);
 
     // CASO A: Ambos tienen turno ese día → intercambio directo
     if(!esLibre&&!compLibreMiDia&&!_esPasado(day,monthKey,year)){
@@ -6544,9 +6533,9 @@ function calcularCambios(){
       for(var d2=1;d2<=31;d2++){
         if(d2===day||_esPasado(d2,monthKey,year))continue;
         var myT2=(myRaw[monthKey]||{})[d2];
-        if(!_esLibreCambio(myT2))continue; // yo debe librar ese día
+        if(myT2&&myT2.e1)continue; // yo debo librar ese día
         var cT2=compDias[d2];
-        if(_esLibreCambio(cT2))continue; // comp debe trabajar ese día
+        if(!cT2||!cT2.e1)continue; // comp debe trabajar ese día
         var cE1=_toMin(cT2.e1),cS1=_toMin(cT2.s1),cE2=cT2.e2?_toMin(cT2.e2):null,cS2=cT2.s2?_toMin(cT2.s2):null;
         var errB=errBbase.concat(_validarTurno(cE1,cS1,cE2,cS2).errores);
         var myCatB=_parseCategoria(myCat);
@@ -6579,9 +6568,9 @@ function calcularCambios(){
       for(var d3=1;d3<=31;d3++){
         if(d3===day||_esPasado(d3,monthKey,year))continue;
         var myT3=(myRaw[monthKey]||{})[d3];
-        if(_esLibreCambio(myT3))continue; // yo debe trabajar ese día
+        if(!myT3||!myT3.e1)continue; // yo debo trabajar ese día
         var cT3=compDias[d3];
-        if(!_esLibreCambio(cT3))continue; // comp debe librar ese día
+        if(cT3&&cT3.e1)continue; // comp debe librar ese día
         var mE1=_toMin(myT3.e1),mS1=_toMin(myT3.s1),mE2=myT3.e2?_toMin(myT3.e2):null,mS2=myT3.s2?_toMin(myT3.s2):null;
         var errC=errCbase.concat(_validarTurno(mE1,mS1,mE2,mS2).errores);
         var ccC=_parseCategoria(comp.categoria||'');
@@ -6609,6 +6598,7 @@ function calcularCambios(){
     if(!_sonCompatibles(myCat,comp.categoria||''))return;
     var compDias=(comp.meses&&comp.meses[monthKey])||{};
     var compT=compDias[day]||null;
+    if(compT&&(!compT.e1||compT.tipo==='libre'))compT=null;
     var compE1=compT?_toMin(compT.e1):null;
     var compS1=compT?_toMin(compT.s1):null;
     var compE2=compT&&compT.e2?_toMin(compT.e2):null;
@@ -6827,20 +6817,13 @@ function _aplicarFiltro(filtro,texto,estado){
     if(r.tipo==='yo_libro')return r.turnoComp;      // yo trabajo el turno del comp en el dia futuro
     return r.turnoYo;
   }
-  function yoLibraElDia(r){return r.tipo==='yo_libro';} // yo libra el dia senalado
-  function hayLibreEnCambio(r){return r.tipo==='yo_libro'||r.tipo==='comp_libro'||r.turnoYo==='Libre'||r.turnoComp==='Libre';}
+  function yoLibraElDia(r){return r.tipo==='yo_libro';} // solo yo_libro significa que yo libra el dia senalado
   function diaRelevante(r){return r.tipo==='yo_libro'?r.labelComp:r.labelDia;}
   function norm(s){return String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');}
-  var textoNorm=norm(texto);
-  var libreGenerico=/^(libre|dl|dia libre|día libre)$/.test(textoNorm.trim());
   var filtrados=_todosResultados.filter(function(r){
     if(!r.ok)return false;
-    // "Libre" o "DL" a secas = cualquier cambio donde alguien libra ese dia.
-    // "librar/no trabajar" = opciones donde YO libro el dia senalado.
-    if(filtro.soloLibrar){
-      if(libreGenerico){if(!hayLibreEnCambio(r))return false;}
-      else if(!yoLibraElDia(r))return false;
-    }
+    // Filtro soloLibrar: solo opciones donde yo libra el dia senalado
+    if(filtro.soloLibrar&&!yoLibraElDia(r))return false;
     if(filtro.nombre&&norm(r.nombre).indexOf(norm(filtro.nombre))<0)return false;
     var lbl=diaRelevante(r);
     var numMatch=lbl.match(/\b(\d{1,2})\b/);
