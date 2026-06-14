@@ -7054,6 +7054,8 @@ function evBuscar(){
   evMostrarResultados(resultados,null,nombreEvento,hDesde,hHasta);
 }
 
+var _evResultados=[];
+var _evHDesde=0,_evHHasta=0;
 function evMostrarResultados(resultados,error,nombreEvento,hDesde,hHasta){
   document.getElementById('ev-form').style.display='none';
   var sec=document.getElementById('ev-results');
@@ -7061,6 +7063,7 @@ function evMostrarResultados(resultados,error,nombreEvento,hDesde,hHasta){
   if(error){sec.innerHTML='<div class="ev-empty">😕 '+error+'</div>'+_evBtnVolver();return;}
   if(!resultados||!resultados.length){sec.innerHTML='<div class="ev-empty">😕 No hay días disponibles en ese rango</div>'+_evBtnVolver();return;}
 
+  _evResultados=resultados;_evHDesde=hDesde;_evHHasta=hHasta;
   var horaStr=_evFmtMin(hDesde)+' – '+_evFmtMin(hHasta);
   var html='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">';
   html+='<div><div style="font-family:\'Bebas Neue\',sans-serif;font-size:18px;color:var(--gold)">'+nombreEvento+'</div>';
@@ -7069,7 +7072,7 @@ function evMostrarResultados(resultados,error,nombreEvento,hDesde,hHasta){
   html+='</div>';
   html+='<div class="ev-seccion">📅 Mejores días</div>';
 
-  resultados.slice(0,10).forEach(function(r,i){
+  resultados.slice(0,15).forEach(function(r,i){
     var pct=Math.round(r.libres.length/r.total*100);
     var cls='ev-card'+(i===0?' ev-top1':i<=1?' ev-top2':'');
     var libresCompletos=r.libres.filter(function(x){return!x.parcial;});
@@ -7082,21 +7085,50 @@ function evMostrarResultados(resultados,error,nombreEvento,hDesde,hHasta){
     html+='</div><div class="ev-card-num'+(i===0?' gold':'')+'">'+r.libres.length+'/'+r.total+'</div></div>';
     html+='<div class="ev-card-row">Todo el evento: <span>'+libresCompletos.length+' personas</span></div>';
     if(parcialesArr.length)html+='<div class="ev-card-row">Asistencia parcial: <span style="color:#fbbf24">'+parcialesArr.length+' personas</span></div>';
-    if(r.sinDatos.length)html+='<div class="ev-card-row">Sin publicar: <span style="color:var(--gray)">'+r.sinDatos.length+'</span></div>';
-    if(libresCompletos.length)html+='<div class="ev-names">'+libresCompletos.slice(0,6).map(function(x){return x.nombre;}).join(' · ')+(libresCompletos.length>6?' +más':'')+'</div>';
-    if(parcialesArr.length){
-      html+='<div class="ev-parciales">';
-      parcialesArr.slice(0,4).forEach(function(x){html+='🕐 '+x.nombre+' (desde '+_evFmtMin(x.desde)+')  ';});
-      html+='</div>';
-    }
+    if(r.sinDatos.length)html+='<div class="ev-card-row">Sin publicar: <span style="color:var(--gray)">'+r.sinDatos.length+' (aún sin turno asignado)</span></div>';
     if(r.impFaltan.length)html+='<div class="ev-missing">No disponibles: '+r.impFaltan.join(', ')+'</div>';
+    // Botón desplegable
+    html+='<button onclick="_evToggleDetalle('+r.dia+')" style="width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:8px;color:var(--gold);font-family:Outfit,sans-serif;font-size:11px;font-weight:600;cursor:pointer;margin-top:8px">👥 Ver lista completa</button>';
+    html+='<div id="ev-detalle-'+r.dia+'" style="display:none;margin-top:8px"></div>';
     html+='<div class="ev-bar" style="width:'+pct+'%"></div>';
     html+='</div>';
   });
 
-  if(resultados.length>10)html+='<div style="font-size:11px;color:var(--gray);text-align:center;padding:8px">... y '+(resultados.length-10)+' días más</div>';
+  if(resultados.length>15)html+='<div style="font-size:11px;color:var(--gray);text-align:center;padding:8px">... y '+(resultados.length-15)+' días más</div>';
   html+=_evBtnVolver();
   sec.innerHTML=html;
+}
+
+function _evToggleDetalle(dia){
+  var det=document.getElementById('ev-detalle-'+dia);
+  if(!det)return;
+  if(det.style.display==='block'){det.style.display='none';return;}
+  var r=_evResultados.filter(function(x){return x.dia===dia;})[0];
+  if(!r)return;
+  var libresCompletos=r.libres.filter(function(x){return!x.parcial;}).sort(function(a,b){return a.nombre.localeCompare(b.nombre);});
+  var parcialesArr=r.libres.filter(function(x){return x.parcial;}).sort(function(a,b){return a.desde-b.desde;});
+  var ocupadosArr=(r.ocupados||[]).slice().sort();
+  var sinDatosArr=(r.sinDatos||[]).slice().sort();
+
+  var h='';
+  if(libresCompletos.length){
+    h+='<div style="font-size:10px;font-weight:700;color:#4ade80;text-transform:uppercase;letter-spacing:.5px;margin:8px 0 4px">✅ Todo el evento ('+libresCompletos.length+')</div>';
+    libresCompletos.forEach(function(x){h+='<div style="font-size:11px;color:var(--white);padding:3px 0;border-bottom:1px solid rgba(255,255,255,.04)">'+x.nombre+'</div>';});
+  }
+  if(parcialesArr.length){
+    h+='<div style="font-size:10px;font-weight:700;color:#fbbf24;text-transform:uppercase;letter-spacing:.5px;margin:10px 0 4px">🕐 Asistencia parcial ('+parcialesArr.length+')</div>';
+    parcialesArr.forEach(function(x){h+='<div style="font-size:11px;color:var(--white);padding:3px 0;border-bottom:1px solid rgba(255,255,255,.04);display:flex;justify-content:space-between"><span>'+x.nombre+'</span><span style="color:#fbbf24">desde '+_evFmtMin(x.desde)+'</span></div>';});
+  }
+  if(sinDatosArr.length){
+    h+='<div style="font-size:10px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;margin:10px 0 4px">❔ Sin publicar ('+sinDatosArr.length+')</div>';
+    sinDatosArr.forEach(function(n){h+='<div style="font-size:11px;color:var(--gray);padding:3px 0;border-bottom:1px solid rgba(255,255,255,.04)">'+n+'</div>';});
+  }
+  if(ocupadosArr.length){
+    h+='<div style="font-size:10px;font-weight:700;color:#f87171;text-transform:uppercase;letter-spacing:.5px;margin:10px 0 4px">❌ No pueden ('+ocupadosArr.length+')</div>';
+    ocupadosArr.forEach(function(n){h+='<div style="font-size:11px;color:#f87171;opacity:.7;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.04)">'+n+'</div>';});
+  }
+  det.innerHTML=h;
+  det.style.display='block';
 }
 
 function _evBtnVolver(){return '<button onclick="_evVolverForm()" style="width:100%;background:none;border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px;font-family:\'Outfit\',sans-serif;font-size:13px;color:var(--gray);cursor:pointer;margin-top:8px">← Nueva búsqueda</button>';}
