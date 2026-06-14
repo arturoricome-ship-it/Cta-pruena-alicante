@@ -896,6 +896,46 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
   #op-free-list .op-free-between{font-size:12px;padding:9px 10px}
 }
 
+
+/* ═══ BUSCADOR EVENTO ════════════════════════════════════ */
+#ev-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:200000;backdrop-filter:blur(4px)}
+#ev-panel{position:fixed;bottom:0;left:0;right:0;background:#0f1828;border-radius:22px 22px 0 0;z-index:200001;transform:translateY(100%);transition:transform .28s cubic-bezier(.4,0,.2,1);max-height:92vh;display:flex;flex-direction:column;overflow:hidden}
+#ev-panel.open{transform:translateY(0)}
+.ev-handle{width:36px;height:4px;background:rgba(255,255,255,.15);border-radius:2px;margin:14px auto 0;flex-shrink:0}
+.ev-header{padding:12px 16px 10px;flex-shrink:0;border-bottom:1px solid rgba(255,255,255,.07)}
+.ev-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;color:var(--gold)}
+.ev-sub{font-size:11px;color:var(--gray);margin-top:2px}
+#ev-body{overflow-y:auto;padding:14px 14px calc(24px + env(safe-area-inset-bottom));flex:1;min-height:0;-webkit-overflow-scrolling:touch}
+.ev-field{margin-bottom:14px}
+.ev-field label{font-size:10px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:6px}
+.ev-field input,.ev-field select{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:12px;color:var(--white);font-family:'Outfit',sans-serif;font-size:13px;padding:10px 13px;outline:none}
+.ev-row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ev-chip-wrap{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.ev-chip{background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.3);border-radius:20px;padding:4px 10px;font-size:11px;color:#a78bfa;display:flex;align-items:center;gap:5px}
+.ev-chip button{background:none;border:none;color:#a78bfa;cursor:pointer;font-size:14px;padding:0;line-height:1}
+.ev-add-row{display:flex;gap:8px}
+.ev-add-row input{flex:1}
+.ev-add-row button{background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.3);border-radius:12px;padding:10px 14px;color:#a78bfa;font-family:'Outfit',sans-serif;font-size:13px;cursor:pointer;flex-shrink:0}
+.ev-btn-search{width:100%;background:rgba(200,168,75,.2);border:1px solid rgba(200,168,75,.4);border-radius:14px;padding:13px;font-family:'Outfit',sans-serif;font-size:14px;font-weight:700;color:var(--gold);cursor:pointer;margin-top:4px}
+.ev-seccion{font-size:10px;font-weight:700;color:var(--gold);letter-spacing:1px;text-transform:uppercase;margin:14px 0 8px;padding-bottom:4px;border-bottom:1px solid rgba(200,168,75,.2)}
+.ev-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:13px;margin-bottom:8px;position:relative;overflow:hidden}
+.ev-card.ev-top1{border-color:rgba(200,168,75,.5);background:rgba(200,168,75,.05)}
+.ev-card.ev-top2{border-color:rgba(96,165,250,.3)}
+.ev-bar{position:absolute;bottom:0;left:0;height:3px;background:linear-gradient(90deg,#4ade80,#60a5fa);border-radius:0 0 14px 14px}
+.ev-card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.ev-card-fecha{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--white)}
+.ev-card-num{font-size:20px;font-weight:800;color:#4ade80}
+.ev-card-num.gold{color:var(--gold)}
+.ev-card-row{font-size:11px;color:var(--gray);margin-bottom:4px}
+.ev-card-row span{color:var(--white);font-weight:600}
+.ev-names{font-size:10px;color:#4ade80;margin-top:6px;line-height:1.7}
+.ev-parciales{font-size:10px;color:#fbbf24;margin-top:4px;line-height:1.7}
+.ev-missing{font-size:10px;color:#f87171;margin-top:4px}
+.ev-empty{text-align:center;padding:30px 16px;font-size:13px;color:var(--gray)}
+.ev-mes-tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+.ev-mes-tabs::-webkit-scrollbar{display:none}
+.ev-mes-tab{background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:10px;padding:6px 12px;font-size:12px;color:var(--gray);cursor:pointer;white-space:nowrap;flex-shrink:0;font-family:'Outfit',sans-serif}
+.ev-mes-tab.active{background:rgba(200,168,75,.15);border-color:rgba(200,168,75,.4);color:var(--gold);font-weight:700}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
@@ -2537,6 +2577,7 @@ document.getElementById("btn-logout").addEventListener("click",function(){
     <button class="calc-small-btn" id="btn-mismo-turno" onclick="filtrarMismoTurno()">🎯 Mismo turno</button>
     <button class="calc-small-btn" id="btn-en-turno" onclick="filtrarEnTurno()">⚡ En turno</button>
     <button id="btn-sort-salida" onclick="toggleSortSalida()" title="Ordenar por próxima salida" style="background:rgba(200,168,75,.12);border:1px solid rgba(200,168,75,.3);border-radius:8px;padding:5px 9px;cursor:pointer;font-size:13px;line-height:1">⇅</button>
+    <button onclick="abrirBuscadorEvento()" style="background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.3);border-radius:8px;padding:5px 10px;cursor:pointer;font-size:11px;font-weight:700;color:#a78bfa;font-family:'Outfit',sans-serif">🎉 Evento</button>
     <input type="file" id="grupo-file-input" accept=".xlsx" style="display:none" onchange="procesarGrupoXlsx(this.files[0])">
   </div>
   <div id="grupo-panel"></div>
@@ -6277,23 +6318,33 @@ function _validarDescanso10h(empDias, monthKey, dia, e1n, s1n, e2n, s2n, etiquet
 }
 
 // Valida que empDias tenga al menos 1 dia libre en la semana del dia dado (con turno nuevo en ese dia)
+// Si hay dias sin publicar (sin datos) en la semana, se asume q podrian ser libres → no falla
 function _validarLibreSemana(empDias, monthKey, dia, e1n, etiqueta){
   var idx=_GRUPO_MONTHS.indexOf(monthKey);
   var fecha=new Date(_cambioYear,idx,dia);
   var dow=(fecha.getDay()+6)%7;
   var lunes=new Date(fecha.getTime()-dow*86400000);
-  var libres=0;
+  var diasPublicados=0, libres=0;
   for(var i=0;i<7;i++){
     var f=new Date(lunes.getTime()+i*86400000);
     var d=f.getDate();
     var mk=_GRUPO_MONTHS[f.getMonth()];
-    if(mk!==monthKey)continue;
+    if(mk!==monthKey)continue; // dia de otro mes = sin publicar
     var trabaja;
-    if(d===dia){trabaja=(e1n!==null);}
-    else{var t=empDias[d];trabaja=!!(t&&t.e1);}
+    if(d===dia){
+      trabaja=(e1n!==null);
+      diasPublicados++;
+    } else {
+      var t=empDias[d];
+      if(t===undefined||t===null){continue;} // sin publicar, podria ser libre
+      diasPublicados++;
+      trabaja=!!(t&&t.e1);
+    }
     if(!trabaja)libres++;
   }
-  if(libres===0)return[(etiqueta||'')+'Sin dia libre esa semana'];
+  // Solo falla si todos los dias publicados son trabajados (ninguno libre)
+  // Si hay dias sin publicar, podrian ser el dia libre
+  if(diasPublicados===7&&libres===0)return[(etiqueta||'')+'Sin dia libre esa semana'];
   return[];
 }
 
@@ -6868,6 +6919,54 @@ function _renderCambioCard(r,ok){
   return html;
 }
 </script>
+
+
+<!-- PANEL BUSCADOR EVENTO -->
+<div id="ev-bg" onclick="cerrarEvento()"></div>
+<div id="ev-panel">
+  <div class="ev-handle"></div>
+  <div class="ev-header">
+    <div class="ev-title">🎉 Buscar día para evento</div>
+    <div class="ev-sub" id="ev-sub">Encuentra el día con más compañeros disponibles</div>
+  </div>
+  <div id="ev-body">
+    <div id="ev-form">
+      <div class="ev-field" style="margin-top:6px">
+        <label>Mes</label>
+        <div class="ev-mes-tabs" id="ev-mes-tabs"></div>
+      </div>
+      <div class="ev-field">
+        <label>Rango de días</label>
+        <div class="ev-row2">
+          <div><label style="font-size:10px;color:var(--gray);display:block;margin-bottom:4px">Desde</label><input type="number" id="ev-dia-desde" min="1" max="31" value="1"></div>
+          <div><label style="font-size:10px;color:var(--gray);display:block;margin-bottom:4px">Hasta</label><input type="number" id="ev-dia-hasta" min="1" max="31" value="31"></div>
+        </div>
+      </div>
+      <div class="ev-field">
+        <label>Hora del evento</label>
+        <div class="ev-row2">
+          <div><label style="font-size:10px;color:var(--gray);display:block;margin-bottom:4px">Desde</label><input type="time" id="ev-hora-desde" value="14:00"></div>
+          <div><label style="font-size:10px;color:var(--gray);display:block;margin-bottom:4px">Hasta</label><input type="time" id="ev-hora-hasta" value="20:00"></div>
+        </div>
+      </div>
+      <div class="ev-field">
+        <label>Imprescindibles</label>
+        <div class="ev-add-row">
+          <input type="text" id="ev-nombre-input" placeholder="Nombre del compañero..." onkeydown="if(event.key==='Enter')evAddNombre()">
+          <button onclick="evAddNombre()">+ Añadir</button>
+        </div>
+        <div class="ev-chip-wrap" id="ev-chips"></div>
+      </div>
+      <div class="ev-field">
+        <label>Nombre del evento (opcional)</label>
+        <input type="text" id="ev-nombre-evento" placeholder="Barbacoa, fiesta, cena...">
+      </div>
+      <button class="ev-btn-search" onclick="evBuscar()">🔍 Buscar mejor día</button>
+      <button onclick="cerrarEvento()" style="width:100%;background:none;border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:11px;font-family:'Outfit',sans-serif;font-size:13px;color:var(--gray);cursor:pointer;margin-top:8px">Cancelar</button>
+    </div>
+    <div id="ev-results" style="display:none"></div>
+  </div>
+</div>
 
 </body>
 </html>
