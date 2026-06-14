@@ -7114,6 +7114,21 @@ function _evTurnoDisponibleCompleto(turno){
   if(!turno.e1)return true;
   return _EV_TIPOS_NO_OPERATIVA.indexOf(tipo)>=0;
 }
+function _evMesSinTurnosDeTrabajo(diasMes){
+  // Caso real CTA: empleados de excedencia/baja larga pueden tener casi todo el mes vacío
+  // y algunos días guardados como DL/libre. Eso no debe tratarse como "sin publicar".
+  var keys=Object.keys(diasMes||{});
+  for(var i=0;i<keys.length;i++){
+    var t=diasMes[keys[i]];
+    if(!t)continue;
+    var tipo=String(t.tipo||'').toLowerCase();
+    if(t.ausencia||t.disponibilidadNoConfirmada)continue;
+    if(!t.e1)continue;
+    if(_EV_TIPOS_NO_OPERATIVA.indexOf(tipo)>=0)continue;
+    return false; // hay al menos un turno real de trabajo en el mes
+  }
+  return true;
+}
 function _evCalcularAsistencia(turno, evDesde, evHasta){
   if(evHasta<=evDesde)evHasta+=1440; // permite eventos que cruzan medianoche
   var evDur=evHasta-evDesde;
@@ -7162,13 +7177,15 @@ function _evClasificarEmpleadoEvento(emp, mes, dia, hDesde, hHasta, mesPublicado
   var nombre=emp.nombre;
   var diasGuardados=Object.keys(diasMes).length;
   var mesVacioEmpleado=tieneMesEmp&&diasGuardados===0;
+  var mesSinTrabajoEmpleado=tieneMesEmp&&_evMesSinTurnosDeTrabajo(diasMes);
   var tieneMesPublicado=diasGuardados>0;
 
-  // Regla CTA: si el MES COMPLETO de ese empleado viene vacío, se interpreta como
-  // excedencia/baja larga y sí puede venir al evento. Una celda vacía aislada NO cuenta.
+  // Regla CTA: si el empleado no tiene ningún turno real de trabajo en el mes,
+  // aunque tenga algunos DL/libres guardados, se interpreta como excedencia/baja larga
+  // y sí puede venir al evento. Una celda vacía aislada de alguien con turnos reales NO cuenta.
   if(turno===undefined||turno===null){
-    if(mesPublicadoGlobal&&mesVacioEmpleado){
-      return{nombre:nombre,estado:'completo',parcial:false,desde:hDesde,huecos:[[hDesde,(hHasta<=hDesde?hHasta+1440:hHasta)]],turno:'Mes vacío',motivo:'Excedencia/baja larga'};
+    if(mesPublicadoGlobal&&(mesVacioEmpleado||mesSinTrabajoEmpleado)){
+      return{nombre:nombre,estado:'completo',parcial:false,desde:hDesde,huecos:[[hDesde,(hHasta<=hDesde?hHasta+1440:hHasta)]],turno:'Mes sin turnos',motivo:'Excedencia/baja larga'};
     }
     return{nombre:nombre,estado:'sinDatos',parcial:false,desde:null,huecos:[],turno:'',motivo:tieneMesPublicado?'Sin turno publicado':'Mes no importado'};
   }
@@ -7332,7 +7349,7 @@ function _evDetalleCompletoTag(x){
   var turno=String(x.turno||'');
   if(motivo.indexOf('disponibilidad no operativa')>=0||turno==='!')return 'No operativa';
   if(motivo==='Libre / no operativo'||motivo==='Libre'||turno==='Libre')return 'Libre';
-  if(motivo==='Excedencia/baja larga'&&turno==='Mes vacío')return 'Excedencia/baja larga';
+  if(motivo==='Excedencia/baja larga'&&(turno==='Mes vacío'||turno==='Mes sin turnos'))return 'Excedencia/baja larga';
   return motivo+(turno?' · '+turno:'');
 }
 
