@@ -6996,21 +6996,35 @@ function _evFmtMin(m){if(m===null||m===undefined)return'--';m=((m%1440)+1440)%14
 
 function _evCalcularAsistencia(turno, evDesde, evHasta){
   var evDur=evHasta-evDesde;
-  if(!turno||!turno.e1)return{puede:true,parcial:false,desde:evDesde,horasAsiste:evDur};
+  if(!turno||!turno.e1)return{puede:true,parcial:false,desde:evDesde,horasAsiste:evDur,huecos:[[evDesde,evHasta]]};
   var partes=[[_evToMin(turno.e1),_evToMin(turno.s1)]];
   if(turno.e2&&turno.s2)partes.push([_evToMin(turno.e2),_evToMin(turno.s2)]);
-  var minutosOcupados=0;
+
+  // Normalizar partes (nocturnos) y recortar al rango del evento
+  var ocupados=[];
   partes.forEach(function(p){
     var e=p[0],s=p[1];if(s<e)s+=1440;
     var ss=Math.max(e,evDesde),se=Math.min(s,evHasta);
-    if(se>ss)minutosOcupados+=se-ss;
+    if(se>ss)ocupados.push([ss,se]);
   });
-  if(minutosOcupados===0)return{puede:true,parcial:false,desde:evDesde,horasAsiste:evDur};
-  if(minutosOcupados>=evDur)return{puede:false,parcial:false,desde:null,horasAsiste:0};
-  var ultimaSalida=0;
-  partes.forEach(function(p){var s=p[1];if(s<p[0])s+=1440;if(s>ultimaSalida)ultimaSalida=s;});
-  var desde=Math.min(Math.max(evDesde,ultimaSalida),evHasta);
-  return{puede:true,parcial:true,desde:desde,horasAsiste:evDur-minutosOcupados};
+
+  if(ocupados.length===0)return{puede:true,parcial:false,desde:evDesde,horasAsiste:evDur,huecos:[[evDesde,evHasta]]};
+
+  // Calcular huecos libres dentro del evento
+  ocupados.sort(function(a,b){return a[0]-b[0];});
+  var huecos=[];
+  var cursor=evDesde;
+  ocupados.forEach(function(o){
+    if(o[0]>cursor)huecos.push([cursor,o[0]]);
+    cursor=Math.max(cursor,o[1]);
+  });
+  if(cursor<evHasta)huecos.push([cursor,evHasta]);
+
+  var minutosLibres=huecos.reduce(function(acc,h){return acc+(h[1]-h[0]);},0);
+  if(minutosLibres<=0)return{puede:false,parcial:false,desde:null,horasAsiste:0,huecos:[]};
+  if(minutosLibres>=evDur)return{puede:true,parcial:false,desde:evDesde,horasAsiste:evDur,huecos:huecos};
+
+  return{puede:true,parcial:true,desde:huecos[0][0],horasAsiste:minutosLibres,huecos:huecos};
 }
 
 function evBuscar(){
@@ -7065,7 +7079,7 @@ function evBuscar(){
           if(nombre.toLowerCase().indexOf(imp.toLowerCase())>=0&&impFaltan.indexOf(nombre)<0)impFaltan.push(nombre);
         });
       } else {
-        libres.push({nombre:nombre,parcial:asist.parcial,desde:asist.desde});
+        libres.push({nombre:nombre,parcial:asist.parcial,desde:asist.desde,huecos:asist.huecos});
       }
     });
     var impOk=_evImprescindibles.every(function(imp){
@@ -7154,7 +7168,15 @@ function _evToggleDetalle(dia){
   }
   if(parcialesArr.length){
     h+='<div style="font-size:10px;font-weight:700;color:#fbbf24;text-transform:uppercase;letter-spacing:.5px;margin:10px 0 4px">🕐 Asistencia parcial ('+parcialesArr.length+')</div>';
-    parcialesArr.forEach(function(x){h+='<div style="font-size:11px;color:var(--white);padding:3px 0;border-bottom:1px solid rgba(255,255,255,.04);display:flex;justify-content:space-between"><span>'+x.nombre+'</span><span style="color:#fbbf24">desde '+_evFmtMin(x.desde)+'</span></div>';});
+    parcialesArr.forEach(function(x){
+      var horarioStr='';
+      if(x.huecos&&x.huecos.length){
+        horarioStr=x.huecos.map(function(h){return _evFmtMin(h[0])+'–'+_evFmtMin(h[1]);}).join(', ');
+      } else {
+        horarioStr='desde '+_evFmtMin(x.desde);
+      }
+      h+='<div style="font-size:11px;color:var(--white);padding:3px 0;border-bottom:1px solid rgba(255,255,255,.04);display:flex;justify-content:space-between;gap:8px"><span>'+x.nombre+'</span><span style="color:#fbbf24;text-align:right;white-space:nowrap">'+horarioStr+'</span></div>';
+    });
   }
   if(sinDatosArr.length){
     h+='<div style="font-size:10px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;margin:10px 0 4px">❔ Sin publicar ('+sinDatosArr.length+')</div>';
