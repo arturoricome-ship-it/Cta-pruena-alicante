@@ -7159,8 +7159,8 @@ function evBuscar(){
         }
         return;
       }
-      // Día libre o tipo no-operativo (festivo, vacaciones, baja...) → disponible todo el evento
-      if(!turno.e1||TIPOS_NO_OPERATIVA.indexOf(turno.tipo||'libre')>=0){
+      // Día libre, ausencia (!), o tipo no-operativo (festivo, vacaciones, baja...) → disponible todo el evento
+      if(!turno.e1||turno.ausencia||TIPOS_NO_OPERATIVA.indexOf(turno.tipo||'libre')>=0){
         libres.push({nombre:nombre,parcial:false,desde:hDesde});return;
       }
       var asist=_evCalcularAsistencia(turno,hDesde,hHasta);
@@ -7179,7 +7179,7 @@ function evBuscar(){
         var dm=(emp.meses&&emp.meses[mes])||{};
         var t=dm[dia];
         if(t===undefined||t===null)return true;
-        if(!t.e1||TIPOS_NO_OPERATIVA.indexOf(t.tipo||'libre')>=0)return true;
+        if(!t.e1||t.ausencia||TIPOS_NO_OPERATIVA.indexOf(t.tipo||'libre')>=0)return true;
         return _evCalcularAsistencia(t,hDesde,hHasta).puede;
       });
     });
