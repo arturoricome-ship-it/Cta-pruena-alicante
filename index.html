@@ -6276,6 +6276,73 @@ function _validarDescanso10h(empDias, monthKey, dia, e1n, s1n, e2n, s2n, etiquet
   return errores;
 }
 
+// Valida que empDias tenga al menos 1 dia libre en la semana del dia dado (con turno nuevo en ese dia)
+function _validarLibreSemana(empDias, monthKey, dia, e1n, etiqueta){
+  var idx=_GRUPO_MONTHS.indexOf(monthKey);
+  var fecha=new Date(_cambioYear,idx,dia);
+  var dow=(fecha.getDay()+6)%7;
+  var lunes=new Date(fecha.getTime()-dow*86400000);
+  var libres=0;
+  for(var i=0;i<7;i++){
+    var f=new Date(lunes.getTime()+i*86400000);
+    var d=f.getDate();
+    var mk=_GRUPO_MONTHS[f.getMonth()];
+    if(mk!==monthKey)continue;
+    var trabaja;
+    if(d===dia){trabaja=(e1n!==null);}
+    else{var t=empDias[d];trabaja=!!(t&&t.e1);}
+    if(!trabaja)libres++;
+  }
+  if(libres===0)return[(etiqueta||'')+'Sin dia libre esa semana'];
+  return[];
+}
+
+// Valida descanso semanal de 36h: entre fin del ultimo dia trabajado y inicio del siguiente bloque
+function _validarDescansoSemanal(empDias, monthKey, dia, e1n, s1n, e2n, s2n, etiqueta){
+  var errores=[];
+  var DESC_SEM=2160; // 36h en minutos
+  var idx=_GRUPO_MONTHS.indexOf(monthKey);
+  var maxDia=new Date(_cambioYear,idx+1,0).getDate();
+
+  function entradaDe(d){
+    var t=d===dia?{e1:e1n!==null?_fmtMin(e1n):null}:(empDias[d]||null);
+    return t&&t.e1?_toMin(t.e1):null;
+  }
+  function salidaDe(d){
+    if(d===dia){
+      if(e1n===null)return null;
+      return (e2n!==null&&s2n!==null)?s2n:s1n;
+    }
+    var t=empDias[d]||null;
+    if(!t||!t.e1)return null;
+    var s=t.e2&&t.s2?_toMin(t.s2):_toMin(t.s1);
+    return s;
+  }
+  function trabajaEn(d){return entradaDe(d)!==null;}
+
+  // Buscar bloques de trabajo separados por al menos 1 libre
+  // Para cada transicion: ultimo_trabajo → libres → primer_trabajo
+  for(var d=1;d<=maxDia;d++){
+    if(!trabajaEn(d))continue;
+    // Buscar el siguiente dia de trabajo tras un gap de libres
+    var salD=salidaDe(d);
+    // Avanzar hasta encontrar gap (libre) y luego siguiente trabajo
+    var d2=d+1;
+    var tieneLibre=false;
+    while(d2<=maxDia&&!trabajaEn(d2)){tieneLibre=true;d2++;}
+    if(d2>maxDia||!tieneLibre)continue;
+    var entD2=entradaDe(d2);
+    if(salD===null||entD2===null)continue;
+    // Calcular horas entre salida de d y entrada de d2
+    var difDias=d2-d;
+    var descTotal=difDias*1440-salD+entD2;
+    if(descTotal<DESC_SEM){
+      errores.push((etiqueta||'')+'Descanso semanal <36h entre dia '+d+' y dia '+d2+' ('+(descTotal/60).toFixed(1)+'h)');
+    }
+  }
+  return errores;
+}
+
 function calcularCambios(){
   var body=document.getElementById('cambio-body');
   var subTxt=document.getElementById('cambio-sub-txt');
@@ -6366,6 +6433,11 @@ function calcularCambios(){
       // Descanso 10h: yo hago turno del comp ese dia; comp hace el mio
       errA=errA.concat(_validarDescanso10h(myRaw[monthKey]||{},monthKey,day,compE1,compS1,compE2,compS2,''));
       errA=errA.concat(_validarDescanso10h(compDias,monthKey,day,myE1,myS1,myE2,myS2,comp.nombre.split(' ')[0]+': '));
+      // Libre semana y descanso semanal
+      errA=errA.concat(_validarLibreSemana(myRaw[monthKey]||{},monthKey,day,compE1,''));
+      errA=errA.concat(_validarLibreSemana(compDias,monthKey,day,myE1,comp.nombre.split(' ')[0]+': '));
+      errA=errA.concat(_validarDescansoSemanal(myRaw[monthKey]||{},monthKey,day,compE1,compS1,compE2,compS2,''));
+      errA=errA.concat(_validarDescansoSemanal(compDias,monthKey,day,myE1,myS1,myE2,myS2,comp.nombre.split(' ')[0]+': '));
       resultados.push({
         nombre:comp.nombre,cat:comp.categoria||'',tipo:'mismo_dia',
         labelDia:titleDia,
@@ -6383,6 +6455,8 @@ function calcularCambios(){
       if(ccB.tipo!=='FIJO'){var hBc=_horasLVSemana(compDias,monthKey,day,myE1,myS1,myE2,myS2);if(hBc>2160)errBbase.push(comp.nombre.split(' ')[0]+' supera 36h semana ('+(hBc/60).toFixed(1)+'h)');}
       // Descanso 10h del comp al hacer MI turno el dia senalado
       errBbase=errBbase.concat(_validarDescanso10h(compDias,monthKey,day,myE1,myS1,myE2,myS2,comp.nombre.split(' ')[0]+': '));
+      errBbase=errBbase.concat(_validarLibreSemana(compDias,monthKey,day,myE1,comp.nombre.split(' ')[0]+': '));
+      errBbase=errBbase.concat(_validarDescansoSemanal(compDias,monthKey,day,myE1,myS1,myE2,myS2,comp.nombre.split(' ')[0]+': '));
       for(var d2=1;d2<=31;d2++){
         if(d2===day||_esPasado(d2,monthKey,year))continue;
         var myT2=(myRaw[monthKey]||{})[d2];
@@ -6395,6 +6469,8 @@ function calcularCambios(){
         if(myCatB.tipo!=='FIJO'){var hBy=_horasLVSemana(myRaw[monthKey]||{},monthKey,d2,cE1,cS1,cE2,cS2);if(hBy>2160)errB.push('Yo supero 36h semana ('+(hBy/60).toFixed(1)+'h)');}
         // Descanso 10h: yo trabajo el turno del comp en d2
         errB=errB.concat(_validarDescanso10h(myRaw[monthKey]||{},monthKey,d2,cE1,cS1,cE2,cS2,''));
+        errB=errB.concat(_validarLibreSemana(myRaw[monthKey]||{},monthKey,d2,cE1,''));
+        errB=errB.concat(_validarDescansoSemanal(myRaw[monthKey]||{},monthKey,d2,cE1,cS1,cE2,cS2,''));
         var dn2=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'][(new Date(year,_cambioMonth,d2).getDay()+6)%7];
         resultados.push({
           nombre:comp.nombre,cat:comp.categoria||'',tipo:'yo_libro',
@@ -6414,6 +6490,8 @@ function calcularCambios(){
       if(myCatC.tipo!=='FIJO'){var hCy=_horasLVSemana(myRaw[monthKey]||{},monthKey,day,compE1,compS1,compE2,compS2);if(hCy>2160)errCbase.push('Yo supero 36h semana ('+(hCy/60).toFixed(1)+'h)');}
       // Descanso 10h: yo trabajo el turno del comp el dia senalado
       errCbase=errCbase.concat(_validarDescanso10h(myRaw[monthKey]||{},monthKey,day,compE1,compS1,compE2,compS2,''));
+      errCbase=errCbase.concat(_validarLibreSemana(myRaw[monthKey]||{},monthKey,day,compE1,''));
+      errCbase=errCbase.concat(_validarDescansoSemanal(myRaw[monthKey]||{},monthKey,day,compE1,compS1,compE2,compS2,''));
       for(var d3=1;d3<=31;d3++){
         if(d3===day||_esPasado(d3,monthKey,year))continue;
         var myT3=(myRaw[monthKey]||{})[d3];
@@ -6426,6 +6504,8 @@ function calcularCambios(){
         if(ccC.tipo!=='FIJO'){var hCc=_horasLVSemana(compDias,monthKey,d3,mE1,mS1,mE2,mS2);if(hCc>2160)errC.push(comp.nombre.split(' ')[0]+' supera 36h semana ('+(hCc/60).toFixed(1)+'h)');}
         // Descanso 10h: el comp trabaja mi turno en d3
         errC=errC.concat(_validarDescanso10h(compDias,monthKey,d3,mE1,mS1,mE2,mS2,comp.nombre.split(' ')[0]+': '));
+        errC=errC.concat(_validarLibreSemana(compDias,monthKey,d3,mE1,comp.nombre.split(' ')[0]+': '));
+        errC=errC.concat(_validarDescansoSemanal(compDias,monthKey,d3,mE1,mS1,mE2,mS2,comp.nombre.split(' ')[0]+': '));
         var dn3=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'][(new Date(year,_cambioMonth,d3).getDay()+6)%7];
         resultados.push({
           nombre:comp.nombre,cat:comp.categoria||'',tipo:'comp_libro',
@@ -6519,6 +6599,8 @@ function calcularCambios(){
           compRes={e1:ord2.e1,s1:ord2.s1,e2:ord2.e2,s2:ord2.s2};
         }
 
+        // Saltar si las partes cedidas son idénticas (intercambio sin sentido)
+        if(pMia.e1===pComp.e1&&pMia.s1===pComp.s1)return;
         // Validar ambos turnos resultantes
         var errP=[];
         errP=errP.concat(validarResultante(miRes.e1,miRes.s1,miRes.e2,miRes.s2,myRaw[monthKey]||{},''));
@@ -6528,6 +6610,10 @@ function calcularCambios(){
         if(myCatP2.tipo!=='FIJO'){var hP=_horasLVSemana(myRaw[monthKey]||{},monthKey,day,miRes.e1,miRes.s1,miRes.e2,miRes.s2);if(hP>2160)errP.push('Yo supero 36h semana ('+(hP/60).toFixed(1)+'h)');}
         if(ccP.tipo!=='FIJO'){var hPc=_horasLVSemana(compDias,monthKey,day,compRes.e1,compRes.s1,compRes.e2,compRes.s2);if(hPc>2160)errP.push(comp.nombre.split(' ')[0]+' supera 36h semana ('+(hPc/60).toFixed(1)+'h)');}
 
+        errP=errP.concat(_validarLibreSemana(myRaw[monthKey]||{},monthKey,day,miRes.e1,''));
+        errP=errP.concat(_validarLibreSemana(compDias,monthKey,day,compRes.e1,comp.nombre.split(' ')[0]+': '));
+        errP=errP.concat(_validarDescansoSemanal(myRaw[monthKey]||{},monthKey,day,miRes.e1,miRes.s1,miRes.e2,miRes.s2,''));
+        errP=errP.concat(_validarDescansoSemanal(compDias,monthKey,day,compRes.e1,compRes.s1,compRes.e2,compRes.s2,comp.nombre.split(' ')[0]+': '));
         parciales.push({
           nombre:comp.nombre,cat:comp.categoria||'',tipo:'parcial',
           labelDia:titleDia,
@@ -6576,26 +6662,28 @@ function renderResultadosCambio(resultados, titleDia){
     return;
   }
 
+  // Juntar viables (completos + parciales) y no viables por separado
+  var parcialesV=(!_filtroIA&&_todosParciales)?_todosParciales.filter(function(r){return r.ok;}):[];
+  var parcialesI=(!_filtroIA&&_todosParciales)?_todosParciales.filter(function(r){return!r.ok;}):[];
+  var totalViables=validos.length+parcialesV.length;
+  var totalInvalidos=invalidos.length+parcialesI.length;
+
   var html='';
-  if(validos.length){
-    html+='<div class="cambio-seccion">✅ Cambios completos válidos ('+validos.length+')</div>';
-    validos.forEach(function(r){html+=_renderCambioCard(r,true);});
-  }
-  if(invalidos.length){
-    html+='<div class="cambio-seccion" style="margin-top:18px;color:var(--gray)">⚠️ No válidos ('+invalidos.length+')</div>';
-    invalidos.forEach(function(r){html+=_renderCambioCard(r,false);});
-  }
-  if(!_filtroIA&&_todosParciales&&_todosParciales.length){
-    var parcialesV=_todosParciales.filter(function(r){return r.ok;});
-    var parcialesI=_todosParciales.filter(function(r){return!r.ok;});
+  if(totalViables){
+    html+='<div class="cambio-seccion">✅ Opciones viables ('+totalViables+')</div>';
+    if(validos.length){
+      html+='<div style="font-size:10px;color:var(--gray);margin:6px 0 4px;text-transform:uppercase;letter-spacing:.5px">Cambio completo</div>';
+      validos.forEach(function(r){html+=_renderCambioCard(r,true);});
+    }
     if(parcialesV.length){
-      html+='<div class="cambio-seccion" style="margin-top:18px;color:#a78bfa">🔀 Cambios parciales válidos ('+parcialesV.length+')</div>';
+      html+='<div style="font-size:10px;color:#a78bfa;margin:10px 0 4px;text-transform:uppercase;letter-spacing:.5px">🔀 Cambio parcial</div>';
       parcialesV.forEach(function(r){html+=_renderCambioCard(r,true);});
     }
-    if(parcialesI.length){
-      html+='<div class="cambio-seccion" style="margin-top:18px;color:var(--gray)">🔀 Parciales no válidos ('+parcialesI.length+')</div>';
-      parcialesI.forEach(function(r){html+=_renderCambioCard(r,false);});
-    }
+  }
+  if(totalInvalidos){
+    html+='<div class="cambio-seccion" style="margin-top:18px;color:var(--gray)">⚠️ No viables ('+totalInvalidos+')</div>';
+    invalidos.forEach(function(r){html+=_renderCambioCard(r,false);});
+    parcialesI.forEach(function(r){html+=_renderCambioCard(r,false);});
   }
   html+='<button onclick="cerrarBuscadorCambio()" style="width:100%;background:none;border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px;font-family:Outfit,sans-serif;font-size:13px;color:var(--gray);cursor:pointer;margin-top:8px">Cerrar</button>';
   body.innerHTML=html;
