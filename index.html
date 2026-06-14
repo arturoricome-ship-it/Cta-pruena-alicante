@@ -7024,6 +7024,10 @@ function evBuscar(){
       var turno=diasMes[dia];
       var nombre=emp.nombre;
       if(turno===undefined||turno===null){sinDatos.push(nombre);return;}
+      // Dia libre: tipo='libre' o e1 vacio/null → puede asistir todo el evento
+      if(!turno.e1||turno.tipo==='libre'){
+        libres.push({nombre:nombre,parcial:false,desde:hDesde});return;
+      }
       var asist=_evCalcularAsistencia(turno,hDesde,hHasta);
       if(!asist.puede){
         ocupados.push(nombre);
@@ -7039,6 +7043,7 @@ function evBuscar(){
         if(emp.nombre.toLowerCase().indexOf(imp.toLowerCase())<0)return false;
         var t=(emp.meses&&emp.meses[mes]||{})[dia];
         if(t===undefined||t===null)return true;
+        if(!t.e1||t.tipo==='libre')return true; // dia libre = puede venir
         return _evCalcularAsistencia(t,hDesde,hHasta).puede;
       });
     });
