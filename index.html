@@ -6887,7 +6887,12 @@ function _aplicarFiltro(filtro,texto,estado){
   var filtrados=_todosResultados.filter(function(r){
     if(!r.ok)return false;
     // Filtro soloLibrar: solo opciones donde yo libra el dia senalado
-    if(filtro.soloLibrar&&!yoLibraElDia(r))return false;
+    if(filtro.soloLibrar){
+      if(!yoLibraElDia(r))return false;
+      // Si libro, solo aplico filtros de nombre/dia (no de horario, porque no trabajo)
+      if(filtro.nombre&&norm(r.nombre).indexOf(norm(filtro.nombre))<0)return false;
+      return true;
+    }
     if(filtro.nombre&&norm(r.nombre).indexOf(norm(filtro.nombre))<0)return false;
     var lbl=diaRelevante(r);
     var numMatch=lbl.match(/\b(\d{1,2})\b/);
@@ -6916,6 +6921,7 @@ function _aplicarFiltro(filtro,texto,estado){
     if(filtro.salidaAntesDe&&tS1!==null&&tS1>=_toMin(filtro.salidaAntesDe))return false;
     return true;
   });
+  // Si filtro librar, añadir también las cesiones parciales donde acabo con menos turno? No: librar = libro entero.
   if(estado)estado.textContent='\u2705 '+filtrados.length+' resultados para "'+texto+'"';
   renderResultadosCambio(filtrados);
 }
