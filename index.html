@@ -6905,15 +6905,22 @@ function _aplicarFiltro(filtro,texto,estado){
     }
     var tt2=turnoMioDe(r);
     if(!tt2||tt2==='Libre')return false;
-    var p=tt2.split(' / ')[0];
-    var tE1=_toMin(p.split('\u2192')[0]);
-    var tS1=_toMin(p.split('\u2192')[1]);
+    // Parsear turno completo: primera entrada y ÚLTIMA salida (no solo la primera parte)
+    var tramos=tt2.split(' / ');
+    var primerTramo=tramos[0].split('\u2192');
+    var ultimoTramo=tramos[tramos.length-1].split('\u2192');
+    var tE1=_toMin(primerTramo[0]);          // primera entrada
+    var tS1=_toMin(ultimoTramo[1]);          // última salida (fin del turno completo)
+    var tSprimera=_toMin(primerTramo[1]);    // salida de la primera parte (para tipo mañana)
     if(filtro.turnoTipo){
       var tt=norm(filtro.turnoTipo);
       if(tE1===null)return false;
+      // Mañana: entra antes de 12:00 y termina (salida final) antes/igual 15:00
       if(tt==='manana'&&(tE1>=720||tS1>900))return false;
-      if(tt==='tarde'&&(tS1===null||tS1>1200||tE1<720))return false;
-      if(tt==='noche'&&(tE1>=300&&tE1<1200))return false;
+      // Tarde: el turno termina por la tarde (salida final entre 15:00 y 22:00) o entra después de mediodía
+      if(tt==='tarde'&&!((tS1>=900&&tS1<=1320)||(tE1>=720&&tE1<1320)))return false;
+      // Noche: entra muy temprano (madrugada) o el turno cruza/termina de noche
+      if(tt==='noche'&&!(tE1<300||tS1>1320||tS1<tE1))return false;
     }
     if(filtro.entradaDespuesDe&&tE1!==null&&tE1<_toMin(filtro.entradaDespuesDe))return false;
     if(filtro.entradaAntesDe&&tE1!==null&&tE1>=_toMin(filtro.entradaAntesDe))return false;
