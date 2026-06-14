@@ -4502,9 +4502,29 @@ function procesarGrupoXlsx(file){
         var diasMes={};
         Object.keys(dayColMap).forEach(function(d){
           var cell=String(row[dayColMap[d]]||'').trim();
-          if(cell&&cell!==''&&cell.toUpperCase()!=='DL'){
-            var parsed=parseTurnoGrupo(cell);
-            if(parsed)diasMes[parseInt(d)]=parsed;
+          if(cell===''){
+            // Celda vacía → sin publicar, no se guarda
+            return;
+          }
+          // Exclamación → baja, vacaciones o similar → cuenta como día libre
+          if(cell.indexOf('!')!==-1){
+            diasMes[parseInt(d)]={tipo:'libre',e1:'',s1:'',e2:'',s2:'',ausencia:true};
+            return;
+          }
+          var cellUp=cell.toUpperCase().replace(/[\s.]/g,'');
+          var esLibre=(cellUp==='DL'||cellUp==='LIBRE'||cellUp==='DIALIBRE'||cellUp==='DESCANSO'||cellUp==='DESCANSOSEMANA'||cellUp==='MA'||cellUp==='FM'||cellUp==='FY');
+          if(esLibre){
+            diasMes[parseInt(d)]={tipo:'libre',e1:'',s1:'',e2:'',s2:''};
+            return;
+          }
+          var parsed=parseTurnoGrupo(cell);
+          if(parsed){
+            // Si no tiene horas válidas, tratarlo como libre (vacaciones, baja, etc. cuentan como no-trabajo ese día)
+            if(!parsed.e1){
+              diasMes[parseInt(d)]={tipo:parsed.tipo||'libre',e1:'',s1:'',e2:'',s2:''};
+            } else {
+              diasMes[parseInt(d)]=parsed;
+            }
           }
         });
         empleados.push({nomina:nomina,nombre:nombre,categoria:categoria,dias:diasMes});
@@ -7023,7 +7043,17 @@ function evBuscar(){
       var diasMes=(emp.meses&&emp.meses[mes])||{};
       var turno=diasMes[dia];
       var nombre=emp.nombre;
-      if(turno===undefined||turno===null){sinDatos.push(nombre);return;}
+      // ¿Tiene este empleado el mes publicado? (algún día con datos)
+      var tieneMesPublicado=Object.keys(diasMes).length>0;
+      if(turno===undefined||turno===null){
+        if(tieneMesPublicado){
+          // El mes está publicado pero este día no aparece → es libre
+          libres.push({nombre:nombre,parcial:false,desde:hDesde});
+        } else {
+          sinDatos.push(nombre);
+        }
+        return;
+      }
       // Dia libre: tipo='libre' o e1 vacio/null → puede asistir todo el evento
       if(!turno.e1||turno.tipo==='libre'){
         libres.push({nombre:nombre,parcial:false,desde:hDesde});return;
@@ -7041,8 +7071,10 @@ function evBuscar(){
     var impOk=_evImprescindibles.every(function(imp){
       return empleados.some(function(emp){
         if(emp.nombre.toLowerCase().indexOf(imp.toLowerCase())<0)return false;
-        var t=(emp.meses&&emp.meses[mes]||{})[dia];
-        if(t===undefined||t===null)return true;
+        var dm=(emp.meses&&emp.meses[mes])||{};
+        var t=dm[dia];
+        var tieneMes=Object.keys(dm).length>0;
+        if(t===undefined||t===null)return tieneMes?true:true; // libre o sin publicar → asumimos puede
         if(!t.e1||t.tipo==='libre')return true; // dia libre = puede venir
         return _evCalcularAsistencia(t,hDesde,hHasta).puede;
       });
