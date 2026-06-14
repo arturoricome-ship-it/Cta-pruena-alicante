@@ -7326,6 +7326,16 @@ function evMostrarResultados(resultados,error,nombreEvento,hDesde,hHasta){
   sec.innerHTML=html;
 }
 
+function _evDetalleCompletoTag(x){
+  if(!x)return '';
+  var motivo=String(x.motivo||'');
+  var turno=String(x.turno||'');
+  if(motivo.indexOf('disponibilidad no operativa')>=0||turno==='!')return 'No operativa';
+  if(motivo==='Libre / no operativo'||motivo==='Libre'||turno==='Libre')return 'Libre';
+  if(motivo==='Excedencia/baja larga'&&turno==='Mes vacío')return 'Excedencia/baja larga';
+  return motivo+(turno?' · '+turno:'');
+}
+
 function _evToggleDetalle(dia){
   var det=document.getElementById('ev-detalle-'+dia);
   if(!det)return;
@@ -7348,7 +7358,8 @@ function _evToggleDetalle(dia){
   if(libresCompletos.length){
     h+='<div style="font-size:10px;font-weight:700;color:#4ade80;text-transform:uppercase;letter-spacing:.5px;margin:8px 0 4px">✅ Todo el evento ('+libresCompletos.length+')</div>';
     libresCompletos.forEach(function(x){
-      var tag=x.motivo?'<span style="color:var(--gray);font-size:10px;text-align:right">'+_evHtml(x.motivo)+(x.turno?' · '+_evHtml(x.turno):'')+'</span>':'';
+      var detalle=_evDetalleCompletoTag(x);
+      var tag=detalle?'<span style="color:var(--gray);font-size:10px;text-align:right">'+_evHtml(detalle)+'</span>':'';
       h+='<div style="font-size:11px;color:var(--white);padding:3px 0;border-bottom:1px solid rgba(255,255,255,.04);display:flex;justify-content:space-between;gap:8px"><span>'+_evHtml(x.nombre)+'</span>'+tag+'</div>';
     });
   }
