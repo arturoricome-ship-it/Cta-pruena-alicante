@@ -6123,6 +6123,7 @@ function initLiveViewMode(){
 
 var _cambioDay=null, _cambioMonth=null, _cambioYear=null;
 var _todosResultados=[];
+var _todosParciales=[];
 var _filtroIA=null;
 
 function abrirBuscadorCambio(){
@@ -6223,7 +6224,7 @@ function _horasLVSemana(empDias, monthKey, dia, e1nuevo, s1nuevo, e2nuevo, s2nue
   var lunes=new Date(fecha.getTime()-dow*86400000);
 
   var total=0;
-  for(var i=0;i<5;i++){ // Lun a Vie
+  for(var i=0;i<7;i++){ // Lun a Dom
     var f=new Date(lunes.getTime()+i*86400000);
     var d=f.getDate();
     var mk=_GRUPO_MONTHS[f.getMonth()];
@@ -6360,8 +6361,8 @@ function calcularCambios(){
       errA=errA.concat(_validarTurno(compE1,compS1,compE2,compS2).errores);
       errA=errA.concat(_validarTurno(myE1,myS1,myE2,myS2).errores);
       var myCatA=_parseCategoria(myCat),ccA=_parseCategoria(comp.categoria||'');
-      if(myCatA.tipo!=='FIJO'){var hA=_horasLVSemana(myRaw[monthKey]||{},monthKey,day,compE1,compS1,compE2,compS2);if(hA>2160)errA.push('Yo supero 36h L-V ('+(hA/60).toFixed(1)+'h)');}
-      if(ccA.tipo!=='FIJO'){var hAc=_horasLVSemana(compDias,monthKey,day,myE1,myS1,myE2,myS2);if(hAc>2160)errA.push(comp.nombre.split(' ')[0]+' supera 36h L-V ('+(hAc/60).toFixed(1)+'h)');}
+      if(myCatA.tipo!=='FIJO'){var hA=_horasLVSemana(myRaw[monthKey]||{},monthKey,day,compE1,compS1,compE2,compS2);if(hA>2160)errA.push('Yo supero 36h semana ('+(hA/60).toFixed(1)+'h)');}
+      if(ccA.tipo!=='FIJO'){var hAc=_horasLVSemana(compDias,monthKey,day,myE1,myS1,myE2,myS2);if(hAc>2160)errA.push(comp.nombre.split(' ')[0]+' supera 36h semana ('+(hAc/60).toFixed(1)+'h)');}
       // Descanso 10h: yo hago turno del comp ese dia; comp hace el mio
       errA=errA.concat(_validarDescanso10h(myRaw[monthKey]||{},monthKey,day,compE1,compS1,compE2,compS2,''));
       errA=errA.concat(_validarDescanso10h(compDias,monthKey,day,myE1,myS1,myE2,myS2,comp.nombre.split(' ')[0]+': '));
@@ -6379,7 +6380,7 @@ function calcularCambios(){
     if(!esLibre&&compLibreMiDia&&!_esPasado(day,monthKey,year)){
       var errBbase=_validarTurno(myE1,myS1,myE2,myS2).errores.slice();
       var ccB=_parseCategoria(comp.categoria||'');
-      if(ccB.tipo!=='FIJO'){var hBc=_horasLVSemana(compDias,monthKey,day,myE1,myS1,myE2,myS2);if(hBc>2160)errBbase.push(comp.nombre.split(' ')[0]+' supera 36h L-V ('+(hBc/60).toFixed(1)+'h)');}
+      if(ccB.tipo!=='FIJO'){var hBc=_horasLVSemana(compDias,monthKey,day,myE1,myS1,myE2,myS2);if(hBc>2160)errBbase.push(comp.nombre.split(' ')[0]+' supera 36h semana ('+(hBc/60).toFixed(1)+'h)');}
       // Descanso 10h del comp al hacer MI turno el dia senalado
       errBbase=errBbase.concat(_validarDescanso10h(compDias,monthKey,day,myE1,myS1,myE2,myS2,comp.nombre.split(' ')[0]+': '));
       for(var d2=1;d2<=31;d2++){
@@ -6391,7 +6392,7 @@ function calcularCambios(){
         var cE1=_toMin(cT2.e1),cS1=_toMin(cT2.s1),cE2=cT2.e2?_toMin(cT2.e2):null,cS2=cT2.s2?_toMin(cT2.s2):null;
         var errB=errBbase.concat(_validarTurno(cE1,cS1,cE2,cS2).errores);
         var myCatB=_parseCategoria(myCat);
-        if(myCatB.tipo!=='FIJO'){var hBy=_horasLVSemana(myRaw[monthKey]||{},monthKey,d2,cE1,cS1,cE2,cS2);if(hBy>2160)errB.push('Yo supero 36h L-V ('+(hBy/60).toFixed(1)+'h)');}
+        if(myCatB.tipo!=='FIJO'){var hBy=_horasLVSemana(myRaw[monthKey]||{},monthKey,d2,cE1,cS1,cE2,cS2);if(hBy>2160)errB.push('Yo supero 36h semana ('+(hBy/60).toFixed(1)+'h)');}
         // Descanso 10h: yo trabajo el turno del comp en d2
         errB=errB.concat(_validarDescanso10h(myRaw[monthKey]||{},monthKey,d2,cE1,cS1,cE2,cS2,''));
         var dn2=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'][(new Date(year,_cambioMonth,d2).getDay()+6)%7];
@@ -6410,7 +6411,7 @@ function calcularCambios(){
     if(esLibre&&!compLibreMiDia&&!_esPasado(day,monthKey,year)){
       var errCbase=_validarTurno(compE1,compS1,compE2,compS2).errores.slice();
       var myCatC=_parseCategoria(myCat);
-      if(myCatC.tipo!=='FIJO'){var hCy=_horasLVSemana(myRaw[monthKey]||{},monthKey,day,compE1,compS1,compE2,compS2);if(hCy>2160)errCbase.push('Yo supero 36h L-V ('+(hCy/60).toFixed(1)+'h)');}
+      if(myCatC.tipo!=='FIJO'){var hCy=_horasLVSemana(myRaw[monthKey]||{},monthKey,day,compE1,compS1,compE2,compS2);if(hCy>2160)errCbase.push('Yo supero 36h semana ('+(hCy/60).toFixed(1)+'h)');}
       // Descanso 10h: yo trabajo el turno del comp el dia senalado
       errCbase=errCbase.concat(_validarDescanso10h(myRaw[monthKey]||{},monthKey,day,compE1,compS1,compE2,compS2,''));
       for(var d3=1;d3<=31;d3++){
@@ -6422,7 +6423,7 @@ function calcularCambios(){
         var mE1=_toMin(myT3.e1),mS1=_toMin(myT3.s1),mE2=myT3.e2?_toMin(myT3.e2):null,mS2=myT3.s2?_toMin(myT3.s2):null;
         var errC=errCbase.concat(_validarTurno(mE1,mS1,mE2,mS2).errores);
         var ccC=_parseCategoria(comp.categoria||'');
-        if(ccC.tipo!=='FIJO'){var hCc=_horasLVSemana(compDias,monthKey,d3,mE1,mS1,mE2,mS2);if(hCc>2160)errC.push(comp.nombre.split(' ')[0]+' supera 36h L-V ('+(hCc/60).toFixed(1)+'h)');}
+        if(ccC.tipo!=='FIJO'){var hCc=_horasLVSemana(compDias,monthKey,d3,mE1,mS1,mE2,mS2);if(hCc>2160)errC.push(comp.nombre.split(' ')[0]+' supera 36h semana ('+(hCc/60).toFixed(1)+'h)');}
         // Descanso 10h: el comp trabaja mi turno en d3
         errC=errC.concat(_validarDescanso10h(compDias,monthKey,d3,mE1,mS1,mE2,mS2,comp.nombre.split(' ')[0]+': '));
         var dn3=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'][(new Date(year,_cambioMonth,d3).getDay()+6)%7];
@@ -6437,6 +6438,111 @@ function calcularCambios(){
     }
   });
 
+  // CAMBIOS PARCIALES: solo cuando hay turnos partidos implicados
+  var parciales=[];
+  empleados.forEach(function(comp){
+    if(myNombre&&comp.nombre===myNombre)return;
+    if(!_sonCompatibles(myCat,comp.categoria||''))return;
+    var compDias=(comp.meses&&comp.meses[monthKey])||{};
+    var compT=compDias[day]||null;
+    var compE1=compT?_toMin(compT.e1):null;
+    var compS1=compT?_toMin(compT.s1):null;
+    var compE2=compT&&compT.e2?_toMin(compT.e2):null;
+    var compS2=compT&&compT.s2?_toMin(compT.s2):null;
+    if(_esPasado(day,monthKey,year))return;
+
+    // Helper: validar turno resultante completo y devolver errores
+    function validarResultante(e1r,s1r,e2r,s2r,empDiasR,etiq){
+      var errs=_validarTurno(e1r,s1r,e2r,s2r).errores.slice();
+      errs=errs.concat(_validarDescanso10h(empDiasR,monthKey,day,e1r,s1r,e2r,s2r,etiq));
+      return errs;
+    }
+
+    // Ordenar dos partes para que e1<e2 (no solapadas)
+    function ordenarPartes(a1,b1,a2,b2){
+      if(a1===null||a2===null)return{e1:a1,s1:b1,e2:a2,s2:b2};
+      if(a1<=a2)return{e1:a1,s1:b1,e2:a2,s2:b2};
+      return{e1:a2,s1:b2,e2:a1,s2:b1};
+    }
+
+    // Solo cuando MI turno es partido o el del comp es partido
+    var yoPartido=(myE2!==null&&myS2!==null);
+    var compPartido=(compE2!==null&&compS2!==null);
+    if(!yoPartido&&!compPartido)return; // ninguno es partido, no hay cambio parcial
+
+    var partesMias=[];
+    if(yoPartido){
+      partesMias.push({e1:myE1,s1:myS1,label:'parte 1 ('+_fmtMin(myE1)+'→'+_fmtMin(myS1)+')'});
+      partesMias.push({e1:myE2,s1:myS2,label:'parte 2 ('+_fmtMin(myE2)+'→'+_fmtMin(myS2)+')'});
+    } else if(myE1!==null){
+      partesMias.push({e1:myE1,s1:myS1,label:'turno ('+_fmtMin(myE1)+'→'+_fmtMin(myS1)+')'});
+    }
+
+    var partesComp=[];
+    if(compPartido){
+      partesComp.push({e1:compE1,s1:compS1,label:'parte 1 ('+_fmtMin(compE1)+'→'+_fmtMin(compS1)+')'});
+      partesComp.push({e1:compE2,s1:compS2,label:'parte 2 ('+_fmtMin(compE2)+'→'+_fmtMin(compS2)+')'});
+    } else if(compE1!==null){
+      partesComp.push({e1:compE1,s1:compS1,label:'turno ('+_fmtMin(compE1)+'→'+_fmtMin(compS1)+')'});
+    }
+
+    // Generar todas las combinaciones de intercambio parcial
+    partesMias.forEach(function(pMia){
+      partesComp.forEach(function(pComp){
+        // Yo cedo pMia al comp, yo me quedo con el resto de mi turno + pComp
+        // Comp cede pComp a mi, comp se queda con el resto de su turno + pMia
+
+        // Mi turno resultante: mis partes que NO cedo + pComp
+        var misPartes=partesMias.filter(function(p){return p!==pMia;});
+        var miRestoE1=misPartes.length>0?misPartes[0].e1:null;
+        var miRestoS1=misPartes.length>0?misPartes[0].s1:null;
+        // Combinar miResto con pComp
+        var miRes;
+        if(miRestoE1===null){
+          // Solo tengo pComp
+          miRes={e1:pComp.e1,s1:pComp.s1,e2:null,s2:null};
+        } else {
+          // Tengo miResto + pComp → ordenar como partido
+          var ord=ordenarPartes(miRestoE1,miRestoS1,pComp.e1,pComp.s1);
+          miRes={e1:ord.e1,s1:ord.s1,e2:ord.e2,s2:ord.s2};
+        }
+
+        // Turno resultante del comp: partes del comp que NO cede + pMia
+        var compPartes=partesComp.filter(function(p){return p!==pComp;});
+        var compRestoE1=compPartes.length>0?compPartes[0].e1:null;
+        var compRestoS1=compPartes.length>0?compPartes[0].s1:null;
+        var compRes;
+        if(compRestoE1===null){
+          compRes={e1:pMia.e1,s1:pMia.s1,e2:null,s2:null};
+        } else {
+          var ord2=ordenarPartes(compRestoE1,compRestoS1,pMia.e1,pMia.s1);
+          compRes={e1:ord2.e1,s1:ord2.s1,e2:ord2.e2,s2:ord2.s2};
+        }
+
+        // Validar ambos turnos resultantes
+        var errP=[];
+        errP=errP.concat(validarResultante(miRes.e1,miRes.s1,miRes.e2,miRes.s2,myRaw[monthKey]||{},''));
+        errP=errP.concat(validarResultante(compRes.e1,compRes.s1,compRes.e2,compRes.s2,compDias,comp.nombre.split(' ')[0]+': '));
+        // 36h semanales
+        var myCatP2=_parseCategoria(myCat),ccP=_parseCategoria(comp.categoria||'');
+        if(myCatP2.tipo!=='FIJO'){var hP=_horasLVSemana(myRaw[monthKey]||{},monthKey,day,miRes.e1,miRes.s1,miRes.e2,miRes.s2);if(hP>2160)errP.push('Yo supero 36h semana ('+(hP/60).toFixed(1)+'h)');}
+        if(ccP.tipo!=='FIJO'){var hPc=_horasLVSemana(compDias,monthKey,day,compRes.e1,compRes.s1,compRes.e2,compRes.s2);if(hPc>2160)errP.push(comp.nombre.split(' ')[0]+' supera 36h semana ('+(hPc/60).toFixed(1)+'h)');}
+
+        parciales.push({
+          nombre:comp.nombre,cat:comp.categoria||'',tipo:'parcial',
+          labelDia:titleDia,
+          pMiaLabel:pMia.label,       // la parte que yo cedo
+          pCompLabel:pComp.label,     // la parte que el comp cede
+          turnoYoRes:_fmtTurno(miRes.e1,miRes.s1,miRes.e2,miRes.s2),   // mi turno resultante
+          turnoCompRes:_fmtTurno(compRes.e1,compRes.s1,compRes.e2,compRes.s2), // turno comp resultante
+          ok:errP.length===0,errores:errP
+        });
+      });
+    });
+  });
+
+  parciales.sort(function(a,b){if(a.ok&&!b.ok)return -1;if(!a.ok&&b.ok)return 1;return a.nombre.localeCompare(b.nombre);});
+
   // Ordenar: válidos primero, luego por nombre
   resultados.sort(function(a,b){
     if(a.ok&&!b.ok)return -1;
@@ -6445,6 +6551,7 @@ function calcularCambios(){
   });
 
   _todosResultados=resultados;
+  _todosParciales=parciales;
   _filtroIA=null;
   document.getElementById('cambio-ia-input').value='';
   document.getElementById('cambio-ia-estado').textContent='';
@@ -6471,34 +6578,70 @@ function renderResultadosCambio(resultados, titleDia){
 
   var html='';
   if(validos.length){
-    html+='<div class="cambio-seccion">✅ Opciones válidas ('+validos.length+')</div>';
+    html+='<div class="cambio-seccion">✅ Cambios completos válidos ('+validos.length+')</div>';
     validos.forEach(function(r){html+=_renderCambioCard(r,true);});
   }
   if(invalidos.length){
-    html+='<div class="cambio-seccion" style="margin-top:18px;color:var(--gray)">⚠️ No válidas ('+invalidos.length+')</div>';
+    html+='<div class="cambio-seccion" style="margin-top:18px;color:var(--gray)">⚠️ No válidos ('+invalidos.length+')</div>';
     invalidos.forEach(function(r){html+=_renderCambioCard(r,false);});
+  }
+  if(!_filtroIA&&_todosParciales&&_todosParciales.length){
+    var parcialesV=_todosParciales.filter(function(r){return r.ok;});
+    var parcialesI=_todosParciales.filter(function(r){return!r.ok;});
+    if(parcialesV.length){
+      html+='<div class="cambio-seccion" style="margin-top:18px;color:#a78bfa">🔀 Cambios parciales válidos ('+parcialesV.length+')</div>';
+      parcialesV.forEach(function(r){html+=_renderCambioCard(r,true);});
+    }
+    if(parcialesI.length){
+      html+='<div class="cambio-seccion" style="margin-top:18px;color:var(--gray)">🔀 Parciales no válidos ('+parcialesI.length+')</div>';
+      parcialesI.forEach(function(r){html+=_renderCambioCard(r,false);});
+    }
   }
   html+='<button onclick="cerrarBuscadorCambio()" style="width:100%;background:none;border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px;font-family:Outfit,sans-serif;font-size:13px;color:var(--gray);cursor:pointer;margin-top:8px">Cerrar</button>';
   body.innerHTML=html;
 }
 
-// Interpreta la consulta localmente sin IA (respaldo si la API falla)
-function _interpretarLocal(texto){
+
+// Interpreta la consulta localmente sin IA
+// myS1ref: hora de salida actual del usuario (en minutos) para contextualizar "antes/despues"
+function _interpretarLocal(texto, myS1ref, myE1ref){
   var t=String(texto||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-  var f={turnoTipo:null,diaSemana:null,diaNumero:null,entradaDespuesDe:null,entradaAntesDe:null,salidaDespuesDe:null,salidaAntesDe:null,nombre:null};
+  var f={turnoTipo:null,diaSemana:null,diaNumero:null,entradaDespuesDe:null,entradaAntesDe:null,salidaDespuesDe:null,salidaAntesDe:null,nombre:null,soloLibrar:false};
   if(/\bmanana\b|\bmananas\b/.test(t))f.turnoTipo='manana';
   else if(/\btarde\b|\btardes\b/.test(t))f.turnoTipo='tarde';
   else if(/\bnoche\b|\bnoches\b|\bnocturno\b/.test(t))f.turnoTipo='noche';
+  // Librar: filtrar solo opciones donde yo libra el dia senalado
+  if(/\blibrar\b|\blibre\b|\bno\s+trabajar\b/.test(t))f.soloLibrar=true;
   var dias={lunes:'lunes',martes:'martes',miercoles:'miercoles',jueves:'jueves',viernes:'viernes',sabado:'sabado',domingo:'domingo'};
   for(var k in dias){if(t.indexOf(k)>=0){f.diaSemana=dias[k];break;}}
   var mDia=t.match(/\bdia\s+(\d{1,2})\b|\bel\s+(\d{1,2})\b/);
   if(mDia)f.diaNumero=parseInt(mDia[1]||mDia[2]);
+  // "salir antes" sin hora = antes de mi salida actual
   var mSalAntes=t.match(/salir?\s+antes\s+(?:de\s+las?\s+)?(\d{1,2})(?::(\d{2}))?/);
-  if(mSalAntes)f.salidaAntesDe=(mSalAntes[1].length<2?'0':'')+mSalAntes[1]+':'+(mSalAntes[2]||'00');
-  var mEntDespues=t.match(/entrar?\s+despues\s+(?:de\s+las?\s+)?(\d{1,2})(?::(\d{2}))?/);
-  if(mEntDespues)f.entradaDespuesDe=(mEntDespues[1].length<2?'0':'')+mEntDespues[1]+':'+(mEntDespues[2]||'00');
-  var mEntAntes=t.match(/entrar?\s+antes\s+(?:de\s+las?\s+)?(\d{1,2})(?::(\d{2}))?/);
-  if(mEntAntes)f.entradaAntesDe=(mEntAntes[1].length<2?'0':'')+mEntAntes[1]+':'+(mEntAntes[2]||'00');
+  if(mSalAntes){
+    f.salidaAntesDe=(mSalAntes[1].length<2?'0':'')+mSalAntes[1]+':'+(mSalAntes[2]||'00');
+  } else if(/salir?\s+antes/.test(t)&&myS1ref!==null){
+    f.salidaAntesDe=_fmtMin(myS1ref); // antes de mi salida actual
+  }
+  // "salir despues" sin hora = despues de mi salida actual
+  var mSalDespues=t.match(/salir?\s+despues\s+(?:de\s+las?\s+)?(\d{1,2})(?::(\d{2}))?/);
+  if(mSalDespues){
+    f.salidaDespuesDe=(mSalDespues[1].length<2?'0':'')+mSalDespues[1]+':'+(mSalDespues[2]||'00');
+  } else if(/salir?\s+despues/.test(t)&&myS1ref!==null){
+    f.salidaDespuesDe=_fmtMin(myS1ref);
+  }
+  var mEntDespues=t.match(/entrar?\s+(?:mas\s+tarde|despues)\s+(?:de\s+las?\s+)?(\d{1,2})(?::(\d{2}))?/);
+  if(mEntDespues){
+    f.entradaDespuesDe=(mEntDespues[1].length<2?'0':'')+mEntDespues[1]+':'+(mEntDespues[2]||'00');
+  } else if(/entrar?\s+(?:mas\s+tarde|despues)/.test(t)&&myE1ref!==null){
+    f.entradaDespuesDe=_fmtMin(myE1ref);
+  }
+  var mEntAntes=t.match(/entrar?\s+(?:mas\s+temprano|antes)\s+(?:de\s+las?\s+)?(\d{1,2})(?::(\d{2}))?/);
+  if(mEntAntes){
+    f.entradaAntesDe=(mEntAntes[1].length<2?'0':'')+mEntAntes[1]+':'+(mEntAntes[2]||'00');
+  } else if(/entrar?\s+(?:mas\s+temprano|antes)/.test(t)&&myE1ref!==null){
+    f.entradaAntesDe=_fmtMin(myE1ref);
+  }
   return f;
 }
 
@@ -6506,15 +6649,19 @@ function _interpretarLocal(texto){
 function _aplicarFiltro(filtro,texto,estado){
   _filtroIA=filtro;
   function turnoMioDe(r){
-    if(r.tipo==='mismo_dia')return r.turnoComp;
-    if(r.tipo==='comp_libro')return r.turnoYo;
-    if(r.tipo==='yo_libro')return r.turnoComp;
+    // El turno que YO hare en el intercambio
+    if(r.tipo==='mismo_dia')return r.turnoComp;    // intercambio mismo dia: yo hago el turno del comp
+    if(r.tipo==='comp_libro')return r.turnoYo;      // yo trabajo el turno del comp el dia senalado
+    if(r.tipo==='yo_libro')return r.turnoComp;      // yo trabajo el turno del comp en el dia futuro
     return r.turnoYo;
   }
+  function yoLibraElDia(r){return r.tipo==='yo_libro';} // solo yo_libro significa que yo libra el dia senalado
   function diaRelevante(r){return r.tipo==='yo_libro'?r.labelComp:r.labelDia;}
   function norm(s){return String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');}
   var filtrados=_todosResultados.filter(function(r){
     if(!r.ok)return false;
+    // Filtro soloLibrar: solo opciones donde yo libra el dia senalado
+    if(filtro.soloLibrar&&!yoLibraElDia(r))return false;
     if(filtro.nombre&&norm(r.nombre).indexOf(norm(filtro.nombre))<0)return false;
     var lbl=diaRelevante(r);
     var numMatch=lbl.match(/\b(\d{1,2})\b/);
@@ -6526,7 +6673,7 @@ function _aplicarFiltro(filtro,texto,estado){
       if(mapa[nd]!==norm(filtro.diaSemana))return false;
     }
     var tt2=turnoMioDe(r);
-    if(tt2==='Libre')return false;
+    if(!tt2||tt2==='Libre')return false;
     var p=tt2.split(' / ')[0];
     var tE1=_toMin(p.split('\u2192')[0]);
     var tS1=_toMin(p.split('\u2192')[1]);
@@ -6575,11 +6722,16 @@ async function filtrarConIA(){
     var raw=(data.content&&data.content[0]&&data.content[0].text)||'{}';
     raw=raw.replace(/```json|```/g,'').trim();
     var filtro=JSON.parse(raw);
+    // Añadir soloLibrar si la IA no lo devuelve pero el texto lo implica
+    if(!filtro.soloLibrar){var tl=texto.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');filtro.soloLibrar=/\blibrar\b|\blibre\b|\bno\s+trabajar\b/.test(tl);}
     _aplicarFiltro(filtro,texto,estado);
   }catch(err){
-    // Si la API falla, usar interprete local
+    // Si la API falla, usar interprete local con contexto de mi turno actual
     console.warn('IA no disponible, usando interprete local:',err);
-    var filtroLocal=_interpretarLocal(texto);
+    var myDayObj2=(function(){try{var r=JSON.parse(localStorage.getItem('cta_ed_'+_cambioYear)||'{}');return(r[_MC_MONTHS[_cambioMonth]]||{})[_cambioDay]||null;}catch(e){return null;}})();
+    var myS1ref2=myDayObj2&&myDayObj2.s1?_toMin(myDayObj2.s1):null;
+    var myE1ref2=myDayObj2&&myDayObj2.e1?_toMin(myDayObj2.e1):null;
+    var filtroLocal=_interpretarLocal(texto,myS1ref2,myE1ref2);
     _aplicarFiltro(filtroLocal,texto,estado);
   }
 }
@@ -6615,6 +6767,13 @@ function _renderCambioCard(r,ok){
     html+='<div class="cambio-card-row"><span class="cambio-card-lbl">'+nom+' libra:</span><span class="cambio-card-val yo">'+r.labelDia+'</span></div>';
     html+='<div style="border-top:1px solid rgba(255,255,255,.06);margin:6px 0"></div>';
     html+='<div class="cambio-card-row"><span class="cambio-card-lbl">A cambio:</span><span class="cambio-card-val el">'+nom+' trabaja '+r.labelComp+' · '+r.turnoComp+'</span></div>';
+  } else if(r.tipo==='parcial'){
+    html+='<div class="cambio-card-row"><span class="cambio-card-lbl">Día:</span><span class="cambio-card-val">'+r.labelDia+'</span></div>';
+    html+='<div class="cambio-card-row"><span class="cambio-card-lbl">Tú cedes:</span><span class="cambio-card-val yo">'+r.pMiaLabel+'</span></div>';
+    html+='<div class="cambio-card-row"><span class="cambio-card-lbl">'+nom+' cede:</span><span class="cambio-card-val yo">'+r.pCompLabel+'</span></div>';
+    html+='<div style="border-top:1px solid rgba(255,255,255,.06);margin:6px 0"></div>';
+    html+='<div class="cambio-card-row"><span class="cambio-card-lbl">Tú quedas:</span><span class="cambio-card-val el">'+r.turnoYoRes+'</span></div>';
+    html+='<div class="cambio-card-row"><span class="cambio-card-lbl">'+nom+' queda:</span><span class="cambio-card-val el">'+r.turnoCompRes+'</span></div>';
   }
   if(!ok&&r.errores&&r.errores.length)html+='<div class="cambio-error">'+r.errores.join('<br>')+'</div>';
   html+='</div>';
