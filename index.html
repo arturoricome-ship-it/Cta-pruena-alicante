@@ -6533,9 +6533,12 @@ function calcularCambios(){
       for(var d2=1;d2<=31;d2++){
         if(d2===day||_esPasado(d2,monthKey,year))continue;
         var myT2=(myRaw[monthKey]||{})[d2];
-        if(myT2&&myT2.e1)continue; // yo debo librar ese día
+        // Yo debo librar ese día: sin turno, o turno tipo libre, o e1 vacío
+        var yoTrabajoD2=!!(myT2&&myT2.e1&&myT2.tipo!=='libre');
+        if(yoTrabajoD2)continue;
         var cT2=compDias[d2];
-        if(!cT2||!cT2.e1)continue; // comp debe trabajar ese día
+        // Comp debe trabajar ese día
+        if(!cT2||!cT2.e1||cT2.tipo==='libre')continue;
         var cE1=_toMin(cT2.e1),cS1=_toMin(cT2.s1),cE2=cT2.e2?_toMin(cT2.e2):null,cS2=cT2.s2?_toMin(cT2.s2):null;
         var errB=errBbase.concat(_validarTurno(cE1,cS1,cE2,cS2).errores);
         var myCatB=_parseCategoria(myCat);
@@ -6568,9 +6571,12 @@ function calcularCambios(){
       for(var d3=1;d3<=31;d3++){
         if(d3===day||_esPasado(d3,monthKey,year))continue;
         var myT3=(myRaw[monthKey]||{})[d3];
-        if(!myT3||!myT3.e1)continue; // yo debo trabajar ese día
+        // Yo debo trabajar ese día
+        if(!myT3||!myT3.e1||myT3.tipo==='libre')continue;
         var cT3=compDias[d3];
-        if(cT3&&cT3.e1)continue; // comp debe librar ese día
+        // Comp debe librar ese día: sin turno, tipo libre o e1 vacío
+        var compTrabajaD3=!!(cT3&&cT3.e1&&cT3.tipo!=='libre');
+        if(compTrabajaD3)continue;
         var mE1=_toMin(myT3.e1),mS1=_toMin(myT3.s1),mE2=myT3.e2?_toMin(myT3.e2):null,mS2=myT3.s2?_toMin(myT3.s2):null;
         var errC=errCbase.concat(_validarTurno(mE1,mS1,mE2,mS2).errores);
         var ccC=_parseCategoria(comp.categoria||'');
