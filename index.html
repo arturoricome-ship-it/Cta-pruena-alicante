@@ -7144,23 +7144,23 @@ function evBuscar(){
     var fecha=new Date(_evAño,_evMesSel,dia);
     if(fecha<hoy)continue;
     var libres=[],ocupados=[],sinDatos=[],impFaltan=[];
+    // Tipos que NO cuentan como trabajo operativo → disponible todo el día
+    var TIPOS_NO_OPERATIVA=['libre','vacaciones','festivo','hl','hlp','baja','rm','curso','perentorias','hfun','nh','bp','h6'];
     empleados.forEach(function(emp){
       var diasMes=(emp.meses&&emp.meses[mes])||{};
       var turno=diasMes[dia];
       var nombre=emp.nombre;
-      // ¿Tiene este empleado el mes publicado? (algún día con datos)
       var tieneMesPublicado=Object.keys(diasMes).length>0;
       if(turno===undefined||turno===null){
         if(tieneMesPublicado){
-          // El mes está publicado pero este día no aparece → es libre
           libres.push({nombre:nombre,parcial:false,desde:hDesde});
         } else {
           sinDatos.push(nombre);
         }
         return;
       }
-      // Dia libre: tipo='libre' o e1 vacio/null → puede asistir todo el evento
-      if(!turno.e1||turno.tipo==='libre'){
+      // Día libre o tipo no-operativo (festivo, vacaciones, baja...) → disponible todo el evento
+      if(!turno.e1||TIPOS_NO_OPERATIVA.indexOf(turno.tipo||'libre')>=0){
         libres.push({nombre:nombre,parcial:false,desde:hDesde});return;
       }
       var asist=_evCalcularAsistencia(turno,hDesde,hHasta);
@@ -7178,18 +7178,23 @@ function evBuscar(){
         if(emp.nombre.toLowerCase().indexOf(imp.toLowerCase())<0)return false;
         var dm=(emp.meses&&emp.meses[mes])||{};
         var t=dm[dia];
-        var tieneMes=Object.keys(dm).length>0;
-        if(t===undefined||t===null)return tieneMes?true:true; // libre o sin publicar → asumimos puede
-        if(!t.e1||t.tipo==='libre')return true; // dia libre = puede venir
+        if(t===undefined||t===null)return true;
+        if(!t.e1||TIPOS_NO_OPERATIVA.indexOf(t.tipo||'libre')>=0)return true;
         return _evCalcularAsistencia(t,hDesde,hHasta).puede;
       });
     });
-    resultados.push({dia:dia,label:dias[fecha.getDay()]+' '+dia+' '+_MC_NAMES[_evMesSel],libres:libres,ocupados:ocupados,sinDatos:sinDatos,total:empleados.length,impOk:impOk,impFaltan:impFaltan});
+    // Contador: solo los que pueden TODO el evento (no parciales)
+    var libresCompletos=libres.filter(function(x){return!x.parcial;}).length;
+    resultados.push({dia:dia,label:dias[fecha.getDay()]+' '+dia+' '+_MC_NAMES[_evMesSel],libres:libres,libresCompletos:libresCompletos,ocupados:ocupados,sinDatos:sinDatos,total:empleados.length,impOk:impOk,impFaltan:impFaltan});
   }
 
   resultados.sort(function(a,b){
+    // Prioridad 1: imprescindibles presentes
     if(a.impOk&&!b.impOk)return-1;
     if(!a.impOk&&b.impOk)return 1;
+    // Prioridad 2: más gente que puede TODO el evento
+    if(b.libresCompletos!==a.libresCompletos)return b.libresCompletos-a.libresCompletos;
+    // Prioridad 3: más gente en total (incluyendo parciales)
     return b.libres.length-a.libres.length;
   });
 
@@ -7215,20 +7220,19 @@ function evMostrarResultados(resultados,error,nombreEvento,hDesde,hHasta){
   html+='<div class="ev-seccion">📅 Mejores días</div>';
 
   resultados.slice(0,15).forEach(function(r,i){
-    var pct=Math.round(r.libres.length/r.total*100);
-    var cls='ev-card'+(i===0?' ev-top1':i<=1?' ev-top2':'');
     var libresCompletos=r.libres.filter(function(x){return!x.parcial;});
     var parcialesArr=r.libres.filter(function(x){return x.parcial;});
+    var pct=Math.round(libresCompletos.length/r.total*100);
+    var cls='ev-card'+(i===0?' ev-top1':i<=1?' ev-top2':'');
     html+='<div class="'+cls+'">';
     html+='<div class="ev-card-top"><div>';
     html+='<div class="ev-card-fecha">'+r.label+'</div>';
-    if(!r.impOk&&_evImprescindibles.length)html+='<div style="font-size:10px;color:#f87171;margin-top:2px">⚠️ Faltan imprescindibles</div>';
+    if(!r.impOk&&_evImprescindibles.length)html+='<div style="font-size:10px;color:#f87171;margin-top:2px">⚠️ Falta: '+(r.impFaltan.length?r.impFaltan.join(', '):'algún imprescindible')+'</div>';
     else if(_evImprescindibles.length)html+='<div style="font-size:10px;color:#4ade80;margin-top:2px">✅ Todos los imprescindibles disponibles</div>';
-    html+='</div><div class="ev-card-num'+(i===0?' gold':'')+'">'+r.libres.length+'/'+r.total+'</div></div>';
+    html+='</div><div class="ev-card-num'+(i===0?' gold':'')+'">'+libresCompletos.length+'/'+r.total+'</div></div>';
     html+='<div class="ev-card-row">Todo el evento: <span>'+libresCompletos.length+' personas</span></div>';
     if(parcialesArr.length)html+='<div class="ev-card-row">Asistencia parcial: <span style="color:#fbbf24">'+parcialesArr.length+' personas</span></div>';
     if(r.sinDatos.length)html+='<div class="ev-card-row">Sin publicar: <span style="color:var(--gray)">'+r.sinDatos.length+' (aún sin turno asignado)</span></div>';
-    if(r.impFaltan.length)html+='<div class="ev-missing">No disponibles: '+r.impFaltan.join(', ')+'</div>';
     // Botón desplegable
     html+='<button onclick="_evToggleDetalle('+r.dia+')" style="width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:8px;color:var(--gold);font-family:Outfit,sans-serif;font-size:11px;font-weight:600;cursor:pointer;margin-top:8px">👥 Ver lista completa</button>';
     html+='<div id="ev-detalle-'+r.dia+'" style="display:none;margin-top:8px"></div>';
