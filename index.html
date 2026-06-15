@@ -6666,6 +6666,31 @@ function _validarDescansoSemanal(empDias, monthKey, dia, e1n, s1n, e2n, s2n, eti
   return errores;
 }
 
+
+// Empleados sin ningún turno real de trabajo en el mes = baja larga/excedencia.
+// Pueden aparecer como libres en eventos, pero NO deben ofrecerse para cambios de turno.
+function _esTurnoTrabajoRealCambio(t){
+  if(!t)return false;
+  var tipo=String(t.tipo||'').toLowerCase();
+  if(tipo==='libre'||_tipoCambioEsLibre(tipo))return false;
+  return !!(t.e1&&t.s1);
+}
+function _empleadoTieneTurnosRealesMesCambio(emp, monthKey, year){
+  if(!emp||!emp.meses)return false;
+  var idx=_GRUPO_MONTHS.indexOf(monthKey);
+  if(idx<0)return false;
+  var dias=emp.meses[monthKey]||{};
+  var maxDia=new Date(year,idx+1,0).getDate();
+  for(var d=1;d<=maxDia;d++){
+    var t=dias[d]||null;
+    // Aplicar cambios compartidos antes de decidir. Si un cambio compartido lo deja como HL/DL,
+    // no cuenta como turno real; si lo convierte a trabajado, sí cuenta.
+    t=_turnoGrupoConCambioCompartido(emp,new Date(year,idx,d),t);
+    if(_esTurnoTrabajoRealCambio(t))return true;
+  }
+  return false;
+}
+
 function calcularCambios(){
   var body=document.getElementById('cambio-body');
   var subTxt=document.getElementById('cambio-sub-txt');
@@ -6736,6 +6761,7 @@ function calcularCambios(){
     if(comp.nombre===myNombre&&myNombre)return; // saltar si soy yo
     var compDias=comp.meses&&comp.meses[monthKey]?comp.meses[monthKey]:{};
     if(!_sonCompatibles(myCat,comp.categoria||''))return;
+    if(!_empleadoTieneTurnosRealesMesCambio(comp,monthKey,year))return; // baja/excedencia: no ofrecer para cambios
 
     // El compañero ese día
     var compTurnoMiDia=compDias[day]||null;
@@ -6873,6 +6899,7 @@ function calcularCambios(){
   empleados.forEach(function(comp){
     if(myNombre&&comp.nombre===myNombre)return;
     if(!_sonCompatibles(myCat,comp.categoria||''))return;
+    if(!_empleadoTieneTurnosRealesMesCambio(comp,monthKey,year))return; // baja/excedencia: no ofrecer para cambios
     var compDias=(comp.meses&&comp.meses[monthKey])||{};
     var compT=compDias[day]||null;
     compT=_turnoGrupoConCambioCompartido(comp,new Date(year,_cambioMonth,day),compT);
@@ -6984,9 +7011,11 @@ function calcularCambios(){
   empleados.forEach(function(comp){
     if(myNombre&&comp.nombre===myNombre)return;
     if(!_sonCompatibles(myCat,comp.categoria||''))return;
+    if(!_empleadoTieneTurnosRealesMesCambio(comp,monthKey,year))return; // baja/excedencia: no ofrecer para cambios
     if(esLibre||_esPasado(day,monthKey,year))return;
     var compDias2=(comp.meses&&comp.meses[monthKey])||{};
     var compT2c=compDias2[day]||null;
+    compT2c=_turnoGrupoConCambioCompartido(comp,new Date(year,_cambioMonth,day),compT2c);
     var compLibre2=!compT2c||!compT2c.e1||compT2c.tipo==='libre';
     if(!compLibre2)return; // solo si el comp libra ese día
     if(myE2===null||myS2===null)return; // solo si mi turno es partido
