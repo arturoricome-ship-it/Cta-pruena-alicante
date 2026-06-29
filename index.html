@@ -400,6 +400,7 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 .mc-day.vacaciones{background:rgba(34,197,94,.14);color:#4ade80}
 .mc-day.festivo{background:rgba(251,191,36,.14);color:#fbbf24}
 .mc-day.hl,.mc-day.hlp{background:rgba(168,85,247,.14);color:#c084fc}
+.mc-day.hl-parcial{background:linear-gradient(135deg,rgba(59,130,246,.22) 0%,rgba(59,130,246,.22) 49%,rgba(168,85,247,.32) 51%,rgba(168,85,247,.32) 100%)!important;color:#e9e4f5!important}
 .mc-day.baja{background:rgba(239,68,68,.1);color:#f87171}
 .mc-day.perentorias{background:rgba(251,146,60,.12);color:#fb923c}
 .mc-day.h6,.mc-day.hfun{background:rgba(99,102,241,.12);color:#818cf8}
@@ -436,6 +437,7 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 .cambio-handle{width:36px;height:4px;background:rgba(255,255,255,.15);border-radius:2px;margin:14px auto 0;flex-shrink:0}
 .cambio-header{padding:12px 16px 10px;flex-shrink:0;border-bottom:1px solid rgba(255,255,255,.07)}
 .cambio-title{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px;color:var(--gold)}
+.cambio-modo-activo{background:rgba(167,139,250,.15)!important;border-color:rgba(167,139,250,.4)!important;color:#a78bfa!important}
 .cambio-sub{font-size:11px;color:var(--gray);margin-top:2px}
 #cambio-body{overflow-y:auto;padding:12px 14px calc(24px + env(safe-area-inset-bottom));flex:1;min-height:0;-webkit-overflow-scrolling:touch}
 .cambio-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px 13px;margin-bottom:8px}
@@ -538,6 +540,69 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 #grupo-panel::-webkit-scrollbar-track{background:transparent}
 #grupo-panel::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:4px}
 #grupo-panel .grupo-item:last-child{margin-bottom:12px}
+
+/* ─── Vista por horas (línea de tiempo) ─────────────────── */
+#btn-vista-horas.active{background:linear-gradient(135deg,#0f3d33,#10261f);border-color:#34d399;color:#6ee7b7}
+#grupo-timeline{display:none;margin-top:10px;border-top:1px solid rgba(255,255,255,.07);padding-top:10px;max-height:min(72vh,560px);overflow-y:auto;overflow-x:hidden;padding-right:2px;padding-bottom:20px;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.1) transparent}
+#grupo-timeline.open{display:block;padding-top:0}
+#grupo-timeline::-webkit-scrollbar{width:3px}
+#grupo-timeline::-webkit-scrollbar-track{background:transparent}
+#grupo-timeline::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:4px}
+.grupo-tl-hint{font-size:9.5px;color:var(--gray);text-align:center;margin:0 0 8px}
+.grupo-tl-body{display:flex;align-items:flex-start;border:1px solid var(--border);border-radius:12px;overflow:hidden;background:var(--card)}
+.grupo-tl-names{flex:0 0 96px;border-right:1px solid var(--border)}
+.grupo-tl-names .grupo-tl-spacer{height:28px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--card);z-index:3}
+.grupo-tl-name{height:40px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:1px;padding:0 8px;border-bottom:1px solid rgba(255,255,255,.05);overflow:hidden}
+.grupo-tl-name .nm{font-size:11px;font-weight:600;color:var(--white);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.grupo-tl-name .sch{font-size:8px;font-weight:500;color:var(--gray);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.grupo-tl-name.is-active{background:rgba(110,231,183,.12);color:#a7f3d0}
+.grupo-tl-name.is-active .sch{color:#a7f3d0;opacity:.75}
+.grupo-tl-scroll{flex:1;overflow-x:auto}
+.grupo-tl-grid{position:relative;width:max-content}
+.grupo-tl-header{display:flex;height:28px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--card);z-index:2}
+.grupo-tl-header .grupo-tl-hr{width:64px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;font-size:9.5px;color:var(--gray);font-weight:600;border-right:1px solid rgba(255,255,255,.05)}
+.grupo-tl-row{height:40px;position:relative;border-bottom:1px solid rgba(255,255,255,.05);background-image:repeating-linear-gradient(to right, transparent 0, transparent 31px, rgba(255,255,255,.04) 31px, rgba(255,255,255,.04) 32px),repeating-linear-gradient(to right, transparent 0, transparent 63px, rgba(255,255,255,.09) 63px, rgba(255,255,255,.09) 64px)}
+.grupo-tl-row.is-active{background-color:rgba(110,231,183,.04)}
+.grupo-tl-bar{position:absolute;top:5px;bottom:5px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;clip-path:inset(0 round 5px);padding:0;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.32);color:var(--white);text-shadow:0 1px 2px rgba(0,0,0,.4)}
+.grupo-tl-bar>.lbl{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.grupo-tl-bar.is-past{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.07);color:var(--gray);opacity:.75}
+.grupo-tl-bar.is-active{background:rgba(110,231,183,.22);border-color:rgba(110,231,183,.55);color:#a7f3d0;box-shadow:0 0 8px rgba(110,231,183,.25)}
+.grupo-tl-bar.is-night{background:rgba(251,146,60,.18);border-color:rgba(251,146,60,.45);color:#fdba74}
+.grupo-tl-bar.is-night.is-active{background:rgba(251,146,60,.28);border-color:rgba(251,146,60,.6);color:#fed7aa;box-shadow:0 0 8px rgba(251,146,60,.3)}
+.grupo-tl-bar.is-you{background:rgba(200,168,75,.2);border-color:rgba(200,168,75,.5);color:var(--gold)}
+.grupo-tl-bar.fade-left::before{content:'‹';position:absolute;left:1px;opacity:.55;font-size:11px;font-weight:900}
+.grupo-tl-bar.fade-right::after{content:'›';position:absolute;right:1px;opacity:.55;font-size:11px;font-weight:900}
+.grupo-tl-now{position:absolute;top:0;bottom:0;width:2px;background:#ef4444;z-index:4;box-shadow:0 0 5px #ef4444}
+.grupo-tl-now-lbl{position:absolute;top:-18px;transform:translateX(-50%);background:#ef4444;color:#1a0505;font-size:9.5px;font-weight:800;padding:1px 5px;border-radius:5px;white-space:nowrap;z-index:5}
+
+/* ─── Carril de llegadas (✈️) dentro de la vista por horas ─────────── */
+.grupo-tl-vuelos-label{display:flex;align-items:center;gap:5px;padding:0 8px;font-size:9.5px;color:#93c5fd;font-weight:700;letter-spacing:.3px;border-bottom:2px solid rgba(255,255,255,.08);background:rgba(96,165,250,.06);cursor:pointer;user-select:none}
+.grupo-tl-vuelos-label .chev{font-size:8px;opacity:.8;transition:transform .15s ease;display:inline-block}
+.grupo-tl-vuelos-label.collapsed .chev{transform:rotate(-90deg)}
+.grupo-tl-vuelos-row{position:relative;border-bottom:2px solid rgba(255,255,255,.08);background:rgba(96,165,250,.04)}
+.grupo-tl-vuelo-bar{position:absolute;border-radius:4px;background:rgba(96,165,250,.24);border:1px solid rgba(96,165,250,.6);color:#bfdbfe;font-size:9.5px;font-weight:800;letter-spacing:.2px;display:flex;align-items:center;justify-content:center;clip-path:inset(0 round 4px);padding:0;cursor:pointer}
+.grupo-tl-vuelo-bar:active{transform:scale(.95)}
+.grupo-tl-vuelo-bar>.lbl{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.grupo-tl-vuelo-bar.is-now{background:rgba(96,165,250,.4);border-color:#60a5fa;box-shadow:0 0 8px rgba(96,165,250,.45);color:#eff6ff}
+.grupo-tl-vuelo-bar.is-past{opacity:.5}
+.conector{position:absolute;height:0;border-top:1.5px solid rgba(167,139,250,.55);transform:translateY(-50%);z-index:1}
+.grupo-tl-vuelo-bar.es-salida{background:rgba(239,68,68,.22);border-color:rgba(239,68,68,.6);color:#fecaca}
+.grupo-tl-vuelo-bar.es-salida.is-now{background:rgba(239,68,68,.42);border-color:#ef4444;box-shadow:0 0 8px rgba(239,68,68,.5);color:#fee2e2}
+
+/* Descanso (hueco >= umbral entre vuelos/bloques solapados) — en dorado, dentro de la propia fila de llegadas */
+.descanso-seg{position:absolute;top:50%;height:16px;transform:translateY(-50%);z-index:2}
+.descanso-linea{position:absolute;left:7px;right:7px;top:50%;border-top:1px dashed rgba(232,201,106,.6);transform:translateY(-50%)}
+.descanso-flecha{position:absolute;top:50%;transform:translateY(-50%);color:rgba(232,201,106,.8);font-size:10px;font-weight:900}
+.descanso-flecha.izq{left:0}
+.descanso-flecha.der{right:0}
+.descanso-lbl{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:#241d0f;border:1px solid rgba(232,201,106,.5);padding:1px 6px;border-radius:8px;font-size:8px;color:var(--gold-light);font-weight:700;white-space:nowrap;z-index:1}
+.descanso-seg.es-vivo .descanso-lbl{background:#2e2210;border-color:var(--gold-light);box-shadow:0 0 6px rgba(232,201,106,.4)}
+.descanso-seg.es-vivo .descanso-linea{border-top-color:var(--gold-light)}
+
+/* Aviso emergente al tocar un vuelo, posicionado donde se pulsa */
+.tl-toast-vuelo{position:fixed;background:#15233a;border:1px solid rgba(96,165,250,.5);color:#dbeafe;padding:8px 14px;border-radius:10px;font-size:12.5px;font-weight:600;line-height:1.5;box-shadow:0 8px 24px rgba(0,0,0,.45);opacity:0;pointer-events:none;transition:opacity .15s ease;z-index:9999;text-align:center;white-space:nowrap;font-family:'Outfit',sans-serif}
+.tl-toast-vuelo b{color:#93c5fd}
+.tl-toast-vuelo.show{opacity:1}
 
 /* ═══ OPERATIVA ════ */
 #bottom-turno{display:none!important}
@@ -1055,13 +1120,13 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
     </div>
     <p class="op-sec">📊 Resumen operativo del día</p>
     <!-- RESUMEN OPERATIVO -->
-    <div class="op-comp-card" style="flex-direction:column;align-items:stretch;gap:0;padding:0;overflow:hidden;cursor:pointer" onclick="if(typeof verCompanerosHoy==='function'){var p=document.getElementById('calc-panel');var o=document.getElementById('calc-overlay');if(p){p.classList.add('show');if(o)o.classList.add('show');setTimeout(function(){verCompanerosHoy();},80);}}">
+    <div class="op-comp-card" style="flex-direction:column;align-items:stretch;gap:0;padding:0;overflow:hidden;cursor:pointer" onclick="abrirCompanerosPorDia()">
       <!-- Sub-tabs a todo ancho, pegados al borde superior -->
       <div style="display:flex;gap:0">
         <button id="op-tab-dist" onclick="event.stopPropagation();opResTab('dist')" style="flex:1;background:rgba(200,168,75,.15);border:none;border-right:1px solid var(--border);border-bottom:2px solid var(--gold);color:var(--gold);font-family:'Outfit',sans-serif;font-size:10px;font-weight:700;padding:9px 4px;cursor:pointer;letter-spacing:.3px">Distribución</button>
         <button id="op-tab-pico" onclick="event.stopPropagation();opResTab('pico')" style="flex:1;background:none;border:none;border-right:1px solid var(--border);border-bottom:2px solid transparent;color:var(--gray);font-family:'Outfit',sans-serif;font-size:10px;font-weight:700;padding:9px 4px;cursor:pointer;letter-spacing:.3px">Picos</button>
         <button id="op-tab-now" onclick="event.stopPropagation();opResTab('now')" style="flex:1;background:none;border:none;border-bottom:2px solid transparent;color:var(--gray);font-family:'Outfit',sans-serif;font-size:10px;font-weight:700;padding:9px 4px;cursor:pointer;letter-spacing:.3px">Ahora</button>
-        <div id="op-ver-btn" style="flex-shrink:0;background:none;border:none;border-left:1px solid var(--border);border-bottom:2px solid transparent;color:#60a5fa;font-size:10px;font-weight:800;padding:9px 14px;letter-spacing:.5px;cursor:pointer;display:flex;align-items:center" onclick="event.stopPropagation();if(typeof verCompanerosHoy==='function'){var p=document.getElementById('calc-panel');var o=document.getElementById('calc-overlay');if(p){p.classList.add('show');if(o)o.classList.add('show');setTimeout(function(){verCompanerosHoy();},80);}}">VER</div>
+        <div id="op-ver-btn" style="flex-shrink:0;background:none;border:none;border-left:1px solid var(--border);border-bottom:2px solid transparent;color:#60a5fa;font-size:10px;font-weight:800;padding:9px 14px;letter-spacing:.5px;cursor:pointer;display:flex;align-items:center" onclick="event.stopPropagation();abrirCompanerosPorDia()">VER</div>
       </div>
       <!-- Content panels -->
       <div id="op-res-dist" style="padding:12px 14px">
@@ -1075,6 +1140,19 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
     <details class="op-details">
       <summary><span class="op-summary-title">📊 Detalles operativos del día</span><button type="button" class="op-info-btn" aria-label="Información sobre los datos operativos" onclick="opShowDataInfo(event)">?</button></summary>
       <div class="op-details-body">
+        <div id="op-grupo-import-banner" style="display:none;grid-column:1/-1;background:linear-gradient(160deg,rgba(200,168,75,.08),rgba(200,168,75,.02));border:1px solid rgba(200,168,75,.3);border-radius:16px;padding:14px">
+          <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:6px">📥 Importa el calendario de tu grupo de trabajo</div>
+          <div style="font-size:10.5px;color:var(--gray);line-height:1.55;margin-bottom:10px">Sin esto no se pueden calcular los datos de esta pantalla (presión operativa, compañeros trabajando, personas por avión, etc.). El resto seguirá mostrando lo que pueda con los vuelos.</div>
+          <div style="font-size:10.5px;color:var(--gray);line-height:1.55;margin-bottom:12px">
+            1. Entra en <b style="color:#e9e4f5">Accesos directos → Grupo de trabajo</b> y descarga el Excel de tu equipo.<br>
+            2. Aquí en la app: <b style="color:#e9e4f5">Resumen operativo del día → Compañeros por día → Importar</b>.<br>
+            Puedes importar tantos grupos/Excels como quieras — se suman entre sí, no se sustituyen.
+          </div>
+          <div style="display:flex;gap:8px">
+            <a href="https://tryp.southeu.com/tryp/website/gruposTrabajo/calendario/7557" target="_blank" onclick="event.stopPropagation()" style="flex:1;text-align:center;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:9px 6px;color:var(--gray);font-size:11px;font-weight:700;text-decoration:none">🌐 Ir al grupo de trabajo</a>
+            <button type="button" onclick="event.stopPropagation();abrirCompanerosPorDia()" style="flex:1;background:rgba(200,168,75,.18);border:1px solid rgba(200,168,75,.45);border-radius:10px;padding:9px 6px;color:var(--gold);font-family:inherit;font-size:11px;font-weight:700;cursor:pointer">📥 Ir a Compañeros por día</button>
+          </div>
+        </div>
         <div class="op-dashboard">
           <div class="op-pressure-card">
             <div class="op-card-head">
@@ -2486,6 +2564,7 @@ function loadLive(){
       var hNow=new Date();
       document.getElementById("live-hora").textContent="Actualizado: "+pad(hNow.getHours())+":"+pad(hNow.getMinutes());
       renderLive();
+      if(window._grupoVistaHoras)refrescarCompanerosPanel(window._grupoOffsetDias||0,false);
       if(typeof window.renderOperativa==='function'){
         setTimeout(window.renderOperativa,50);
         setTimeout(window.renderOperativa,500);
@@ -2582,9 +2661,11 @@ document.getElementById("btn-logout").addEventListener("click",function(){
     <button class="calc-small-btn" id="btn-en-turno" onclick="filtrarEnTurno()">⚡ En turno</button>
     <button id="btn-sort-salida" onclick="toggleSortSalida()" title="Ordenar por próxima salida" style="background:rgba(200,168,75,.12);border:1px solid rgba(200,168,75,.3);border-radius:8px;padding:5px 9px;cursor:pointer;font-size:13px;line-height:1">⇅</button>
     <button onclick="abrirBuscadorEvento()" style="background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.3);border-radius:8px;padding:5px 10px;cursor:pointer;font-size:11px;font-weight:700;color:#a78bfa;font-family:'Outfit',sans-serif">🎉 Evento</button>
+    <button id="btn-vista-horas" class="calc-small-btn" onclick="toggleVistaHoras()">🕐 Vista por horas</button>
     <input type="file" id="grupo-file-input" accept=".xlsx" style="display:none" onchange="procesarGrupoXlsx(this.files[0])">
   </div>
   <div id="grupo-panel"></div>
+  <div id="grupo-timeline"></div>
   <div class="grupo-import-wrap" id="grupo-import-hint" style="display:none">
     <span id="grupo-import-txt"></span>
   </div>
@@ -2641,8 +2722,18 @@ function handleCredentialResponse(response){
   if(!payload){status.textContent="Error. Inténtalo de nuevo.";return;}
   var email=payload.email;
   var nombre=payload.name||email;
+  // Para el Log de Sheets (solo eso): si ya hay una identidad real del Tryp guardada en
+  // este dispositivo para este mismo email, se manda esa en vez del nombre de Google.
+  // "nombre" (el que queda guardado como sesión y se usa en el resto de la app) no se toca.
+  var nombreParaLog=nombre;
+  try{
+    var trypLogin=JSON.parse(localStorage.getItem('cta_mi_nombre_tryp')||'null');
+    if(trypLogin&&trypLogin.email&&trypLogin.nombre&&trypLogin.email===email){
+      nombreParaLog=trypLogin.nombre+(trypLogin.nomina?' ('+trypLogin.nomina+')':'');
+    }
+  }catch(e){}
 
-  fetch(SHEETS_URL,{method:"POST",body:JSON.stringify({email:email,nombre:nombre}),headers:{"Content-Type":"text/plain"}})
+  fetch(SHEETS_URL,{method:"POST",body:JSON.stringify({email:email,nombre:nombreParaLog}),headers:{"Content-Type":"text/plain"}})
   .then(function(r){return r.json();})
   .then(function(data){
     if(data.bloqueado){
@@ -2672,7 +2763,7 @@ window.addEventListener("load",function(){
     function verificarAcceso(){
       var s=null;try{s=JSON.parse(localStorage.getItem("cta_session"));}catch(e){}
       if(!s||!s.email) return;
-      fetch(SHEETS_URL,{method:"POST",body:JSON.stringify({email:s.email,nombre:s.nombre||s.email}),headers:{"Content-Type":"text/plain"}})
+      fetch(SHEETS_URL,{method:"POST",body:JSON.stringify({accion:"verificar_acceso",email:s.email}),headers:{"Content-Type":"text/plain"}})
       .then(function(r){return r.json();})
       .then(function(d){if(d.bloqueado){localStorage.removeItem("cta_session");location.reload();}})
       .catch(function(){});
@@ -3116,7 +3207,7 @@ function initGoogle(){
         ✅ Importar turnos
       </button>
     </div>
-    <button onclick="exportarICS()" style="width:100%;background:rgba(200,168,75,.08);border:1px solid rgba(200,168,75,.25);border-radius:12px;padding:11px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:700;color:var(--gold);cursor:pointer;margin-bottom:8px">
+    <button onclick="abrirSelectorMesesICS()" style="width:100%;background:rgba(200,168,75,.08);border:1px solid rgba(200,168,75,.25);border-radius:12px;padding:11px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:700;color:var(--gold);cursor:pointer;margin-bottom:8px">
       📅 Exportar calendario (.ics) con alarmas
     </button>
     <button onclick="tiResetData()" style="width:100%;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:12px;padding:11px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;color:#f87171;cursor:pointer;margin-bottom:6px">
@@ -3378,16 +3469,28 @@ function tiApplyBackup(){
 function logActividad(tipo, detalle){
   var sess=null;try{sess=JSON.parse(localStorage.getItem('cta_session'));}catch(e){}
   if(!sess||!sess.email){console.warn('logActividad: no session for',tipo);return;}
+  // Si ya se ha importado el Tryp personal, se manda nombre+nómina reales en vez del
+  // nombre de Google (que puede no coincidir con el oficial). Hasta que se importe,
+  // se sigue mandando el nombre de Google como hasta ahora.
+  var nombreLog=sess.nombre||'';
+  try{
+    var tryp=JSON.parse(localStorage.getItem('cta_mi_nombre_tryp')||'null');
+    if(tryp&&tryp.email&&tryp.nombre&&tryp.email===sess.email){
+      nombreLog=tryp.nombre+(tryp.nomina?' ('+tryp.nomina+')':'');
+    }
+  }catch(e){}
   console.log('logActividad →',tipo,sess.email, detalle||'');
   var url=typeof SHEETS_URL!=='undefined'?SHEETS_URL:null;
   if(!url){console.warn('logActividad: no SHEETS_URL');return;}
   fetch(url,{
     method:'POST',
-    body:JSON.stringify({accion:'log_accion',email:sess.email,nombre:sess.nombre||'',tipo:tipo,detalle:detalle||''}),
+    body:JSON.stringify({accion:'log_accion',email:sess.email,nombre:nombreLog,tipo:tipo,detalle:detalle||''}),
     headers:{'Content-Type':'text/plain'}
   }).then(function(r){return r.json();}).then(function(d){console.log('logActividad ok',tipo,d);})
   .catch(function(e){console.error('logActividad error',tipo,e);});
 }
+
+
 // ═══════════════════════════════════════════════════════════════
 // TRYP IMPORT
 // ═══════════════════════════════════════════════════════════════
@@ -3435,7 +3538,69 @@ setTimeout(positionImportPanel,300);
 // ═══════════════════════════════════════════════════════════════
 // EXPORTAR .ICS — turnos del mes con alarma 70min antes
 // ═══════════════════════════════════════════════════════════════
-function exportarICS(){
+function abrirSelectorMesesICS(){
+  var now=new Date();
+  var year=now.getFullYear();
+  var MESES=["ENERO","FEBRERO","MARZO","ABRIL","MAYO","JUNIO","JULIO","AGOSTO","SEPTIEMBRE","OCTUBRE","NOVIEMBRE","DICIEMBRE"];
+  var MESES_ES=["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+
+  var raw;try{raw=localStorage.getItem('cta_ed_'+year);}catch(e){}
+  if(!raw){alert('No tienes turnos importados.');return;}
+  var ue;try{ue=JSON.parse(raw);}catch(e){alert('Error leyendo turnos.');return;}
+
+  var mesesConDatos=[];
+  MESES.forEach(function(mk,idx){
+    var mData=ue[mk];
+    if(mData&&Object.keys(mData).some(function(d){return mData[d]&&mData[d].e1;}))mesesConDatos.push(idx);
+  });
+  if(!mesesConDatos.length){alert('No hay turnos trabajados en el calendario.');return;}
+  var ultimoMes=mesesConDatos[mesesConDatos.length-1];
+
+  var overlay=document.createElement('div');
+  overlay.id='ics-meses-overlay';
+  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+  function cerrar(){if(document.body.contains(overlay))document.body.removeChild(overlay);}
+  overlay.onclick=function(e){if(e.target===overlay)cerrar();};
+
+  var panel=document.createElement('div');
+  panel.style.cssText='background:#182135;border:1px solid rgba(200,168,75,.3);border-radius:16px;padding:18px;max-width:340px;width:100%;max-height:80vh;overflow-y:auto';
+  panel.onclick=function(e){e.stopPropagation();};
+
+  var html='<div style="font-size:14px;font-weight:700;color:var(--gold);margin-bottom:4px">📅 Exportar calendario (.ics)</div>'
+    +'<div style="font-size:11px;color:var(--gray);margin-bottom:12px">Elige qué meses quieres incluir</div>'
+    +'<div style="display:flex;gap:6px;margin-bottom:10px">'
+    +'<button type="button" id="ics-sel-todos" style="flex:1;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:7px;color:var(--gray);font-family:\'Outfit\',sans-serif;font-size:10.5px;font-weight:700;cursor:pointer">Todos</button>'
+    +'<button type="button" id="ics-sel-ultimo" style="flex:1;background:rgba(200,168,75,.15);border:1px solid rgba(200,168,75,.4);border-radius:8px;padding:7px;color:var(--gold);font-family:\'Outfit\',sans-serif;font-size:10.5px;font-weight:700;cursor:pointer">Solo el último</button>'
+    +'</div>'
+    +'<div id="ics-meses-list" style="display:flex;flex-direction:column;gap:4px;margin-bottom:14px">';
+  mesesConDatos.forEach(function(idx){
+    html+='<label style="display:flex;align-items:center;gap:8px;padding:7px 9px;background:rgba(255,255,255,.04);border-radius:8px;font-size:12px;color:var(--white);cursor:pointer">'
+      +'<input type="checkbox" class="ics-mes-chk" value="'+idx+'" checked style="width:15px;height:15px;flex-shrink:0">'
+      +MESES_ES[idx]+'</label>';
+  });
+  html+='</div><div style="display:flex;gap:8px">'
+    +'<button type="button" id="ics-cancelar" style="flex:1;background:rgba(255,255,255,.06);border:none;border-radius:10px;padding:10px;color:var(--gray);font-family:\'Outfit\',sans-serif;font-size:12px;font-weight:700;cursor:pointer">Cancelar</button>'
+    +'<button type="button" id="ics-generar" style="flex:2;background:#2563eb;border:none;border-radius:10px;padding:10px;color:#fff;font-family:\'Outfit\',sans-serif;font-size:12px;font-weight:700;cursor:pointer">✅ Generar .ics</button>'
+    +'</div>';
+  panel.innerHTML=html;
+  overlay.appendChild(panel);
+  document.body.appendChild(overlay);
+
+  document.getElementById('ics-cancelar').onclick=cerrar;
+  document.getElementById('ics-sel-todos').onclick=function(){
+    Array.prototype.forEach.call(document.querySelectorAll('.ics-mes-chk'),function(c){c.checked=true;});
+  };
+  document.getElementById('ics-sel-ultimo').onclick=function(){
+    Array.prototype.forEach.call(document.querySelectorAll('.ics-mes-chk'),function(c){c.checked=(+c.value===ultimoMes);});
+  };
+  document.getElementById('ics-generar').onclick=function(){
+    var seleccionados=Array.prototype.filter.call(document.querySelectorAll('.ics-mes-chk'),function(c){return c.checked;}).map(function(c){return +c.value;});
+    if(!seleccionados.length){alert('Selecciona al menos un mes.');return;}
+    cerrar();
+    exportarICS(seleccionados);
+  };
+}
+function exportarICS(mesesIdx){
   var now=new Date();
   var year=now.getFullYear();
   var MESES=["ENERO","FEBRERO","MARZO","ABRIL","MAYO","JUNIO","JULIO","AGOSTO","SEPTIEMBRE","OCTUBRE","NOVIEMBRE","DICIEMBRE"];
@@ -3471,6 +3636,7 @@ function exportarICS(){
   var eventCount=0;
 
   MESES.forEach(function(mesKey, mIdx){
+    if(mesesIdx&&mesesIdx.indexOf(mIdx)<0)return;
     var mData=ue[mesKey];
     if(!mData)return;
     var daysInMonth=new Date(year,mIdx+1,0).getDate();
@@ -3546,7 +3712,9 @@ function exportarICS(){
   var url=URL.createObjectURL(blob);
   var a=document.createElement('a');
   a.href=url;
-  a.download='turnos-'+year+'.ics';
+  var MESES_NUM2=["01","02","03","04","05","06","07","08","09","10","11","12"];
+  var sufijoMeses=(mesesIdx&&mesesIdx.length&&mesesIdx.length<12)?('-'+mesesIdx.map(function(i){return MESES_NUM2[i];}).join('_')):'';
+  a.download='turnos-'+year+sufijoMeses+'.ics';
   document.body.appendChild(a);
   a.click();
   setTimeout(function(){document.body.removeChild(a);URL.revokeObjectURL(url);},1000);
@@ -3629,6 +3797,12 @@ function tiHandleFile(file){
       var data=new Uint8Array(ev.target.result);
       var wb=XLSX.read(data,{type:'array',cellText:true,cellStyles:true});
       var sheet=wb.Sheets['Calendario empleado']||wb.Sheets[wb.SheetNames[0]];
+      var leyenda=_leerLeyendaTryp(wb);
+      if(leyenda&&leyenda.nombreCompleto){
+        _guardarMiIdentidadTryp(leyenda.nombreCompleto,leyenda.nomina);
+      } else {
+        _guardarMiIdentidadTryp(_extraerNombreDeTituloTryp(tiCellVal(sheet,1,0)),'');
+      }
       tiParseSheet(sheet,file.name);
     }catch(err){alert('Error al leer el archivo: '+err.message);}
   };
@@ -3840,7 +4014,9 @@ function mcRender(){
     // cls now computed per-cell below (hasPeren check)
     var hasPeren=dayObj&&dayObj.perenDur&&dayObj.perenDur!=='0:00';
     var hasHfun=dayObj&&dayObj.hfunDur&&dayObj.hfunDur!=='0:00';
+    var hasHLParcial=!!(dayObj&&dayObj.hlParcial&&dayObj.hlParcial.ini&&dayObj.hlParcial.fin);
     var dispCls='mc-day '+(hasPeren?'perentorias':(tipo||'libre'));
+    if(hasHLParcial)dispCls+=' hl-parcial';
     if(hasHfun)dispCls+=' hfun-mark';
     if(isThisMonth&&d===today.getDate())dispCls+=' hoy';
     var timeLines='';
@@ -3850,6 +4026,7 @@ function mcRender(){
     }
     if(hasPeren)timeLines+='<div class="mc-day-time" style="color:#fb923c">'+(dayObj.perenTipo==='cp'?'-':'+')+dayObj.perenDur+'</div>';
     if(hasHfun)timeLines+='<div class="mc-day-time" style="color:#818cf8">+'+dayObj.hfunDur+'</div>';
+    if(hasHLParcial)timeLines+='<div class="mc-day-time" style="color:#c084fc">HL '+dayObj.hlParcial.ini+'-'+dayObj.hlParcial.fin+'</div>';
     html+='<div class="'+dispCls+'" onclick="mcEditDay('+d+',event)">'+
       '<div class="mc-day-num">'+d+'</div>'+
       timeLines+
@@ -4028,6 +4205,7 @@ function mcRenderSummary(ue){
     }
     if(totalTypes.indexOf(day.tipo)>=0) totalMin+=eff;
     if(day.tipo==='hl') hlMin+=eff;
+    else if(day.hlParcial) hlMin+=_mcMin(day.hlParcial.ini,day.hlParcial.fin);
   });
 
   _MC_MONTHS.forEach(function(mk){
@@ -4040,6 +4218,7 @@ function mcRenderSummary(ue){
       if(totalTypes.indexOf(day.tipo)>=0) anualMin+=eff;
       if(contTypes.indexOf(day.tipo)>=0) anualContMin+=eff;
       if(day.tipo==='hl') hlAnualMin+=eff;
+      else if(day.hlParcial) hlAnualMin+=_mcMin(day.hlParcial.ini,day.hlParcial.fin);
     });
   });
   var names=_MC_NAMES;
@@ -4107,6 +4286,21 @@ function mcRenderSummary(ue){
 
 // ─── Day edit modal ──────────────────────────────────────────────
 var _mcEditDay=null,_mcEditMonth=null,_mcEditYear=null;
+var _mcHLModo='completo'; // 'completo' | 'parcial' — modo activo del sub-selector HL
+function mcHLModoSel(modo){
+  _mcHLModo=modo;
+  var bC=document.getElementById('mc-hl-modo-completo'),bP=document.getElementById('mc-hl-modo-parcial');
+  var times=document.getElementById('mc-hl-parcial-times');
+  if(modo==='parcial'){
+    bP.style.background='rgba(192,132,252,.18)';bP.style.borderColor='rgba(192,132,252,.45)';bP.style.color='#c084fc';
+    bC.style.background='rgba(255,255,255,.06)';bC.style.borderColor='rgba(255,255,255,.12)';bC.style.color='var(--gray)';
+    if(times)times.style.display='block';
+  } else {
+    bC.style.background='rgba(192,132,252,.18)';bC.style.borderColor='rgba(192,132,252,.45)';bC.style.color='#c084fc';
+    bP.style.background='rgba(255,255,255,.06)';bP.style.borderColor='rgba(255,255,255,.12)';bP.style.color='var(--gray)';
+    if(times)times.style.display='none';
+  }
+}
 var _MC_TIPOS=[
   {v:'trabajado',l:'Trabajado',ico:'⚙️',c:'#60a5fa'},
   {v:'hl',l:'H. Libre',ico:'🤝',c:'#c084fc'},
@@ -4133,7 +4327,7 @@ function mcEditDay(day,e){
   var title=dname+' '+day+' '+_MC_NAMES[_mcMonth];
   document.getElementById('mc-edit-title').textContent=title;
   // Mark current tipo — if day has perenDur, select perentorias btn
-  var displayTipo=(dayObj.perenDur&&dayObj.perenDur!=='0:00')?(dayObj.perenTipo||'perentorias'):(dayObj.hfunDur&&dayObj.hfunDur!=='0:00')?'hfun':dayObj.tipo;
+  var displayTipo=(dayObj.perenDur&&dayObj.perenDur!=='0:00')?(dayObj.perenTipo||'perentorias'):(dayObj.hfunDur&&dayObj.hfunDur!=='0:00')?'hfun':(dayObj.hlParcial?'hl':dayObj.tipo);
   document.querySelectorAll('.mc-tipo-btn').forEach(function(b){
     b.classList.toggle('sel',b.dataset.tipo===displayTipo);
   });
@@ -4147,20 +4341,28 @@ function mcEditDay(day,e){
   if(ptEl)ptEl.value=dayObj.perenDur||'';
   var hfEl=document.getElementById('mc-hfun-total');
   if(hfEl)hfEl.value=dayObj.hfunDur||'0:30';
+  // HL: modo completo/parcial + horas del tramo si lo hay
+  mcHLModoSel(dayObj.hlParcial?'parcial':'completo');
+  var hlIniEl=document.getElementById('mc-hl-ini'),hlFinEl=document.getElementById('mc-hl-fin');
+  if(hlIniEl)hlIniEl.value=(dayObj.hlParcial&&dayObj.hlParcial.ini)||'';
+  if(hlFinEl)hlFinEl.value=(dayObj.hlParcial&&dayObj.hlParcial.fin)||'';
   // Auto-show correct section
   var showTimesEl=document.getElementById('mc-edit-times');
   var showPerenEl=document.getElementById('mc-edit-peren');
   var showHfunEl=document.getElementById('mc-edit-hfun');
+  var showHlEl=document.getElementById('mc-edit-hl');
   if(displayTipo==='perentorias'||displayTipo==='cp'){
-    showTimesEl.style.display='none';showPerenEl.style.display='block';if(showHfunEl)showHfunEl.style.display='none';
+    showTimesEl.style.display='none';showPerenEl.style.display='block';if(showHfunEl)showHfunEl.style.display='none';if(showHlEl)showHlEl.style.display='none';
     var pl=document.getElementById('mc-peren-label');
     if(pl)pl.textContent=displayTipo==='cp'?'Horas compensadas (banco)':'Horas de perentorias realizadas';
   } else if(displayTipo==='hfun'){
-    showTimesEl.style.display='none';showPerenEl.style.display='none';if(showHfunEl)showHfunEl.style.display='block';
+    showTimesEl.style.display='none';showPerenEl.style.display='none';if(showHfunEl)showHfunEl.style.display='block';if(showHlEl)showHlEl.style.display='none';
   } else if(displayTipo==='trabajado'||displayTipo==='curso'){
-    showTimesEl.style.display='block';showPerenEl.style.display='none';if(showHfunEl)showHfunEl.style.display='none';
+    showTimesEl.style.display='block';showPerenEl.style.display='none';if(showHfunEl)showHfunEl.style.display='none';if(showHlEl)showHlEl.style.display='none';
+  } else if(displayTipo==='hl'){
+    showTimesEl.style.display='none';showPerenEl.style.display='none';if(showHfunEl)showHfunEl.style.display='none';if(showHlEl)showHlEl.style.display='block';
   } else {
-    showTimesEl.style.display='none';showPerenEl.style.display='none';if(showHfunEl)showHfunEl.style.display='none';
+    showTimesEl.style.display='none';showPerenEl.style.display='none';if(showHfunEl)showHfunEl.style.display='none';if(showHlEl)showHlEl.style.display='none';
   }
   document.getElementById('mc-edit-bg').style.display='block';
   setTimeout(function(){document.getElementById('mc-edit-panel').classList.add('open');},10);
@@ -4194,6 +4396,7 @@ function mcEditSave(){
     });
     // If day was libre, mark as trabajado so shift shows
     if(!ue[month][day].tipo||ue[month][day].tipo==='libre')ue[month][day].tipo='trabajado';
+    delete ue[month][day].hlParcial;
   } else if(tipoVal==='hfun'){
     // Overlay: H. Función NO sustituye el turno del día.
     // Mantiene tipo, horarios y total existentes; solo añade la línea morada +hh:mm.
@@ -4209,6 +4412,41 @@ function mcEditSave(){
       total:existingDay.total||0,
       hfunDur:hfunTxt
     });
+    delete ue[month][day].hlParcial;
+  } else if(tipoVal==='hl'){
+    if(_mcHLModo==='parcial'){
+      // HL parcial: overlay sobre el turno existente, igual que Perentorias/H.Función.
+      // NO sustituye tipo/horas: el turno sigue siendo el real, solo se anota el tramo HL.
+      var hlIni=document.getElementById('mc-hl-ini').value.trim();
+      var hlFin=document.getElementById('mc-hl-fin').value.trim();
+      if(!hlIni||!hlFin){alert('Indica las horas Desde/Hasta del tramo HL.');return;}
+      var baseTipoHL=existingDay.tipo;
+      if(!baseTipoHL||baseTipoHL==='libre'||baseTipoHL==='hl'||baseTipoHL==='hlp')baseTipoHL='trabajado';
+      ue[month][day]=Object.assign({},existingDay,{
+        tipo:baseTipoHL,
+        e1:existingDay.e1||'',
+        s1:existingDay.s1||'',
+        e2:existingDay.e2||'',
+        s2:existingDay.s2||'',
+        total:existingDay.total||0,
+        hlParcial:{ini:hlIni,fin:hlFin}
+      });
+    } else {
+      // HL día completo: igual que siempre, mantiene horarios guardados pero el tipo
+      // pasa a 'hl' (se trata como no disponible/no trabajado en todos los sitios).
+      ue[month][day]=Object.assign({},existingDay,{
+        tipo:'hl',
+        e1:existingDay.e1||'',
+        s1:existingDay.s1||'',
+        e2:existingDay.e2||'',
+        s2:existingDay.s2||'',
+        total:existingDay.total||0
+      });
+      delete ue[month][day].hlParcial;
+    }
+    delete ue[month][day].perenDur;
+    delete ue[month][day].perenTipo;
+    delete ue[month][day].hfunDur;
   } else {
     if(tipoVal==='trabajado'||tipoVal==='curso'){
       // Trabajado/Curso sí permiten editar y guardar horarios manualmente.
@@ -4236,6 +4474,7 @@ function mcEditSave(){
     delete ue[month][day].perenDur;
     delete ue[month][day].perenTipo;
     delete ue[month][day].hfunDur;
+    delete ue[month][day].hlParcial;
   }
   try{localStorage.setItem('cta_ed_'+year,JSON.stringify(ue));}catch(er){alert('Error: '+er.message);}
   if(typeof guardarCambioTurnoCompartido==='function')guardarCambioTurnoCompartido(year,month,day,ue[month][day]);
@@ -4258,26 +4497,37 @@ function mcTipoSel(btn){
   var showTimes=document.getElementById('mc-edit-times');
   var showPeren=document.getElementById('mc-edit-peren');
   var showHfun=document.getElementById('mc-edit-hfun');
+  var showHl=document.getElementById('mc-edit-hl');
   if(v==='trabajado'||v==='curso'){
     showTimes.style.display='block';
     showPeren.style.display='none';
     if(showHfun)showHfun.style.display='none';
+    if(showHl)showHl.style.display='none';
   } else if(v==='perentorias'||v==='cp'){
     showTimes.style.display='none';
     showPeren.style.display='block';
     if(showHfun)showHfun.style.display='none';
+    if(showHl)showHl.style.display='none';
     var perenLbl=document.getElementById('mc-peren-label');
     if(perenLbl)perenLbl.textContent=v==='cp'?'Horas compensadas (banco)':'Horas de perentorias realizadas';
   } else if(v==='hfun'){
     showTimes.style.display='none';
     showPeren.style.display='none';
     if(showHfun)showHfun.style.display='block';
+    if(showHl)showHl.style.display='none';
     var hf=document.getElementById('mc-hfun-total');
     if(hf&&!hf.value.trim())hf.value='0:30';
+  } else if(v==='hl'){
+    showTimes.style.display='none';
+    showPeren.style.display='none';
+    if(showHfun)showHfun.style.display='none';
+    if(showHl)showHl.style.display='block';
+    mcHLModoSel('completo'); // por defecto, al elegir HL desde cero, día completo
   } else {
     showTimes.style.display='none';
     showPeren.style.display='none';
     if(showHfun)showHfun.style.display='none';
+    if(showHl)showHl.style.display='none';
   }
 }
 
@@ -4336,6 +4586,19 @@ document.addEventListener('DOMContentLoaded',function(){
     <button class="mc-tipo-btn" data-tipo="curso" onclick="mcTipoSel(this)"><span class="t-ico">📚</span><span class="t-lbl">Curso</span></button>
     <button class="mc-tipo-btn" data-tipo="hl" onclick="mcTipoSel(this)"><span class="t-ico">🤝</span><span class="t-lbl">HL</span></button>
   </div>
+  <div class="mc-edit-hl" id="mc-edit-hl" style="display:none;margin-bottom:12px">
+    <div style="display:flex;gap:8px;margin-bottom:10px">
+      <button type="button" id="mc-hl-modo-completo" onclick="mcHLModoSel('completo')" style="flex:1;background:rgba(192,132,252,.18);border:1px solid rgba(192,132,252,.45);border-radius:10px;padding:9px;color:#c084fc;font-family:'Outfit',sans-serif;font-size:12px;font-weight:700;cursor:pointer">Día completo</button>
+      <button type="button" id="mc-hl-modo-parcial" onclick="mcHLModoSel('parcial')" style="flex:1;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:9px;color:var(--gray);font-family:'Outfit',sans-serif;font-size:12px;font-weight:700;cursor:pointer">Horas concretas</button>
+    </div>
+    <div id="mc-hl-parcial-times" style="display:none">
+      <div style="font-size:11px;color:var(--gray);margin-bottom:8px">Tramo de tu turno que es HL — el resto sigue contando como trabajado</div>
+      <div class="mc-time-row">
+        <div><label>Desde</label><input type="time" id="mc-hl-ini"></div>
+        <div><label>Hasta</label><input type="time" id="mc-hl-fin"></div>
+      </div>
+    </div>
+  </div>
   <div class="mc-edit-times" id="mc-edit-times">
     <div class="mc-time-row">
       <div><label>Entrada 1</label><input type="time" id="mc-edit-e1"></div>
@@ -4379,6 +4642,7 @@ document.addEventListener('DOMContentLoaded',function(){
   <div class="cambio-header">
     <div class="cambio-title">🔄 Buscar cambio de turno</div>
     <div class="cambio-sub" id="cambio-sub-txt">Calculando opciones...</div>
+    <button id="cambio-modo-btn" onclick="toggleModoCambioCategorias()" style="margin-top:8px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:6px 10px;color:var(--gray);font-family:'Outfit',sans-serif;font-size:11px;font-weight:600;cursor:pointer">🔒 Solo mi categoría</button>
     <div style="margin-top:10px;display:flex;gap:8px;align-items:center">
       <div style="flex:1;position:relative">
         <input id="cambio-ia-input" type="text" placeholder="¿Qué buscas? Ej: tarde el lunes, salir antes de las 14h..." 
@@ -4443,6 +4707,122 @@ function resetGrupo(){
   if(panel){panel.innerHTML='';panel.classList.remove('open');}
 }
 
+// Códigos de día que nunca son un nombre real, por si se han colado como "nombre"
+// debido a una importación corrupta (columnas desalineadas).
+var _DIAS_CODIGO_BASURA=['DL','LIBRE','DIALIBRE','DESCANSO','DESCANSOSEMANA','MA','FM','FY','EXC'];
+function _esNombreBasuraGrupo(nombre){
+  var n=String(nombre||'').trim();
+  if(!n)return true;
+  if(/\d/.test(n))return true; // un nombre real de persona nunca lleva dígitos
+  if(/[()]/.test(n))return true; // un nombre real no lleva paréntesis (p.ej. "(EXC)")
+  var up=n.toUpperCase().replace(/[\s.]/g,'');
+  return _DIAS_CODIGO_BASURA.indexOf(up)>=0;
+}
+function _normNombreGrupo(nombre){
+  return String(nombre||'').toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,' ').trim();
+}
+// Identidad real del Tryp personal: nombre + nómina, asociados al email de la sesión
+// actual. Más fiable que el nombre de Google (que puede no coincidir con el oficial),
+// y se usa también para sustituirlo en el Log de Sheets una vez se ha importado.
+function _guardarMiIdentidadTryp(nombre,nomina){
+  var n=String(nombre||'').trim();
+  if(!n||_esNombreBasuraGrupo(n))return;
+  var sess=null;try{sess=JSON.parse(localStorage.getItem('cta_session'));}catch(e){}
+  var email=(sess&&sess.email)||'';
+  try{localStorage.setItem('cta_mi_nombre_tryp',JSON.stringify({email:email,nombre:n,nomina:String(nomina||'').trim()}));}catch(e){}
+}
+// Respaldo si no se encuentra la hoja "Leyenda": el título del Tryp personal viene como
+// "Nombre Apellido1 Apellido2 Calendario 2026"; se le quita " Calendario <año>".
+function _extraerNombreDeTituloTryp(tituloRaw){
+  var t=String(tituloRaw||'').trim();
+  if(!t)return '';
+  return t.replace(/\s+calendario\s+\d{4}\s*$/i,'').trim();
+}
+// Lee la hoja "Leyenda" del Tryp personal (si existe), con filas "Nómina"/"Nombre
+// Completo" en limpio — más fiable que parsear el título de la hoja de calendario.
+function _leerLeyendaTryp(wb){
+  var sheet=wb&&wb.Sheets&&wb.Sheets['Leyenda'];
+  if(!sheet)return null;
+  var nomina='',nombreCompleto='';
+  for(var r=0;r<20;r++){
+    var k=tiCellVal(sheet,r,0);
+    if(!k)continue;
+    var kUp=k.toUpperCase();
+    if(kUp.indexOf('NOMINA')>=0||kUp.indexOf('NÓMINA')>=0){
+      var v=tiCellVal(sheet,r,1);if(v)nomina=v;
+    } else if(kUp.indexOf('NOMBRE COMPLETO')>=0){
+      var v2=tiCellVal(sheet,r,1);if(v2)nombreCompleto=v2;
+    }
+  }
+  return (nomina||nombreCompleto)?{nomina:nomina,nombreCompleto:nombreCompleto}:null;
+}
+// Identifica qué entrada del roster del grupo corresponde al usuario actual.
+// Prioridad: 1) nombre real extraído del Tryp personal (exacto, mismo formato oficial
+// que el roster) si fue guardado para este mismo email de sesión; 2) si no hay, el
+// nombre de la sesión de Google como respaldo (puede diferir en orden/apellidos).
+// Solo asigna una identidad si hay UN ÚNICO candidato sin ambigüedad: si dos personas
+// del roster podrían coincidir, prefiere no identificar a nadie antes que arriesgarse
+// a identificar a la persona equivocada.
+function _identificarMiEmpleadoGrupo(nominaMap,sess){
+  var nombreParaBuscar='';
+  var tryp=null;try{tryp=JSON.parse(localStorage.getItem('cta_mi_nombre_tryp')||'null');}catch(e){}
+  if(tryp&&tryp.nombre&&tryp.email&&sess&&sess.email&&tryp.email===sess.email){
+    nombreParaBuscar=tryp.nombre;
+  } else if(sess&&sess.nombre){
+    nombreParaBuscar=sess.nombre;
+  }
+  if(!nombreParaBuscar)return null;
+  var sessWords=_normNombreGrupo(nombreParaBuscar).split(' ').filter(Boolean);
+  if(!sessWords.length)return null;
+  var candidatos=[];
+  Object.keys(nominaMap).forEach(function(k){
+    var emp=nominaMap[k];
+    var empWords=_normNombreGrupo(emp&&emp.nombre||'').split(' ').filter(Boolean);
+    if(!empWords.length)return;
+    var todasPresentes=empWords.every(function(w){return sessWords.indexOf(w)>=0;});
+    if(todasPresentes)candidatos.push(k);
+  });
+  return candidatos.length===1?candidatos[0]:null;
+}
+function _totalDiasEmpGrupo(emp){
+  var t=0;var meses=(emp&&emp.meses)||{};
+  Object.keys(meses).forEach(function(mk){t+=Object.keys(meses[mk]||{}).length;});
+  return t;
+}
+// Fusiona automáticamente, sin avisos ni botón, entradas que son la misma persona
+// bajo distinta clave de nómina (p.ej. nómina real de una importación de categoría
+// suelta vs el ID sintético de un Excel "todos los grupos"). Se ejecuta solo en cada
+// import, conservando de cada mes los datos más completos entre las entradas fusionadas.
+function _fusionarDuplicadosGrupoSilencioso(map){
+  var porNombre={};
+  Object.keys(map).forEach(function(k){
+    var nk=_normNombreGrupo(map[k].nombre);
+    if(!porNombre[nk])porNombre[nk]=[];
+    porNombre[nk].push(k);
+  });
+  Object.keys(porNombre).forEach(function(nk){
+    var keys=porNombre[nk];
+    if(keys.length<2)return;
+    keys.sort(function(a,b){return _totalDiasEmpGrupo(map[b])-_totalDiasEmpGrupo(map[a]);});
+    var base=map[keys[0]];
+    var meses=base.meses||{};
+    for(var i=1;i<keys.length;i++){
+      var otro=map[keys[i]];
+      Object.keys(otro.meses||{}).forEach(function(mk){
+        var diasOtro=otro.meses[mk]||{};
+        var diasBase=meses[mk]||{};
+        if(!meses[mk]||Object.keys(diasOtro).length>Object.keys(diasBase).length){
+          meses[mk]=diasOtro;
+        }
+      });
+      delete map[keys[i]];
+    }
+    base.meses=meses;
+    map[keys[0]]=base;
+  });
+  return map;
+}
+
 function abrirTodaPlantilla(){
   var panel=document.getElementById('calc-panel');
   var overlay=document.getElementById('calc-overlay');
@@ -4455,17 +4835,37 @@ function abrirTodaPlantilla(){
     if(gp){gp.classList.add('open');verCompanerosHoy(true);}
   },50);
 }
+function abrirCompanerosPorDia(){
+  if(typeof verCompanerosHoy!=='function')return;
+  var p=document.getElementById('calc-panel');
+  var o=document.getElementById('calc-overlay');
+  if(!p)return;
+  p.classList.add('show');
+  if(o)o.classList.add('show');
+  setTimeout(function(){verCompanerosHoy();},80);
+}
 function importarGrupo(){
   document.getElementById('grupo-file-input').click();
 }
 
 // Extrae el turno/tipo de una celda de día del Excel de grupo (DL, !, horas, etc.)
 // Devuelve null si el día no está publicado (no se guarda).
+// Códigos de ausencia que en el Excel de grupo vienen anotados entre paréntesis
+// (segundo formato, alternativo al de "!"), p.ej. "06:00 13:00 (V) (B0)": el turno con
+// horas que trae la celda quedó anulado por la baja/excedencia/vacaciones, así que no
+// cuenta como turno de trabajo real aunque haya horas escritas.
+var _CODIGOS_AUSENCIA_GRUPO=['B0','EXC','V','MA'];
 function _parseCeldaDiaGrupo(cellRaw){
   var cell=String(cellRaw||'').trim();
   if(cell==='')return null; // Celda vacía → sin publicar, no se guarda
   // Exclamación → baja, vacaciones o similar → cuenta como día libre
   if(cell.indexOf('!')!==-1){
+    return {tipo:'libre',e1:'',s1:'',e2:'',s2:'',ausencia:true};
+  }
+  // Formato alternativo: código de ausencia entre paréntesis, con o sin horas reales
+  // acompañándolo. El código manda: si está presente, es ausencia aunque haya horas.
+  var notasCelda=(cell.match(/\(([^)]+)\)/g)||[]).map(function(n){return n.replace(/[()]/g,'').toUpperCase().trim();});
+  if(notasCelda.some(function(n){return _CODIGOS_AUSENCIA_GRUPO.indexOf(n)>=0;})){
     return {tipo:'libre',e1:'',s1:'',e2:'',s2:'',ausencia:true};
   }
   var cellUp=cell.toUpperCase().replace(/[\s.]/g,'');
@@ -4574,6 +4974,7 @@ function procesarGrupoXlsx(file){
           var nombreFull=String(row[empCol]).trim();
           if(nomina.toLowerCase().indexOf('calendario')>=0||nomina.toLowerCase().indexOf('fecha')>=0)continue;
           var nombre=formatNombre(nombreFull);
+          if(_esNombreBasuraGrupo(nombre))continue; // p.ej. "(EXC)" colado como nombre, no es una persona
           var diasMes={};
           Object.keys(dayColMap).forEach(function(d){
             var t=_parseCeldaDiaGrupo(row[dayColMap[d]]);
@@ -4607,6 +5008,7 @@ function procesarGrupoXlsx(file){
           var nombreFull2=cellA;
           var nomina2=_nominaSinteticaDesdeNombre(nombreFull2);
           var nombre2=formatNombre(nombreFull2);
+          if(_esNombreBasuraGrupo(nombre2))continue; // p.ej. "(EXC)" colado como nombre, no es una persona
           var diasMes2={};
           Object.keys(dayColMap).forEach(function(d){
             var t=_parseCeldaDiaGrupo(rowM[dayColMap[d]]);
@@ -4620,19 +5022,28 @@ function procesarGrupoXlsx(file){
       var nominaMap={};
       var _rawMap=localStorage.getItem(_GRUPO_KEY+'_map');
       try{nominaMap=JSON.parse(_rawMap||'{}')}catch(ex){}
+      _fusionarDuplicadosGrupoSilencioso(nominaMap);
+      var _porNombreExistente={};
+      Object.keys(nominaMap).forEach(function(k){_porNombreExistente[_normNombreGrupo(nominaMap[k].nombre)]=k;});
       var added=0,updated=0;
       empleados.forEach(function(emp){
-        if(nominaMap[emp.nomina]){updated++;}else{added++;}
+        var key=emp.nomina;
+        if(!nominaMap[key]){
+          var nk=_normNombreGrupo(emp.nombre);
+          if(_porNombreExistente[nk])key=_porNombreExistente[nk]; // misma persona ya registrada con otra clave
+        }
+        if(nominaMap[key]){updated++;}else{added++;}
         // Store month data under the detected month key
-        var prev=nominaMap[emp.nomina]||{};
+        var prev=nominaMap[key]||{};
         var meses=prev.meses||{};
         meses[monthKey]=emp.dias;
-        nominaMap[emp.nomina]={
-          nomina:emp.nomina,
+        nominaMap[key]={
+          nomina:key,
           nombre:emp.nombre,
           categoria:emp.categoria,
           meses:meses
         };
+        _porNombreExistente[_normNombreGrupo(emp.nombre)]=key;
       });
       try{localStorage.setItem(_GRUPO_KEY+'_map',JSON.stringify(nominaMap));}catch(ex){alert('Error guardando: '+ex.message);}
 
@@ -4641,11 +5052,12 @@ function procesarGrupoXlsx(file){
       if(btn)btn.classList.add('has-data');
       var hint=document.getElementById('grupo-import-hint');
       var txt=document.getElementById('grupo-import-txt');
+      var etiqueta=(formato==='MULTI')?(gruposDetectados.length+' grupos'):gruposDetectados[0];
       if(hint&&txt){
         hint.style.display='block';txt.style.color='#4ade80';txt.style.fontSize='11px';
-        var etiqueta=(formato==='MULTI')?(gruposDetectados.length+' grupos'):gruposDetectados[0];
         txt.textContent='✅ '+etiqueta+': +'+added+' nuevos, '+updated+' actualizados · '+total+' total';
       }
+      if(typeof logActividad==='function')logActividad('importar_companeros',etiqueta+': +'+added+' nuevos, '+updated+' actualizados');
     }catch(err){alert('Error al leer el Excel del grupo: '+err.message);}
   };
   reader.readAsArrayBuffer(file);
@@ -4776,13 +5188,15 @@ function verCompanerosHoy(){
   // Always render, never toggle — reset open state first
   var gp=document.getElementById('grupo-panel');
   if(gp)gp.classList.remove('open');
-  return renderCompanerosDia(window._grupoOffsetDias,false);
+  var tl=document.getElementById('grupo-timeline');
+  if(tl)tl.classList.remove('open');
+  return refrescarCompanerosPanel(window._grupoOffsetDias,false);
 }
 
 function moverCompanerosDia(delta){
   if(typeof window._grupoOffsetDias!=='number')window._grupoOffsetDias=0;
   window._grupoOffsetDias+=delta;
-  renderCompanerosDia(window._grupoOffsetDias,false);
+  refrescarCompanerosPanel(window._grupoOffsetDias,false);
 }
 
 function toggleTodaPlantilla(){
@@ -4790,7 +5204,7 @@ function toggleTodaPlantilla(){
   if(b)b.classList.toggle('active',!window._grupoMostrarTodaPlantilla);
   window._grupoMostrarTodaPlantilla=!window._grupoMostrarTodaPlantilla;
   if(typeof window._grupoOffsetDias!=='number')window._grupoOffsetDias=0;
-  renderCompanerosDia(window._grupoOffsetDias,false);
+  refrescarCompanerosPanel(window._grupoOffsetDias,false);
 }
 
 function formateaFechaGrupo(baseDate,offsetDias){
@@ -4802,6 +5216,9 @@ function formateaFechaGrupo(baseDate,offsetDias){
 function normalizaCategoriaGrupo(cat){
   cat=String(cat||'General').trim();
   if(/\bFDS?\b|FIJOS?\s+DISCONTINUOS?/i.test(cat))return 'FD';
+  if(/AGENTES?\s*JEFE/i.test(cat))return 'Agentes Jefe';
+  if(/SUPERVIS/i.test(cat))return 'Supervisores';
+  if(/OPERARI/i.test(cat))return 'Operarios';
   return cat||'General';
 }
 
@@ -4820,21 +5237,75 @@ function _esArturoPlantilla(nombre){
   var n=_normPlantillaNombre(nombre);
   return n==='ARTURO RICO'||n==='ARTURO RICO GARCIA'||n.indexOf('ARTURO RICO')>=0;
 }
-function _miCalendarioMarcaHL(dateObj){
-  if(!dateObj)return false;
+// Devuelve el día del calendario PERSONAL de Arturo (este dispositivo) para una fecha,
+// o null si no hay datos. Usado tanto para el chequeo HL como para leer el hlParcial.
+function _miCalendarioDiaArturo(dateObj){
+  if(!dateObj)return null;
   var meses=(typeof _MC_MONTHS!=='undefined'&&_MC_MONTHS.length)?_MC_MONTHS:((typeof _GRUPO_MONTHS!=='undefined'&&_GRUPO_MONTHS.length)?_GRUPO_MONTHS:['ENERO','FEBRERO','MARZO','ABRIL','MAYO','JUNIO','JULIO','AGOSTO','SEPTIEMBRE','OCTUBRE','NOVIEMBRE','DICIEMBRE']);
   var raw=null;
   try{raw=localStorage.getItem('cta_ed_'+dateObj.getFullYear());}catch(e){raw=null;}
   var ue={};
   try{ue=raw?JSON.parse(raw):{};}catch(e){ue={};}
   var mData=(ue&&ue[meses[dateObj.getMonth()]])||{};
-  var d=mData[dateObj.getDate()];
+  return mData[dateObj.getDate()]||null;
+}
+function _miCalendarioMarcaHL(dateObj){
+  var d=_miCalendarioDiaArturo(dateObj);
   if(!d||!d.tipo)return false;
   var tipo=String(d.tipo||'').toLowerCase();
-  return tipo==='hl'||tipo==='hlp';
+  // HL parcial NO cuenta como "todo el día libre": ese caso se trata aparte,
+  // recortando solo el tramo correspondiente (ver _ajustarTurnoConHLPersonal).
+  return (tipo==='hl'||tipo==='hlp')&&!d.hlParcial;
 }
 function _arturoDebeTratarseLibre(nombre,dateObj){
   return _esArturoPlantilla(nombre)&&(_miCalendarioMarcaHL(dateObj)||_arturoHLPubFecha(dateObj));
+}
+
+function _minToHHMM(min){
+  min=((min%1440)+1440)%1440;
+  var h=Math.floor(min/60),m=Math.round(min%60);
+  return (h<10?'0':'')+h+':'+(m<10?'0':'')+m;
+}
+// Resta un tramo horario (rango.ini → rango.fin) de un turno con hasta 2 segmentos
+// (e1-s1, e2-s2). Si el tramo cubre un segmento entero, lo anula. Si solo lo toca por
+// un extremo, recorta ese extremo. Si cae en medio (lo partiría en 3 tramos, que el
+// modelo no soporta), se queda con el trozo más largo como aproximación razonable.
+function _restarRangoDeTurno(turno,rango){
+  if(!turno||!rango||!rango.ini||!rango.fin)return turno;
+  var rIni=_toMin(rango.ini),rFin=_toMin(rango.fin);
+  if(rIni===null||rFin===null)return turno;
+  var effRFin=rFin<=rIni?rFin+1440:rFin;
+  function recorta(e,s){
+    if(!e||!s)return {e:e||'',s:s||''};
+    var em=_toMin(e),sm=_toMin(s);
+    var effS=sm<=em?sm+1440:sm;
+    if(rIni>=effS||effRFin<=em)return {e:e,s:s}; // sin solape
+    if(rIni<=em&&effRFin>=effS)return {e:'',s:''}; // HL cubre todo el segmento
+    if(rIni<=em)return {e:_minToHHMM(effRFin),s:s}; // HL pega al inicio: recorta el inicio
+    if(effRFin>=effS)return {e:e,s:_minToHHMM(rIni)}; // HL pega al final: recorta el final
+    // HL en medio del segmento: nos quedamos con el trozo más largo
+    var antes=rIni-em, despues=effS-effRFin;
+    return antes>=despues?{e:e,s:_minToHHMM(rIni)}:{e:_minToHHMM(effRFin),s:s};
+  }
+  var seg1=recorta(turno.e1,turno.s1);
+  var seg2=recorta(turno.e2,turno.s2);
+  // Si el primer segmento quedó vacío pero el segundo sobrevive, lo subimos a la posición 1
+  if((!seg1.e||!seg1.s)&&seg2.e&&seg2.s){
+    return Object.assign({},turno,{e1:seg2.e,s1:seg2.s,e2:'',s2:''});
+  }
+  return Object.assign({},turno,{e1:seg1.e,s1:seg1.s,e2:seg2.e,s2:seg2.s});
+}
+// Ajusta `turno` según la marca de HL del calendario PERSONAL de quien lo tiene asignado
+// (`diaPersonalHL`, el día de cta_ed_<año> de esa persona):
+// - Sin marca HL → turno sin tocar.
+// - HL día completo (tipo hl/hlp sin hlParcial) → null (sin turno ese día).
+// - HL parcial (hlParcial:{ini,fin}) → se descuenta solo ese tramo, el resto queda igual.
+function _ajustarTurnoConHLPersonal(turno,diaPersonalHL){
+  if(!diaPersonalHL||!diaPersonalHL.tipo)return turno;
+  var tipo=String(diaPersonalHL.tipo).toLowerCase();
+  if((tipo==='hl'||tipo==='hlp')&&!diaPersonalHL.hlParcial)return null;
+  if(diaPersonalHL.hlParcial)return _restarRangoDeTurno(turno,diaPersonalHL.hlParcial);
+  return turno;
 }
 
 
@@ -4889,7 +5360,11 @@ function cargarCambiosTurnosCompartidos(year,force){
     (data.cambios||[]).forEach(_cacheCambioTurnoCompartido);
     _CAMBIOS_TURNOS_ULTIMA_CARGA[year]=Date.now();
     setTimeout(function(){
-      try{if(typeof renderCompanerosDia==='function'&&document.getElementById('grupo-panel')&&document.getElementById('grupo-panel').classList.contains('open'))renderCompanerosDia(window._grupoOffsetDias||0,false);}catch(e){}
+      try{
+        var _gp=document.getElementById('grupo-panel'),_tl=document.getElementById('grupo-timeline');
+        var _abierto=(_gp&&_gp.classList.contains('open'))||(_tl&&_tl.classList.contains('open'));
+        if(typeof refrescarCompanerosPanel==='function'&&_abierto)refrescarCompanerosPanel(window._grupoOffsetDias||0,false);
+      }catch(e){}
       try{if(typeof opActualizarDashboard==='function')opActualizarDashboard();}catch(e){}
       try{if(typeof renderDashboardOperativa==='function')renderDashboardOperativa();}catch(e){}
     },50);
@@ -4945,7 +5420,10 @@ function _cambioToTurno(c){
   if(_tipoCambioEsLibre(tipo)||(!c.e1&&!c.s1)){
     return{tipo:'libre',e1:'',s1:'',e2:'',s2:'',cambioCompartido:true,etiquetaCambio:String(c.tipo||'Libre').toUpperCase(),actualizadoPor:c.actualizado_por||c.email||''};
   }
-  return{tipo:(tipo==='curso'?'curso':'trabajado'),e1:c.e1||'',s1:c.s1||'',e2:c.e2||'',s2:c.s2||'',total:c.total||0,cambioCompartido:true,etiquetaCambio:String(c.tipo||'TRABAJA').toUpperCase(),actualizadoPor:c.actualizado_por||c.email||''};
+  var turno={tipo:(tipo==='curso'?'curso':'trabajado'),e1:c.e1||'',s1:c.s1||'',e2:c.e2||'',s2:c.s2||'',total:c.total||0,cambioCompartido:true,etiquetaCambio:String(c.tipo||'TRABAJA').toUpperCase(),actualizadoPor:c.actualizado_por||c.email||''};
+  // HL parcial recibido de Sheets: recorta solo ese tramo, igual que en el propio dispositivo.
+  if(c.hlIni&&c.hlFin)turno=Object.assign({},_restarRangoDeTurno(turno,{ini:c.hlIni,fin:c.hlFin}),{cambioCompartido:true,etiquetaCambio:turno.etiquetaCambio,actualizadoPor:turno.actualizadoPor});
+  return turno;
 }
 function _turnoGrupoConCambioCompartido(emp,dateObj,turnoOriginal){
   var c=_getCambioCompartidoEmpleado(emp,dateObj);
@@ -5019,6 +5497,7 @@ function guardarCambioTurnoCompartido(year,monthKey,day,dayObj){
   var sess=_ctaSession();
   if(!sess||!sess.email||typeof SHEETS_URL==='undefined'||!SHEETS_URL)return Promise.resolve(null);
   var fecha=_fechaISOFromParts(year,monthKey,day);
+  var hlParcial=(dayObj&&dayObj.hlParcial&&dayObj.hlParcial.ini&&dayObj.hlParcial.fin)?dayObj.hlParcial:null;
   var payload={
     accion:'guardar_cambio_turno',
     email:sess.email,
@@ -5032,7 +5511,14 @@ function guardarCambioTurnoCompartido(year,monthKey,day,dayObj){
     s1:(dayObj&&dayObj.s1)||'',
     e2:(dayObj&&dayObj.e2)||'',
     s2:(dayObj&&dayObj.s2)||'',
-    total:(dayObj&&dayObj.total)||0
+    total:(dayObj&&dayObj.total)||0,
+    // HL parcial: solo este tramo del turno es HL, el resto sigue siendo trabajo real.
+    // IMPORTANTE: el Apps Script de Sheets tiene que guardar y devolver hlIni/hlFin
+    // (columnas nuevas) para que esto llegue a otros dispositivos — si el script no las
+    // contempla, las ignorará silenciosamente y el cambio compartido llegará como turno
+    // completo sin recortar.
+    hlIni:hlParcial?hlParcial.ini:'',
+    hlFin:hlParcial?hlParcial.fin:''
   };
   var miEmp=_getMiEmpleadoGrupoActual(year,monthKey,day);
   if(miEmp){
@@ -5061,6 +5547,8 @@ function guardarCambioTurnoCompartido(year,monthKey,day,dayObj){
 
 function renderCompanerosDia(offsetDias,toggleIfOpen){
   var panel=document.getElementById('grupo-panel');
+  var tlPanel=document.getElementById('grupo-timeline');
+  if(tlPanel)tlPanel.classList.remove('open');
   if(toggleIfOpen&&panel.classList.contains('open')){panel.classList.remove('open');return;}
   var modoToda=!!window._grupoMostrarTodaPlantilla;
   var modoMismoTurno=!!_mismoTurnoMode;
@@ -5128,11 +5616,14 @@ function renderCompanerosDia(offsetDias,toggleIfOpen){
   // Build list: coincidencias o toda la plantilla
   var coinciden=[];
   empleados.forEach(function(emp){
-    // Si Arturo tiene HL/HLP en el calendario personal local o en lista pública, no debe salir como operativo.
-    if(_arturoDebeTratarseLibre(emp.nombre||emp.nomina,target))return;
     // Today's shift
     var turno=emp.dias[day];
     turno=_turnoGrupoConCambioCompartido(emp,target,turno);
+    // Si es Arturo y su calendario personal marca HL ese día, se ajusta su turno:
+    // día completo → sin turno; parcial → se descuenta solo ese tramo.
+    if(_esArturoPlantilla(emp.nombre||emp.nomina)){
+      turno=_arturoHLPubFecha(target)?null:_ajustarTurnoConHLPersonal(turno,_miCalendarioDiaArturo(target));
+    }
     if(turno&&turno.e1&&turno.tipo!=='libre'){
       var grE1=toMinG(turno.e1),grS1=toMinG(turno.s1);
       var grE2=turno.e2?toMinG(turno.e2):null,grS2=turno.s2?toMinG(turno.s2):null;
@@ -5298,6 +5789,618 @@ function renderCompanerosDia(offsetDias,toggleIfOpen){
   setTimeout(checkExitBlinks,100);
 }
 
+// ─── Vista por horas (línea de tiempo) ──────────────────────────────
+// _buildCompanerosTimelineData duplica a propósito la lógica de
+// emparejamiento de renderCompanerosDia (en vez de refactorizarla) para
+// no tocar la función de la vista de lista, que ya está en producción.
+// Si se cambia una regla de turnos/HL/cambios compartidos ahí, replicar
+// el cambio aquí también.
+function _tlPrefVistaHorasLeer(){
+  try{return localStorage.getItem('cta_vista_horas')==='1';}catch(e){return false;}
+}
+function _tlPrefVistaHorasGuardar(val){
+  try{localStorage.setItem('cta_vista_horas',val?'1':'0');}catch(e){}
+}
+window._grupoVistaHoras=_tlPrefVistaHorasLeer();
+(function(){
+  var btn=document.getElementById('btn-vista-horas');
+  if(btn&&window._grupoVistaHoras){
+    btn.classList.add('active');
+    btn.textContent='📋 Vista lista';
+  }
+})();
+
+function _buildCompanerosTimelineData(offsetDias){
+  var modoToda=!!window._grupoMostrarTodaPlantilla;
+  var modoMismoTurno=!!_mismoTurnoMode;
+  var modoEnTurno=!!_enTurnoMode;
+  var ahoraReal=new Date();
+  var nowMinReal=ahoraReal.getHours()*60+ahoraReal.getMinutes();
+
+  var now=new Date();
+  var target=new Date(now.getTime());
+  target.setDate(target.getDate()+offsetDias);
+  var monthKey=_GRUPO_MONTHS[target.getMonth()];
+  var day=target.getDate();
+
+  var nominaMapHoy={};
+  try{nominaMapHoy=JSON.parse(localStorage.getItem(_GRUPO_KEY+'_map')||'{}')}catch(e){}
+  var empleados=[];
+  for(var _nk in nominaMapHoy){
+    if(nominaMapHoy.hasOwnProperty(_nk)){
+      var _emp=nominaMapHoy[_nk];
+      var _dias=(_emp.meses&&_emp.meses[monthKey])||null;
+      if(_dias)empleados.push({nomina:_emp.nomina,nombre:_emp.nombre,categoria:_emp.categoria,dias:_dias,meses:_emp.meses||{}});
+    }
+  }
+  var fechaISOGrupo=_fechaISOPlantilla(target);
+  empleados=empleados.filter(function(emp){
+    return !_estaExcluidoPlantilla(emp.nombre||emp.nomina,fechaISOGrupo);
+  });
+
+  if(!empleados.length) return {error:'no-excel'};
+
+  var myData={};
+  try{myData=JSON.parse(localStorage.getItem('cta_ed_'+target.getFullYear())||'{}')}catch(e){}
+  var myDay=(myData[monthKey]||{})[day];
+  var myE1=myDay&&myDay.e1?toMinG(myDay.e1):null;
+  var myS1=myDay&&myDay.s1?toMinG(myDay.s1):null;
+  var myE2=myDay&&myDay.e2?toMinG(myDay.e2):null;
+  var myS2=myDay&&myDay.s2?toMinG(myDay.s2):null;
+  if((!myDay||!myDay.e1)&&!modoToda) return {error:'no-turno'};
+
+  var ahoraMin=now.getHours()*60+now.getMinutes();
+  var esDiaActual=offsetDias===0;
+
+  function _esTramoNocheReal(e,s){
+    if(e===null||s===null||typeof e==='undefined'||typeof s==='undefined')return false;
+    return (s<e && e>=22*60 && e<24*60 && s>=5*60 && s<8*60);
+  }
+  function _turnoTieneNocheReal(e1,s1,e2,s2){
+    return _esTramoNocheReal(e1,s1)||_esTramoNocheReal(e2,s2);
+  }
+
+  var coinciden=[];
+  empleados.forEach(function(emp){
+    var turno=emp.dias[day];
+    turno=_turnoGrupoConCambioCompartido(emp,target,turno);
+    if(_esArturoPlantilla(emp.nombre||emp.nomina)){
+      turno=_arturoHLPubFecha(target)?null:_ajustarTurnoConHLPersonal(turno,_miCalendarioDiaArturo(target));
+    }
+    if(turno&&turno.e1&&turno.tipo!=='libre'){
+      var grE1=toMinG(turno.e1),grS1=toMinG(turno.s1);
+      var grE2=turno.e2?toMinG(turno.e2):null,grS2=turno.s2?toMinG(turno.s2):null;
+      var solapa=turnosSeSuperponen(myE1,myS1,myE2,myS2,grE1,grS1,grE2,grS2);
+      var mismoTurno=modoMismoTurno?(Math.abs(grE1-(myE1||0))<=30):true;
+      var _t1ok=minutoEnTramo(nowMinReal,grE1,grS1);
+      if(esDiaActual&&grE1!==null&&grS1!==null&&grS1<grE1)_t1ok=(nowMinReal>=grE1);
+      var _t2ok=minutoEnTramo(nowMinReal,grE2,grS2);
+      if(esDiaActual&&grE2!==null&&grS2!==null&&grS2<grE2)_t2ok=(nowMinReal>=grE2);
+      var trabAhora=!modoEnTurno||(_t1ok||_t2ok);
+      var _esExcl=!!(turno&&(turno.noVieneInterrogacion||turno.disponibilidadNoConfirmada));
+      if((modoToda||solapa)&&mismoTurno&&trabAhora&&(!_esExcl||window._showExcl)){
+        var horario=turno.e1+'→'+turno.s1+(turno.e2&&turno.s2?' / '+turno.e2+'→'+turno.s2:'');
+        var enT1=minutoEnTramo(ahoraMin,grE1,grS1),enT2=minutoEnTramo(ahoraMin,grE2,grS2);
+        if(esDiaActual&&grE1!==null&&grS1!==null&&grS1<grE1)enT1=(ahoraMin>=grE1);
+        if(esDiaActual&&grE2!==null&&grS2!==null&&grS2<grE2)enT2=(ahoraMin>=grE2);
+        var opAhora=esDiaActual&&(enT1||enT2)&&!turno.disponibilidadNoConfirmada&&!turno.noVieneInterrogacion;
+        var _nocheReal=_turnoTieneNocheReal(grE1,grS1,grE2,grS2);
+        var _futOvn=_nocheReal&&nowMinReal<grE1;
+        coinciden.push({nombre:emp.nombre,horario:horario,e1:grE1,s1:grS1,e2:grE2,s2:grS2,categoria:emp.categoria||'General',disponibilidadNoConfirmada:!!turno.disponibilidadNoConfirmada,noVieneInterrogacion:!!turno.noVieneInterrogacion,operativoAhora:opAhora,overnight:false,futuraNoche:_futOvn,nocheReal:_nocheReal,nocheDiaFin:false});
+      }
+    }
+    var fechaAyer=new Date(target.getFullYear(),target.getMonth(),target.getDate()-1);
+    var monthKeyAyer=_GRUPO_MONTHS[fechaAyer.getMonth()];
+    var dayAyer=fechaAyer.getDate();
+    var diasAyer=(emp.meses&&emp.meses[monthKeyAyer])||emp.dias||{};
+    var turnoAyer=diasAyer[dayAyer];
+    turnoAyer=_turnoGrupoConCambioCompartido(emp,fechaAyer,turnoAyer);
+    if(turnoAyer&&turnoAyer.e1&&turnoAyer.s1){
+      var yE1=toMinG(turnoAyer.e1),yS1=toMinG(turnoAyer.s1);
+      var yE2=turnoAyer.e2?toMinG(turnoAyer.e2):null,yS2=turnoAyer.s2?toMinG(turnoAyer.s2):null;
+      // Fin del/los tramo(s) que de verdad cruzan medianoche (s<e). Cualquier
+      // turno que cruce cuenta aquí, no solo los de "noche real" (22-24h →
+      // 05-08h) — eso solo se usa más abajo para decidir el ESTILO (🌙/color).
+      var _finCruce1=(yE1!==null&&yS1!==null&&yS1<yE1)?yS1:null;
+      var _finCruce2=(yE2!==null&&yS2!==null&&yS2<yE2)?yS2:null;
+      var _finCruceAyer=(_finCruce1===null)?_finCruce2:(_finCruce2===null?_finCruce1:Math.max(_finCruce1,_finCruce2));
+      if(_finCruceAyer!==null){
+        var _nocheRealAyer=_turnoTieneNocheReal(yE1,yS1,yE2,yS2); // solo para el estilo
+        var _trabOvn=true;
+        if(modoEnTurno){
+          var dentro1=_finCruce1!==null&&minutoEnTramo(nowMinReal,0,_finCruce1);
+          var dentro2=_finCruce2!==null&&minutoEnTramo(nowMinReal,0,_finCruce2);
+          _trabOvn=!!(dentro1||dentro2);
+        }
+        if(_trabOvn&&(modoToda||turnosSeSuperponen(myE1,myS1,myE2,myS2,0,_finCruceAyer+1,null,null))){
+          var alreadyIn=coinciden.some(function(c){return c.nombre===emp.nombre&&c.nocheDiaFin;});
+          if(!alreadyIn){
+            var hAyer=turnoAyer.e1+'→'+turnoAyer.s1+(turnoAyer.e2&&turnoAyer.s2?' / '+turnoAyer.e2+'→'+turnoAyer.s2:'');
+            coinciden.push({nombre:emp.nombre,horario:hAyer,e1:0,s1:_finCruceAyer,e2:null,s2:null,categoria:emp.categoria||'General',disponibilidadNoConfirmada:false,noVieneInterrogacion:false,operativoAhora:(esDiaActual&&nowMinReal<_finCruceAyer),overnight:true,futuraNoche:false,nocheReal:_nocheRealAyer,nocheDiaFin:true});
+          }
+        }
+      }
+    }
+  });
+
+  if(!coinciden.length) return {error:'no-match',modoToda:modoToda};
+
+  return {error:null,modoToda:modoToda,esDiaActual:esDiaActual,myDay:myDay,coinciden:coinciden};
+}
+
+function _tlFmtMin(m){
+  m=((m%1440)+1440)%1440;
+  var h=Math.floor(m/60),mm=m%60;
+  return (h<10?'0':'')+h+':'+(mm<10?'0':'')+mm;
+}
+
+// Recorta cada tramo [inicio,fin] del turno a la rejilla del día mostrado.
+// flag 'fromYesterday' = el tramo viene de un turno de noche de ayer (e=0 ya recortado).
+// flag 'continuesTomorrow' = el tramo sigue después de medianoche (fin<inicio en los datos crudos).
+function _tlSegmentos(c){
+  var segs=[];
+  function add(e,s,esFinDeNoche){
+    if(e===null||typeof e==='undefined'||s===null||typeof s==='undefined')return;
+    if(esFinDeNoche){segs.push([0,s,'fromYesterday']);return;}
+    if(s<e){segs.push([e,1440,'continuesTomorrow']);return;}
+    segs.push([e,s,null]);
+  }
+  add(c.e1,c.s1,!!c.nocheDiaFin);
+  add(c.e2,c.s2,false);
+  return segs;
+}
+
+function _tlEstadoSegmento(seg,nowMin,esDiaActual){
+  if(!esDiaActual)return 'future';
+  var start=seg[0],end=seg[1],flag=seg[2];
+  if(flag==='fromYesterday')return nowMin<end?'active':'past';
+  if(flag==='continuesTomorrow')return nowMin>=start?'active':'future';
+  if(nowMin>=start&&nowMin<end)return 'active';
+  if(nowMin<start)return 'future';
+  return 'past';
+}
+
+function _tlFilaHtml(segs,extraClass,esDiaActual,nowMin){
+  var activa=segs.some(function(seg){return _tlEstadoSegmento(seg,nowMin,esDiaActual)==='active';});
+  var barsHtml=segs.map(function(seg){
+    var start=seg[0],end=seg[1],flag=seg[2];
+    var estado=_tlEstadoSegmento(seg,nowMin,esDiaActual);
+    var cls='grupo-tl-bar'+(extraClass?' '+extraClass:'');
+    if(estado==='past')cls+=' is-past';
+    if(estado==='active')cls+=' is-active';
+    if(flag==='fromYesterday')cls+=' fade-left';
+    if(flag==='continuesTomorrow')cls+=' fade-right';
+    var leftPct=(start/1440*100),widthPct=((end-start)/1440*100);
+    var label=_tlFmtMin(start)+'–'+_tlFmtMin(end===1440?0:end);
+    return '<div class="'+cls+'" style="left:'+leftPct+'%;width:'+widthPct+'%" title="'+label+'"><span class="lbl">'+label+'</span></div>';
+  }).join('');
+  return '<div class="grupo-tl-row'+(activa?' is-active':'')+'">'+barsHtml+'</div>';
+}
+
+// ─── Carril de llegadas (✈️) dentro de la vista por horas ──────────────
+// Reutiliza liveData.lle (el mismo array que ya rellena el panel "Live
+// vuelos"), así que no se vuelve a pedir nada a AENA aparte. Se muestra
+// para HOY (offsetDias=0, vuelos con esManana=false) y para MAÑANA
+// (offsetDias=1, vuelos con esManana=true). No hay ningún umbral de hora
+// fijo aquí en el frontend: si liveData.lle ya trae vuelos marcados como
+// esManana (eso lo decide el backend de Railway, sea a la hora que sea),
+// aparecen automáticamente en el carril de "Día siguiente". Para el resto
+// de días (pasado mañana en adelante) el carril queda vacío porque no hay
+// datos de AENA tan lejos.
+var DURACION_LLEGADA_TL=22; // minutos que dura cada bloque de llegada (azul)
+var DURACION_SALIDA_TL=23;  // minutos que dura cada bloque de salida (rojo)
+var TOLERANCIA_EMPAREJAR_TL=20; // margen ± en min: cuánto hueco real se tolera para considerar "pegadas" (objetivo = 0)
+var UMBRAL_DESCANSO_MIN=29; // a partir de cuántos minutos sin vuelos se marca como "descanso"
+var PISTA_LLEGADA_H=22; // alto de cada pista, en px
+var TL_GRID_W_VUELOS=32*48; // = CELL*48 usado en renderCompanerosTimeline
+
+function _tlFmtDur(mins){
+  var h=Math.floor(mins/60),m=mins%60;
+  if(h===0)return m+'min';
+  if(m===0)return h+'h';
+  return h+'h '+m+'min';
+}
+
+// Fusiona llegadas solapadas/contiguas en "bloques ocupados" y devuelve los
+// huecos entre bloques que sean >= UMBRAL_DESCANSO_MIN. Así un grupo de
+// vuelos solapados cuenta como un solo bloque, no como huecos sueltos.
+// Fusiona llegadas/salidas solapadas o contiguas en "bloques ocupados".
+function _tlBloquesOcupados(llegadas){
+  var ordenadas=llegadas.slice().sort(function(a,b){return a.start-b.start;});
+  var bloques=[];
+  ordenadas.forEach(function(it){
+    var ultimo=bloques[bloques.length-1];
+    if(ultimo&&it.start<=ultimo.end)ultimo.end=Math.max(ultimo.end,it.end);
+    else bloques.push({start:it.start,end:it.end});
+  });
+  return bloques;
+}
+
+function _tlCalcularDescansos(llegadas,umbralMin){
+  var bloques=_tlBloquesOcupados(llegadas);
+  var descansos=[];
+  for(var i=0;i<bloques.length-1;i++){
+    var gap=bloques[i+1].start-bloques[i].end;
+    if(gap>=umbralMin)descansos.push({start:bloques[i].end,end:bloques[i+1].start,dur:gap});
+  }
+  return descansos;
+}
+
+// Hueco que contiene "ahora mismo", sin umbral mínimo: puede ser antes del
+// primer vuelo del día, o entre dos bloques. Si "ahora" ya está dentro de
+// un vuelo, o ya ha pasado el último de hoy (no hay "siguiente avión" al
+// que contar), devuelve null — no hay nada que mostrar en directo.
+function _tlGapEnVivo(llegadas,nowMin){
+  var bloques=_tlBloquesOcupados(llegadas);
+  if(!bloques.length)return null;
+  for(var i=0;i<bloques.length;i++){
+    if(nowMin>=bloques[i].start&&nowMin<bloques[i].end)return null; // ahora mismo en un vuelo
+  }
+  if(nowMin<bloques[0].start)return{start:nowMin,end:bloques[0].start};
+  for(var j=0;j<bloques.length-1;j++){
+    if(nowMin>=bloques[j].end&&nowMin<bloques[j+1].start)return{start:nowMin,end:bloques[j+1].start};
+  }
+  return null; // ya pasó el último vuelo del día
+}
+
+// Aviso emergente al tocar un vuelo, posicionado justo donde se ha pulsado.
+function mostrarToastVuelo(ev,numero,cod,start,end,tipo){
+  if(ev&&ev.stopPropagation)ev.stopPropagation();
+  var t=document.getElementById('tlToastVuelo');
+  if(!t){
+    t=document.createElement('div');
+    t.id='tlToastVuelo';
+    t.className='tl-toast-vuelo';
+    document.body.appendChild(t);
+  }
+  var emoji=tipo==='salida'?'🛫':'✈️';
+  t.innerHTML=emoji+' <b>'+numero+'</b> · '+cod+'<br>'+_tlFmtMin(start)+' → '+_tlFmtMin(end===1440?0:end);
+  t.style.left=ev.clientX+'px';
+  t.style.top=(ev.clientY-12)+'px';
+  t.style.transform='translate(-50%,-100%)';
+  t.classList.add('show');
+  requestAnimationFrame(function(){
+    var r=t.getBoundingClientRect();
+    var margen=8,dx=0,dy=0;
+    if(r.left<margen)dx=margen-r.left;
+    if(r.right>window.innerWidth-margen)dx=window.innerWidth-margen-r.right;
+    if(r.top<margen)dy=margen-r.top;
+    t.style.transform='translate(calc(-50% + '+dx+'px), calc(-100% + '+dy+'px))';
+  });
+  clearTimeout(t._timer);
+  t._timer=setTimeout(function(){t.classList.remove('show');},3000);
+}
+
+// HTML de una caja individual (llegada o salida). esDiaActual/nowMin se
+// pasan explícitos porque esto se usa desde dentro de renderCompanerosTimeline.
+function _tlCajaHtml(v,esSalida,pista,esDiaActual,nowMin){
+  var activo=esDiaActual&&nowMin>=v.start&&nowMin<v.end;
+  var pasado=esDiaActual&&nowMin>=v.end;
+  var cls='grupo-tl-vuelo-bar'+(esSalida?' es-salida':'')+(activo?' is-now':'')+(pasado?' is-past':'');
+  var leftPct=(v.start/1440*100),widthPct=((v.end-v.start)/1440*100);
+  var top=(pista*PISTA_LLEGADA_H+2);
+  return '<div class="'+cls+'" style="left:'+leftPct+'%;width:'+widthPct+'%;top:'+top+'px;height:'+(PISTA_LLEGADA_H-4)+'px" title="'+((esSalida?'Salida ':'Llegada ')+v.numero+' · '+v.cod+' · '+_tlFmtMin(v.start)+'–'+_tlFmtMin(v.end===1440?0:v.end))+'" onclick="mostrarToastVuelo(event,\''+v.numero+'\',\''+v.cod+'\','+v.start+','+v.end+',\''+(esSalida?'salida':'llegada')+'\')"><span class="lbl">'+v.cod+'</span></div>';
+}
+
+function _tlPrefLlegadasLeer(){
+  try{var v=localStorage.getItem('cta_mostrar_llegadas');return v===null?true:v==='1';}
+  catch(e){return true;}
+}
+function _tlPrefLlegadasGuardar(val){
+  try{localStorage.setItem('cta_mostrar_llegadas',val?'1':'0');}catch(e){}
+}
+window._tlMostrarLlegadas=_tlPrefLlegadasLeer();
+
+function toggleLlegadasTimeline(){
+  window._tlMostrarLlegadas=!window._tlMostrarLlegadas;
+  _tlPrefLlegadasGuardar(window._tlMostrarLlegadas);
+  refrescarCompanerosPanel(window._grupoOffsetDias||0,false);
+}
+
+// Mapa inverso (ciudad → código) construido a partir de CIUDADES, que ya
+// usa tu panel Live. v.origen llega como nombre de ciudad (no código), p.ej.
+// "Ámsterdam", "Argel", "Bilbao"... Solo "Londres" es ambiguo (LHR/LGW/STN);
+// se prioriza LGW porque es la ruta real que opera Vueling desde ALC.
+var _CIUDADES_PREF={'Londres':'LGW'};
+var _CIUDADES_INVERSO=(function(){
+  var map={};
+  Object.keys(CIUDADES).forEach(function(code){
+    var nombre=CIUDADES[code];
+    if(!(nombre in map)||_CIUDADES_PREF[nombre]===code)map[nombre]=code;
+  });
+  return map;
+})();
+
+function _tlOrigenCorto(origenStr){
+  origenStr=String(origenStr||'').trim();
+  if(!origenStr)return'---';
+  // 1) Coincidencia exacta por nombre de ciudad — es el formato real que llega
+  if(_CIUDADES_INVERSO[origenStr])return _CIUDADES_INVERSO[origenStr];
+  // 2) Por si vinera con guion tipo "Ciudad-COD" o "COD-Ciudad"
+  var partes=origenStr.split('-').map(function(s){return s.trim();});
+  for(var i=0;i<partes.length;i++){
+    if(/^[A-Z]{3}$/.test(partes[i]))return partes[i];
+    if(_CIUDADES_INVERSO[partes[i]])return _CIUDADES_INVERSO[partes[i]];
+  }
+  // 3) Último recurso: primeras letras del nombre, para ciudades nuevas que no estén en CIUDADES
+  return partes[0].substring(0,4).toUpperCase();
+}
+
+function _tlLlegadasDelDia(offsetDias){
+  if(typeof liveData==='undefined'||!liveData||!liveData.lle)return[];
+  var quiereManana=offsetDias===1; // mañana solo tiene datos si el backend ya los incluye con esManana=true (no hay umbral de hora fijo aquí)
+  return liveData.lle
+    .filter(function(v){return(!!v.esManana===quiereManana)&&v.estadoClass!=='e-cancelled';})
+    .map(function(v){
+      var start=hToMin(v.horaReal||v.horaProg||'');
+      if(start===null)return null;
+      return{numero:v.numero||'',cod:_tlOrigenCorto(v.origen),start:start,end:start+DURACION_LLEGADA_TL,tipo:'llegada'};
+    })
+    .filter(Boolean)
+    .sort(function(a,b){return a.start-b.start;});
+}
+
+// Todas las salidas del día (antes solo se miraban las de madrugada sin
+// llegada — ahora se muestran todas, porque el emparejamiento de abajo
+// necesita ver el día completo para poder unir cada llegada con su salida).
+function _tlSalidasDelDia(offsetDias){
+  if(typeof liveData==='undefined'||!liveData||!liveData.sal)return[];
+  var quiereManana=offsetDias===1;
+  return liveData.sal
+    .filter(function(v){return(!!v.esManana===quiereManana)&&v.estadoClass!=='e-cancelled';})
+    .map(function(v){
+      var dep=hToMin(v.horaReal||v.horaProg||'');
+      if(dep===null)return null;
+      return{numero:v.numero||'',cod:_tlOrigenCorto(v.destino),start:dep,end:dep+DURACION_SALIDA_TL,tipo:'salida'};
+    })
+    .filter(Boolean)
+    .sort(function(a,b){return a.start-b.start;});
+}
+
+// Intenta emparejar cada llegada con una salida que empiece justo cuando
+// termina la llegada (hueco real ≈ 0, con un margen de tolerancia por si
+// el horario real no es perfecto) — así, juntas, ocupan 22+23=45 min
+// seguidos, pegadas, sin hueco entre ellas. PRIORITY INSTRUCTION para quien
+// toque esto luego: esto es una estimación SOLO por horario — no hay
+// matrícula de avión ni dato de rotación real, así que puede acertar o no.
+// Nunca tratar el resultado como un hecho confirmado en ningún sitio de la UI.
+function _tlEmparejarVuelos(llegadas,salidas,tol){
+  var llOrd=llegadas.slice().sort(function(a,b){return a.start-b.start;});
+  var salDisp=salidas.slice().sort(function(a,b){return a.start-b.start;});
+  var usadas={};
+  var pares=[],llSinPar=[];
+  llOrd.forEach(function(ll){
+    var mejorIdx=-1,mejorDif=Infinity;
+    salDisp.forEach(function(sa,idx){
+      if(usadas[idx])return;
+      var hueco=sa.start-ll.end; // objetivo: 0 (pegadas)
+      if(hueco<-tol||hueco>tol)return;
+      var dif=Math.abs(hueco);
+      if(dif<mejorDif){mejorDif=dif;mejorIdx=idx;}
+    });
+    if(mejorIdx>=0){usadas[mejorIdx]=true;pares.push({ll:ll,sa:salDisp[mejorIdx],hueco:salDisp[mejorIdx].start-ll.end});}
+    else llSinPar.push(ll);
+  });
+  var saSinPar=salDisp.filter(function(s,idx){return !usadas[idx];});
+  return{pares:pares,llSinPar:llSinPar,saSinPar:saSinPar};
+}
+
+// Texto pequeño de parking dentro del recuadro: usa gateOperationalLabel,
+// que ya tienes definido para el panel Live ("Parking N" / "Remoto"). Si
+// no hay dato de puerta o no encaja en los sets conocidos, no muestra nada
+// — esto es una preparación para cuando ese dato llegue fiable también en
+// llegadas, hoy puede que casi siempre venga vacío.
+// Reparte cada llegada en la primera pista libre (igual idea que un
+// calendario apilando eventos solapados). La pista de cada vuelo es FIJA
+// para todo el día; lo que cambia con el scroll es solo el alto visible.
+function _tlAsignarPistasVuelos(llegadas){
+  var finPorPista=[];
+  llegadas.forEach(function(it){
+    var colocado=false;
+    for(var i=0;i<finPorPista.length;i++){
+      if(it.start>=finPorPista[i]){finPorPista[i]=it.end;it.pista=i;colocado=true;break;}
+    }
+    if(!colocado){it.pista=finPorPista.length;finPorPista.push(it.end);}
+  });
+  return llegadas;
+}
+
+// Ajusta el ALTO del carril según cuántas pistas hacen falta para los
+// vuelos que se solapan con la ventana visible AHORA MISMO al hacer scroll
+// horizontal (no según el total del día).
+function actualizarAlturaVuelosCompaneros(){
+  var row=document.getElementById('grupoTlVuelosRow');
+  var label=document.getElementById('grupoTlVuelosLabel');
+  if(!row||!label)return;
+  if(!window._tlMostrarLlegadas){row.style.height='18px';label.style.height='18px';return;}
+  var lista=window._tlLlegadasConPistaActual||[];
+  if(!lista.length){row.style.height=PISTA_LLEGADA_H+'px';label.style.height=PISTA_LLEGADA_H+'px';return;}
+  var sc=document.getElementById('grupo-tl-scroll');
+  if(!sc)return;
+  var visStart=(sc.scrollLeft/TL_GRID_W_VUELOS)*1440;
+  var visEnd=((sc.scrollLeft+sc.clientWidth)/TL_GRID_W_VUELOS)*1440;
+  var maxPista=0;
+  lista.forEach(function(v){
+    if(v.start<visEnd&&v.end>visStart&&v.pista>maxPista)maxPista=v.pista;
+  });
+  var alto=(maxPista+1)*PISTA_LLEGADA_H;
+  row.style.height=alto+'px';
+  label.style.height=alto+'px';
+}
+
+function renderCompanerosTimeline(offsetDias,toggleIfOpen){
+  var wrap=document.getElementById('grupo-timeline');
+  var listPanel=document.getElementById('grupo-panel');
+  if(listPanel)listPanel.classList.remove('open');
+  if(toggleIfOpen&&wrap.classList.contains('open')){wrap.classList.remove('open');return;}
+
+  // Si ya había una vista por horas abierta (p.ej. en un refresco automático
+  // de fondo), recordamos su scroll para no "saltar" de sitio al redibujar.
+  var _scPrevio=document.getElementById('grupo-tl-scroll');
+  var _scrollLeftPrevio=_scPrevio?_scPrevio.scrollLeft:null;
+
+  var navHtml='<div class="grupo-nav"><button class="grupo-nav-btn" onclick="moverCompanerosDia(-1)">← Día anterior</button><div class="grupo-nav-date">'+formateaFechaGrupo(new Date(),offsetDias)+'</div><button class="grupo-nav-btn" onclick="moverCompanerosDia(1)">Día siguiente →</button></div>';
+
+  var data=_buildCompanerosTimelineData(offsetDias);
+  if(data.error==='no-excel'){wrap.innerHTML='<div class="grupo-empty">📋 Importa el Excel del grupo primero</div>';wrap.classList.add('open');return;}
+  if(data.error==='no-turno'){wrap.innerHTML=navHtml+'<div class="grupo-empty">📅 No tienes turno ese día</div>';wrap.classList.add('open');return;}
+  if(data.error==='no-match'){wrap.innerHTML=navHtml+'<div class="grupo-empty">'+(data.modoToda?'No hay nadie con turno ese día':'No coincides con nadie del grupo ese día')+'</div>';wrap.classList.add('open');return;}
+
+  var coinciden=data.coinciden.slice().sort(function(a,b){return (a.e1||0)-(b.e1||0);});
+  var esDiaActual=data.esDiaActual;
+  var nowMin=(function(){var n=new Date();return n.getHours()*60+n.getMinutes();})();
+  var CELL=32,GRID_W=CELL*48;
+
+  var headerHtml='';
+  for(var h=0;h<24;h++){headerHtml+='<div class="grupo-tl-hr">'+(h<10?'0':'')+h+'</div>';}
+
+  // Carril de vuelos — llegadas (azul, 22min) y salidas (rojo, 23min) de
+  // todo el día. Se intenta emparejar cada llegada con la salida que
+  // empiece justo cuando termina (ver _tlEmparejarVuelos) — si encajan,
+  // van juntas en la misma fila, pegadas. Es solo una estimación por
+  // horario, nunca un hecho confirmado (no hay matrícula de avión).
+  // Datos reales para HOY, y para MAÑANA en cuanto el backend de Railway
+  // empiece a incluir esos vuelos con esManana=true.
+  // TODO este bloque va en try/catch: si algo aquí falla, el resto del
+  // panel (nombres, filas, navegación, el propio botón de abrir/cerrar
+  // Llegadas) tiene que seguir funcionando igual.
+  var llegadasConPista=[];
+  var vuelosLabelHtml='<div class="grupo-tl-vuelos-label'+(window._tlMostrarLlegadas?'':' collapsed')+'" id="grupoTlVuelosLabel" onclick="toggleLlegadasTimeline()"><span class="chev">▾</span> ✈️ Vuelos</div>';
+  var vuelosRowHtml='<div class="grupo-tl-vuelos-row" id="grupoTlVuelosRow" style="width:'+GRID_W+'px">';
+  try{
+    if(offsetDias===0||offsetDias===1){
+      var llegadasRaw=_tlLlegadasDelDia(offsetDias);
+      var salidasRaw=_tlSalidasDelDia(offsetDias);
+      var emparejado=_tlEmparejarVuelos(llegadasRaw,salidasRaw,TOLERANCIA_EMPAREJAR_TL);
+      var itemsCombinados=[];
+      emparejado.pares.forEach(function(p){itemsCombinados.push({tipo:'par',start:p.ll.start,end:p.sa.end,par:p});});
+      emparejado.llSinPar.forEach(function(l){itemsCombinados.push({tipo:'llegada',start:l.start,end:l.end,item:l});});
+      emparejado.saSinPar.forEach(function(s){itemsCombinados.push({tipo:'salida',start:s.start,end:s.end,item:s});});
+      llegadasConPista=_tlAsignarPistasVuelos(itemsCombinados);
+      if(!liveLoaded&&typeof loadLive==='function')loadLive(); // dispara la carga si aún no se había abierto el panel Live
+    }
+    window._tlLlegadasConPistaActual=llegadasConPista;
+    if(window._tlMostrarLlegadas){
+      llegadasConPista.forEach(function(it){
+        if(it.tipo==='par'){
+          var ll=it.par.ll,sa=it.par.sa;
+          var cLeft=(ll.end/1440*100),cWidth=((sa.start-ll.end)/1440*100);
+          if(cWidth>0){
+            vuelosRowHtml+='<div class="conector" style="left:'+cLeft+'%;width:'+cWidth+'%;top:'+(it.pista*PISTA_LLEGADA_H+PISTA_LLEGADA_H/2)+'px" title="Posible mismo avión · hueco real '+it.par.hueco+'min (estimado, no confirmado)"></div>';
+          }
+          vuelosRowHtml+=_tlCajaHtml(ll,false,it.pista,esDiaActual,nowMin);
+          vuelosRowHtml+=_tlCajaHtml(sa,true,it.pista,esDiaActual,nowMin);
+        } else if(it.tipo==='llegada'){
+          vuelosRowHtml+=_tlCajaHtml(it.item,false,it.pista,esDiaActual,nowMin);
+        } else {
+          vuelosRowHtml+=_tlCajaHtml(it.item,true,it.pista,esDiaActual,nowMin);
+        }
+      });
+      // descansos (huecos largos entre vuelos / bloques solapados/emparejados) — en dorado, dentro de la propia fila.
+      // El hueco que contiene "ahora" se pinta aparte (_tlGapEnVivo), sin umbral mínimo.
+      var gapVivo=esDiaActual?_tlGapEnVivo(llegadasConPista,nowMin):null;
+      if(gapVivo&&(gapVivo.end-gapVivo.start)<UMBRAL_DESCANSO_MIN)gapVivo=null; // mismo umbral que entre vuelos: si quedan menos de 29min, no se muestra
+      _tlCalcularDescansos(llegadasConPista,UMBRAL_DESCANSO_MIN).forEach(function(d){
+        if(gapVivo&&d.end===gapVivo.end)return; // ese es el que pintamos "en vivo"
+        vuelosRowHtml+='<div class="descanso-seg" style="left:'+(d.start/1440*100)+'%;width:'+((d.end-d.start)/1440*100)+'%"><div class="descanso-linea"></div><span class="descanso-flecha izq">‹</span><span class="descanso-flecha der">›</span><span class="descanso-lbl">'+_tlFmtDur(d.dur)+'</span></div>';
+      });
+      if(gapVivo){
+        // sin umbral: aunque queden 5 minutos, se muestra — es justo lo que se quiere ver en directo
+        var dLeftPct=(gapVivo.start/1440*100),dWidthPct=((gapVivo.end-gapVivo.start)/1440*100);
+        vuelosRowHtml+='<div class="descanso-seg es-vivo" style="left:'+dLeftPct+'%;width:'+dWidthPct+'%"><div class="descanso-linea"></div><span class="descanso-flecha izq">‹</span><span class="descanso-flecha der">›</span><span class="descanso-lbl">'+_tlFmtDur(gapVivo.end-gapVivo.start)+' restantes</span></div>';
+      }
+    }
+  }catch(_eVuelos){
+    console.error('Error pintando el carril de vuelos (no debería bloquear el resto):',_eVuelos);
+  }
+  vuelosRowHtml+='</div>';
+
+  var namesHtml='<div class="grupo-tl-spacer"></div>'+vuelosLabelHtml;
+  var rowsHtml='';
+  if(data.myDay&&data.myDay.e1){
+    var myE1=toMinG(data.myDay.e1),myS1=toMinG(data.myDay.s1);
+    var myE2=data.myDay.e2?toMinG(data.myDay.e2):null,myS2=data.myDay.s2?toMinG(data.myDay.s2):null;
+    var segsYo=_tlSegmentos({e1:myE1,s1:myS1,e2:myE2,s2:myS2,nocheDiaFin:false});
+    var miHorario=data.myDay.e1+'→'+data.myDay.s1+(data.myDay.e2&&data.myDay.s2?' / '+data.myDay.e2+'→'+data.myDay.s2:'');
+    namesHtml+='<div class="grupo-tl-name" style="color:var(--gold)"><span class="nm">Tú</span><span class="sch">'+miHorario+'</span></div>';
+    rowsHtml+=_tlFilaHtml(segsYo,'is-you',false,nowMin); // siempre en dorado, sin resaltado "activo"
+  } else {
+    namesHtml+='<div class="grupo-tl-name" style="color:var(--gray)"><span class="nm">Tú</span><span class="sch">Libre</span></div>';
+    rowsHtml+='<div class="grupo-tl-row"></div>';
+  }
+
+  coinciden.forEach(function(c){
+    var segs=_tlSegmentos(c);
+    var activaFila=esDiaActual&&segs.some(function(seg){return _tlEstadoSegmento(seg,nowMin,true)==='active';});
+    namesHtml+='<div class="grupo-tl-name'+(activaFila?' is-active':'')+'"><span class="nm">'+c.nombre+(c.nocheReal?' 🌙':'')+'</span><span class="sch">'+c.horario+'</span></div>';
+    rowsHtml+=_tlFilaHtml(segs,c.nocheReal?'is-night':'',esDiaActual,nowMin);
+  });
+
+  var nowLineHtml='';
+  if(esDiaActual){
+    var leftPx=Math.round((nowMin/1440)*GRID_W);
+    nowLineHtml='<div class="grupo-tl-now" style="left:'+leftPx+'px"></div><div class="grupo-tl-now-lbl" style="left:'+leftPx+'px">'+_tlFmtMin(nowMin)+'</div>';
+  }
+
+  var html=navHtml
+    +'<div class="grupo-title">👥 '+(data.modoToda?'Toda la plantilla':'Coincidencias')+' · '+coinciden.length+'</div>'
+    +'<div class="grupo-tl-hint">👉 Desliza para ver las 24h'+(esDiaActual?' · línea roja = ahora':'')+'</div>'
+    +'<div class="grupo-tl-body">'
+      +'<div class="grupo-tl-names">'+namesHtml+'</div>'
+      +'<div class="grupo-tl-scroll" id="grupo-tl-scroll">'
+        +'<div class="grupo-tl-grid" style="width:'+GRID_W+'px">'
+          +'<div class="grupo-tl-header" style="width:'+GRID_W+'px">'+headerHtml+'</div>'
+          +vuelosRowHtml
+          +'<div style="width:'+GRID_W+'px">'+rowsHtml+'</div>'
+          +nowLineHtml
+        +'</div>'
+      +'</div>'
+    +'</div>';
+
+  wrap.innerHTML=html+'<div style="height:16px"></div>';
+  wrap.classList.add('open');
+
+  setTimeout(function(){
+    var sc=document.getElementById('grupo-tl-scroll');
+    if(!sc)return;
+    if(_scrollLeftPrevio!==null){
+      sc.scrollLeft=_scrollLeftPrevio; // ya estaba abierto: no lo recentramos, solo se actualizan los datos
+    } else {
+      var targetMin=esDiaActual?nowMin:360;
+      sc.scrollLeft=Math.max(0,(targetMin/1440)*GRID_W-sc.clientWidth/2);
+    }
+    sc.addEventListener('scroll',actualizarAlturaVuelosCompaneros);
+    actualizarAlturaVuelosCompaneros();
+  },0);
+}
+
+// Refresco automático cada 30s para que la línea de "ahora" y el contador de
+// "descanso restante" no se queden desactualizados si dejas la pantalla abierta.
+// Reutiliza renderCompanerosTimeline, que ya preserva el scroll si ya estaba abierta.
+setInterval(function(){
+  if(!window._grupoVistaHoras)return;
+  var tl=document.getElementById('grupo-timeline');
+  if(tl&&tl.classList.contains('open'))renderCompanerosTimeline(window._grupoOffsetDias||0,false);
+},30000);
+
+// Decide qué vista (lista o línea de tiempo) hay que refrescar/abrir.
+function refrescarCompanerosPanel(offsetDias,toggleIfOpen){
+  if(window._grupoVistaHoras)renderCompanerosTimeline(offsetDias,toggleIfOpen);
+  else renderCompanerosDia(offsetDias,toggleIfOpen);
+}
+
+function toggleVistaHoras(){
+  window._grupoVistaHoras=!window._grupoVistaHoras;
+  _tlPrefVistaHorasGuardar(window._grupoVistaHoras);
+  var btn=document.getElementById('btn-vista-horas');
+  if(btn){
+    btn.classList.toggle('active',window._grupoVistaHoras);
+    btn.textContent=window._grupoVistaHoras?'📋 Vista lista':'🕐 Vista por horas';
+  }
+  if(typeof window._grupoOffsetDias!=='number')window._grupoOffsetDias=0;
+  refrescarCompanerosPanel(window._grupoOffsetDias,false);
+}
+
 // Init: check if group data exists
 (function(){
   try{
@@ -5321,7 +6424,7 @@ function filtrarEnTurno(){
   var btn=document.getElementById('btn-en-turno');
   if(btn)btn.classList.toggle('active',_enTurnoMode);
   window._grupoOffsetDias=window._grupoOffsetDias||0;
-  renderCompanerosDia(window._grupoOffsetDias);
+  refrescarCompanerosPanel(window._grupoOffsetDias);
 }
 
 
@@ -5342,7 +6445,7 @@ function toggleSortSalida(){
   window._sortBySalida=!window._sortBySalida;
   var btn=document.getElementById('btn-sort-salida');
   if(btn){btn.style.background=window._sortBySalida?'rgba(200,168,75,.3)':'rgba(200,168,75,.12)';btn.style.color=window._sortBySalida?'var(--gold)':'inherit';}
-  renderCompanerosDia(window._grupoOffsetDias||0);
+  refrescarCompanerosPanel(window._grupoOffsetDias||0);
 }
 var _mismoTurnoMode=false;
 function filtrarMismoTurno(){
@@ -5350,7 +6453,7 @@ function filtrarMismoTurno(){
   var btn=document.getElementById('btn-mismo-turno');
   if(btn)btn.classList.toggle('active',_mismoTurnoMode);
   window._grupoOffsetDias=window._grupoOffsetDias||0;
-  renderCompanerosDia(window._grupoOffsetDias);
+  refrescarCompanerosPanel(window._grupoOffsetDias);
 }
 
 function buildHorarioHtml(c){
@@ -5430,6 +6533,34 @@ function g(id){return document.getElementById(id);}
 function toM(t){if(!t)return null;var p=t.split(":");return +p[0]*60+(+p[1]||0);}
 function fmtT(m){if(!m&&m!==0)return"";var h=Math.floor(m/60),mn=m%60;return h>0?h+"h"+(mn?" "+mn+"m":""):mn+"m";}
 
+// Cuando el usuario nunca ha importado su Tryp personal, "Mi jornada" muestra
+// instrucciones de cómo hacerlo en vez del placeholder de "Descanso" (que antes
+// salía igual tanto si hoy era descanso real como si no había datos en absoluto).
+function _renderJornadaSinImportarTryp(card){
+  var grid=card.parentElement;
+  var calCard=grid?grid.querySelector(".op-cal-card"):null;
+  if(calCard)calCard.style.display="none";
+  card.style.gridColumn="1 / -1";
+  card.innerHTML=
+    '<div style="font-size:11px;font-weight:700;color:var(--gold);margin-bottom:8px">📥 Importa tu calendario del Tryp</div>'+
+    '<div style="font-size:10.5px;color:var(--gray);line-height:1.55;margin-bottom:12px">'+
+      '1. Entra en la intranet y descarga el Excel de tu calendario del Tryp.<br>'+
+      '2. Vuelve aquí y pulsa <b style="color:#e9e4f5">Importar TRYP</b>.'+
+    '</div>'+
+    '<div style="display:flex;gap:8px;margin-bottom:14px">'+
+      '<a href="https://tryp.southeu.com/tryp/website/horarios/calendario" target="_blank" onclick="event.stopPropagation()" style="flex:1;text-align:center;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:9px 6px;color:var(--gray);font-size:11px;font-weight:700;text-decoration:none">🌐 Ir al Tryp</a>'+
+      '<button type="button" onclick="event.stopPropagation();openTrypImport()" style="flex:1;background:rgba(200,168,75,.18);border:1px solid rgba(200,168,75,.45);border-radius:10px;padding:9px 6px;color:var(--gold);font-family:inherit;font-size:11px;font-weight:700;cursor:pointer">📤 Importar TRYP</button>'+
+    '</div>'+
+    '<div style="font-size:9px;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px">Con esto tendrás</div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;font-size:10.5px;color:var(--gray)">'+
+      '<div>📅 Calendario completo</div>'+
+      '<div>⏱️ Horas mensuales</div>'+
+      '<div>🔢 Horas contador</div>'+
+      '<div>⚙️ Tus turnos cada día</div>'+
+      '<div>📊 Total de horas</div>'+
+    '</div>';
+}
+
 window.opSetDetalleDia=function(dia){
   try{localStorage.setItem('op_detalle_dia',dia==='manana'?'manana':'hoy');}catch(e){}
   if(typeof window.renderOperativa==='function')window.renderOperativa();
@@ -5482,6 +6613,8 @@ window.renderOperativa=function(){
   var card=g("op-turno-card");
   // ─ Resumen Operativo ─────────────────────────────────────
   var gmap={};try{gmap=JSON.parse(localStorage.getItem("cta_grupo_2026_map")||"{}");}catch(e){}
+  var grupoBanner=g("op-grupo-import-banner");
+  if(grupoBanner)grupoBanner.style.display=Object.keys(gmap).length===0?"block":"none";
   var todayNum=now.getDate();
   var trabajanHoy=[],compN=0;
   var mE1o=d&&d.e1?toM(d.e1):null,mS1o=d&&d.s1?toM(d.s1):null;
@@ -5489,9 +6622,12 @@ window.renderOperativa=function(){
   Object.keys(gmap).forEach(function(nom){
     var emp=gmap[nom],dias=(emp.meses&&emp.meses[mK])||null;
     if(_estaExcluidoPlantilla((emp&&emp.nombre)||nom,_fechaISOPlantilla(now)))return;
-    if(_arturoDebeTratarseLibre((emp&&emp.nombre)||nom,now))return;
     if(!dias)return;
-    var t=dias[todayNum];t=_turnoGrupoConCambioCompartido(emp,now,t);if(!t||!t.e1)return;
+    var t=dias[todayNum];t=_turnoGrupoConCambioCompartido(emp,now,t);
+    if(_esArturoPlantilla((emp&&emp.nombre)||nom)){
+      t=_arturoHLPubFecha(now)?null:_ajustarTurnoConHLPersonal(t,_miCalendarioDiaArturo(now));
+    }
+    if(!t||!t.e1)return;
     var excl=!!(t.noVieneInterrogacion||t.disponibilidadNoConfirmada);if(excl)return;
     var gE1=toM(t.e1),gS1=toM(t.s1),gE2=t.e2?toM(t.e2):null,gS2=t.s2?toM(t.s2):null;
     trabajanHoy.push({nombre:nom,e1:gE1,s1:gS1,e2:gE2,s2:gS2});
@@ -5509,8 +6645,12 @@ window.renderOperativa=function(){
   function opTrabajadoresFecha(dateObj){
     var mk=MESES[dateObj.getMonth()],dn=dateObj.getDate(),out=[];
     Object.keys(gmap).forEach(function(nom){
-      var emp=gmap[nom],dias=(emp.meses&&emp.meses[mk])||null;if(_estaExcluidoPlantilla((emp&&emp.nombre)||nom,_fechaISOPlantilla(dateObj)))return;if(_arturoDebeTratarseLibre((emp&&emp.nombre)||nom,dateObj))return;if(!dias)return;
-      var t=dias[dn];t=_turnoGrupoConCambioCompartido(emp,dateObj,t);if(!t||!t.e1)return;
+      var emp=gmap[nom],dias=(emp.meses&&emp.meses[mk])||null;if(_estaExcluidoPlantilla((emp&&emp.nombre)||nom,_fechaISOPlantilla(dateObj)))return;if(!dias)return;
+      var t=dias[dn];t=_turnoGrupoConCambioCompartido(emp,dateObj,t);
+      if(_esArturoPlantilla((emp&&emp.nombre)||nom)){
+        t=_arturoHLPubFecha(dateObj)?null:_ajustarTurnoConHLPersonal(t,_miCalendarioDiaArturo(dateObj));
+      }
+      if(!t||!t.e1)return;
       var excl=!!(t.noVieneInterrogacion||t.disponibilidadNoConfirmada);if(excl)return;
       out.push({nombre:nom,e1:toM(t.e1),s1:toM(t.s1),e2:t.e2?toM(t.e2):null,s2:t.s2?toM(t.s2):null});
     });
@@ -6158,6 +7298,21 @@ window.renderOperativa=function(){
   if(!card)return;
   ["state-working","state-pausa","state-rest","state-next"].forEach(function(c){card.classList.remove(c);});
 
+  // Si el usuario nunca ha importado su Tryp personal (ningún mes con datos en
+  // absoluto, no solo que hoy sea descanso), se muestran instrucciones de
+  // importación en vez del placeholder de "Descanso".
+  // Si en un render anterior se ocultó la tarjeta de calendario por falta de datos,
+  // se restaura aquí en cuanto vuelva a haber datos (sin necesitar recargar la página).
+  var hayDatosTryp=Object.keys(ue).some(function(mk){var m=ue[mk];return m&&typeof m==='object'&&Object.keys(m).length>0;});
+  if(hayDatosTryp){
+    card.style.gridColumn="";
+    var calCardRestore=card.parentElement?card.parentElement.querySelector(".op-cal-card"):null;
+    if(calCardRestore)calCardRestore.style.display="";
+  } else {
+    _renderJornadaSinImportarTryp(card);
+    return;
+  }
+
   var _isFreeDay=false;
   // Libre, Festivo, HL/HLP y Vacaciones se pintan como descanso en Mi jornada.
   if(!d||!d.tipo||d.tipo==="libre"||(!d.e1&&["festivo","hl","hlp","vacaciones"].indexOf(d.tipo)<0)||["festivo","hl","hlp","vacaciones"].indexOf(d.tipo)>=0){
@@ -6307,8 +7462,6 @@ window.renderOperativa=function(){
     if(g("op-tc-rem"))g("op-tc-rem").textContent="Empieza en "+fmtT(e1-nowMin);
     if(g("op-tc-bar"))g("op-tc-bar").style.width="0%";
   }
-
-
 
 };
 
@@ -6564,6 +7717,28 @@ function initLiveViewMode(){
 // ============================================================
 
 var _cambioDay=null, _cambioMonth=null, _cambioYear=null;
+var _cambioModoTodas=false; // false = solo mi rol (por defecto) · true = todas las categorías excepto Agente Jefe
+
+// Compatibilidad ampliada para el modo "todas las categorías": mezcla Operarios,
+// Supervisores y FD de cualquier contrato. Agente Jefe queda SIEMPRE aislado, incluso
+// en este modo (solo cambia con Agente Jefe).
+function _sonCompatiblesAmplio(cat1,cat2){
+  var a=_parseCategoria(cat1), b=_parseCategoria(cat2);
+  if(a.rol==='AGENTE_JEFE'||b.rol==='AGENTE_JEFE')return a.rol===b.rol;
+  return true;
+}
+function _cambioEsCompatible(cat1,cat2){
+  return _cambioModoTodas?_sonCompatiblesAmplio(cat1,cat2):_sonCompatibles(cat1,cat2);
+}
+function toggleModoCambioCategorias(){
+  _cambioModoTodas=!_cambioModoTodas;
+  var btn=document.getElementById('cambio-modo-btn');
+  if(btn){
+    btn.textContent=_cambioModoTodas?'🔓 Todas las categorías':'🔒 Solo mi categoría';
+    btn.classList.toggle('cambio-modo-activo',_cambioModoTodas);
+  }
+  calcularCambios();
+}
 var _todosResultados=[];
 var _todosParciales=[];
 var _todosNoImportados=[];
@@ -6573,6 +7748,7 @@ function abrirBuscadorCambio(){
   _cambioDay=_mcEditDay;
   _cambioMonth=_mcEditMonth;
   _cambioYear=_mcEditYear;
+  _cambioModoTodas=false;
   if(_cambioDay===null||_cambioDay===undefined){alert('Error: no hay día seleccionado');return;}
   // Cerrar panel edición
   var ep=document.getElementById('mc-edit-panel');
@@ -6584,6 +7760,8 @@ function abrirBuscadorCambio(){
     var bg=document.getElementById('cambio-bg');
     var panel=document.getElementById('cambio-panel');
     if(!bg||!panel){alert('Error: panel cambio no encontrado');return;}
+    var modoBtn=document.getElementById('cambio-modo-btn');
+    if(modoBtn){modoBtn.textContent='🔒 Solo mi categoría';modoBtn.classList.remove('cambio-modo-activo');}
     bg.style.display='block';
     setTimeout(function(){panel.classList.add('open');},10);
     calcularCambios();
@@ -6613,16 +7791,12 @@ function _parseCategoria(cat){
   return{tipo:tipo,rol:rol};
 }
 
-// Compatibilidad de contratos. FIJO y FD son categorías aisladas: solo cambian
-// entre sí mismas (un FD nunca con un FTP/Eventual aunque coincida el rol).
+// Compatibilidad de cambios de turno: solo importa el rol. Operarios cambian con
+// operarios (sean Fijos, FTP o FD), Supervisores con Supervisores (Fijos, FTP o FD),
+// y Agentes Jefe solo entre Agentes Jefe. El tipo de contrato no restringe el cambio.
 function _sonCompatibles(cat1,cat2){
   var a=_parseCategoria(cat1), b=_parseCategoria(cat2);
-  if(a.rol!==b.rol)return false;
-  var aislados=['FIJO','FD'];
-  if(aislados.indexOf(a.tipo)>=0||aislados.indexOf(b.tipo)>=0){
-    if(a.tipo!==b.tipo)return false;
-  }
-  return true;
+  return a.rol===b.rol;
 }
 
 // Validar un turno resultante cumple las reglas
@@ -7043,7 +8217,10 @@ function calcularCambios(){
 
   // Mi turno ese día
   var myRaw;try{myRaw=JSON.parse(localStorage.getItem('cta_ed_'+year)||'{}')}catch(e){myRaw={};}
-  var myDayObj=(myRaw[monthKey]||{})[day]||null;
+  var myDayObjOriginal=(myRaw[monthKey]||{})[day]||null;
+  // Si ese día tengo HL, ajusto mi disponibilidad: día completo → sin turno;
+  // parcial → se descuenta solo el tramo marcado, el resto sigue contando como trabajo.
+  var myDayObj=_ajustarTurnoConHLPersonal(myDayObjOriginal,myDayObjOriginal);
   var myE1=myDayObj&&myDayObj.e1?_toMin(myDayObj.e1):null;
   var myS1=myDayObj&&myDayObj.s1?_toMin(myDayObj.s1):null;
   var myE2=myDayObj&&myDayObj.e2?_toMin(myDayObj.e2):null;
@@ -7053,22 +8230,29 @@ function calcularCambios(){
   // Mi categoría
   var nominaMap;try{nominaMap=JSON.parse(localStorage.getItem(_GRUPO_KEY+'_map')||'{}')}catch(e){nominaMap={};}
 
-  // Buscar mi propio empleado en el mapa (por nombre, comparando con sessión)
+  // Buscar mi propio empleado en el mapa: PRIMERO por nombre de sesión (fiable),
+  // y solo si no hay match claro, caer en la antigua heurística por coincidencia de
+  // horario (no fiable: si otra persona tiene el mismo turno ese día, identificaba
+  // mal quién era "yo", mostrando categorías ajenas o a mí mismo como opción de cambio).
   var myCat='FTP-Operarios'; // fallback
   var myNombre='';
   var sess=null;try{sess=JSON.parse(localStorage.getItem('cta_session'));}catch(e){}
-  // Intentar identificar al usuario por su turno del día (coincidencia exacta en el mapa del grupo)
-  // o por nombre de sesión parcial
-  for(var nk in nominaMap){
-    if(!nominaMap.hasOwnProperty(nk))continue;
-    var emp=nominaMap[nk];
-    var meses=emp.meses||{};
-    var empDias=meses[monthKey]||{};
-    var empT=empDias[day];
-    if(empT&&empT.e1===myDayObj.e1&&empT.s1===myDayObj.s1){
-      myCat=emp.categoria||myCat;
-      myNombre=emp.nombre||'';
-      break;
+  var miKey=_identificarMiEmpleadoGrupo(nominaMap,sess);
+  if(miKey){
+    myCat=nominaMap[miKey].categoria||myCat;
+    myNombre=nominaMap[miKey].nombre||'';
+  } else {
+    for(var nk in nominaMap){
+      if(!nominaMap.hasOwnProperty(nk))continue;
+      var emp=nominaMap[nk];
+      var meses=emp.meses||{};
+      var empDias=meses[monthKey]||{};
+      var empT=empDias[day];
+      if(empT&&myDayObj&&empT.e1===myDayObj.e1&&empT.s1===myDayObj.s1){
+        myCat=emp.categoria||myCat;
+        myNombre=emp.nombre||'';
+        break;
+      }
     }
   }
 
@@ -7080,7 +8264,7 @@ function calcularCambios(){
   for(var nk2 in nominaMap){
     if(!nominaMap.hasOwnProperty(nk2))continue;
     var e2=nominaMap[nk2];
-    if(e2.meses)empleados.push(e2);
+    if(e2.meses){e2._key=nk2;empleados.push(e2);}
   }
 
   if(!empleados.length){
@@ -7101,9 +8285,9 @@ function calcularCambios(){
   }
 
   empleados.forEach(function(comp){
-    if(comp.nombre===myNombre&&myNombre)return; // saltar si soy yo
+    if(miKey?comp._key===miKey:(comp.nombre===myNombre&&myNombre))return; // saltar si soy yo
     var compDias=comp.meses&&comp.meses[monthKey]?comp.meses[monthKey]:{};
-    if(!_sonCompatibles(myCat,comp.categoria||''))return;
+    if(!_cambioEsCompatible(myCat,comp.categoria||''))return;
     if(!_empleadoTieneTurnosRealesMesCambio(comp,monthKey,year))return; // baja/excedencia: no ofrecer para cambios
     if(!_diaImportadoCambio(comp,monthKey,year,day)){marcarNoImportado(comp);return;}
 
@@ -7257,8 +8441,8 @@ function calcularCambios(){
   // CAMBIOS PARCIALES: solo cuando hay turnos partidos implicados
   var parciales=[];
   empleados.forEach(function(comp){
-    if(myNombre&&comp.nombre===myNombre)return;
-    if(!_sonCompatibles(myCat,comp.categoria||''))return;
+    if(miKey?comp._key===miKey:(myNombre&&comp.nombre===myNombre))return;
+    if(!_cambioEsCompatible(myCat,comp.categoria||''))return;
     if(!_empleadoTieneTurnosRealesMesCambio(comp,monthKey,year))return; // baja/excedencia: no ofrecer para cambios
     if(!_diaImportadoCambio(comp,monthKey,year,day)){marcarNoImportado(comp);return;}
     var compDias=(comp.meses&&comp.meses[monthKey])||{};
@@ -7370,8 +8554,8 @@ function calcularCambios(){
   // CESIÓN PARCIAL sin contrapartida: yo turno partido, comp libra ese día
   // Le cedo UNA parte de mi turno, él la trabaja, yo me quedo con el resto
   empleados.forEach(function(comp){
-    if(myNombre&&comp.nombre===myNombre)return;
-    if(!_sonCompatibles(myCat,comp.categoria||''))return;
+    if(miKey?comp._key===miKey:(myNombre&&comp.nombre===myNombre))return;
+    if(!_cambioEsCompatible(myCat,comp.categoria||''))return;
     if(!_empleadoTieneTurnosRealesMesCambio(comp,monthKey,year))return; // baja/excedencia: no ofrecer para cambios
     if(!_diaImportadoCambio(comp,monthKey,year,day)){marcarNoImportado(comp);return;}
     if(esLibre||_esPasado(day,monthKey,year))return;
@@ -7850,6 +9034,13 @@ function _evClasificarEmpleadoEvento(emp, mes, dia, hDesde, hHasta, mesPublicado
   var fechaEvento=new Date(_evAño,_GRUPO_MONTHS.indexOf(mes),dia);
   var cambioCompartido=_getCambioCompartidoEmpleado(emp,fechaEvento);
   if(cambioCompartido)turno=_cambioToTurno(cambioCompartido);
+  // Si es Arturo y su calendario personal (este dispositivo) marca HL ese día, se ajusta:
+  // día completo → sin turno; parcial → se descuenta solo ese tramo. Igual que en
+  // Vista compañeros, esto faltaba aquí y por eso Buscar Evento seguía mostrando el
+  // turno entero aunque hubiera HL parcial marcado.
+  if(_esArturoPlantilla(emp.nombre||emp.nomina)){
+    turno=_arturoHLPubFecha(fechaEvento)?null:_ajustarTurnoConHLPersonal(turno,_miCalendarioDiaArturo(fechaEvento));
+  }
   var nombre=emp.nombre;
   var diasGuardados=Object.keys(diasMes).length;
   var mesVacioEmpleado=tieneMesEmp&&diasGuardados===0;
@@ -7861,16 +9052,25 @@ function _evClasificarEmpleadoEvento(emp, mes, dia, hDesde, hHasta, mesPublicado
   // Para el buscador de eventos, una celda vacía dentro de un mes ya importado debe contar
   // como Libre y disponible para todo el evento. Si además el empleado no tiene turnos reales
   // en todo el mes, se mantiene la etiqueta de excedencia/baja larga.
+
+  // FD/FDS: se importan por semanas. Si ese día no existe en la importación,
+  // no se debe etiquetar como baja/excedencia ni contar como disponible.
+  if(!cambioCompartido&&(turno===undefined||turno===null)&&_evEsEmpleadoFD(emp)){
+    return{nombre:nombre,estado:'noImportado',parcial:false,desde:null,huecos:[],turno:'',motivo:'No importado'};
+  }
+
+  // Excedencia/baja larga: si en TODO el mes no hay ni un solo turno real de trabajo,
+  // se etiqueta así para cualquier día del mes, tenga o no ese día concreto un valor de
+  // "Libre"/"DL" explícito en la importación. Esos "Libre" sueltos en un mes totalmente
+  // inactivo son el valor por defecto de alguien de baja, no una libranza real dentro de
+  // una rotación activa (antes solo se miraba esto cuando el día venía sin publicar, y un
+  // "Libre" explícito ese día concreto se mostraba como libranza normal por error).
+  if(!cambioCompartido&&!_evEsEmpleadoFD(emp)&&mesPublicadoGlobal&&tieneMesEmp&&(mesVacioEmpleado||mesSinTrabajoEmpleado)){
+    return{nombre:nombre,estado:'completo',parcial:false,desde:hDesde,huecos:[[hDesde,(hHasta<=hDesde?hHasta+1440:hHasta)]],turno:'Mes sin turnos',motivo:'Excedencia/baja larga'};
+  }
+
   if(!cambioCompartido&&(turno===undefined||turno===null)){
-    // FD/FDS: se importan por semanas. Si ese día no existe en la importación,
-    // no se debe etiquetar como baja/excedencia ni contar como disponible.
-    if(_evEsEmpleadoFD(emp)){
-      return{nombre:nombre,estado:'noImportado',parcial:false,desde:null,huecos:[],turno:'',motivo:'No importado'};
-    }
     if(mesPublicadoGlobal&&tieneMesEmp){
-      if(mesVacioEmpleado||mesSinTrabajoEmpleado){
-        return{nombre:nombre,estado:'completo',parcial:false,desde:hDesde,huecos:[[hDesde,(hHasta<=hDesde?hHasta+1440:hHasta)]],turno:'Mes sin turnos',motivo:'Excedencia/baja larga'};
-      }
       return{nombre:nombre,estado:'completo',parcial:false,desde:hDesde,huecos:[[hDesde,(hHasta<=hDesde?hHasta+1440:hHasta)]],turno:'Libre',motivo:'Libre'};
     }
     return{nombre:nombre,estado:'sinDatos',parcial:false,desde:null,huecos:[],turno:'',motivo:tieneMesPublicado?'Sin turno publicado':'Mes no importado'};
@@ -8156,6 +9356,75 @@ function _evVolverForm(){
     <div id="ev-results" style="display:none"></div>
   </div>
 </div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// REGISTRO AUTOMÁTICO DE CADA BOTÓN/ENLACE QUE SE TOCA EN LA APP
+// ═══════════════════════════════════════════════════════════════
+// Aislado en su propio <script> al final del documento a propósito: si algún script
+// anterior de la página lanza un error en algún momento, NO impide que este se cargue
+// (cada <script> es su propio bloque de ejecución independiente).
+//
+// En vez de añadir logActividad(...) a mano en cada botón (fácil dejarse alguno y
+// fácil de desincronizar con botones nuevos), se escucha CUALQUIER clic en un botón,
+// enlace o elemento clicable de toda la app, en fase de captura (para no perderse
+// ninguno aunque el propio botón llame a event.stopPropagation()).
+//
+// El "tipo" que se manda al Log se deduce del nombre de la función que llama el
+// onclick (p.ej. onclick="abrirBuscadorCambio()" → tipo "abrirBuscadorCambio"). Si el
+// botón no tiene onclick con función (algunos se crean por JS con addEventListener,
+// p.ej. los del navegador de Drive o las filas de Publicados), cae al id, luego a la
+// clase CSS, y como último recurso a "click" genérico — nunca se descarta en silencio.
+// Si el botón ya tiene su propio logActividad(...) explícito (los que ya estaban
+// antes: import_excel, ver_calendario, etc.) no se duplica aquí.
+try{
+  function _inferirTipoClick(oc,el){
+    var ignorar=['stopPropagation','preventDefault','logActividad'];
+    var calls=(oc||'').match(/[A-Za-z_$][A-Za-z0-9_$.]*\s*\(/g)||[];
+    for(var i=calls.length-1;i>=0;i--){
+      var name=calls[i].replace(/\(\s*$/,'').trim();
+      var shortName=name.split('.').pop();
+      if(ignorar.indexOf(shortName)>=0)continue;
+      return shortName;
+    }
+    if(el&&el.id)return el.id;
+    if(el&&el.className){
+      var cls=String(el.className).trim().split(/\s+/)[0];
+      if(cls)return 'click:'+cls;
+    }
+    return 'click';
+  }
+  // Busca el elemento clicable más cercano subiendo desde el punto exacto del toque:
+  // <button>/<a> reales, cualquier cosa con onclick, role="button", o simplemente con
+  // cursor:pointer (el patrón que usan tarjetas/filas creadas dinámicamente sin
+  // onclick ni id, como las del navegador de Drive o las filas de "Publicados").
+  function _buscarElementoClicable(target){
+    var el=target,depth=0;
+    while(el&&el.nodeType===1&&depth<8){
+      if(el.tagName==='BUTTON'||el.tagName==='A')return el;
+      if(el.hasAttribute&&el.hasAttribute('onclick'))return el;
+      if(el.getAttribute&&el.getAttribute('role')==='button')return el;
+      try{if(getComputedStyle(el).cursor==='pointer')return el;}catch(ex){}
+      el=el.parentElement;depth++;
+    }
+    return null;
+  }
+  document.addEventListener('click',function(e){
+    try{
+      var el=e.target&&e.target.nodeType===1?_buscarElementoClicable(e.target):null;
+      if(!el)return;
+      var oc=el.getAttribute('onclick')||'';
+      if(oc.indexOf('logActividad')>=0)return; // ya se registra explícitamente él mismo
+      var tipo=_inferirTipoClick(oc,el);
+      if(!tipo)return;
+      var texto=(el.textContent||'').replace(/\s+/g,' ').trim().slice(0,60);
+      var detalle=(texto?texto+' · ':'')+(el.id?'#'+el.id:'');
+      if(typeof logActividad==='function')logActividad(tipo,detalle);
+    }catch(errInner){console.error('[CTA click-tracker] error en clic:',errInner);}
+  },true);
+  console.log('[CTA] click-tracker activo');
+}catch(errOuter){console.error('[CTA click-tracker] no se pudo activar:',errOuter);}
+</script>
 
 </body>
 </html>
