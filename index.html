@@ -471,6 +471,7 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 .mc-stat-lbl{font-size:9px;color:var(--gray);letter-spacing:.4px;text-transform:uppercase}
 .mc-day.cp{background:rgba(251,146,60,.1);color:#fb923c}
 .mc-day.curso{background:rgba(56,189,248,.12);color:#38bdf8}
+.mc-day.permiso{background:rgba(244,114,182,.14);color:#f472b6}
 
 .mc-peren-chip{background:rgba(251,146,60,.1);border:1px solid rgba(251,146,60,.3);border-radius:8px;color:#fb923c;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;padding:6px 10px;cursor:pointer}
 .mc-peren-chip:active{background:rgba(251,146,60,.25)}
@@ -585,7 +586,6 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 .grupo-tl-vuelo-bar>.lbl{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
 .grupo-tl-vuelo-bar.is-now{background:rgba(96,165,250,.4);border-color:#60a5fa;box-shadow:0 0 8px rgba(96,165,250,.45);color:#eff6ff}
 .grupo-tl-vuelo-bar.is-past{opacity:.5}
-.conector{position:absolute;height:0;border-top:1.5px solid rgba(167,139,250,.55);transform:translateY(-50%);z-index:1}
 .grupo-tl-vuelo-bar.es-salida{background:rgba(239,68,68,.22);border-color:rgba(239,68,68,.6);color:#fecaca}
 .grupo-tl-vuelo-bar.es-salida.is-now{background:rgba(239,68,68,.42);border-color:#ef4444;box-shadow:0 0 8px rgba(239,68,68,.5);color:#fee2e2}
 
@@ -2205,6 +2205,88 @@ var AVIATION_KEY="c69da0d719ab8a9787dc0c391ae414e2";
 var liveMode="llegadas";
 var liveFiltro=true;
 var liveLoaded=false;
+
+// ─── Resaltado de pareja por matrícula (Flightradar24) ──────────────────
+// window._fr24Map: numero de vuelo -> matrícula (solo se rellena cuando
+// /rotaciones encuentra el dato; si no hay matrícula, ese vuelo no se toca).
+// window._fr24Colores: matrícula -> color asignado mientras esté "encendida"
+// (varias parejas pueden estar resaltadas a la vez, cada una con su color).
+window._fr24Map = window._fr24Map || {};
+window._fr24Colores = window._fr24Colores || {};
+var FR24_PALETA = ['#34d399','#fbbf24','#38bdf8','#f472b6','#a78bfa','#fb7185','#f97316','#2dd4bf'];
+
+function _fr24ColorLibre(){
+  var usados=Object.values(window._fr24Colores);
+  for(var i=0;i<FR24_PALETA.length;i++){if(usados.indexOf(FR24_PALETA[i])===-1)return FR24_PALETA[i];}
+  return FR24_PALETA[Object.keys(window._fr24Colores).length%FR24_PALETA.length];
+}
+
+function aplicarFr24AlDOM(){
+  var map=window._fr24Map||{};
+  document.querySelectorAll('.vcr[data-numero]').forEach(function(row){
+    var num=row.getAttribute('data-numero');
+    var reg=map[num];
+    if(reg){
+      row.setAttribute('data-reg',reg);
+      row.title='Matrícula confirmada: '+reg;
+      // si esta matrícula ya estaba resaltada (p.ej. tras un refresco de fondo), se repinta con su mismo color
+      if(window._fr24Colores[reg])_fr24PintarPareja(reg,window._fr24Colores[reg]);
+    }else{
+      row.removeAttribute('data-reg');
+      row.removeAttribute('title');
+    }
+  });
+}
+
+function _fr24PintarPareja(reg,color){
+  document.querySelectorAll('.vcr[data-reg="'+reg+'"]').forEach(function(el){
+    if(color){
+      el.style.borderColor=color;
+      el.style.boxShadow='0 0 0 1px '+color+', 0 0 8px '+color+'66';
+    }else{
+      el.style.borderColor='';
+      el.style.boxShadow='';
+    }
+  });
+}
+
+function cargarFr24Rotaciones(){
+  fetch(RAILWAY+"/rotaciones")
+    .then(function(r){return r.json();})
+    .then(function(json){
+      if(!json||!json.ok)return;
+      var mapa={};
+      (json.llegadas||[]).forEach(function(v){if(v.matricula)mapa[v.numero]=v.matricula;});
+      (json.salidas||[]).forEach(function(v){if(v.matricula)mapa[v.numero]=v.matricula;});
+      window._fr24Map=mapa;
+      aplicarFr24AlDOM();
+    })
+    .catch(function(e){console.error('[fr24] rotaciones no disponible (no afecta al resto de la app):',e&&e.message);});
+}
+
+document.addEventListener('click',function(e){
+  var row=e.target.closest&&e.target.closest('.vcr');
+  if(!row)return;
+  var reg=row.getAttribute('data-reg');
+  if(!reg){
+    // sin matrícula confirmada todavía: un pequeño parpadeo para que se note el toque, sin encender nada
+    row.style.borderColor='rgba(255,255,255,.35)';
+    setTimeout(function(){if(!row.getAttribute('data-reg'))row.style.borderColor='';},300);
+    return;
+  }
+  if(window._fr24Colores[reg]){
+    _fr24PintarPareja(reg,null);
+    delete window._fr24Colores[reg];
+  }else{
+    var color=_fr24ColorLibre();
+    window._fr24Colores[reg]=color;
+    _fr24PintarPareja(reg,color);
+  }
+});
+
+// Refresco periódico de matrículas, mismo intervalo que la caché del backend
+// (3 min) — así no hace falta cerrar y abrir el panel para que aparezcan.
+setInterval(function(){if(liveLoaded)cargarFr24Rotaciones();},3*60*1000);
 var liveData={sal:[],lle:[]};
 var liveLastServerEmpty=false;
 
@@ -2418,6 +2500,11 @@ function renderLiveCol(container,data,esS){
     row.setAttribute('data-live-mode',esS?'salidas':'llegadas');
     row.setAttribute('data-estado-class',estadoClass);
     row.setAttribute('data-es-manana',v.esManana?'1':'0');
+    row.setAttribute('data-numero',num);
+    if(window._fr24Map&&window._fr24Map[num]){
+      row.setAttribute('data-reg',window._fr24Map[num]);
+      row.title='Matrícula confirmada: '+window._fr24Map[num];
+    }
 
     // Badge parking/remoto centrado absoluto a la altura de "Puerta"
     var midHtml='';
@@ -2565,6 +2652,7 @@ function loadLive(){
       document.getElementById("live-hora").textContent="Actualizado: "+pad(hNow.getHours())+":"+pad(hNow.getMinutes());
       renderLive();
       if(window._grupoVistaHoras)refrescarCompanerosPanel(window._grupoOffsetDias||0,false);
+      try{cargarFr24Rotaciones();}catch(e){console.error('[fr24] error al disparar rotaciones:',e&&e.message);}
       if(typeof window.renderOperativa==='function'){
         setTimeout(window.renderOperativa,50);
         setTimeout(window.renderOperativa,500);
@@ -2830,7 +2918,7 @@ function initGoogle(){
 (function(){
   var _MONTHS=['ENERO','FEBRERO','MARZO','ABRIL','MAYO','JUNIO','JULIO','AGOSTO','SEPTIEMBRE','OCTUBRE','NOVIEMBRE','DICIEMBRE'];
   var _ICO={trabajado:'⚙️',festivo:'🎉',hl:'🤝',hlp:'🤝',h6:'📋',curso:'📚',vacaciones:'🏖️',perentorias:'⏱️',hfun:'🏛️',baja:'🏥',rm:'🔄',nh:'🌙',bp:'💆',libre:'🌙'};
-  var _LABEL={trabajado:'Trabajado',festivo:'Festivo',hl:'H. Libre',hlp:'H. Libre Plus',h6:'Art. 6',curso:'Curso',vacaciones:'Vacaciones',perentorias:'Perentorias',hfun:'H. Función',baja:'Baja',rm:'R. Médico',nh:'Noche',bp:'Bienestar'};
+  var _LABEL={trabajado:'Trabajado',festivo:'Festivo',hl:'H. Libre',hlp:'H. Libre Plus',h6:'Art. 6',curso:'Curso',vacaciones:'Vacaciones',perentorias:'Perentorias',hfun:'H. Función',baja:'Baja',rm:'R. Médico',nh:'Noche',bp:'Bienestar',permiso:'Permiso'};
   var _timer=null;
 
   function toMin(t){if(!t||t.indexOf(':')<0)return null;var p=t.split(':');return +p[0]*60+ +p[1];}
@@ -4073,7 +4161,7 @@ function mcRenderWeeks(){
   // Week: Mon-Sun, find first Monday
   var firstDate=new Date(_mcYear,_mcMonth,1);
   var startDow=(firstDate.getDay()+6)%7; // 0=Mon
-  var totalTypes=['trabajado','vacaciones','festivo','hl','hlp','baja','rm','curso'];
+  var totalTypes=['trabajado','vacaciones','festivo','hl','hlp','baja','rm','curso','permiso'];
   var MNAMES_SHORT=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
 
   // Group into weeks (Mon-Sun)
@@ -4127,7 +4215,7 @@ function mcRenderWeeks(){
   }
 
   var html='';
-  var TIPO_ICO2={trabajado:'⚙️',festivo:'🎉',hl:'🤝',vacaciones:'🏖️',baja:'🏥',rm:'🔄',libre:'',curso:'📚'};
+  var TIPO_ICO2={trabajado:'⚙️',festivo:'🎉',hl:'🤝',vacaciones:'🏖️',baja:'🏥',rm:'🔄',libre:'',curso:'📚',permiso:'✋'};
   weeks.forEach(function(w,i){
     var startLbl=w.start.getDate()+' '+MNAMES_SHORT[w.start.getMonth()];
     var endLbl=w.end.getDate()+' '+MNAMES_SHORT[w.end.getMonth()];
@@ -4190,8 +4278,8 @@ function mcRenderSummary(ue){
   // totales año:  same
   // contador año: trabajado, hl, hlp, baja, rm
   // perentorias:  perenDur overlay (tracked separately)
-  var totalTypes=['trabajado','vacaciones','festivo','hl','hlp','baja','rm','hfun','curso'];
-  var contTypes= ['trabajado','hl','hlp','baja','rm','curso'];
+  var totalTypes=['trabajado','vacaciones','festivo','hl','hlp','baja','rm','hfun','curso','permiso'];
+  var contTypes= ['trabajado','hl','hlp','baja','rm','curso','permiso'];
   var anualMin=0,hlMin=0,hlAnualMin=0;
 
   Object.keys(mData).forEach(function(d){
@@ -4315,6 +4403,7 @@ var _MC_TIPOS=[
   {v:'bp',l:'Bienestar',ico:'💆',c:'#2dd4bf'},
   {v:'curso',l:'Curso',ico:'📚',c:'#38bdf8'},
   {v:'libre',l:'Libre',ico:'🌙',c:'rgba(255,255,255,.2)'},
+  {v:'permiso',l:'Permiso',ico:'✋',c:'#f472b6'},
 ];
 function mcEditDay(day,e){
   if(e)e.stopPropagation();
@@ -4376,7 +4465,7 @@ function mcEditSave(){
   if(!tipo)return;
   var tipoVal=tipo.dataset.tipo;
   var e1='',s1='',e2='',s2='';
-  if(tipoVal==='trabajado'||tipoVal==='curso'){
+  if(tipoVal==='trabajado'||tipoVal==='curso'||tipoVal==='permiso'){
     e1=document.getElementById('mc-edit-e1').value.trim();
     s1=document.getElementById('mc-edit-s1').value.trim();
     e2=document.getElementById('mc-edit-e2').value.trim();
@@ -4448,8 +4537,8 @@ function mcEditSave(){
     delete ue[month][day].perenTipo;
     delete ue[month][day].hfunDur;
   } else {
-    if(tipoVal==='trabajado'||tipoVal==='curso'){
-      // Trabajado/Curso sí permiten editar y guardar horarios manualmente.
+    if(tipoVal==='trabajado'||tipoVal==='curso'||tipoVal==='permiso'){
+      // Trabajado/Curso/Permiso sí permiten editar y guardar horarios manualmente.
       var totalMin = _mcMin(e1, s1) + _mcMin(e2, s2);
       ue[month][day]={
         tipo:tipoVal,
@@ -4498,7 +4587,7 @@ function mcTipoSel(btn){
   var showPeren=document.getElementById('mc-edit-peren');
   var showHfun=document.getElementById('mc-edit-hfun');
   var showHl=document.getElementById('mc-edit-hl');
-  if(v==='trabajado'||v==='curso'){
+  if(v==='trabajado'||v==='curso'||v==='permiso'){
     showTimes.style.display='block';
     showPeren.style.display='none';
     if(showHfun)showHfun.style.display='none';
@@ -4585,6 +4674,7 @@ document.addEventListener('DOMContentLoaded',function(){
     <button class="mc-tipo-btn" data-tipo="libre" onclick="mcTipoSel(this)"><span class="t-ico">🌙</span><span class="t-lbl">Libre</span></button>
     <button class="mc-tipo-btn" data-tipo="curso" onclick="mcTipoSel(this)"><span class="t-ico">📚</span><span class="t-lbl">Curso</span></button>
     <button class="mc-tipo-btn" data-tipo="hl" onclick="mcTipoSel(this)"><span class="t-ico">🤝</span><span class="t-lbl">HL</span></button>
+    <button class="mc-tipo-btn" data-tipo="permiso" onclick="mcTipoSel(this)"><span class="t-ico">✋</span><span class="t-lbl">Permiso</span></button>
   </div>
   <div class="mc-edit-hl" id="mc-edit-hl" style="display:none;margin-bottom:12px">
     <div style="display:flex;gap:8px;margin-bottom:10px">
@@ -5412,7 +5502,14 @@ function _getCambioCompartidoEmpleado(emp,dateObj){
 }
 function _tipoCambioEsLibre(tipo){
   tipo=String(tipo||'').toLowerCase();
-  return ['hl','hlp','libre','dl','descanso','festivo','vacaciones','baja','perentorias','h6','hfun','rm','bp','nh','cp'].indexOf(tipo)>=0;
+  return ['hl','hlp','libre','dl','descanso','festivo','vacaciones','baja','perentorias','h6','hfun','rm','bp','nh','cp','permiso'].indexOf(tipo)>=0;
+}
+// Permiso cuenta horas (e1/s1/e2/s2 reales, para nómina) pero para todo lo
+// que sea "¿esta persona viene a trabajar?" (coincidencias, buscador de
+// cambio de turno, etc.) se trata exactamente igual que Libre.
+function _esTipoNoTrabaja(tipo){
+  tipo=String(tipo||'').toLowerCase();
+  return tipo==='libre'||tipo==='permiso';
 }
 function _cambioToTurno(c){
   if(!c)return null;
@@ -5624,7 +5721,7 @@ function renderCompanerosDia(offsetDias,toggleIfOpen){
     if(_esArturoPlantilla(emp.nombre||emp.nomina)){
       turno=_arturoHLPubFecha(target)?null:_ajustarTurnoConHLPersonal(turno,_miCalendarioDiaArturo(target));
     }
-    if(turno&&turno.e1&&turno.tipo!=='libre'){
+    if(turno&&turno.e1&&!_esTipoNoTrabaja(turno.tipo)){
       var grE1=toMinG(turno.e1),grS1=toMinG(turno.s1);
       var grE2=turno.e2?toMinG(turno.e2):null,grS2=turno.s2?toMinG(turno.s2):null;
       var solapa=turnosSeSuperponen(myE1,myS1,myE2,myS2,grE1,grS1,grE2,grS2);
@@ -5867,7 +5964,7 @@ function _buildCompanerosTimelineData(offsetDias){
     if(_esArturoPlantilla(emp.nombre||emp.nomina)){
       turno=_arturoHLPubFecha(target)?null:_ajustarTurnoConHLPersonal(turno,_miCalendarioDiaArturo(target));
     }
-    if(turno&&turno.e1&&turno.tipo!=='libre'){
+    if(turno&&turno.e1&&!_esTipoNoTrabaja(turno.tipo)){
       var grE1=toMinG(turno.e1),grS1=toMinG(turno.s1);
       var grE2=turno.e2?toMinG(turno.e2):null,grS2=turno.s2?toMinG(turno.s2):null;
       var solapa=turnosSeSuperponen(myE1,myS1,myE2,myS2,grE1,grS1,grE2,grS2);
@@ -5987,12 +6084,12 @@ function _tlFilaHtml(segs,extraClass,esDiaActual,nowMin){
 // aparecen automáticamente en el carril de "Día siguiente". Para el resto
 // de días (pasado mañana en adelante) el carril queda vacío porque no hay
 // datos de AENA tan lejos.
-var DURACION_LLEGADA_TL=22; // minutos que dura cada bloque de llegada (azul)
-var DURACION_SALIDA_TL=23;  // minutos que dura cada bloque de salida (rojo)
-var TOLERANCIA_EMPAREJAR_TL=20; // margen ± en min: cuánto hueco real se tolera para considerar "pegadas" (objetivo = 0)
+var DURACION_LLEGADA_TL=45; // minutos que dura cada bloque de llegada
 var UMBRAL_DESCANSO_MIN=29; // a partir de cuántos minutos sin vuelos se marca como "descanso"
 var PISTA_LLEGADA_H=22; // alto de cada pista, en px
 var TL_GRID_W_VUELOS=32*48; // = CELL*48 usado en renderCompanerosTimeline
+var VENTANA_SOLO_SALIDAS_INICIO=270; // 04:30 — desde aquí se buscan salidas "sin llegada" (avión durmió en ALC)
+var VENTANA_SOLO_SALIDAS_FIN=480;    // 08:00 — hasta aquí
 
 function _tlFmtDur(mins){
   var h=Math.floor(mins/60),m=mins%60;
@@ -6071,17 +6168,6 @@ function mostrarToastVuelo(ev,numero,cod,start,end,tipo){
   t._timer=setTimeout(function(){t.classList.remove('show');},3000);
 }
 
-// HTML de una caja individual (llegada o salida). esDiaActual/nowMin se
-// pasan explícitos porque esto se usa desde dentro de renderCompanerosTimeline.
-function _tlCajaHtml(v,esSalida,pista,esDiaActual,nowMin){
-  var activo=esDiaActual&&nowMin>=v.start&&nowMin<v.end;
-  var pasado=esDiaActual&&nowMin>=v.end;
-  var cls='grupo-tl-vuelo-bar'+(esSalida?' es-salida':'')+(activo?' is-now':'')+(pasado?' is-past':'');
-  var leftPct=(v.start/1440*100),widthPct=((v.end-v.start)/1440*100);
-  var top=(pista*PISTA_LLEGADA_H+2);
-  return '<div class="'+cls+'" style="left:'+leftPct+'%;width:'+widthPct+'%;top:'+top+'px;height:'+(PISTA_LLEGADA_H-4)+'px" title="'+((esSalida?'Salida ':'Llegada ')+v.numero+' · '+v.cod+' · '+_tlFmtMin(v.start)+'–'+_tlFmtMin(v.end===1440?0:v.end))+'" onclick="mostrarToastVuelo(event,\''+v.numero+'\',\''+v.cod+'\','+v.start+','+v.end+',\''+(esSalida?'salida':'llegada')+'\')"><span class="lbl">'+v.cod+'</span></div>';
-}
-
 function _tlPrefLlegadasLeer(){
   try{var v=localStorage.getItem('cta_mostrar_llegadas');return v===null?true:v==='1';}
   catch(e){return true;}
@@ -6140,10 +6226,12 @@ function _tlLlegadasDelDia(offsetDias){
     .sort(function(a,b){return a.start-b.start;});
 }
 
-// Todas las salidas del día (antes solo se miraban las de madrugada sin
-// llegada — ahora se muestran todas, porque el emparejamiento de abajo
-// necesita ver el día completo para poder unir cada llegada con su salida).
-function _tlSalidasDelDia(offsetDias){
+// De madrugada (04:30-08:00 por defecto) los primeros vuelos del día suelen
+// ser aviones que pasaron la noche en ALC: no hay llegada que mostrar, solo
+// salida. Para que esa franja no se vea vacía, se muestran esas salidas en
+// rojo, con un bloque que arranca 45 min antes de la hora de salida (real
+// si la hay, programada si no) y termina justo en la hora de salida.
+function _tlSalidasTempranasDelDia(offsetDias){
   if(typeof liveData==='undefined'||!liveData||!liveData.sal)return[];
   var quiereManana=offsetDias===1;
   return liveData.sal
@@ -6151,38 +6239,11 @@ function _tlSalidasDelDia(offsetDias){
     .map(function(v){
       var dep=hToMin(v.horaReal||v.horaProg||'');
       if(dep===null)return null;
-      return{numero:v.numero||'',cod:_tlOrigenCorto(v.destino),start:dep,end:dep+DURACION_SALIDA_TL,tipo:'salida'};
+      if(dep<VENTANA_SOLO_SALIDAS_INICIO||dep>VENTANA_SOLO_SALIDAS_FIN)return null;
+      return{numero:v.numero||'',cod:_tlOrigenCorto(v.destino),start:dep-DURACION_LLEGADA_TL,end:dep,tipo:'salida'};
     })
     .filter(Boolean)
     .sort(function(a,b){return a.start-b.start;});
-}
-
-// Intenta emparejar cada llegada con una salida que empiece justo cuando
-// termina la llegada (hueco real ≈ 0, con un margen de tolerancia por si
-// el horario real no es perfecto) — así, juntas, ocupan 22+23=45 min
-// seguidos, pegadas, sin hueco entre ellas. PRIORITY INSTRUCTION para quien
-// toque esto luego: esto es una estimación SOLO por horario — no hay
-// matrícula de avión ni dato de rotación real, así que puede acertar o no.
-// Nunca tratar el resultado como un hecho confirmado en ningún sitio de la UI.
-function _tlEmparejarVuelos(llegadas,salidas,tol){
-  var llOrd=llegadas.slice().sort(function(a,b){return a.start-b.start;});
-  var salDisp=salidas.slice().sort(function(a,b){return a.start-b.start;});
-  var usadas={};
-  var pares=[],llSinPar=[];
-  llOrd.forEach(function(ll){
-    var mejorIdx=-1,mejorDif=Infinity;
-    salDisp.forEach(function(sa,idx){
-      if(usadas[idx])return;
-      var hueco=sa.start-ll.end; // objetivo: 0 (pegadas)
-      if(hueco<-tol||hueco>tol)return;
-      var dif=Math.abs(hueco);
-      if(dif<mejorDif){mejorDif=dif;mejorIdx=idx;}
-    });
-    if(mejorIdx>=0){usadas[mejorIdx]=true;pares.push({ll:ll,sa:salDisp[mejorIdx],hueco:salDisp[mejorIdx].start-ll.end});}
-    else llSinPar.push(ll);
-  });
-  var saSinPar=salDisp.filter(function(s,idx){return !usadas[idx];});
-  return{pares:pares,llSinPar:llSinPar,saSinPar:saSinPar};
 }
 
 // Texto pequeño de parking dentro del recuadro: usa gateOperationalLabel,
@@ -6254,49 +6315,35 @@ function renderCompanerosTimeline(offsetDias,toggleIfOpen){
   var headerHtml='';
   for(var h=0;h<24;h++){headerHtml+='<div class="grupo-tl-hr">'+(h<10?'0':'')+h+'</div>';}
 
-  // Carril de vuelos — llegadas (azul, 22min) y salidas (rojo, 23min) de
-  // todo el día. Se intenta emparejar cada llegada con la salida que
-  // empiece justo cuando termina (ver _tlEmparejarVuelos) — si encajan,
-  // van juntas en la misma fila, pegadas. Es solo una estimación por
-  // horario, nunca un hecho confirmado (no hay matrícula de avión).
-  // Datos reales para HOY, y para MAÑANA en cuanto el backend de Railway
-  // empiece a incluir esos vuelos con esManana=true.
+  // Carril de llegadas — datos reales para HOY, y para MAÑANA en cuanto el
+  // backend de Railway empiece a incluir esos vuelos con esManana=true
+  // (no hay ninguna hora fija comprobada aquí, sea cuando sea aparecerán).
+  // De madrugada se añaden también las salidas "sin llegada" (avión que
+  // durmió en ALC) en rojo — ver _tlSalidasTempranasDelDia.
   // TODO este bloque va en try/catch: si algo aquí falla, el resto del
   // panel (nombres, filas, navegación, el propio botón de abrir/cerrar
   // Llegadas) tiene que seguir funcionando igual.
   var llegadasConPista=[];
-  var vuelosLabelHtml='<div class="grupo-tl-vuelos-label'+(window._tlMostrarLlegadas?'':' collapsed')+'" id="grupoTlVuelosLabel" onclick="toggleLlegadasTimeline()"><span class="chev">▾</span> ✈️ Vuelos</div>';
+  var vuelosLabelHtml='<div class="grupo-tl-vuelos-label'+(window._tlMostrarLlegadas?'':' collapsed')+'" id="grupoTlVuelosLabel" onclick="toggleLlegadasTimeline()"><span class="chev">▾</span> ✈️ Llegadas</div>';
   var vuelosRowHtml='<div class="grupo-tl-vuelos-row" id="grupoTlVuelosRow" style="width:'+GRID_W+'px">';
   try{
     if(offsetDias===0||offsetDias===1){
-      var llegadasRaw=_tlLlegadasDelDia(offsetDias);
-      var salidasRaw=_tlSalidasDelDia(offsetDias);
-      var emparejado=_tlEmparejarVuelos(llegadasRaw,salidasRaw,TOLERANCIA_EMPAREJAR_TL);
-      var itemsCombinados=[];
-      emparejado.pares.forEach(function(p){itemsCombinados.push({tipo:'par',start:p.ll.start,end:p.sa.end,par:p});});
-      emparejado.llSinPar.forEach(function(l){itemsCombinados.push({tipo:'llegada',start:l.start,end:l.end,item:l});});
-      emparejado.saSinPar.forEach(function(s){itemsCombinados.push({tipo:'salida',start:s.start,end:s.end,item:s});});
-      llegadasConPista=_tlAsignarPistasVuelos(itemsCombinados);
+      var combinado=_tlLlegadasDelDia(offsetDias).concat(_tlSalidasTempranasDelDia(offsetDias));
+      llegadasConPista=_tlAsignarPistasVuelos(combinado);
       if(!liveLoaded&&typeof loadLive==='function')loadLive(); // dispara la carga si aún no se había abierto el panel Live
     }
     window._tlLlegadasConPistaActual=llegadasConPista;
     if(window._tlMostrarLlegadas){
-      llegadasConPista.forEach(function(it){
-        if(it.tipo==='par'){
-          var ll=it.par.ll,sa=it.par.sa;
-          var cLeft=(ll.end/1440*100),cWidth=((sa.start-ll.end)/1440*100);
-          if(cWidth>0){
-            vuelosRowHtml+='<div class="conector" style="left:'+cLeft+'%;width:'+cWidth+'%;top:'+(it.pista*PISTA_LLEGADA_H+PISTA_LLEGADA_H/2)+'px" title="Posible mismo avión · hueco real '+it.par.hueco+'min (estimado, no confirmado)"></div>';
-          }
-          vuelosRowHtml+=_tlCajaHtml(ll,false,it.pista,esDiaActual,nowMin);
-          vuelosRowHtml+=_tlCajaHtml(sa,true,it.pista,esDiaActual,nowMin);
-        } else if(it.tipo==='llegada'){
-          vuelosRowHtml+=_tlCajaHtml(it.item,false,it.pista,esDiaActual,nowMin);
-        } else {
-          vuelosRowHtml+=_tlCajaHtml(it.item,true,it.pista,esDiaActual,nowMin);
-        }
+      llegadasConPista.forEach(function(v){
+        var esSalida=v.tipo==='salida';
+        var activo=esDiaActual&&nowMin>=v.start&&nowMin<v.end;
+        var pasado=esDiaActual&&nowMin>=v.end;
+        var cls='grupo-tl-vuelo-bar'+(esSalida?' es-salida':'')+(activo?' is-now':'')+(pasado?' is-past':'');
+        var leftPct=(v.start/1440*100),widthPct=((v.end-v.start)/1440*100);
+        var top=(v.pista*PISTA_LLEGADA_H+2);
+        vuelosRowHtml+='<div class="'+cls+'" style="left:'+leftPct+'%;width:'+widthPct+'%;top:'+top+'px;height:'+(PISTA_LLEGADA_H-4)+'px" title="'+((esSalida?'Salida ':'Llegada ')+v.numero+' · '+v.cod+' · '+_tlFmtMin(v.start)+'–'+_tlFmtMin(v.end===1440?0:v.end))+'" onclick="mostrarToastVuelo(event,\''+v.numero+'\',\''+v.cod+'\','+v.start+','+v.end+',\''+v.tipo+'\')"><span class="lbl">'+v.cod+'</span></div>';
       });
-      // descansos (huecos largos entre vuelos / bloques solapados/emparejados) — en dorado, dentro de la propia fila.
+      // descansos (huecos largos entre vuelos / bloques solapados) — en dorado, dentro de la propia fila.
       // El hueco que contiene "ahora" se pinta aparte (_tlGapEnVivo), sin umbral mínimo.
       var gapVivo=esDiaActual?_tlGapEnVivo(llegadasConPista,nowMin):null;
       if(gapVivo&&(gapVivo.end-gapVivo.start)<UMBRAL_DESCANSO_MIN)gapVivo=null; // mismo umbral que entre vuelos: si quedan menos de 29min, no se muestra
@@ -6311,7 +6358,7 @@ function renderCompanerosTimeline(offsetDias,toggleIfOpen){
       }
     }
   }catch(_eVuelos){
-    console.error('Error pintando el carril de vuelos (no debería bloquear el resto):',_eVuelos);
+    console.error('Error pintando el carril de llegadas (no debería bloquear el resto):',_eVuelos);
   }
   vuelosRowHtml+='</div>';
 
@@ -8295,7 +8342,7 @@ function calcularCambios(){
     var compTurnoMiDia=compDias[day]||null;
     compTurnoMiDia=_turnoGrupoConCambioCompartido(comp,new Date(year,_cambioMonth,day),compTurnoMiDia);
     // Día libre: turno con tipo libre o e1 vacío
-    if(compTurnoMiDia&&(!compTurnoMiDia.e1||compTurnoMiDia.tipo==='libre'))compTurnoMiDia=null;
+    if(compTurnoMiDia&&(!compTurnoMiDia.e1||_esTipoNoTrabaja(compTurnoMiDia.tipo)))compTurnoMiDia=null;
     var compE1=compTurnoMiDia?_toMin(compTurnoMiDia.e1):null;
     var compS1=compTurnoMiDia?_toMin(compTurnoMiDia.s1):null;
     var compE2=compTurnoMiDia&&compTurnoMiDia.e2?_toMin(compTurnoMiDia.e2):null;
@@ -8339,12 +8386,12 @@ function calcularCambios(){
         if(d2===day||_esPasado(d2,monthKey,year))continue;
         var myT2=(myRaw[monthKey]||{})[d2];
         // Yo debo librar ese día: sin turno, o turno tipo libre, o e1 vacío
-        var yoTrabajoD2=!!(myT2&&myT2.e1&&myT2.tipo!=='libre');
+        var yoTrabajoD2=!!(myT2&&myT2.e1&&!_esTipoNoTrabaja(myT2.tipo));
         if(yoTrabajoD2)continue;
         var cT2=compDias[d2];
         cT2=_turnoGrupoConCambioCompartido(comp,new Date(year,_cambioMonth,d2),cT2);
         // Comp debe trabajar ese día
-        if(!cT2||!cT2.e1||cT2.tipo==='libre')continue;
+        if(!cT2||!cT2.e1||_esTipoNoTrabaja(cT2.tipo))continue;
         var cE1=_toMin(cT2.e1),cS1=_toMin(cT2.s1),cE2=cT2.e2?_toMin(cT2.e2):null,cS2=cT2.s2?_toMin(cT2.s2):null;
 
         // Simulación real del intercambio:
@@ -8401,12 +8448,12 @@ function calcularCambios(){
         if(d3===day||_esPasado(d3,monthKey,year))continue;
         var myT3=(myRaw[monthKey]||{})[d3];
         // Yo debo trabajar ese día
-        if(!myT3||!myT3.e1||myT3.tipo==='libre')continue;
+        if(!myT3||!myT3.e1||_esTipoNoTrabaja(myT3.tipo))continue;
         if(!_diaImportadoCambio(comp,monthKey,year,d3))continue;
         var cT3=compDias[d3];
         cT3=_turnoGrupoConCambioCompartido(comp,new Date(year,_cambioMonth,d3),cT3);
         // Comp debe librar ese día: sin turno, tipo libre o e1 vacío
-        var compTrabajaD3=!!(cT3&&cT3.e1&&cT3.tipo!=='libre');
+        var compTrabajaD3=!!(cT3&&cT3.e1&&!_esTipoNoTrabaja(cT3.tipo));
         if(compTrabajaD3)continue;
         var mE1=_toMin(myT3.e1),mS1=_toMin(myT3.s1),mE2=myT3.e2?_toMin(myT3.e2):null,mS2=myT3.s2?_toMin(myT3.s2):null;
 
@@ -8448,7 +8495,7 @@ function calcularCambios(){
     var compDias=(comp.meses&&comp.meses[monthKey])||{};
     var compT=compDias[day]||null;
     compT=_turnoGrupoConCambioCompartido(comp,new Date(year,_cambioMonth,day),compT);
-    if(compT&&(!compT.e1||compT.tipo==='libre'))compT=null;
+    if(compT&&(!compT.e1||_esTipoNoTrabaja(compT.tipo)))compT=null;
     var compE1=compT?_toMin(compT.e1):null;
     var compS1=compT?_toMin(compT.s1):null;
     var compE2=compT&&compT.e2?_toMin(compT.e2):null;
@@ -8562,7 +8609,7 @@ function calcularCambios(){
     var compDias2=(comp.meses&&comp.meses[monthKey])||{};
     var compT2c=compDias2[day]||null;
     compT2c=_turnoGrupoConCambioCompartido(comp,new Date(year,_cambioMonth,day),compT2c);
-    var compLibre2=!compT2c||!compT2c.e1||compT2c.tipo==='libre';
+    var compLibre2=!compT2c||!compT2c.e1||_esTipoNoTrabaja(compT2c.tipo);
     if(!compLibre2)return; // solo si el comp libra ese día
     if(myE2===null||myS2===null)return; // solo si mi turno es partido
 
