@@ -1019,6 +1019,54 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 .ev-mes-tabs::-webkit-scrollbar{display:none}
 .ev-mes-tab{background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:10px;padding:6px 12px;font-size:12px;color:var(--gray);cursor:pointer;white-space:nowrap;flex-shrink:0;font-family:'Outfit',sans-serif}
 .ev-mes-tab.active{background:rgba(200,168,75,.15);border-color:rgba(200,168,75,.4);color:var(--gold);font-weight:700}
+
+
+/* =========================================================
+   AJUSTE ARTURO 2026-07-02
+   Objetivo:
+   - Fuentes algo más grandes sin forzar scroll en portada.
+   - Portada Operativa encajada en el hueco visible.
+   - "Mi jornada" pegada abajo, justo encima de la barra de botones.
+   - El desplegable "Más" queda debajo de la portada y solo aparece al hacer scroll.
+   ========================================================= */
+body{font-size:15px!important}
+#app-header{padding-top:10px!important}
+.header-name{font-size:23px!important}.header-sub{font-size:10px!important}.header-portal{font-size:11px!important}
+#nav-bar{padding-top:4px!important;padding-bottom:5px!important}
+#tab-bar{padding-top:4px!important}.tab{font-size:12px!important;padding:8px 0!important}
+#bottom-nav{min-height:64px!important;padding-top:7px!important;padding-bottom:max(7px,env(safe-area-inset-bottom))!important}
+.nav-btn{font-size:9px!important}.nav-ico{font-size:21px!important}
+#scroll-area{padding:8px 12px calc(76px + env(safe-area-inset-bottom))!important}
+#panel-operativa.active{height:100%!important;min-height:0!important}
+#op-fit-outer{height:100%!important;overflow:hidden!important;margin:0!important;padding:0!important}
+#op-fit-zone{height:100%!important;min-height:0!important;display:flex!important;flex-direction:column!important;padding-bottom:2px!important}
+#op-fit-zone>.op-sec{font-size:15px!important;margin:9px 0 6px!important;line-height:1.05!important}
+#op-fit-zone>.op-sec:first-child{margin-top:0!important}
+/* La sección Mi jornada baja y absorbe el espacio sobrante */
+#op-fit-zone>.op-sec:has(+ #op-turno-card){margin-top:auto!important;margin-bottom:6px!important}
+#op-turno-card{flex:0 0 auto!important;margin-bottom:0!important;border-radius:17px!important;padding:12px 16px!important;min-height:92px!important}
+.op-turno-card.op-tc-horiz .op-tc-lbl{font-size:12px!important;margin-bottom:7px!important}
+.op-turno-card.op-tc-horiz .op-tc-row{gap:14px!important;margin-bottom:8px!important}
+.op-tc-pct{font-size:31px!important}.op-tc-rem{font-size:12px!important}.op-tc-sub{font-size:16px!important}.op-tc-shift{font-size:12px!important}.op-tc-times span{font-size:13px!important;padding:6px 12px!important}
+#op-v2-mas{margin-top:14px!important;margin-bottom:20px!important}
+#op-v2-mas:not([open]){min-height:48px!important}
+.op-details summary{font-size:13px!important;padding:13px 14px!important}
+/* Si el móvil es bajo, compactamos lo justo para seguir sin scroll en portada */
+@media(max-height:760px){
+  #app-header{padding-top:8px!important}.header-row{margin-bottom:2px!important}.logo{width:39px!important;height:39px!important}.header-name{font-size:21px!important}
+  #nav-bar{padding-top:3px!important;padding-bottom:4px!important}#tab-bar{padding-top:3px!important}.tab{padding:7px 0!important;font-size:11.5px!important}
+  #scroll-area{padding-top:6px!important;padding-bottom:calc(70px + env(safe-area-inset-bottom))!important}
+  #op-fit-zone>.op-sec{font-size:14px!important;margin:7px 0 5px!important}
+  #op-turno-card{min-height:84px!important;padding:10px 14px!important}
+  .op-turno-card.op-tc-horiz .op-tc-row{gap:10px!important;margin-bottom:7px!important}
+  .op-tc-pct{font-size:28px!important}.op-tc-sub{font-size:15px!important}.op-tc-times span{font-size:12px!important;padding:5px 10px!important}
+}
+@media(max-height:690px){
+  .header-sub,.header-portal{display:none!important}#app-header::after{margin-top:6px!important}
+  #bottom-nav{min-height:58px!important}.nav-ico{font-size:19px!important}.nav-btn{font-size:8.5px!important}
+  #op-turno-card{min-height:76px!important}.op-tc-pct{font-size:25px!important}.op-tc-sub{font-size:14px!important}.op-tc-rem,.op-tc-shift{font-size:11px!important}
+}
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
@@ -1048,7 +1096,7 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
       <div class="header-name">CTA Alicante</div>
       <div class="header-sub">Comision de Trabajadores Asamblearios</div>
       <div class="header-portal" id="header-welcome">Portal del Afiliado</div>
-      <div style="font-size:9px;color:rgba(255,255,255,.25);letter-spacing:.5px;margin-top:1px">build v2026-07-02-o</div>
+      <div style="font-size:9px;color:rgba(255,255,255,.25);letter-spacing:.5px;margin-top:1px">build v2026-07-02-l</div>
     </div>
   </div>
   <div id="nav-bar">
@@ -1080,8 +1128,8 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 <div id="scroll-area">
 
   <div class="panel active" id="panel-operativa">
-    <div id="op-fit-outer" style="position:relative;height:100%">
-    <div id="op-fit-zone" style="display:flex;flex-direction:column;min-height:0;height:100%;padding-bottom:4px">
+    <div id="op-fit-outer" style="position:relative;overflow:hidden;height:100%">
+    <div id="op-fit-zone" style="transform-origin:top left;padding-bottom:4px;display:flex;flex-direction:column;min-height:0;height:100%">
     <p class="op-sec">Vuelos hoy · ALC</p>
     <div class="op-vuelos" onclick="document.getElementById('btn-live').click()">
       <span class="op-plane">✈</span>
@@ -1156,9 +1204,30 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
           <span style="font-size:20px;color:var(--gray);font-weight:600">Media/mes necesaria hasta dic.</span>
           <span id="op-cal-media-mes" style="font-size:23px;font-weight:800;color:#60a5fa">—</span>
         </div>
-        <div id="op-cal-media-mes-sub" style="font-size:12.5px;color:var(--gray);margin-top:2px;text-align:right"></div>
+        <div id="op-cal-media-mes-sub" onclick="event.stopPropagation();opCorregirVacTomadas()" style="font-size:12.5px;color:var(--gray);margin-top:2px;text-align:right;text-decoration:underline dotted;cursor:pointer"></div>
       </div>
     </div>
+
+    <p class="op-sec">Mi jornada</p>
+    <div class="op-turno-card state-working op-tc-horiz" id="op-turno-card" onclick="switchTab('afiliate',null,document.getElementById('nav-afiliate'))">
+      <div class="op-tc-lbl" id="op-tc-lbl">Turno hoy</div>
+      <div class="op-tc-row">
+        <div class="op-tc-col op-tc-col-a">
+          <div class="op-tc-pct" id="op-tc-pct">—</div>
+          <div class="op-tc-rem" id="op-tc-rem"></div>
+        </div>
+        <div class="op-tc-col op-tc-col-b">
+          <div class="op-tc-sub" id="op-tc-sub">—</div>
+          <div class="op-tc-shift" id="op-tc-shift"></div>
+        </div>
+        <div class="op-tc-col op-tc-col-c">
+          <div class="op-tc-times" id="op-tc-times"><span style="color:var(--gray);font-size:11px">Cargando...</span></div>
+        </div>
+      </div>
+      <div class="op-tc-bar-bg"><div class="op-tc-bar" id="op-tc-bar" style="width:0%"></div></div>
+    </div>
+    </div>
+    </div><!-- /op-fit-outer -->
 
     <!-- ══ v2: todo lo demás (resumen operativo, detalles, historial) se ha
          quitado de la portada y queda aquí colapsado, por si hace falta ══ -->
@@ -1302,28 +1371,6 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 
       </div>
     </details>
-
-        <p class="op-sec">Mi jornada</p>
-    <div class="op-turno-card state-working op-tc-horiz" id="op-turno-card" onclick="switchTab('afiliate',null,document.getElementById('nav-afiliate'))">
-      <div class="op-tc-lbl" id="op-tc-lbl">Turno hoy</div>
-      <div class="op-tc-row">
-        <div class="op-tc-col op-tc-col-a">
-          <div class="op-tc-pct" id="op-tc-pct">—</div>
-          <div class="op-tc-rem" id="op-tc-rem"></div>
-        </div>
-        <div class="op-tc-col op-tc-col-b">
-          <div class="op-tc-sub" id="op-tc-sub">—</div>
-          <div class="op-tc-shift" id="op-tc-shift"></div>
-        </div>
-        <div class="op-tc-col op-tc-col-c">
-          <div class="op-tc-times" id="op-tc-times"><span style="color:var(--gray);font-size:11px">Cargando...</span></div>
-        </div>
-      </div>
-      <div class="op-tc-bar-bg"><div class="op-tc-bar" id="op-tc-bar" style="width:0%"></div></div>
-    </div>
-    </div>
-    </div><!-- /op-fit-outer -->
-
 
     <div id="op-info-overlay" onclick="opHideDataInfo()">
       <div class="op-info-modal" onclick="event.stopPropagation()">
@@ -4930,42 +4977,61 @@ function abrirTodaPlantilla(){
     if(gp){gp.classList.add('open');verCompanerosHoy(true);}
   },50);
 }
-// ══ v2: "Mi jornada" (el recuadro verde, #op-turno-card) crece para tocar
-// justo el borde de los iconos. Antes esto se intentaba con una cascada de
-// alturas al 100% (body→scroll-area→panel→contenedor→zona→tarjeta) — en
-// teoría válido, pero en la práctica algunos navegadores móviles no
-// resuelven bien un 100% encadenado en tantos niveles, y el resultado se
-// quedaba corto. Ahora es una medición DIRECTA y mínima: dónde está el
-// borde de arriba de la tarjeta verde ahora mismo, menos dónde empieza la
-// barra de iconos (que es position:fixed, siempre en el mismo sitio) — esa
-// resta ES la altura que debe tener la tarjeta. Un solo cálculo, sin
-// cadenas ni capas intermedias que puedan fallar. El desplegable "Más"
-// queda fuera de la tarjeta, así que al crecer ésta, "Más" se empuja solo
-// hacia abajo, fuera de la vista.
-function _ajustarMiJornadaAltura(){
+// ══ v2: "encajar" Vuelos+Día a día+Calendario+Mi jornada exactamente en el
+// hueco visible, para que Mi jornada quede pegada abajo. El truco clave:
+// NO usamos window.innerHeight (poco fiable en móvil por la barra del
+// navegador que aparece/desaparece con el scroll — era la causa de que el
+// tamaño "bailara" y de que quedara hueco). En su lugar medimos la altura
+// del propio #scroll-area, que es un contenedor con altura fija por CSS
+// (flex:1 dentro de un layout de altura 100dvh) y NO cambia al hacer
+// scroll dentro de él. El desplegable "Más" queda fuera de op-fit-outer.
+function _ajustarFitZoneOperativa(){
   var panel=document.getElementById('panel-operativa');
   if(!panel||!panel.classList.contains('active'))return;
-  var card=document.getElementById('op-turno-card');
+  var outer=document.getElementById('op-fit-outer'),inner=document.getElementById('op-fit-zone');
+  if(!outer||!inner)return;
+  var scrollArea=document.getElementById('scroll-area');
+  if(!scrollArea)return;
+
+  inner.style.transform='none';
+  inner.style.width='';
+  inner.style.height='';
+  outer.style.height='auto';
+
+  var cs=getComputedStyle(scrollArea);
+  var padTop=parseFloat(cs.paddingTop)||0;
   var nav=document.getElementById('bottom-nav');
-  if(!card||!nav)return;
-  card.style.minHeight='0px'; // reset: medir siempre desde la posición real actual
-  var cardTop=card.getBoundingClientRect().top;
-  var navTop=nav.getBoundingClientRect().top;
-  var target=navTop-cardTop-10; // 10px de margen de seguridad
-  if(target>60)card.style.minHeight=target+'px';
+  var navH=nav?nav.getBoundingClientRect().height:70;
+  // Altura realmente visible antes de la barra inferior. Dejamos 3 px de seguridad.
+  var disponible=scrollArea.clientHeight-padTop-navH-3;
+  if(disponible<180){ disponible=scrollArea.clientHeight-padTop-3; }
+
+  var innerH=inner.scrollHeight;
+  if(innerH<=0||disponible<=0)return;
+  var escala=disponible/innerH;
+
+  if(escala<0.94){
+    escala=Math.max(0.82,escala);
+    inner.style.width=(100/escala)+'%';
+    inner.style.transform='scale('+escala+')';
+    outer.style.height=Math.ceil(inner.scrollHeight*escala)+'px';
+  }else{
+    outer.style.height=Math.floor(disponible)+'px';
+    inner.style.height='100%';
+  }
 }
-window.addEventListener('resize',_ajustarMiJornadaAltura);
-window.addEventListener('orientationchange',function(){setTimeout(_ajustarMiJornadaAltura,200);});
-// "Más" ahora va ANTES que Mi jornada — si el usuario lo despliega o lo
-// cierra, cambia cuánto sitio ocupa por encima, así que hay que recalcular
-// en ese momento (el evento "toggle" salta al abrir y al cerrar el <details>).
-(function(){
-  var masDet=document.getElementById('op-v2-mas');
-  if(masDet)masDet.addEventListener('toggle',function(){setTimeout(_ajustarMiJornadaAltura,50);});
-})();
+window.addEventListener('resize',_ajustarFitZoneOperativa);
+window.addEventListener('orientationchange',function(){setTimeout(_ajustarFitZoneOperativa,200);});
 // Recálculos puntuales tras la carga (para dar tiempo a que lleguen datos
 // de vuelos/calendario), y luego PARA. Nunca en bucle continuo ni en scroll.
-[300,900,2000,4000,6000].forEach(function(ms){setTimeout(_ajustarMiJornadaAltura,ms);});
+// IMPORTANTE: antes había también un MutationObserver que reajustaba cada
+// vez que cambiaba CUALQUIER texto dentro del bloque — incluido el
+// contador de "Mi jornada" que se actualiza solo cada pocos segundos. Cada
+// tick de ese contador disparaba un reset-y-recalculo, y si algo se veía
+// justo en ese instante intermedio, salía sin escalar. Quitado: con los
+// recálculos puntuales de aquí abajo es más que suficiente, ya que el
+// contador cambiando de texto no cambia la altura del bloque.
+[300,900,2000,4000,6000].forEach(function(ms){setTimeout(_ajustarFitZoneOperativa,ms);});
 
 function abrirCompanerosPorDia(){
   if(typeof verCompanerosHoy!=='function')return;
@@ -6723,13 +6789,6 @@ var CONT_OP=["trabajado","hl","hlp","baja","rm","curso"]; // matches calendar co
 function g(id){return document.getElementById(id);}
 function toM(t){if(!t)return null;var p=t.split(":");return +p[0]*60+(+p[1]||0);}
 function fmtT(m){if(!m&&m!==0)return"";var h=Math.floor(m/60),mn=m%60;return h>0?h+"h"+(mn?" "+mn+"m":""):mn+"m";}
-// Formatea horas en cuartos (0,25 / 0,50 / 0,75) con coma decimal — los
-// turnos reales van en tramos de 15 min, así que las horas SIEMPRE caen en
-// un cuarto exacto; con esto se muestra tal cual, sin decimales raros.
-function fmtHoraCuarto(x){
-  var q=Math.round(x*4)/4;
-  return q.toFixed(2).replace('.',',');
-}
 
 // Cuando el usuario nunca ha importado su Tryp personal, "Mi jornada" muestra
 // instrucciones de cómo hacerlo en vez del placeholder de "Descanso" (que antes
@@ -6772,6 +6831,22 @@ window.opSetTopeContrato=function(tipo){
 window.opToggleTopeContrato=function(){
   var actual=null;try{actual=localStorage.getItem('cta_tope_contrato');}catch(e){}
   window.opSetTopeContrato(actual==='parcial'?'fijo':'parcial');
+};
+window.opCorregirVacTomadas=function(){
+  var actualRaw=null;try{actualRaw=localStorage.getItem('cta_vac_tomadas_override');}catch(e){}
+  var msg='¿Cuántos días de vacaciones llevas ya disfrutados este año (de los 30 anuales)?\n\nDéjalo en blanco para que se calcule automáticamente contando los días marcados "Vacaciones" en tu calendario importado.';
+  var val=prompt(msg,actualRaw!==null?actualRaw:'');
+  if(val===null)return; // cancelado
+  val=val.trim();
+  try{
+    if(val===''){localStorage.removeItem('cta_vac_tomadas_override');}
+    else{
+      var n=parseInt(val,10);
+      if(isNaN(n)||n<0||n>30){alert('Introduce un número entre 0 y 30, o déjalo en blanco.');return;}
+      localStorage.setItem('cta_vac_tomadas_override',String(n));
+    }
+  }catch(e){}
+  if(typeof window.renderOperativa==='function')window.renderOperativa();
 };
 
 window.renderOperativa=function(){
@@ -6840,9 +6915,9 @@ window.renderOperativa=function(){
   if(g("op-cal-mes"))g("op-cal-mes").textContent=MESES_ES[now.getMonth()]+" "+now.getFullYear();
   if(g("op-cal-trab"))g("op-cal-trab").textContent=trab;
   if(g("op-cal-lib"))g("op-cal-lib").textContent=lib;
-  if(g("op-cal-hmes"))g("op-cal-hmes").textContent=fmtHoraCuarto(hMes)+"h";
-  if(g("op-cal-cont"))g("op-cal-cont").textContent=fmtHoraCuarto(hCont)+"h";
-  if(g("op-cal-htotal"))g("op-cal-htotal").textContent=fmtHoraCuarto(hAnualTrab)+"h";
+  if(g("op-cal-hmes"))g("op-cal-hmes").textContent=Math.round(hMes*10)/10+"h";
+  if(g("op-cal-cont"))g("op-cal-cont").textContent=Math.round(hCont*10)/10+"h";
+  if(g("op-cal-htotal"))g("op-cal-htotal").textContent=Math.round(hAnualTrab*10)/10+"h";
   if(g("op-cal-fest"))g("op-cal-fest").textContent=festAnual;
   if(g("op-cal-anio-lbl"))g("op-cal-anio-lbl").textContent="Año "+now.getFullYear();
   // Tope de contador según contrato — el usuario elige una vez (se guarda) y
@@ -6862,10 +6937,10 @@ window.renderOperativa=function(){
     var restanteH=TOPES_CONTRATO_OP[topeSel]-hCont;
     var elRest=g('op-cal-restante');
     if(restanteH<0){
-      elRest.textContent=fmtHoraCuarto(-restanteH)+'h superado';
+      elRest.textContent=(Math.round(-restanteH*10)/10)+'h superado';
       elRest.style.color='#f87171';
     } else {
-      elRest.textContent=fmtHoraCuarto(restanteH)+'h';
+      elRest.textContent=(Math.round(restanteH*10)/10)+'h';
       elRest.style.color='var(--gold)';
     }
     // Media de horas/mes necesaria para llegar JUSTO al tope a 31 de
@@ -6881,6 +6956,14 @@ window.renderOperativa=function(){
       var mdv=ue[m]||{};
       Object.keys(mdv).forEach(function(dd){var dy=mdv[dd];if(dy&&dy.tipo==='vacaciones')vacTomadas++;});
     });
+    // El conteo automático se basa en los días marcados "Vacaciones" en tu
+    // calendario importado — si falta algún día por marcar (p.ej. vacaciones
+    // futuras aún no introducidas), puede no coincidir con la realidad.
+    // Toca el texto de abajo para corregirlo a mano; se guarda y se usa en
+    // vez del conteo automático mientras no lo borres.
+    var _vacOverrideRaw=null;try{_vacOverrideRaw=localStorage.getItem('cta_vac_tomadas_override');}catch(e){}
+    var vacTomadasAuto=vacTomadas;
+    if(_vacOverrideRaw!==null&&_vacOverrideRaw!==''){var _vo=parseInt(_vacOverrideRaw,10);if(!isNaN(_vo))vacTomadas=_vo;}
     var vacPendientes=Math.max(0,30-vacTomadas);
     var hoy0=new Date(now.getFullYear(),now.getMonth(),now.getDate());
     var finAno=new Date(now.getFullYear(),11,31);
@@ -6894,12 +6977,13 @@ window.renderOperativa=function(){
         elMedia.style.color='#4ade80';
       } else {
         var mediaMes=restanteH/mesesEfectivos;
-        elMedia.textContent=fmtHoraCuarto(mediaMes)+'h/mes';
+        elMedia.textContent=(Math.round(mediaMes*10)/10)+'h/mes';
         elMedia.style.color='#60a5fa';
       }
     }
     if(elMediaSub){
-      elMediaSub.textContent='('+(Math.round(mesesEfectivos*10)/10)+' meses efectivos · '+vacPendientes+' días vac. pendientes de '+30+')';
+      var _vacTxt=vacPendientes+' días vac. pendientes de 30'+(_vacOverrideRaw!==null&&_vacOverrideRaw!==''?' (manual, tocar para editar)':' (tocar para corregir)');
+      elMediaSub.textContent='('+(Math.round(mesesEfectivos*10)/10)+' meses efectivos · '+_vacTxt+')';
     }
   }
   if(g("op-cal-peren")){
