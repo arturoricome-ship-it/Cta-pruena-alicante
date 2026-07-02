@@ -1046,7 +1046,7 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
       <div class="header-name">CTA Alicante</div>
       <div class="header-sub">Comision de Trabajadores Asamblearios</div>
       <div class="header-portal" id="header-welcome">Portal del Afiliado</div>
-      <div style="font-size:9px;color:rgba(255,255,255,.25);letter-spacing:.5px;margin-top:1px">build v2026-07-02-e</div>
+      <div style="font-size:9px;color:rgba(255,255,255,.25);letter-spacing:.5px;margin-top:1px">build v2026-07-02-f</div>
     </div>
   </div>
   <div id="nav-bar">
@@ -4976,8 +4976,30 @@ function _ajustarFitZoneOperativa(){
 }
 window.addEventListener('resize',_ajustarFitZoneOperativa);
 window.addEventListener('orientationchange',function(){setTimeout(_ajustarFitZoneOperativa,200);});
-setInterval(_ajustarFitZoneOperativa,1000);
-setTimeout(_ajustarFitZoneOperativa,500);
+// IMPORTANTE: aquí antes había un setInterval que recalculaba cada 1s SIN
+// PARAR, incluso mientras el usuario hacía scroll. En móvil, la barra de
+// direcciones del navegador se esconde/aparece al hacer scroll — eso
+// cambia ligeramente window.innerHeight, y el recálculo continuo lo
+// detectaba y reajustaba el tamaño EN DIRECTO, dando la sensación de que
+// "bailaba". El tamaño solo debe recalcularse cuando algo realmente
+// cambia (carga inicial, datos que tardan en llegar, cambio de tamaño de
+// ventana real, rotar el móvil) — nunca en un bucle continuo.
+[500,1200,2500,4000].forEach(function(ms){setTimeout(_ajustarFitZoneOperativa,ms);});
+// Además de esos recálculos puntuales, un observador que solo reacciona
+// cuando el CONTENIDO cambia de verdad (llegan datos nuevos, se repinta
+// una cifra, etc.) — no cuando se hace scroll, que no altera el HTML en
+// absoluto. Con "debounce" para no recalcular docenas de veces si llegan
+// varios cambios seguidos.
+(function(){
+  var fitZone=document.getElementById('op-fit-zone');
+  if(!fitZone||typeof MutationObserver==='undefined')return;
+  var t=null;
+  var obs=new MutationObserver(function(){
+    clearTimeout(t);
+    t=setTimeout(_ajustarFitZoneOperativa,120);
+  });
+  obs.observe(fitZone,{childList:true,subtree:true,characterData:true});
+})();
 
 function abrirCompanerosPorDia(){
   if(typeof verCompanerosHoy!=='function')return;
