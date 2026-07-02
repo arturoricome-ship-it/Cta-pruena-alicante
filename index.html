@@ -1046,7 +1046,7 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
       <div class="header-name">CTA Alicante</div>
       <div class="header-sub">Comision de Trabajadores Asamblearios</div>
       <div class="header-portal" id="header-welcome">Portal del Afiliado</div>
-      <div style="font-size:9px;color:rgba(255,255,255,.25);letter-spacing:.5px;margin-top:1px">build v2026-07-02-g</div>
+      <div id="op-build-dbg" style="font-size:9px;color:rgba(255,255,255,.25);letter-spacing:.5px;margin-top:1px">build v2026-07-02-g2</div>
     </div>
   </div>
   <div id="nav-bar">
@@ -4947,19 +4947,34 @@ function _ajustarFitZoneOperativa(){
   outer.style.height='auto';
   var innerH=inner.scrollHeight;
   if(innerH<=0)return;
-  // clientHeight del área de scroll = alto visible real de esa zona, ya
-  // descontados cabecera y barra inferior por el layout, y estable frente
-  // al scroll. Le restamos su propio padding vertical para saber cuánto
-  // espacio útil hay de verdad.
   var cs=getComputedStyle(scrollArea);
   var padV=(parseFloat(cs.paddingTop)||0)+(parseFloat(cs.paddingBottom)||0);
   var disponible=scrollArea.clientHeight-padV;
   if(disponible<150)return;
   var escala=disponible/innerH;
+  // Marca de diagnóstico visible (temporal): muestra los números reales de
+  // la medición en tu móvil, para ver por qué no llena si aún falla.
+  var dbg=document.getElementById('op-build-dbg');
+  if(dbg)dbg.textContent='build g2 · disp:'+Math.round(disponible)+' innerH:'+Math.round(innerH)+' esc:'+(Math.round(escala*100)/100);
   if(Math.abs(escala-1)>0.01){
-    inner.style.width=(100/escala)+'%';
-    inner.style.transform='scale('+escala+')';
-    outer.style.height=Math.ceil(innerH*escala)+'px';
+    if(escala<1){
+      // ENCOGER: además de reducir en alto, ensanchamos primero para que
+      // el contenido no deje banda vacía a la derecha tras el scale.
+      inner.style.width=(100/escala)+'%';
+      inner.style.transform='scale('+escala+')';
+    } else {
+      // AGRANDAR: NO tocar el ancho (si lo estrechábamos, el contenido se
+      // re-medía mal y el resultado se quedaba corto → hueco). Solo
+      // escalamos hacia arriba desde el ancho natural. transform-origin ya
+      // es top-left, así que crece hacia abajo y derecha; para que no se
+      // salga de ancho, compensamos el ancho al valor que tras el scale
+      // queda al 100%.
+      inner.style.width=(100/escala)+'%';
+      inner.style.transform='scale('+escala+')';
+    }
+    // Medimos el alto real que ocupa YA escalado y se lo damos al outer,
+    // para que ocupe exactamente eso (sin hueco ni recorte).
+    outer.style.height=Math.ceil(inner.scrollHeight*escala)+'px';
   }
 }
 window.addEventListener('resize',_ajustarFitZoneOperativa);
@@ -6900,12 +6915,13 @@ window.renderOperativa=function(){
         elMedia.style.color='#4ade80';
       } else {
         var mediaMes=restanteH/mesesEfectivos;
-        // Formato horas,minutos reales: la parte decimal se convierte a
-        // minutos (0.5h → 30min), no se muestra como decimal. Ej: 142.8h
-        // decimal → 142,48 (142h 48min). Se muestra con coma como pediste.
-        var mmH=Math.floor(mediaMes);
-        var mmMin=Math.round((mediaMes-mmH)*60);
-        if(mmMin===60){mmH++;mmMin=0;} // por si el redondeo sube a 60
+        // Redondeo al cuarto de hora más cercano: los turnos reales se
+        // cuentan en tramos de 15 min, así que una media "objetivo" con
+        // minutos raros (como :47) no tiene sentido operativo. Se redondea
+        // a :00, :15, :30 o :45 — que es como pediste que saliera.
+        var totalMin=Math.round(mediaMes*60/15)*15;
+        var mmH=Math.floor(totalMin/60);
+        var mmMin=totalMin%60;
         elMedia.textContent=mmH+','+(mmMin<10?'0':'')+mmMin+'h/mes';
         elMedia.style.color='#60a5fa';
       }
