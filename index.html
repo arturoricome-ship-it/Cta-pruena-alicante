@@ -7846,6 +7846,11 @@ window.renderOperativa=function(){
     if(g("op-tc-bar"))g("op-tc-bar").style.width="0%";
   }
 
+  // Recalcular el alto disponible AHORA que Mi Jornada ya tiene su contenido final,
+  // para que la tarjeta (que crece con flex) no quede recortada por abajo.
+  if(typeof window._ajustarFitZoneOperativa==="function"){
+    requestAnimationFrame(function(){requestAnimationFrame(window._ajustarFitZoneOperativa);});
+  }
 };
 
 // Hook switchTab safely
@@ -9891,7 +9896,7 @@ try{
     var scrollArea=document.getElementById('scroll-area');
     if(!outer||!inner||!scrollArea)return;
     var cs=getComputedStyle(scrollArea);
-    var disponible=scrollArea.clientHeight-(parseFloat(cs.paddingTop)||0)-(parseFloat(cs.paddingBottom)||0)-2;
+    var disponible=scrollArea.clientHeight-(parseFloat(cs.paddingTop)||0)-(parseFloat(cs.paddingBottom)||0)-8;
     if(disponible<260)return;
     outer.style.setProperty('height',disponible+'px','important');
     outer.style.setProperty('min-height',disponible+'px','important');
@@ -10179,7 +10184,7 @@ try{
     height:auto!important;
     min-height:96px!important;
     max-height:none!important;
-    margin-bottom:0!important;
+    margin-bottom:6px!important;
     padding:5px 10px 8px!important;
     box-sizing:border-box!important;
     overflow:visible!important;
