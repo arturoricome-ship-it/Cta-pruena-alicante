@@ -1046,7 +1046,7 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
       <div class="header-name">CTA Alicante</div>
       <div class="header-sub">Comision de Trabajadores Asamblearios</div>
       <div class="header-portal" id="header-welcome">Portal del Afiliado</div>
-      <div style="font-size:9px;color:rgba(255,255,255,.25);letter-spacing:.5px;margin-top:1px">build v2026-07-02-d</div>
+      <div style="font-size:9px;color:rgba(255,255,255,.25);letter-spacing:.5px;margin-top:1px">build v2026-07-02-e</div>
     </div>
   </div>
   <div id="nav-bar">
@@ -4940,21 +4940,24 @@ function _ajustarFitZoneOperativa(){
   if(!panel||!panel.classList.contains('active'))return;
   var outer=document.getElementById('op-fit-outer'),inner=document.getElementById('op-fit-zone');
   if(!outer||!inner)return;
-  var nav=document.getElementById('bottom-nav');
+  var header=document.getElementById('app-header'),nav=document.getElementById('bottom-nav'),scrollArea=document.getElementById('scroll-area');
   inner.style.transform='none';
   inner.style.width=''; // reset: hay que medir a ancho natural (100%) antes de nada
   outer.style.height='auto';
   var innerH=inner.scrollHeight;
   if(innerH<=0)return;
-  // Medición DIRECTA y real en pantalla, en vez de reconstruir el hueco
-  // sumando paddings/márgenes a mano (eso es lo que fallaba: cualquier
-  // pequeño desajuste en esa suma dejaba un hueco o un exceso de encogido
-  // que no correspondía a la realidad). getBoundingClientRect() da la
-  // posición exacta actual de cada elemento tal y como está renderizado.
-  var outerTop=outer.getBoundingClientRect().top;
-  var navTop=nav?nav.getBoundingClientRect().top:window.innerHeight;
-  if(navTop<=0)navTop=window.innerHeight; // por si el nav aún no ha pintado su posición real
-  var disponible=navTop-outerTop-8;
+  // IMPORTANTE: la medición tiene que basarse SOLO en referencias que no
+  // cambian al hacer scroll. outer.getBoundingClientRect().top SÍ cambia
+  // según el scroll (outer está dentro de la zona que se desplaza), y por
+  // eso el tamaño "bailaba" al hacer scroll — cada segundo se recalculaba
+  // con una posición distinta. header (fuera de la zona de scroll) y nav
+  // (position:fixed) están siempre en el mismo sitio pase lo que pase con
+  // el scroll, así que el cálculo con ellos es estable.
+  var headerH=header?header.getBoundingClientRect().height:0;
+  var navH=nav?nav.getBoundingClientRect().height:0;
+  var padTop=0;
+  if(scrollArea){var cs=getComputedStyle(scrollArea);padTop=(parseFloat(cs.paddingTop)||0)+(parseFloat(cs.marginTop)||0);}
+  var disponible=window.innerHeight-headerH-navH-padTop-8;
   if(disponible<150)return; // pantalla absurdamente pequeña: no forzar nada raro
   // Sin tope: que ocupe exactamente el hueco disponible, se encoja o se
   // agrande lo que haga falta.
