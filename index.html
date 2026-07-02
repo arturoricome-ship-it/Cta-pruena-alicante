@@ -1048,7 +1048,7 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
       <div class="header-name">CTA Alicante</div>
       <div class="header-sub">Comision de Trabajadores Asamblearios</div>
       <div class="header-portal" id="header-welcome">Portal del Afiliado</div>
-      <div style="font-size:9px;color:rgba(255,255,255,.25);letter-spacing:.5px;margin-top:1px">build v2026-07-02-n</div>
+      <div style="font-size:9px;color:rgba(255,255,255,.25);letter-spacing:.5px;margin-top:1px">build v2026-07-02-o</div>
     </div>
   </div>
   <div id="nav-bar">
@@ -1159,27 +1159,6 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
         <div id="op-cal-media-mes-sub" style="font-size:12.5px;color:var(--gray);margin-top:2px;text-align:right"></div>
       </div>
     </div>
-
-    <p class="op-sec">Mi jornada</p>
-    <div class="op-turno-card state-working op-tc-horiz" id="op-turno-card" onclick="switchTab('afiliate',null,document.getElementById('nav-afiliate'))">
-      <div class="op-tc-lbl" id="op-tc-lbl">Turno hoy</div>
-      <div class="op-tc-row">
-        <div class="op-tc-col op-tc-col-a">
-          <div class="op-tc-pct" id="op-tc-pct">—</div>
-          <div class="op-tc-rem" id="op-tc-rem"></div>
-        </div>
-        <div class="op-tc-col op-tc-col-b">
-          <div class="op-tc-sub" id="op-tc-sub">—</div>
-          <div class="op-tc-shift" id="op-tc-shift"></div>
-        </div>
-        <div class="op-tc-col op-tc-col-c">
-          <div class="op-tc-times" id="op-tc-times"><span style="color:var(--gray);font-size:11px">Cargando...</span></div>
-        </div>
-      </div>
-      <div class="op-tc-bar-bg"><div class="op-tc-bar" id="op-tc-bar" style="width:0%"></div></div>
-    </div>
-    </div>
-    </div><!-- /op-fit-outer -->
 
     <!-- ══ v2: todo lo demás (resumen operativo, detalles, historial) se ha
          quitado de la portada y queda aquí colapsado, por si hace falta ══ -->
@@ -1323,6 +1302,28 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 
       </div>
     </details>
+
+        <p class="op-sec">Mi jornada</p>
+    <div class="op-turno-card state-working op-tc-horiz" id="op-turno-card" onclick="switchTab('afiliate',null,document.getElementById('nav-afiliate'))">
+      <div class="op-tc-lbl" id="op-tc-lbl">Turno hoy</div>
+      <div class="op-tc-row">
+        <div class="op-tc-col op-tc-col-a">
+          <div class="op-tc-pct" id="op-tc-pct">—</div>
+          <div class="op-tc-rem" id="op-tc-rem"></div>
+        </div>
+        <div class="op-tc-col op-tc-col-b">
+          <div class="op-tc-sub" id="op-tc-sub">—</div>
+          <div class="op-tc-shift" id="op-tc-shift"></div>
+        </div>
+        <div class="op-tc-col op-tc-col-c">
+          <div class="op-tc-times" id="op-tc-times"><span style="color:var(--gray);font-size:11px">Cargando...</span></div>
+        </div>
+      </div>
+      <div class="op-tc-bar-bg"><div class="op-tc-bar" id="op-tc-bar" style="width:0%"></div></div>
+    </div>
+    </div>
+    </div><!-- /op-fit-outer -->
+
 
     <div id="op-info-overlay" onclick="opHideDataInfo()">
       <div class="op-info-modal" onclick="event.stopPropagation()">
@@ -4955,6 +4956,13 @@ function _ajustarMiJornadaAltura(){
 }
 window.addEventListener('resize',_ajustarMiJornadaAltura);
 window.addEventListener('orientationchange',function(){setTimeout(_ajustarMiJornadaAltura,200);});
+// "Más" ahora va ANTES que Mi jornada — si el usuario lo despliega o lo
+// cierra, cambia cuánto sitio ocupa por encima, así que hay que recalcular
+// en ese momento (el evento "toggle" salta al abrir y al cerrar el <details>).
+(function(){
+  var masDet=document.getElementById('op-v2-mas');
+  if(masDet)masDet.addEventListener('toggle',function(){setTimeout(_ajustarMiJornadaAltura,50);});
+})();
 // Recálculos puntuales tras la carga (para dar tiempo a que lleguen datos
 // de vuelos/calendario), y luego PARA. Nunca en bucle continuo ni en scroll.
 [300,900,2000,4000,6000].forEach(function(ms){setTimeout(_ajustarMiJornadaAltura,ms);});
