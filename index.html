@@ -611,27 +611,37 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 /* ═══ OPERATIVA ════ */
 #bottom-turno{display:none!important}
 #calc-btn{display:none!important}
-.op-sec{font-size:9px;color:var(--gray);letter-spacing:.9px;text-transform:uppercase;margin:11px 0 7px}
+.op-sec{font-size:14px;font-weight:600;color:var(--gray);letter-spacing:.4px;text-transform:uppercase;margin:19px 0 9px}
 .op-sec:first-child{margin-top:4px}
 @keyframes planepulse{0%,100%{opacity:1}50%{opacity:.18}}
-.op-plane{animation:planepulse 2.5s ease-in-out infinite;font-size:28px;filter:hue-rotate(200deg) saturate(3) brightness(1.4);flex-shrink:0}
-.op-vuelos{background:linear-gradient(135deg,rgba(96,165,250,.1),rgba(96,165,250,.03));border:1px solid rgba(96,165,250,.3);border-radius:16px;padding:12px 14px;cursor:pointer;display:flex;align-items:center;gap:13px}
-.op-v-title{font-size:12px;font-weight:700;color:#60a5fa}
-.op-v-nval{font-size:18px;font-weight:800;color:#60a5fa;line-height:1}
-.op-v-nlbl{font-size:8px;color:var(--gray)}
+.op-plane{animation:planepulse 2.5s ease-in-out infinite;font-size:36px;filter:hue-rotate(200deg) saturate(3) brightness(1.4);flex-shrink:0}
+.op-vuelos{background:linear-gradient(135deg,rgba(96,165,250,.1),rgba(96,165,250,.03));border:1px solid rgba(96,165,250,.3);border-radius:16px;padding:18px 16px;cursor:pointer;display:flex;align-items:center;gap:15px}
+.op-v-title{font-size:21px;font-weight:700;color:#60a5fa}
+.op-v-nval{font-size:46px;font-weight:800;color:#60a5fa;line-height:1}
+.op-v-nlbl{font-size:16px;color:var(--gray)}
 .op-jornada-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .op-turno-card{border-radius:16px;padding:14px 12px;cursor:pointer;display:flex;flex-direction:column;-webkit-tap-highlight-color:transparent}
+.op-turno-card.op-tc-horiz{flex-direction:column;align-items:stretch;gap:0;padding:10px 16px}
+.op-turno-card.op-tc-horiz .op-tc-lbl{margin-bottom:8px}
+.op-turno-card.op-tc-horiz .op-tc-row{display:flex;align-items:center;flex-wrap:wrap;gap:16px;margin-bottom:9px}
+.op-turno-card.op-tc-horiz .op-tc-col{display:flex;flex-direction:column;justify-content:center}
+.op-turno-card.op-tc-horiz .op-tc-col-a{flex:0 0 auto;min-width:66px}
+.op-turno-card.op-tc-horiz .op-tc-col-b{flex:1 1 140px;min-width:120px;align-items:center;text-align:center}
+.op-turno-card.op-tc-horiz .op-tc-col-c{flex:0 0 auto;min-width:100px;align-items:flex-end;text-align:right}
+.op-turno-card.op-tc-horiz .op-tc-times{width:auto}
+.op-turno-card.op-tc-horiz .op-tc-times span{width:auto;padding:6px 12px;white-space:nowrap}
+.op-turno-card.op-tc-horiz .op-tc-bar-bg{width:100%}
 .op-turno-card:active{transform:scale(.98)}
-.op-tc-lbl{font-size:7.5px;color:var(--gray);letter-spacing:.7px;text-transform:uppercase;margin-bottom:6px}
+.op-tc-lbl{font-size:13px;color:var(--gray);letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px}
 .op-tc-times{display:flex;flex-direction:column;gap:4px;width:100%}
-.op-tc-times span{display:block;width:100%;border-radius:8px;padding:5px 8px;text-align:center;font-size:13px;font-weight:800;color:var(--white)}
+.op-tc-times span{display:block;width:100%;border-radius:8px;padding:6px 8px;text-align:center;font-size:19px;font-weight:800;color:var(--white)}
 .op-tc-meta{display:flex;align-items:center;justify-content:space-between;margin-top:14px}
-.op-tc-sub{font-size:9px;color:var(--gray);line-height:1.5}
-.op-tc-shift{font-size:12px;font-weight:700;margin-top:3px;line-height:1.4}
+.op-tc-sub{font-size:18px;color:var(--gray);line-height:1.5}
+.op-tc-shift{font-size:26px;font-weight:700;margin-top:3px;line-height:1.4}
 .op-tc-spacer{flex:1;min-height:10px}
 .op-tc-pct-row{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:5px}
-.op-tc-pct{font-size:26px;font-weight:800;line-height:1}
-.op-tc-rem{font-size:8px}
+.op-tc-pct{font-size:42px;font-weight:800;line-height:1}
+.op-tc-rem{font-size:13px}
 .op-tc-bar-bg{background:rgba(255,255,255,.08);border-radius:100px;height:8px;overflow:hidden;margin-top:2px}
 .op-tc-bar{height:100%;border-radius:100px;transition:width 1.2s ease}
 .op-turno-card.state-working{background:linear-gradient(160deg,rgba(200,168,75,.08),rgba(200,168,75,.02));border:1px solid rgba(200,168,75,.3)}
@@ -644,22 +654,22 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 .op-turno-card.state-pausa .op-tc-sub,.op-turno-card.state-pausa .op-tc-pct{color:#c084fc}
 .op-turno-card.state-pausa .op-tc-bar{background:linear-gradient(90deg,#a855f7,#c084fc);box-shadow:0 0 8px rgba(192,132,252,.5)}
 .op-turno-card.state-rest{background:linear-gradient(160deg,rgba(34,197,94,.08),rgba(34,197,94,.02));border:1px solid rgba(34,197,94,.3)}
-.op-turno-card.state-rest .op-tc-times span{border:1px solid rgba(34,197,94,.2);font-size:22px;font-weight:800;color:#4ade80}
+.op-turno-card.state-rest .op-tc-times span{border:1px solid rgba(34,197,94,.2);font-size:29px;font-weight:800;color:#4ade80}
 .op-turno-card.state-rest .op-tc-bar{background:linear-gradient(90deg,#22c55e,#4ade80);box-shadow:0 0 8px rgba(74,222,128,.5)}
-.op-turno-card.state-rest .op-tc-pct{color:#4ade80;font-size:22px;font-weight:800}
+.op-turno-card.state-rest .op-tc-pct{color:#4ade80;font-size:32px;font-weight:800}
 .op-turno-card.state-rest .op-tc-rem{color:var(--gold);font-weight:700}
 .op-turno-card.state-next{background:linear-gradient(160deg,rgba(96,165,250,.08),rgba(96,165,250,.02));border:1px solid rgba(96,165,250,.3)}
 .op-turno-card.state-next .op-tc-times span{border:1px solid rgba(96,165,250,.2)}
 .op-turno-card.state-next .op-tc-sub,.op-turno-card.state-next .op-tc-pct{color:#60a5fa}
 .op-turno-card.state-next .op-tc-bar{background:#60a5fa}
 .op-turno-card.state-next .op-tc-rem{color:var(--gray)}
-.op-cal-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:14px 12px;cursor:pointer;display:flex;flex-direction:column;-webkit-tap-highlight-color:transparent}
+.op-cal-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:12px 12px;cursor:pointer;display:flex;flex-direction:column;-webkit-tap-highlight-color:transparent}
 .op-cal-card:active{transform:scale(.98)}
-.op-cal-rows{display:flex;flex-direction:column;gap:4px;margin-top:8px}
-.op-cal-row{display:flex;justify-content:space-between;align-items:center;padding:4px 7px;background:rgba(255,255,255,.04);border-radius:6px}
-.op-cal-rl{font-size:8px;color:var(--gray)}
-.op-cal-rv{font-size:11px;font-weight:700;color:var(--gold)}
-.op-comp-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:12px 14px;cursor:pointer;display:flex;align-items:center;gap:12px;-webkit-tap-highlight-color:transparent}
+.op-cal-rows{display:flex;flex-direction:column;gap:4px;margin-top:6px}
+.op-cal-row{display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:rgba(255,255,255,.04);border-radius:8px}
+.op-cal-rl{font-size:17px;color:var(--gray)}
+.op-cal-rv{font-size:24px;font-weight:700;color:var(--gold)}
+.op-comp-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:10px 14px;cursor:pointer;display:flex;align-items:center;gap:12px;-webkit-tap-highlight-color:transparent}
 .op-comp-card:active{transform:scale(.98)}
 .op-comp-num{font-size:36px;font-weight:800;color:#f87171;line-height:1}
 .op-pub-card{background:var(--card);border:1px solid rgba(192,132,252,.2);border-radius:16px;overflow:hidden}
@@ -1036,6 +1046,7 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
       <div class="header-name">CTA Alicante</div>
       <div class="header-sub">Comision de Trabajadores Asamblearios</div>
       <div class="header-portal" id="header-welcome">Portal del Afiliado</div>
+      <div style="font-size:9px;color:rgba(255,255,255,.25);letter-spacing:.5px;margin-top:1px">build v2026-07-02-d</div>
     </div>
   </div>
   <div id="nav-bar">
@@ -1067,21 +1078,23 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 <div id="scroll-area">
 
   <div class="panel active" id="panel-operativa">
+    <div id="op-fit-outer" style="position:relative;overflow:hidden">
+    <div id="op-fit-zone" style="transform-origin:top left">
     <p class="op-sec">Vuelos hoy · ALC</p>
     <div class="op-vuelos" onclick="document.getElementById('btn-live').click()">
       <span class="op-plane">✈</span>
       <div style="flex:1">
         <div class="op-v-title">En directo · ALC</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px">
-          <div style="background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.2);border-radius:10px;padding:7px 9px">
-            <div style="font-size:8px;color:var(--gray);text-transform:uppercase;margin-bottom:4px">Hoy</div>
-            <div style="display:flex;gap:10px">
+          <div style="background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.2);border-radius:14px;padding:22px 16px">
+            <div style="font-size:15px;color:var(--gray);text-transform:uppercase;margin-bottom:10px">Hoy</div>
+            <div style="display:flex;gap:18px">
               <div><div class="op-v-nval" id="op-v-total">—</div><div class="op-v-nlbl">total</div></div>
               <div><div class="op-v-nval" id="op-v-turno" style="color:#93c5fd">—</div><div class="op-v-nlbl">mi turno</div></div>
             </div>
           </div>
-          <div style="background:rgba(200,168,75,.06);border:1px solid rgba(200,168,75,.15);border-radius:10px;padding:7px 9px">
-            <div style="font-size:8px;color:var(--gray);text-transform:uppercase;margin-bottom:4px">Mañana</div>
+          <div style="background:rgba(200,168,75,.06);border:1px solid rgba(200,168,75,.15);border-radius:14px;padding:22px 16px">
+            <div style="font-size:15px;color:var(--gray);text-transform:uppercase;margin-bottom:10px">Mañana</div>
             <div style="display:flex;gap:10px">
               <div><div class="op-v-nval" id="op-v-total-tom" style="color:var(--gold)">—</div><div class="op-v-nlbl">total</div></div>
               <div><div class="op-v-nval" id="op-v-turno-tom" style="color:var(--gold-light)">—</div><div class="op-v-nlbl">mi turno</div></div>
@@ -1092,46 +1105,79 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
       <svg width="7" height="12" viewBox="0 0 7 12" fill="none"><path d="M1 1l5 5-5 5" stroke="#8a93a8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </div>
     <p class="op-sec">Día a día</p>
-    <div class="op-comp-card" onclick="abrirCompanerosPorDia()">
-      <span style="font-size:22px;line-height:1">📅</span>
+    <div class="op-comp-card" onclick="abrirCompanerosPorDia()" style="background:linear-gradient(135deg,rgba(192,132,252,.14),rgba(192,132,252,.03));border:1px solid rgba(192,132,252,.4);padding:30px 20px;gap:18px">
+      <span style="font-size:50px;line-height:1">📅</span>
       <div style="flex:1">
-        <div style="font-size:13px;font-weight:700">Día a Día · Compañeros</div>
-        <div style="font-size:10.5px;color:var(--gray);margin-top:2px">Quién trabaja contigo, turnos y coincidencias</div>
+        <div style="font-size:27px;font-weight:800;color:#e9d5ff">Día a Día · Compañeros</div>
+        <div style="font-size:17.5px;color:var(--gray);margin-top:5px">Quién trabaja contigo, turnos y coincidencias</div>
       </div>
-      <svg width="7" height="12" viewBox="0 0 7 12" fill="none"><path d="M1 1l5 5-5 5" stroke="#8a93a8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <svg width="12" height="20" viewBox="0 0 7 12" fill="none"><path d="M1 1l5 5-5 5" stroke="#c084fc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </div>
+
 
     <p class="op-sec">Calendario empleado</p>
     <div class="op-cal-card" id="op-cal-card" onclick="switchTab('afiliate',null,document.getElementById('nav-afiliate'))">
-      <div style="font-size:11px;font-weight:700">📅 Calendario</div>
-      <div style="font-size:8px;color:var(--gray);margin-top:1px" id="op-cal-mes">—</div>
-      <div class="op-cal-rows">
-        <div class="op-cal-row"><span class="op-cal-rl">Trabajados</span><span class="op-cal-rv" id="op-cal-trab">—</span></div>
-        <div class="op-cal-row"><span class="op-cal-rl">Libres</span><span class="op-cal-rv" id="op-cal-lib">—</span></div>
-        <div class="op-cal-row"><span class="op-cal-rl">Horas mes</span><span class="op-cal-rv" id="op-cal-hmes">—</span></div>
-        <div class="op-cal-row"><span class="op-cal-rl">Contador</span><span class="op-cal-rv" id="op-cal-cont" style="color:#4ade80">—</span></div>
-        <div class="op-cal-row"><span class="op-cal-rl">Perentorias</span><span class="op-cal-rv" id="op-cal-peren">—</span></div>
+      <div style="font-size:19px;font-weight:700">📅 Calendario</div>
+      <div style="font-size:14px;color:var(--gray);margin-top:2px" id="op-cal-mes">—</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px">
+        <div>
+          <div style="font-size:13.5px;color:var(--gray);text-transform:uppercase;letter-spacing:.4px;font-weight:700;margin-bottom:5px">Este mes</div>
+          <div class="op-cal-rows" style="margin-top:0">
+            <div class="op-cal-row"><span class="op-cal-rl">Trabajados</span><span class="op-cal-rv" id="op-cal-trab">—</span></div>
+            <div class="op-cal-row"><span class="op-cal-rl">Libres</span><span class="op-cal-rv" id="op-cal-lib">—</span></div>
+            <div class="op-cal-row"><span class="op-cal-rl">Horas mes</span><span class="op-cal-rv" id="op-cal-hmes">—</span></div>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:13.5px;color:var(--gray);text-transform:uppercase;letter-spacing:.4px;font-weight:700;margin-bottom:5px" id="op-cal-anio-lbl">Año —</div>
+          <div class="op-cal-rows" style="margin-top:0">
+            <div class="op-cal-row"><span class="op-cal-rl">Horas</span><span class="op-cal-rv" id="op-cal-htotal">—</span></div>
+            <div class="op-cal-row"><span class="op-cal-rl">Contador</span><span class="op-cal-rv" id="op-cal-cont" style="color:#4ade80">—</span></div>
+            <div class="op-cal-row"><span class="op-cal-rl">Perentorias</span><span class="op-cal-rv" id="op-cal-peren">—</span></div>
+            <div class="op-cal-row"><span class="op-cal-rl">Festivos pend.</span><span class="op-cal-rv" id="op-cal-fest">—</span></div>
+          </div>
+        </div>
+      </div>
+      <div onclick="event.stopPropagation()" style="margin-top:10px;padding-top:8px;border-top:1px solid rgba(255,255,255,.06)">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;flex-wrap:wrap">
+          <div style="font-size:13.5px;color:var(--gray);text-transform:uppercase;letter-spacing:.4px;font-weight:700">Tope contrato</div>
+          <div style="display:flex;gap:6px">
+            <button type="button" id="op-tope-parcial" onclick="opSetTopeContrato('parcial')" style="background:none;border:1px solid var(--border);border-radius:8px;padding:4px 10px;color:var(--gray);font-family:inherit;font-size:16px;font-weight:700;cursor:pointer">1541h</button>
+            <button type="button" id="op-tope-fijo" onclick="opSetTopeContrato('fijo')" style="background:none;border:1px solid var(--border);border-radius:8px;padding:4px 10px;color:var(--gray);font-family:inherit;font-size:16px;font-weight:700;cursor:pointer">1712h</button>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:7px">
+          <span style="font-size:20px;color:var(--gray);font-weight:600">Restantes hasta tope</span>
+          <span id="op-cal-restante" style="font-size:23px;font-weight:800;color:var(--gold)">—</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:5px">
+          <span style="font-size:20px;color:var(--gray);font-weight:600">Media/mes necesaria hasta dic.</span>
+          <span id="op-cal-media-mes" style="font-size:23px;font-weight:800;color:#60a5fa">—</span>
+        </div>
+        <div id="op-cal-media-mes-sub" style="font-size:12.5px;color:var(--gray);margin-top:2px;text-align:right"></div>
       </div>
     </div>
 
     <p class="op-sec">Mi jornada</p>
-    <div class="op-turno-card state-working" id="op-turno-card" style="width:100%" onclick="switchTab('afiliate',null,document.getElementById('nav-afiliate'))">
+    <div class="op-turno-card state-working op-tc-horiz" id="op-turno-card" onclick="switchTab('afiliate',null,document.getElementById('nav-afiliate'))">
       <div class="op-tc-lbl" id="op-tc-lbl">Turno hoy</div>
-      <div class="op-tc-times" id="op-tc-times"><span style="color:var(--gray);font-size:11px">Cargando...</span></div>
-      <div class="op-tc-meta">
-        <div>
-          <div class="op-tc-sub" id="op-tc-sub">—</div>
-          <div class="op-tc-shift" id="op-tc-shift"></div>
-        </div>
-      </div>
-      <div style="margin-top:14px;padding-top:0">
-        <div class="op-tc-pct-row">
+      <div class="op-tc-row">
+        <div class="op-tc-col op-tc-col-a">
           <div class="op-tc-pct" id="op-tc-pct">—</div>
           <div class="op-tc-rem" id="op-tc-rem"></div>
         </div>
-        <div class="op-tc-bar-bg"><div class="op-tc-bar" id="op-tc-bar" style="width:0%"></div></div>
+        <div class="op-tc-col op-tc-col-b">
+          <div class="op-tc-sub" id="op-tc-sub">—</div>
+          <div class="op-tc-shift" id="op-tc-shift"></div>
+        </div>
+        <div class="op-tc-col op-tc-col-c">
+          <div class="op-tc-times" id="op-tc-times"><span style="color:var(--gray);font-size:11px">Cargando...</span></div>
+        </div>
       </div>
+      <div class="op-tc-bar-bg"><div class="op-tc-bar" id="op-tc-bar" style="width:0%"></div></div>
     </div>
+    </div>
+    </div><!-- /op-fit-outer -->
 
     <!-- ══ v2: todo lo demás (resumen operativo, detalles, historial) se ha
          quitado de la portada y queda aquí colapsado, por si hace falta ══ -->
@@ -2786,6 +2832,14 @@ function handleCredentialResponse(response){
 }
 
 window.addEventListener("load",function(){
+  // ══ MODO PRUEBA (v2 layout): login desactivado temporalmente para poder
+  // tocar la app aquí sin pasar por Google Sign-In. El bloque real de
+  // comprobación de sesión se queda comentado justo debajo — cuando
+  // quieras volver a activarlo, dímelo y se restaura tal cual. ══
+  document.getElementById("login-screen").style.display="none";
+  setWelcome("Arturo");
+  return;
+  /* ---- código real de login (desactivado mientras dure la prueba) ----
   // Verificar sesión guardada
   var sess=null;
   try{sess=JSON.parse(localStorage.getItem("cta_session"));}catch(e){}
@@ -2811,6 +2865,7 @@ window.addEventListener("load",function(){
     document.getElementById("login-screen").style.display="flex";
     if(typeof google!=="undefined"&&google.accounts){initGoogle();}
   }
+  ---- fin código real ---- */
 });
 
 // Si la lib de Google carga tarde
@@ -4872,6 +4927,55 @@ function abrirTodaPlantilla(){
     if(gp){gp.classList.add('open');verCompanerosHoy(true);}
   },50);
 }
+// ══ v2: "encajar" Vuelos+Día a día+Calendario+Mi jornada exactamente en el
+// hueco visible entre la cabecera y la barra inferior, sea cual sea el
+// tamaño de pantalla o el tamaño de letra del dispositivo. Mide la altura
+// real ya renderizada (con la letra/pantalla que toque) y si no cabe,
+// encoge todo el bloque en conjunto (transform:scale) para que entre
+// entero. Si sobra sitio, no se toca (escala 1). El desplegable "Más" se
+// queda fuera de este bloque, así que es lo único que puede necesitar
+// scroll.
+function _ajustarFitZoneOperativa(){
+  var panel=document.getElementById('panel-operativa');
+  if(!panel||!panel.classList.contains('active'))return;
+  var outer=document.getElementById('op-fit-outer'),inner=document.getElementById('op-fit-zone');
+  if(!outer||!inner)return;
+  var nav=document.getElementById('bottom-nav');
+  inner.style.transform='none';
+  inner.style.width=''; // reset: hay que medir a ancho natural (100%) antes de nada
+  outer.style.height='auto';
+  var innerH=inner.scrollHeight;
+  if(innerH<=0)return;
+  // Medición DIRECTA y real en pantalla, en vez de reconstruir el hueco
+  // sumando paddings/márgenes a mano (eso es lo que fallaba: cualquier
+  // pequeño desajuste en esa suma dejaba un hueco o un exceso de encogido
+  // que no correspondía a la realidad). getBoundingClientRect() da la
+  // posición exacta actual de cada elemento tal y como está renderizado.
+  var outerTop=outer.getBoundingClientRect().top;
+  var navTop=nav?nav.getBoundingClientRect().top:window.innerHeight;
+  if(navTop<=0)navTop=window.innerHeight; // por si el nav aún no ha pintado su posición real
+  var disponible=navTop-outerTop-8;
+  if(disponible<150)return; // pantalla absurdamente pequeña: no forzar nada raro
+  // Sin tope: que ocupe exactamente el hueco disponible, se encoja o se
+  // agrande lo que haga falta.
+  var escala=disponible/innerH;
+  if(Math.abs(escala-1)>0.01){
+    // Truco para que NO quede hueco en blanco a la derecha: primero
+    // ensanchamos la zona (100/escala %) para que su contenido "recoloque"
+    // como si tuviera más ancho, y LUEGO la escalamos entera. El resultado
+    // final ocupa el 100% del ancho real (ensanchado × escala = 100%) y
+    // solo se reduce en altura — sin bandas vacías ni deformar el aspecto
+    // de las tarjetas.
+    inner.style.width=(100/escala)+'%';
+    inner.style.transform='scale('+escala+')';
+    outer.style.height=Math.ceil(innerH*escala)+'px';
+  }
+}
+window.addEventListener('resize',_ajustarFitZoneOperativa);
+window.addEventListener('orientationchange',function(){setTimeout(_ajustarFitZoneOperativa,200);});
+setInterval(_ajustarFitZoneOperativa,1000);
+setTimeout(_ajustarFitZoneOperativa,500);
+
 function abrirCompanerosPorDia(){
   if(typeof verCompanerosHoy!=='function')return;
   var p=document.getElementById('calc-panel');
@@ -6661,6 +6765,17 @@ window.opSetDetalleDia=function(dia){
   if(typeof window.renderOperativa==='function')window.renderOperativa();
 };
 
+var TOPES_CONTRATO_OP={parcial:1541,fijo:1712};
+window.opSetTopeContrato=function(tipo){
+  if(TOPES_CONTRATO_OP[tipo]===undefined)return;
+  try{localStorage.setItem('cta_tope_contrato',tipo);}catch(e){}
+  if(typeof window.renderOperativa==='function')window.renderOperativa();
+};
+window.opToggleTopeContrato=function(){
+  var actual=null;try{actual=localStorage.getItem('cta_tope_contrato');}catch(e){}
+  window.opSetTopeContrato(actual==='parcial'?'fijo':'parcial');
+};
+
 window.renderOperativa=function(){
   var now=new Date(),nowMin=now.getHours()*60+now.getMinutes();
   var mK=MESES[now.getMonth()];
@@ -6692,11 +6807,103 @@ window.renderOperativa=function(){
   var totalPerenMin=anualPerenMin+_coOp;
   var pMes=totalPerenMin/60; // keep pMes for display compatibility
   function fP(h){var hh=Math.floor(h),mm=Math.round((h-hh)*60);return hh+":"+(mm<10?"0":"")+mm;}
+  // Horas totales del año (todos los tipos "activos", igual criterio que
+  // Horas mes pero sumando los 12 meses).
+  var hAnualTrab=0;
+  MESES.forEach(function(m){
+    var md3=ue[m]||{};
+    Object.keys(md3).forEach(function(dd){
+      var dy=md3[dd];
+      if(!dy||!dy.tipo)return;
+      if(ACTIVOS.indexOf(dy.tipo)>=0)hAnualTrab+=dy.total||0;
+    });
+  });
+  // Festivos PENDIENTES — misma fórmula exacta que la pestaña Calendario
+  // (mcRenderSummary): arrastre de años anteriores + festivos ya generados
+  // (24+ días computables en meses ya cerrados) - festivos ya usados.
+  var _nowYOp=now.getFullYear(),_nowMOp=now.getMonth();
+  var festivosGenerados=0,festivosUsados=0;
+  MESES_ALL.forEach(function(mk,mIdx){
+    var md3f=ue[mk]||{};
+    var diasComputablesFestivo=0;
+    var festivosUsadosMes={};
+    Object.keys(md3f).forEach(function(dd){
+      var dy=md3f[dd];
+      if(!dy)return;
+      if(_mcFestivoCuentaDia(dy))diasComputablesFestivo++;
+      if(dy.tipo==='festivo'&&!festivosUsadosMes[dd]){festivosUsadosMes[dd]=true;festivosUsados++;}
+    });
+    var esFuturo=mIdx>_nowMOp;
+    if(!esFuturo&&diasComputablesFestivo>=24)festivosGenerados+=2;
+  });
+  var _fcoRawOp;try{_fcoRawOp=localStorage.getItem('cta_fest_carryover_'+_nowYOp);}catch(e){}
+  var _fcoOp=parseInt(_fcoRawOp,10);if(isNaN(_fcoOp))_fcoOp=0;
+  var festAnual=_fcoOp+festivosGenerados-festivosUsados;
   if(g("op-cal-mes"))g("op-cal-mes").textContent=MESES_ES[now.getMonth()]+" "+now.getFullYear();
   if(g("op-cal-trab"))g("op-cal-trab").textContent=trab;
   if(g("op-cal-lib"))g("op-cal-lib").textContent=lib;
   if(g("op-cal-hmes"))g("op-cal-hmes").textContent=Math.round(hMes*10)/10+"h";
   if(g("op-cal-cont"))g("op-cal-cont").textContent=Math.round(hCont*10)/10+"h";
+  if(g("op-cal-htotal"))g("op-cal-htotal").textContent=Math.round(hAnualTrab*10)/10+"h";
+  if(g("op-cal-fest"))g("op-cal-fest").textContent=festAnual;
+  if(g("op-cal-anio-lbl"))g("op-cal-anio-lbl").textContent="Año "+now.getFullYear();
+  // Tope de contador según contrato — el usuario elige una vez (se guarda) y
+  // se puede cambiar tocando el botón contrario. Por defecto "Fijo" hasta
+  // que elija, ya que es el colectivo más habitual.
+  var topeSel=null;try{topeSel=localStorage.getItem('cta_tope_contrato');}catch(e){}
+  if(topeSel!=='parcial'&&topeSel!=='fijo')topeSel='fijo';
+  function _opTopeBtnEstilo(btn,activo){
+    if(!btn)return;
+    btn.style.background=activo?'rgba(200,168,75,.18)':'none';
+    btn.style.borderColor=activo?'rgba(200,168,75,.45)':'var(--border)';
+    btn.style.color=activo?'var(--gold)':'var(--gray)';
+  }
+  _opTopeBtnEstilo(g('op-tope-parcial'),topeSel==='parcial');
+  _opTopeBtnEstilo(g('op-tope-fijo'),topeSel==='fijo');
+  if(g('op-cal-restante')){
+    var restanteH=TOPES_CONTRATO_OP[topeSel]-hCont;
+    var elRest=g('op-cal-restante');
+    if(restanteH<0){
+      elRest.textContent=(Math.round(-restanteH*10)/10)+'h superado';
+      elRest.style.color='#f87171';
+    } else {
+      elRest.textContent=(Math.round(restanteH*10)/10)+'h';
+      elRest.style.color='var(--gold)';
+    }
+    // Media de horas/mes necesaria para llegar JUSTO al tope a 31 de
+    // diciembre. No basta con repartir las horas restantes entre los meses
+    // naturales que quedan: parte de esos días serán de vacaciones (no
+    // generan horas de contador), así que primero se calculan los días de
+    // calendario que quedan hasta fin de año, se les restan los días de
+    // vacaciones que todavía faltan por coger (de los 30 anuales), y el
+    // resultado se convierte de nuevo a "meses equivalentes" para sacar la
+    // media real que hace falta trabajar.
+    var vacTomadas=0;
+    MESES.forEach(function(m){
+      var mdv=ue[m]||{};
+      Object.keys(mdv).forEach(function(dd){var dy=mdv[dd];if(dy&&dy.tipo==='vacaciones')vacTomadas++;});
+    });
+    var vacPendientes=Math.max(0,30-vacTomadas);
+    var hoy0=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+    var finAno=new Date(now.getFullYear(),11,31);
+    var diasCalRestantes=Math.round((finAno-hoy0)/86400000)+1; // incluye hoy
+    var diasEfectivos=Math.max(1,diasCalRestantes-vacPendientes);
+    var mesesEfectivos=diasEfectivos/30.4368;
+    var elMedia=g('op-cal-media-mes'),elMediaSub=g('op-cal-media-mes-sub');
+    if(elMedia){
+      if(restanteH<=0){
+        elMedia.textContent='0h — ya cumplido';
+        elMedia.style.color='#4ade80';
+      } else {
+        var mediaMes=restanteH/mesesEfectivos;
+        elMedia.textContent=(Math.round(mediaMes*10)/10)+'h/mes';
+        elMedia.style.color='#60a5fa';
+      }
+    }
+    if(elMediaSub){
+      elMediaSub.textContent='('+(Math.round(mesesEfectivos*10)/10)+' meses efectivos · '+vacPendientes+' días vac. pendientes de '+30+')';
+    }
+  }
   if(g("op-cal-peren")){
     var absMin=Math.abs(totalPerenMin);
     var hh=Math.floor(absMin/60),mm=Math.round(absMin%60);
