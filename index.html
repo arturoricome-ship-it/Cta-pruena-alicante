@@ -175,6 +175,7 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 .tab.active{background:linear-gradient(135deg,var(--gold),var(--gold-light));color:var(--navy);box-shadow:0 4px 12px rgba(200,168,75,.35)}
 #scroll-area{flex:1;overflow-y:auto;overflow-x:hidden;padding-bottom:calc(72px + env(safe-area-inset-bottom));padding:12px 12px 90px;-webkit-overflow-scrolling:touch}
 .panel{display:none;animation:fadeUp .3s ease}.panel.active{display:block}
+#panel-operativa.active{height:100%}
 @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 @media(max-width:400px){.vuelo-estado{font-size:9px;padding:3px 6px}}
 .folder-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding-top:4px}
@@ -621,7 +622,8 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 .op-v-nlbl{font-size:16px;color:var(--gray)}
 .op-jornada-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .op-turno-card{border-radius:16px;padding:14px 12px;cursor:pointer;display:flex;flex-direction:column;-webkit-tap-highlight-color:transparent}
-.op-turno-card.op-tc-horiz{flex-direction:column;align-items:stretch;gap:0;padding:10px 16px}
+#op-turno-card{flex:1 1 auto}
+.op-turno-card.op-tc-horiz{flex-direction:column;align-items:stretch;justify-content:center;gap:0;padding:10px 16px}
 .op-turno-card.op-tc-horiz .op-tc-lbl{margin-bottom:8px}
 .op-turno-card.op-tc-horiz .op-tc-row{display:flex;align-items:center;flex-wrap:wrap;gap:16px;margin-bottom:9px}
 .op-turno-card.op-tc-horiz .op-tc-col{display:flex;flex-direction:column;justify-content:center}
@@ -1046,7 +1048,7 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
       <div class="header-name">CTA Alicante</div>
       <div class="header-sub">Comision de Trabajadores Asamblearios</div>
       <div class="header-portal" id="header-welcome">Portal del Afiliado</div>
-      <div style="font-size:9px;color:rgba(255,255,255,.25);letter-spacing:.5px;margin-top:1px">build v2026-07-02-i</div>
+      <div style="font-size:9px;color:rgba(255,255,255,.25);letter-spacing:.5px;margin-top:1px">build v2026-07-02-j</div>
     </div>
   </div>
   <div id="nav-bar">
@@ -1078,8 +1080,8 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 <div id="scroll-area">
 
   <div class="panel active" id="panel-operativa">
-    <div id="op-fit-outer" style="position:relative;overflow:hidden">
-    <div id="op-fit-zone" style="transform-origin:top left;padding-bottom:4px">
+    <div id="op-fit-outer" style="position:relative;overflow:hidden;height:100%">
+    <div id="op-fit-zone" style="transform-origin:top left;padding-bottom:4px;display:flex;flex-direction:column;min-height:0">
     <p class="op-sec">Vuelos hoy · ALC</p>
     <div class="op-vuelos" onclick="document.getElementById('btn-live').click()">
       <span class="op-plane">✈</span>
@@ -4944,6 +4946,10 @@ function _ajustarFitZoneOperativa(){
   if(!scrollArea)return;
   inner.style.transform='none';
   inner.style.width='';
+  inner.style.height=''; // natural: hace falta para medir bien y para el encogido
+  // Medimos SIEMPRE con outer a 'auto' (sin su altura del 100% fijada por
+  // CSS): así Mi jornada no está todavía "estirada" por el flex:1 y
+  // medimos su alto NATURAL/mínimo real, no uno ya inflado.
   outer.style.height='auto';
   var innerH=inner.scrollHeight;
   if(innerH<=0)return;
@@ -4952,25 +4958,21 @@ function _ajustarFitZoneOperativa(){
   var disponible=scrollArea.clientHeight-padV-2; // -2: margen mínimo, pegado de verdad a los iconos
   if(disponible<150)return;
   var escala=disponible/innerH;
-  if(Math.abs(escala-1)>0.01){
-    if(escala<1){
-      // ENCOGER: además de reducir en alto, ensanchamos primero para que
-      // el contenido no deje banda vacía a la derecha tras el scale.
-      inner.style.width=(100/escala)+'%';
-      inner.style.transform='scale('+escala+')';
-    } else {
-      // AGRANDAR: NO tocar el ancho (si lo estrechábamos, el contenido se
-      // re-medía mal y el resultado se quedaba corto → hueco). Solo
-      // escalamos hacia arriba desde el ancho natural. transform-origin ya
-      // es top-left, así que crece hacia abajo y derecha; para que no se
-      // salga de ancho, compensamos el ancho al valor que tras el scale
-      // queda al 100%.
-      inner.style.width=(100/escala)+'%';
-      inner.style.transform='scale('+escala+')';
-    }
-    // Medimos el alto real que ocupa YA escalado y se lo damos al outer,
-    // para que ocupe exactamente eso (sin hueco ni recorte).
+  if(escala<0.99){
+    // No cabe ni en su tamaño mínimo: encoger todo el bloque en conjunto
+    // (transform:scale). inner se queda a su alto NATURAL (sin 100%) para
+    // que la matemática del escalado sea correcta.
+    inner.style.width=(100/escala)+'%';
+    inner.style.transform='scale('+escala+')';
     outer.style.height=Math.ceil(inner.scrollHeight*escala)+'px';
+  } else {
+    // Cabe de sobra: ahora sí, outer a 100% (vía CSS, quitando el inline)
+    // e inner también a 100%, para que su hijo Mi jornada (flex:1) se
+    // estire y absorba el espacio sobrante. A prueba de fallos de
+    // medición: por diseño del navegador, SIEMPRE llega exacto hasta el
+    // borde, sin cálculos que puedan fallar.
+    outer.style.height='100%';
+    inner.style.height='100%';
   }
 }
 window.addEventListener('resize',_ajustarFitZoneOperativa);
