@@ -1046,7 +1046,7 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
       <div class="header-name">CTA Alicante</div>
       <div class="header-sub">Comision de Trabajadores Asamblearios</div>
       <div class="header-portal" id="header-welcome">Portal del Afiliado</div>
-      <div id="op-build-dbg" style="font-size:9px;color:rgba(255,255,255,.25);letter-spacing:.5px;margin-top:1px">build v2026-07-02-g2</div>
+      <div id="op-build-dbg" style="font-size:9px;color:rgba(255,255,255,.25);letter-spacing:.5px;margin-top:1px">build v2026-07-02-h</div>
     </div>
   </div>
   <div id="nav-bar">
@@ -4981,19 +4981,14 @@ window.addEventListener('resize',_ajustarFitZoneOperativa);
 window.addEventListener('orientationchange',function(){setTimeout(_ajustarFitZoneOperativa,200);});
 // Recálculos puntuales tras la carga (para dar tiempo a que lleguen datos
 // de vuelos/calendario), y luego PARA. Nunca en bucle continuo ni en scroll.
-[300,900,2000,4000].forEach(function(ms){setTimeout(_ajustarFitZoneOperativa,ms);});
-// Observador que reacciona solo a cambios REALES de contenido (datos
-// nuevos), no al scroll. Con debounce.
-(function(){
-  var fitZone=document.getElementById('op-fit-zone');
-  if(!fitZone||typeof MutationObserver==='undefined')return;
-  var t=null;
-  var obs=new MutationObserver(function(){
-    clearTimeout(t);
-    t=setTimeout(_ajustarFitZoneOperativa,120);
-  });
-  obs.observe(fitZone,{childList:true,subtree:true,characterData:true});
-})();
+// IMPORTANTE: antes había también un MutationObserver que reajustaba cada
+// vez que cambiaba CUALQUIER texto dentro del bloque — incluido el
+// contador de "Mi jornada" que se actualiza solo cada pocos segundos. Cada
+// tick de ese contador disparaba un reset-y-recalculo, y si algo se veía
+// justo en ese instante intermedio, salía sin escalar. Quitado: con los
+// recálculos puntuales de aquí abajo es más que suficiente, ya que el
+// contador cambiando de texto no cambia la altura del bloque.
+[300,900,2000,4000,6000].forEach(function(ms){setTimeout(_ajustarFitZoneOperativa,ms);});
 
 function abrirCompanerosPorDia(){
   if(typeof verCompanerosHoy!=='function')return;
