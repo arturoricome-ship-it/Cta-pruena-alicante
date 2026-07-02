@@ -1235,9 +1235,6 @@ body{font-size:14px}
       </div>
     </div>
 
-    </div>
-    </div><!-- /op-fit-outer -->
-
     <p class="op-sec" id="op-mijornada-title">Mi jornada</p>
     <div class="op-turno-card state-working op-tc-horiz" id="op-turno-card" onclick="switchTab('afiliate',null,document.getElementById('nav-afiliate'))">
       <div class="op-tc-lbl" id="op-tc-lbl">Turno hoy</div>
@@ -1257,9 +1254,14 @@ body{font-size:14px}
       <div class="op-tc-bar-bg"><div class="op-tc-bar" id="op-tc-bar" style="width:0%"></div></div>
     </div>
 
+    </div>
+    </div><!-- /op-fit-outer -->
+
+    <div id="op-v2-mas-toggle" onclick="var m=document.getElementById('op-v2-mas');m.style.display='block';m.open=true;this.style.display='none';setTimeout(function(){m.scrollIntoView({behavior:'smooth',block:'start'});},50);" style="margin-top:10px;text-align:center;padding:7px;font-size:10.5px;font-weight:700;color:var(--gray);letter-spacing:.3px;cursor:pointer;border:1px dashed var(--border);border-radius:12px">📊 Ver más · Resumen operativo, detalles e historial</div>
+
     <!-- ══ v2: todo lo demás (resumen operativo, detalles, historial) se ha
          quitado de la portada y queda aquí colapsado, por si hace falta ══ -->
-    <details class="op-details" id="op-v2-mas" style="margin-top:14px">
+    <details class="op-details" id="op-v2-mas" style="margin-top:14px;display:none">
       <summary><span class="op-summary-title">📊 Más · Resumen operativo, detalles e historial</span></summary>
       <div class="op-details-body" style="display:block">
 
@@ -10116,7 +10118,8 @@ try{
     text-align:right!important;
   }
 
-  /* Mi jornada: ya no vive dentro de op-fit-zone, fluye normal y nunca se recorta ni se tapa */
+  /* Mi jornada: vive dentro de op-fit-zone (flex), empujada al fondo, y crece para llenar el hueco.
+     overflow:visible en todo el árbol de arriba garantiza que NUNCA se recorte ni se tape. */
   #panel-operativa.active #op-mijornada-title{
     margin-top:16px!important;
     margin-bottom:6px!important;
