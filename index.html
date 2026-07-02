@@ -5016,15 +5016,15 @@ function _ajustarFitZoneOperativa(){
   var cs=getComputedStyle(scrollArea);
   var padTop=parseFloat(cs.paddingTop)||0;
   var padBottom=parseFloat(cs.paddingBottom)||0;
-  var disponible=scrollArea.clientHeight-padTop-padBottom-2;
+  var disponible=scrollArea.clientHeight-padTop-padBottom-8;
   if(disponible<260)return;
-  outer.style.height=disponible+'px';
-  outer.style.minHeight=disponible+'px';
-  outer.style.overflow='hidden';
-  inner.style.transform='none';
-  inner.style.width='100%';
-  inner.style.height='100%';
-  inner.style.minHeight='0';
+  outer.style.setProperty('height',disponible+'px','important');
+  outer.style.setProperty('min-height',disponible+'px','important');
+  outer.style.setProperty('overflow','hidden','important');
+  inner.style.setProperty('transform','none','important');
+  inner.style.setProperty('width','100%','important');
+  inner.style.setProperty('height','100%','important');
+  inner.style.setProperty('min-height','0','important');
 }
 window.addEventListener('resize',function(){setTimeout(_ajustarFitZoneOperativa,80);});
 window.addEventListener('orientationchange',function(){setTimeout(_ajustarFitZoneOperativa,250);});
