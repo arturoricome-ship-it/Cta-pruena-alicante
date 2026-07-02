@@ -1048,7 +1048,7 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
       <div class="header-name">CTA Alicante</div>
       <div class="header-sub">Comision de Trabajadores Asamblearios</div>
       <div class="header-portal" id="header-welcome">Portal del Afiliado</div>
-      <div style="font-size:9px;color:rgba(255,255,255,.25);letter-spacing:.5px;margin-top:1px">build v2026-07-02-j</div>
+      <div style="font-size:9px;color:rgba(255,255,255,.25);letter-spacing:.5px;margin-top:1px">build v2026-07-02-k</div>
     </div>
   </div>
   <div id="nav-bar">
@@ -1081,7 +1081,7 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 
   <div class="panel active" id="panel-operativa">
     <div id="op-fit-outer" style="position:relative;overflow:hidden;height:100%">
-    <div id="op-fit-zone" style="transform-origin:top left;padding-bottom:4px;display:flex;flex-direction:column;min-height:0">
+    <div id="op-fit-zone" style="transform-origin:top left;padding-bottom:4px;display:flex;flex-direction:column;min-height:0;height:100%">
     <p class="op-sec">Vuelos hoy · ALC</p>
     <div class="op-vuelos" onclick="document.getElementById('btn-live').click()">
       <span class="op-plane">✈</span>
@@ -4958,7 +4958,7 @@ function _ajustarFitZoneOperativa(){
   var disponible=scrollArea.clientHeight-padV-2; // -2: margen mínimo, pegado de verdad a los iconos
   if(disponible<150)return;
   var escala=disponible/innerH;
-  if(escala<0.99){
+  if(escala<0.92){
     // No cabe ni en su tamaño mínimo: encoger todo el bloque en conjunto
     // (transform:scale). inner se queda a su alto NATURAL (sin 100%) para
     // que la matemática del escalado sea correcta.
