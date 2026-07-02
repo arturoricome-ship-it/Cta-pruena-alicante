@@ -1037,7 +1037,7 @@ body{font-size:14px}
 #btn-accesos{height:30px!important;padding:0 10px!important;font-size:10.5px!important}
 #scroll-area{padding:8px 12px calc(72px + env(safe-area-inset-bottom))!important}
 #panel-operativa.active{height:100%!important;min-height:0!important}
-#op-fit-outer{height:100%!important;overflow:hidden!important;position:relative!important}
+#op-fit-outer{height:auto!important;overflow:visible!important;position:relative!important}
 #op-fit-zone{transform-origin:top left!important;padding-bottom:2px!important;display:flex!important;flex-direction:column!important;min-height:0!important;height:auto!important}
 .op-sec{font-size:12.5px!important;margin:9px 0 6px!important;letter-spacing:.35px!important}
 .op-sec:first-child{margin-top:1px!important}
@@ -1155,8 +1155,8 @@ body{font-size:14px}
 <div id="scroll-area">
 
   <div class="panel active" id="panel-operativa">
-    <div id="op-fit-outer" style="position:relative;overflow:hidden;height:100%">
-    <div id="op-fit-zone" style="transform-origin:top left;padding-bottom:4px;display:flex;flex-direction:column;min-height:0;height:100%">
+    <div id="op-fit-outer" style="position:relative;overflow:visible;height:auto">
+    <div id="op-fit-zone" style="transform-origin:top left;padding-bottom:4px;display:flex;flex-direction:column;min-height:0;height:auto">
     <p class="op-sec">Vuelos hoy · ALC</p>
     <div class="op-vuelos" onclick="document.getElementById('btn-live').click()">
       <span class="op-plane">✈</span>
@@ -1235,7 +1235,10 @@ body{font-size:14px}
       </div>
     </div>
 
-    <p class="op-sec">Mi jornada</p>
+    </div>
+    </div><!-- /op-fit-outer -->
+
+    <p class="op-sec" id="op-mijornada-title">Mi jornada</p>
     <div class="op-turno-card state-working op-tc-horiz" id="op-turno-card" onclick="switchTab('afiliate',null,document.getElementById('nav-afiliate'))">
       <div class="op-tc-lbl" id="op-tc-lbl">Turno hoy</div>
       <div class="op-tc-row">
@@ -1253,8 +1256,6 @@ body{font-size:14px}
       </div>
       <div class="op-tc-bar-bg"><div class="op-tc-bar" id="op-tc-bar" style="width:0%"></div></div>
     </div>
-    </div>
-    </div><!-- /op-fit-outer -->
 
     <!-- ══ v2: todo lo demás (resumen operativo, detalles, historial) se ha
          quitado de la portada y queda aquí colapsado, por si hace falta ══ -->
@@ -5008,23 +5009,7 @@ function abrirTodaPlantilla(){
 // El hueco visible se calcula una vez con la altura real del contenedor;
 // el bloque interior usa flex para que "Mi jornada" llegue al borde de la barra inferior.
 function _ajustarFitZoneOperativa(){
-  var panel=document.getElementById('panel-operativa');
-  if(!panel||!panel.classList.contains('active'))return;
-  var outer=document.getElementById('op-fit-outer'),inner=document.getElementById('op-fit-zone');
-  var scrollArea=document.getElementById('scroll-area');
-  var navBar=document.getElementById('bottom-nav');
-  if(!outer||!inner||!scrollArea)return;
-  var outerTop=outer.getBoundingClientRect().top;
-  var limite=(navBar?navBar.getBoundingClientRect().top:0)||window.innerHeight;
-  var disponible=limite-outerTop-16;
-  if(disponible<260)return;
-  outer.style.setProperty('height',disponible+'px','important');
-  outer.style.setProperty('min-height',disponible+'px','important');
-  outer.style.setProperty('overflow','hidden','important');
-  inner.style.setProperty('transform','none','important');
-  inner.style.setProperty('width','100%','important');
-  inner.style.setProperty('height','100%','important');
-  inner.style.setProperty('min-height','0','important');
+  return; // v3: Mi Jornada y el resto de viñetas fluyen con su alto natural; ya no se fuerza altura por JS.
 }
 window.addEventListener('resize',function(){setTimeout(_ajustarFitZoneOperativa,80);});
 window.addEventListener('orientationchange',function(){setTimeout(_ajustarFitZoneOperativa,250);});
@@ -9824,7 +9809,7 @@ try{
   /* Sin escala visual: evita el movimiento raro al abrir. */
   #panel-operativa.active{height:100%!important;min-height:0!important;overflow:visible!important;font-size:10px!important;}
   #scroll-area{padding-top:6px!important;padding-left:12px!important;padding-right:12px!important;padding-bottom:calc(72px + env(safe-area-inset-bottom))!important;}
-  #op-fit-outer{overflow:hidden!important;position:relative!important;}
+  #op-fit-outer{overflow:visible!important;position:relative!important;}
   #op-fit-zone{transform:none!important;width:100%!important;height:100%!important;min-height:0!important;display:flex!important;flex-direction:column!important;padding-bottom:0!important;}
 
   .op-sec{font-size:8.8px!important;line-height:1!important;margin:5px 0 4px!important;letter-spacing:.25px!important;font-weight:700!important;}
@@ -9889,24 +9874,7 @@ try{
 <script id="cta-fit-estable-sin-salto-final">
 (function(){
   function stableFit(){
-    var panel=document.getElementById('panel-operativa');
-    if(!panel||!panel.classList.contains('active'))return;
-    var outer=document.getElementById('op-fit-outer');
-    var inner=document.getElementById('op-fit-zone');
-    var scrollArea=document.getElementById('scroll-area');
-    var navBar=document.getElementById('bottom-nav');
-    if(!outer||!inner||!scrollArea)return;
-    var outerTop=outer.getBoundingClientRect().top;
-    var limite=(navBar?navBar.getBoundingClientRect().top:0)||window.innerHeight;
-    var disponible=limite-outerTop-16;
-    if(disponible<260)return;
-    outer.style.setProperty('height',disponible+'px','important');
-    outer.style.setProperty('min-height',disponible+'px','important');
-    outer.style.setProperty('overflow','hidden','important');
-    inner.style.setProperty('transform','none','important');
-    inner.style.setProperty('width','100%','important');
-    inner.style.setProperty('height','100%','important');
-    inner.style.setProperty('min-height','0','important');
+    return; // v3: todo fluye con su alto natural; el scroll ya existente es la red de seguridad.
   }
   window._ajustarFitZoneOperativa=stableFit;
   document.addEventListener('DOMContentLoaded',function(){stableFit();setTimeout(stableFit,80);setTimeout(stableFit,500);});
@@ -9923,11 +9891,11 @@ try{
   /* Más separación entre las viñetas principales de Operativa */
   #panel-operativa.active #op-fit-zone{
     transform:none!important;
-    height:100%!important;
+    height:auto!important;
     min-height:0!important;
     display:flex!important;
     flex-direction:column!important;
-    overflow:hidden!important;
+    overflow:visible!important;
     padding-bottom:0!important;
   }
 
@@ -9953,9 +9921,8 @@ try{
     margin:16px 0 8px!important;
   }
 
-  /* Mi jornada baja al borde inferior; el espacio sobrante se queda encima */
-  #panel-operativa.active #op-fit-zone > p.op-sec:nth-of-type(4){
-    margin-top:auto!important;
+  /* Mi jornada: ahora fluye normal en la página, ya no vive dentro de op-fit-zone */
+  #panel-operativa.active #op-mijornada-title{
     margin-bottom:6px!important;
   }
 
@@ -10052,28 +10019,7 @@ try{
 
 <!-- === AJUSTE LOCALIZADO: calendario/mi jornada/día a día === -->
 <style id="cta-ajuste-localizado-mi-jornada-v2">
-  /* 1) Que Calendario no pise el título Mi jornada */
-  #panel-operativa.active #op-cal-card{
-    margin-bottom:12px!important;
-  }
-  #panel-operativa.active #op-fit-zone > p.op-sec:nth-of-type(4){
-    margin-top:8px!important;
-    margin-bottom:5px!important;
-    position:relative!important;
-    z-index:3!important;
-  }
-
-  /* 2) Mi jornada más fina: SOLO esta tarjeta, sin tocar el resto de la app */
-  #panel-operativa.active #op-turno-card.op-turno-card.op-tc-horiz{
-    flex:0 0 84px!important;
-    height:84px!important;
-    min-height:84px!important;
-    max-height:84px!important;
-    padding:5px 10px 6px!important;
-    border-radius:12px!important;
-    overflow:hidden!important;
-    justify-content:center!important;
-  }
+  /* 2) Mi jornada: tamaños de columnas/textos (el alto y overflow los fija el bloque más reciente) */
   #panel-operativa.active #op-turno-card .op-tc-lbl{
     margin-bottom:3px!important;
     font-size:7.2px!important;
@@ -10170,23 +10116,17 @@ try{
     text-align:right!important;
   }
 
-  /* Mi jornada: dejar sitio real para que se vea el borde inferior */
-  #panel-operativa.active #op-fit-zone{
-    padding-bottom:5px!important;
-    box-sizing:border-box!important;
-  }
-  #panel-operativa.active #op-fit-zone > p.op-sec:nth-of-type(4){
+  /* Mi jornada: ya no vive dentro de op-fit-zone, fluye normal y nunca se recorta ni se tapa */
+  #panel-operativa.active #op-mijornada-title{
     margin-top:16px!important;
     margin-bottom:6px!important;
-    position:relative!important;
-    z-index:4!important;
   }
   #panel-operativa.active #op-turno-card.op-turno-card.op-tc-horiz{
-    flex:1 0 auto!important;
     height:auto!important;
     min-height:96px!important;
     max-height:none!important;
-    margin-bottom:6px!important;
+    margin-top:0!important;
+    margin-bottom:8px!important;
     padding:5px 10px 8px!important;
     box-sizing:border-box!important;
     overflow:visible!important;
