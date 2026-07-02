@@ -1257,11 +1257,9 @@ body{font-size:14px}
     </div>
     </div><!-- /op-fit-outer -->
 
-    <div id="op-v2-mas-toggle" onclick="var m=document.getElementById('op-v2-mas');m.style.display='block';m.open=true;this.style.display='none';setTimeout(function(){m.scrollIntoView({behavior:'smooth',block:'start'});},50);" style="margin-top:10px;text-align:center;padding:7px;font-size:10.5px;font-weight:700;color:var(--gray);letter-spacing:.3px;cursor:pointer;border:1px dashed var(--border);border-radius:12px">📊 Ver más · Resumen operativo, detalles e historial</div>
-
     <!-- ══ v2: todo lo demás (resumen operativo, detalles, historial) se ha
          quitado de la portada y queda aquí colapsado, por si hace falta ══ -->
-    <details class="op-details" id="op-v2-mas" style="margin-top:14px;display:none">
+    <details class="op-details" id="op-v2-mas" style="margin-top:130px">
       <summary><span class="op-summary-title">📊 Más · Resumen operativo, detalles e historial</span></summary>
       <div class="op-details-body" style="display:block">
 
@@ -10011,9 +10009,9 @@ try{
     margin-top:2px!important;
   }
 
-  /* El bloque Más sigue debajo y no entra en la primera pantalla */
+  /* El bloque Más queda debajo de los iconos; hace falta scroll para verlo */
   #op-v2-mas{
-    margin-top:22px!important;
+    margin-top:130px!important;
   }
 </style>
 
