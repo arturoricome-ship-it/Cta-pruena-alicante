@@ -17,7 +17,7 @@
 <style>
 :root{--navy:#1a2744;--navy-light:#243460;--gold:#c8a84b;--gold-light:#e8c96a;--white:#f0eee8;--gray:#8a93a8;--bg:#0d1623;--card:#182135;--card2:#1f2d47;--border:rgba(255,255,255,0.07)}
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;overflow:hidden}
+html,body{height:100%;height:100dvh;overflow:hidden}
 body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);display:flex;flex-direction:column}
 #app-header{background:linear-gradient(160deg,#1a2a4a 0%,var(--bg) 100%);padding:14px 16px 0;flex-shrink:0;z-index:10}
 #app-header::after{content:"";display:block;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin-top:10px}
@@ -1046,7 +1046,7 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
       <div class="header-name">CTA Alicante</div>
       <div class="header-sub">Comision de Trabajadores Asamblearios</div>
       <div class="header-portal" id="header-welcome">Portal del Afiliado</div>
-      <div style="font-size:9px;color:rgba(255,255,255,.25);letter-spacing:.5px;margin-top:1px">build v2026-07-02-f</div>
+      <div style="font-size:9px;color:rgba(255,255,255,.25);letter-spacing:.5px;margin-top:1px">build v2026-07-02-g</div>
     </div>
   </div>
   <div id="nav-bar">
@@ -4928,47 +4928,35 @@ function abrirTodaPlantilla(){
   },50);
 }
 // ══ v2: "encajar" Vuelos+Día a día+Calendario+Mi jornada exactamente en el
-// hueco visible entre la cabecera y la barra inferior, sea cual sea el
-// tamaño de pantalla o el tamaño de letra del dispositivo. Mide la altura
-// real ya renderizada (con la letra/pantalla que toque) y si no cabe,
-// encoge todo el bloque en conjunto (transform:scale) para que entre
-// entero. Si sobra sitio, no se toca (escala 1). El desplegable "Más" se
-// queda fuera de este bloque, así que es lo único que puede necesitar
-// scroll.
+// hueco visible, para que Mi jornada quede pegada abajo. El truco clave:
+// NO usamos window.innerHeight (poco fiable en móvil por la barra del
+// navegador que aparece/desaparece con el scroll — era la causa de que el
+// tamaño "bailara" y de que quedara hueco). En su lugar medimos la altura
+// del propio #scroll-area, que es un contenedor con altura fija por CSS
+// (flex:1 dentro de un layout de altura 100dvh) y NO cambia al hacer
+// scroll dentro de él. El desplegable "Más" queda fuera de op-fit-outer.
 function _ajustarFitZoneOperativa(){
   var panel=document.getElementById('panel-operativa');
   if(!panel||!panel.classList.contains('active'))return;
   var outer=document.getElementById('op-fit-outer'),inner=document.getElementById('op-fit-zone');
   if(!outer||!inner)return;
-  var header=document.getElementById('app-header'),nav=document.getElementById('bottom-nav'),scrollArea=document.getElementById('scroll-area');
+  var scrollArea=document.getElementById('scroll-area');
+  if(!scrollArea)return;
   inner.style.transform='none';
-  inner.style.width=''; // reset: hay que medir a ancho natural (100%) antes de nada
+  inner.style.width='';
   outer.style.height='auto';
   var innerH=inner.scrollHeight;
   if(innerH<=0)return;
-  // IMPORTANTE: la medición tiene que basarse SOLO en referencias que no
-  // cambian al hacer scroll. outer.getBoundingClientRect().top SÍ cambia
-  // según el scroll (outer está dentro de la zona que se desplaza), y por
-  // eso el tamaño "bailaba" al hacer scroll — cada segundo se recalculaba
-  // con una posición distinta. header (fuera de la zona de scroll) y nav
-  // (position:fixed) están siempre en el mismo sitio pase lo que pase con
-  // el scroll, así que el cálculo con ellos es estable.
-  var headerH=header?header.getBoundingClientRect().height:0;
-  var navH=nav?nav.getBoundingClientRect().height:0;
-  var padTop=0;
-  if(scrollArea){var cs=getComputedStyle(scrollArea);padTop=(parseFloat(cs.paddingTop)||0)+(parseFloat(cs.marginTop)||0);}
-  var disponible=window.innerHeight-headerH-navH-padTop-8;
-  if(disponible<150)return; // pantalla absurdamente pequeña: no forzar nada raro
-  // Sin tope: que ocupe exactamente el hueco disponible, se encoja o se
-  // agrande lo que haga falta.
+  // clientHeight del área de scroll = alto visible real de esa zona, ya
+  // descontados cabecera y barra inferior por el layout, y estable frente
+  // al scroll. Le restamos su propio padding vertical para saber cuánto
+  // espacio útil hay de verdad.
+  var cs=getComputedStyle(scrollArea);
+  var padV=(parseFloat(cs.paddingTop)||0)+(parseFloat(cs.paddingBottom)||0);
+  var disponible=scrollArea.clientHeight-padV;
+  if(disponible<150)return;
   var escala=disponible/innerH;
   if(Math.abs(escala-1)>0.01){
-    // Truco para que NO quede hueco en blanco a la derecha: primero
-    // ensanchamos la zona (100/escala %) para que su contenido "recoloque"
-    // como si tuviera más ancho, y LUEGO la escalamos entera. El resultado
-    // final ocupa el 100% del ancho real (ensanchado × escala = 100%) y
-    // solo se reduce en altura — sin bandas vacías ni deformar el aspecto
-    // de las tarjetas.
     inner.style.width=(100/escala)+'%';
     inner.style.transform='scale('+escala+')';
     outer.style.height=Math.ceil(innerH*escala)+'px';
@@ -4976,20 +4964,11 @@ function _ajustarFitZoneOperativa(){
 }
 window.addEventListener('resize',_ajustarFitZoneOperativa);
 window.addEventListener('orientationchange',function(){setTimeout(_ajustarFitZoneOperativa,200);});
-// IMPORTANTE: aquí antes había un setInterval que recalculaba cada 1s SIN
-// PARAR, incluso mientras el usuario hacía scroll. En móvil, la barra de
-// direcciones del navegador se esconde/aparece al hacer scroll — eso
-// cambia ligeramente window.innerHeight, y el recálculo continuo lo
-// detectaba y reajustaba el tamaño EN DIRECTO, dando la sensación de que
-// "bailaba". El tamaño solo debe recalcularse cuando algo realmente
-// cambia (carga inicial, datos que tardan en llegar, cambio de tamaño de
-// ventana real, rotar el móvil) — nunca en un bucle continuo.
-[500,1200,2500,4000].forEach(function(ms){setTimeout(_ajustarFitZoneOperativa,ms);});
-// Además de esos recálculos puntuales, un observador que solo reacciona
-// cuando el CONTENIDO cambia de verdad (llegan datos nuevos, se repinta
-// una cifra, etc.) — no cuando se hace scroll, que no altera el HTML en
-// absoluto. Con "debounce" para no recalcular docenas de veces si llegan
-// varios cambios seguidos.
+// Recálculos puntuales tras la carga (para dar tiempo a que lleguen datos
+// de vuelos/calendario), y luego PARA. Nunca en bucle continuo ni en scroll.
+[300,900,2000,4000].forEach(function(ms){setTimeout(_ajustarFitZoneOperativa,ms);});
+// Observador que reacciona solo a cambios REALES de contenido (datos
+// nuevos), no al scroll. Con debounce.
 (function(){
   var fitZone=document.getElementById('op-fit-zone');
   if(!fitZone||typeof MutationObserver==='undefined')return;
@@ -6921,7 +6900,13 @@ window.renderOperativa=function(){
         elMedia.style.color='#4ade80';
       } else {
         var mediaMes=restanteH/mesesEfectivos;
-        elMedia.textContent=(Math.round(mediaMes*10)/10)+'h/mes';
+        // Formato horas,minutos reales: la parte decimal se convierte a
+        // minutos (0.5h → 30min), no se muestra como decimal. Ej: 142.8h
+        // decimal → 142,48 (142h 48min). Se muestra con coma como pediste.
+        var mmH=Math.floor(mediaMes);
+        var mmMin=Math.round((mediaMes-mmH)*60);
+        if(mmMin===60){mmH++;mmMin=0;} // por si el redondeo sube a 60
+        elMedia.textContent=mmH+','+(mmMin<10?'0':'')+mmMin+'h/mes';
         elMedia.style.color='#60a5fa';
       }
     }
