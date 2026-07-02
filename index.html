@@ -1080,8 +1080,8 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 <div id="scroll-area">
 
   <div class="panel active" id="panel-operativa">
-    <div id="op-fit-outer" style="position:relative;overflow:hidden;height:100%">
-    <div id="op-fit-zone" style="transform-origin:top left;padding-bottom:4px;display:flex;flex-direction:column;min-height:0;height:100%">
+    <div id="op-fit-outer" style="position:relative;overflow:hidden;height:calc(100% + 1cm)">
+    <div id="op-fit-zone" style="transform-origin:top left;padding-bottom:4px;display:flex;flex-direction:column;min-height:0;height:calc(100% + 1cm)">
     <p class="op-sec">Vuelos hoy · ALC</p>
     <div class="op-vuelos" onclick="document.getElementById('btn-live').click()">
       <span class="op-plane">✈</span>
@@ -4971,8 +4971,8 @@ function _ajustarFitZoneOperativa(){
     // estire y absorba el espacio sobrante. A prueba de fallos de
     // medición: por diseño del navegador, SIEMPRE llega exacto hasta el
     // borde, sin cálculos que puedan fallar.
-    outer.style.height='100%';
-    inner.style.height='100%';
+    outer.style.height='calc(100% + 1cm)';
+    inner.style.height='calc(100% + 1cm)';
   }
 }
 window.addEventListener('resize',_ajustarFitZoneOperativa);
@@ -6744,6 +6744,13 @@ var CONT_OP=["trabajado","hl","hlp","baja","rm","curso"]; // matches calendar co
 function g(id){return document.getElementById(id);}
 function toM(t){if(!t)return null;var p=t.split(":");return +p[0]*60+(+p[1]||0);}
 function fmtT(m){if(!m&&m!==0)return"";var h=Math.floor(m/60),mn=m%60;return h>0?h+"h"+(mn?" "+mn+"m":""):mn+"m";}
+// Formatea horas en cuartos (0,25 / 0,50 / 0,75) con coma decimal — los
+// turnos reales van en tramos de 15 min, así que las horas SIEMPRE caen en
+// un cuarto exacto; con esto se muestra tal cual, sin decimales raros.
+function fmtHoraCuarto(x){
+  var q=Math.round(x*4)/4;
+  return q.toFixed(2).replace('.',',');
+}
 
 // Cuando el usuario nunca ha importado su Tryp personal, "Mi jornada" muestra
 // instrucciones de cómo hacerlo en vez del placeholder de "Descanso" (que antes
@@ -6854,9 +6861,9 @@ window.renderOperativa=function(){
   if(g("op-cal-mes"))g("op-cal-mes").textContent=MESES_ES[now.getMonth()]+" "+now.getFullYear();
   if(g("op-cal-trab"))g("op-cal-trab").textContent=trab;
   if(g("op-cal-lib"))g("op-cal-lib").textContent=lib;
-  if(g("op-cal-hmes"))g("op-cal-hmes").textContent=Math.round(hMes*10)/10+"h";
-  if(g("op-cal-cont"))g("op-cal-cont").textContent=Math.round(hCont*10)/10+"h";
-  if(g("op-cal-htotal"))g("op-cal-htotal").textContent=Math.round(hAnualTrab*10)/10+"h";
+  if(g("op-cal-hmes"))g("op-cal-hmes").textContent=fmtHoraCuarto(hMes)+"h";
+  if(g("op-cal-cont"))g("op-cal-cont").textContent=fmtHoraCuarto(hCont)+"h";
+  if(g("op-cal-htotal"))g("op-cal-htotal").textContent=fmtHoraCuarto(hAnualTrab)+"h";
   if(g("op-cal-fest"))g("op-cal-fest").textContent=festAnual;
   if(g("op-cal-anio-lbl"))g("op-cal-anio-lbl").textContent="Año "+now.getFullYear();
   // Tope de contador según contrato — el usuario elige una vez (se guarda) y
@@ -6876,10 +6883,10 @@ window.renderOperativa=function(){
     var restanteH=TOPES_CONTRATO_OP[topeSel]-hCont;
     var elRest=g('op-cal-restante');
     if(restanteH<0){
-      elRest.textContent=(Math.round(-restanteH*10)/10)+'h superado';
+      elRest.textContent=fmtHoraCuarto(-restanteH)+'h superado';
       elRest.style.color='#f87171';
     } else {
-      elRest.textContent=(Math.round(restanteH*10)/10)+'h';
+      elRest.textContent=fmtHoraCuarto(restanteH)+'h';
       elRest.style.color='var(--gold)';
     }
     // Media de horas/mes necesaria para llegar JUSTO al tope a 31 de
@@ -6908,14 +6915,7 @@ window.renderOperativa=function(){
         elMedia.style.color='#4ade80';
       } else {
         var mediaMes=restanteH/mesesEfectivos;
-        // Redondeo al cuarto de hora más cercano: los turnos reales se
-        // cuentan en tramos de 15 min, así que una media "objetivo" con
-        // minutos raros (como :47) no tiene sentido operativo. Se redondea
-        // a :00, :15, :30 o :45 — que es como pediste que saliera.
-        var totalMin=Math.round(mediaMes*60/15)*15;
-        var mmH=Math.floor(totalMin/60);
-        var mmMin=totalMin%60;
-        elMedia.textContent=mmH+','+(mmMin<10?'0':'')+mmMin+'h/mes';
+        elMedia.textContent=fmtHoraCuarto(mediaMes)+'h/mes';
         elMedia.style.color='#60a5fa';
       }
     }
