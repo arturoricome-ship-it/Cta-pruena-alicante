@@ -1021,50 +1021,77 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 .ev-mes-tab.active{background:rgba(200,168,75,.15);border-color:rgba(200,168,75,.4);color:var(--gold);font-weight:700}
 
 
-/* =========================================================
-   AJUSTE ARTURO 2026-07-02
-   Objetivo:
-   - Fuentes algo más grandes sin forzar scroll en portada.
-   - Portada Operativa encajada en el hueco visible.
-   - "Mi jornada" pegada abajo, justo encima de la barra de botones.
-   - El desplegable "Más" queda debajo de la portada y solo aparece al hacer scroll.
-   ========================================================= */
-body{font-size:15px!important}
-#app-header{padding-top:10px!important}
-.header-name{font-size:23px!important}.header-sub{font-size:10px!important}.header-portal{font-size:11px!important}
-#nav-bar{padding-top:4px!important;padding-bottom:5px!important}
-#tab-bar{padding-top:4px!important}.tab{font-size:12px!important;padding:8px 0!important}
-#bottom-nav{min-height:64px!important;padding-top:7px!important;padding-bottom:max(7px,env(safe-area-inset-bottom))!important}
-.nav-btn{font-size:9px!important}.nav-ico{font-size:21px!important}
-#scroll-area{padding:8px 12px calc(76px + env(safe-area-inset-bottom))!important}
+/* === AJUSTE CTA 2026-07-02: tamaño corregido para que la portada quepa === */
+body{font-size:14px}
+#app-header{padding:10px 14px 0!important}
+#app-header::after{margin-top:8px!important}
+.logo{width:40px!important;height:40px!important;border-radius:12px!important;font-size:16px!important}
+.header-row{gap:11px!important;margin-bottom:2px!important}
+.header-name{font-size:21px!important;letter-spacing:1.4px!important}
+.header-sub{font-size:8.5px!important;letter-spacing:1.25px!important}
+.header-portal{font-size:9.5px!important}
+#nav-bar{padding:5px 12px 7px!important;gap:7px!important}
+#btn-back{height:30px!important;border-radius:10px!important;font-size:14px!important}
+#btn-back::after{font-size:10px!important}
+#btn-home{width:30px!important;height:30px!important;font-size:15px!important}
+#btn-accesos{height:30px!important;padding:0 10px!important;font-size:10.5px!important}
+#scroll-area{padding:8px 12px calc(72px + env(safe-area-inset-bottom))!important}
 #panel-operativa.active{height:100%!important;min-height:0!important}
-#op-fit-outer{height:100%!important;overflow:hidden!important;margin:0!important;padding:0!important}
-#op-fit-zone{height:100%!important;min-height:0!important;display:flex!important;flex-direction:column!important;padding-bottom:2px!important}
-#op-fit-zone>.op-sec{font-size:15px!important;margin:9px 0 6px!important;line-height:1.05!important}
-#op-fit-zone>.op-sec:first-child{margin-top:0!important}
-/* La sección Mi jornada baja y absorbe el espacio sobrante */
-#op-fit-zone>.op-sec:has(+ #op-turno-card){margin-top:auto!important;margin-bottom:6px!important}
-#op-turno-card{flex:0 0 auto!important;margin-bottom:0!important;border-radius:17px!important;padding:12px 16px!important;min-height:92px!important}
-.op-turno-card.op-tc-horiz .op-tc-lbl{font-size:12px!important;margin-bottom:7px!important}
-.op-turno-card.op-tc-horiz .op-tc-row{gap:14px!important;margin-bottom:8px!important}
-.op-tc-pct{font-size:31px!important}.op-tc-rem{font-size:12px!important}.op-tc-sub{font-size:16px!important}.op-tc-shift{font-size:12px!important}.op-tc-times span{font-size:13px!important;padding:6px 12px!important}
-#op-v2-mas{margin-top:14px!important;margin-bottom:20px!important}
-#op-v2-mas:not([open]){min-height:48px!important}
-.op-details summary{font-size:13px!important;padding:13px 14px!important}
-/* Si el móvil es bajo, compactamos lo justo para seguir sin scroll en portada */
+#op-fit-outer{height:100%!important;overflow:hidden!important;position:relative!important}
+#op-fit-zone{transform-origin:top left!important;padding-bottom:2px!important;display:flex!important;flex-direction:column!important;min-height:0!important;height:auto!important}
+.op-sec{font-size:12.5px!important;margin:9px 0 6px!important;letter-spacing:.35px!important}
+.op-sec:first-child{margin-top:1px!important}
+.op-vuelos{border-radius:15px!important;padding:11px 12px!important;gap:10px!important}
+.op-plane{font-size:28px!important}
+.op-v-title{font-size:19px!important;line-height:1.05!important}
+.op-vuelos [style*="grid-template-columns:1fr 1fr"]{gap:6px!important;margin-top:6px!important}
+.op-vuelos [style*="padding:22px 16px"]{padding:13px 11px!important;border-radius:13px!important}
+.op-vuelos [style*="font-size:15px"]{font-size:12px!important;margin-bottom:6px!important}
+.op-v-nval{font-size:34px!important;line-height:.95!important}
+.op-v-nlbl{font-size:13px!important;line-height:1.1!important}
+.op-comp-card[onclick*="abrirCompanerosPorDia"]{padding:17px 16px!important;gap:13px!important;border-radius:15px!important}
+.op-comp-card[onclick*="abrirCompanerosPorDia"] > span{font-size:36px!important}
+.op-comp-card[onclick*="abrirCompanerosPorDia"] div[style*="font-size:27px"]{font-size:22px!important;line-height:1.12!important}
+.op-comp-card[onclick*="abrirCompanerosPorDia"] div[style*="font-size:17.5px"]{font-size:14px!important;line-height:1.25!important;margin-top:3px!important}
+.op-cal-card{border-radius:15px!important;padding:9px 10px!important}
+#op-cal-card > div[style*="font-size:19px"]{font-size:17px!important;line-height:1.05!important}
+#op-cal-mes{font-size:12px!important;margin-top:1px!important}
+#op-cal-card div[style*="grid-template-columns:1fr 1fr"]{gap:7px!important;margin-top:6px!important}
+#op-cal-card div[style*="font-size:13.5px"]{font-size:11px!important;margin-bottom:4px!important;line-height:1.05!important}
+.op-cal-rows{gap:4px!important;margin-top:4px!important}
+.op-cal-row{padding:5px 8px!important;border-radius:8px!important;min-height:0!important}
+.op-cal-rl{font-size:13.5px!important;line-height:1.05!important}
+.op-cal-rv{font-size:19.5px!important;line-height:1!important}
+#op-cal-card div[style*="margin-top:10px;padding-top:8px"]{margin-top:7px!important;padding-top:6px!important}
+#op-tope-parcial,#op-tope-fijo{font-size:13px!important;padding:3px 8px!important;border-radius:8px!important}
+#op-cal-card span[style*="font-size:20px"]{font-size:15px!important;line-height:1.16!important}
+#op-cal-restante,#op-cal-media-mes{font-size:18px!important;line-height:1.05!important}
+#op-cal-media-mes-sub{font-size:10.5px!important;margin-top:1px!important;line-height:1.05!important;text-align:left!important}
+.op-turno-card.op-tc-horiz{padding:7px 12px!important;border-radius:15px!important;min-height:0!important;justify-content:center!important}
+.op-turno-card.op-tc-horiz .op-tc-lbl{font-size:10px!important;margin-bottom:4px!important;line-height:1!important}
+.op-turno-card.op-tc-horiz .op-tc-row{gap:10px!important;margin-bottom:5px!important;flex-wrap:nowrap!important}
+.op-turno-card.op-tc-horiz .op-tc-col-a{min-width:58px!important;flex-basis:58px!important}
+.op-turno-card.op-tc-horiz .op-tc-col-b{min-width:110px!important;flex:1 1 auto!important}
+.op-turno-card.op-tc-horiz .op-tc-col-c{min-width:86px!important;flex-basis:86px!important}
+.op-tc-pct{font-size:32px!important;line-height:.9!important}
+.op-tc-rem{font-size:10.5px!important;line-height:1.05!important}
+.op-tc-sub{font-size:14px!important;line-height:1.15!important}
+.op-tc-shift{font-size:22px!important;line-height:1.1!important;margin-top:1px!important}
+.op-tc-times span{font-size:19px!important;padding:4px 7px!important;line-height:1.05!important;border-radius:8px!important}
+.op-turno-card.state-rest .op-tc-times span{font-size:23px!important}
+.op-turno-card.state-rest .op-tc-pct{font-size:29px!important}
+.op-tc-bar-bg{height:6px!important;margin-top:1px!important}
+#op-v2-mas{margin-top:18px!important}
+#bottom-nav{padding:7px 0 max(7px,env(safe-area-inset-bottom))!important}
+.nav-ico{font-size:19px!important}.nav-btn{font-size:7.5px!important}
 @media(max-height:760px){
-  #app-header{padding-top:8px!important}.header-row{margin-bottom:2px!important}.logo{width:39px!important;height:39px!important}.header-name{font-size:21px!important}
-  #nav-bar{padding-top:3px!important;padding-bottom:4px!important}#tab-bar{padding-top:3px!important}.tab{padding:7px 0!important;font-size:11.5px!important}
-  #scroll-area{padding-top:6px!important;padding-bottom:calc(70px + env(safe-area-inset-bottom))!important}
-  #op-fit-zone>.op-sec{font-size:14px!important;margin:7px 0 5px!important}
-  #op-turno-card{min-height:84px!important;padding:10px 14px!important}
-  .op-turno-card.op-tc-horiz .op-tc-row{gap:10px!important;margin-bottom:7px!important}
-  .op-tc-pct{font-size:28px!important}.op-tc-sub{font-size:15px!important}.op-tc-times span{font-size:12px!important;padding:5px 10px!important}
-}
-@media(max-height:690px){
-  .header-sub,.header-portal{display:none!important}#app-header::after{margin-top:6px!important}
-  #bottom-nav{min-height:58px!important}.nav-ico{font-size:19px!important}.nav-btn{font-size:8.5px!important}
-  #op-turno-card{min-height:76px!important}.op-tc-pct{font-size:25px!important}.op-tc-sub{font-size:14px!important}.op-tc-rem,.op-tc-shift{font-size:11px!important}
+  #scroll-area{padding-top:6px!important}
+  .op-sec{font-size:12px!important;margin:7px 0 5px!important}
+  .op-vuelos{padding:9px 10px!important}.op-v-nval{font-size:31px!important}.op-v-title{font-size:18px!important}.op-v-nlbl{font-size:12px!important}
+  .op-comp-card[onclick*="abrirCompanerosPorDia"]{padding:14px 15px!important}.op-comp-card[onclick*="abrirCompanerosPorDia"] > span{font-size:32px!important}.op-comp-card[onclick*="abrirCompanerosPorDia"] div[style*="font-size:27px"]{font-size:20px!important}.op-comp-card[onclick*="abrirCompanerosPorDia"] div[style*="font-size:17.5px"]{font-size:13px!important}
+  .op-cal-card{padding:8px 9px!important}.op-cal-row{padding:4px 7px!important}.op-cal-rl{font-size:12.5px!important}.op-cal-rv{font-size:18px!important}
+  #op-cal-card span[style*="font-size:20px"]{font-size:14px!important}#op-cal-restante,#op-cal-media-mes{font-size:17px!important}
+  .op-turno-card.op-tc-horiz{padding:6px 11px!important}.op-tc-pct{font-size:29px!important}.op-tc-shift{font-size:20px!important}.op-tc-times span{font-size:18px!important}
 }
 
 </style>
@@ -4989,34 +5016,26 @@ function _ajustarFitZoneOperativa(){
   var panel=document.getElementById('panel-operativa');
   if(!panel||!panel.classList.contains('active'))return;
   var outer=document.getElementById('op-fit-outer'),inner=document.getElementById('op-fit-zone');
-  if(!outer||!inner)return;
   var scrollArea=document.getElementById('scroll-area');
-  if(!scrollArea)return;
-
+  if(!outer||!inner||!scrollArea)return;
   inner.style.transform='none';
   inner.style.width='';
-  inner.style.height='';
-  outer.style.height='auto';
-
+  inner.style.height='auto';
+  outer.style.height='100%';
   var cs=getComputedStyle(scrollArea);
-  var padTop=parseFloat(cs.paddingTop)||0;
-  var nav=document.getElementById('bottom-nav');
-  var navH=nav?nav.getBoundingClientRect().height:70;
-  // Altura realmente visible antes de la barra inferior. Dejamos 3 px de seguridad.
-  var disponible=scrollArea.clientHeight-padTop-navH-3;
-  if(disponible<180){ disponible=scrollArea.clientHeight-padTop-3; }
-
+  var padV=(parseFloat(cs.paddingTop)||0)+(parseFloat(cs.paddingBottom)||0);
+  var disponible=scrollArea.clientHeight-padV-2;
+  if(disponible<240)return;
   var innerH=inner.scrollHeight;
-  if(innerH<=0||disponible<=0)return;
+  if(innerH<=0)return;
   var escala=disponible/innerH;
-
-  if(escala<0.94){
-    escala=Math.max(0.82,escala);
+  if(escala<1){
+    escala=Math.max(0.58,Math.min(1,escala));
     inner.style.width=(100/escala)+'%';
     inner.style.transform='scale('+escala+')';
-    outer.style.height=Math.ceil(inner.scrollHeight*escala)+'px';
+    outer.style.height=Math.ceil(innerH*escala)+'px';
   }else{
-    outer.style.height=Math.floor(disponible)+'px';
+    outer.style.height='100%';
     inner.style.height='100%';
   }
 }
@@ -5032,6 +5051,14 @@ window.addEventListener('orientationchange',function(){setTimeout(_ajustarFitZon
 // recálculos puntuales de aquí abajo es más que suficiente, ya que el
 // contador cambiando de texto no cambia la altura del bloque.
 [300,900,2000,4000,6000].forEach(function(ms){setTimeout(_ajustarFitZoneOperativa,ms);});
+setTimeout(function(){
+  var z=document.getElementById('op-fit-zone');
+  if(z&&window.MutationObserver){
+    var _opFitTimer=null;
+    new MutationObserver(function(){clearTimeout(_opFitTimer);_opFitTimer=setTimeout(_ajustarFitZoneOperativa,80);}).observe(z,{childList:true,subtree:true,characterData:true});
+  }
+  _ajustarFitZoneOperativa();
+},250);
 
 function abrirCompanerosPorDia(){
   if(typeof verCompanerosHoy!=='function')return;
