@@ -1094,11 +1094,6 @@ body{font-size:14px}
   .op-turno-card.op-tc-horiz{padding:6px 11px!important}.op-tc-pct{font-size:29px!important}.op-tc-shift{font-size:20px!important}.op-tc-times span{font-size:18px!important}
 }
 
-
-/* ChatGPT tweaks */
-.cal-subline{margin-top:10px!important;display:block!important;}
-#miJornadaCard,.mi-jornada-card,.jornada-card{padding-bottom:10px!important;min-height:auto!important;}
-
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
@@ -1236,7 +1231,7 @@ body{font-size:14px}
           <span style="font-size:20px;color:var(--gray);font-weight:600">Media/mes necesaria hasta dic.</span>
           <span id="op-cal-media-mes" style="font-size:23px;font-weight:800;color:#60a5fa">—</span>
         </div>
-        <div id="op-cal-media-mes-sub" onclick="event.stopPropagation();opCorregirVacTomadas()" style="font-size:12.5px;color:var(--gray);margin-top:12px;text-align:right;text-decoration:underline dotted;cursor:pointer;line-height:1.25"></div>
+        <div id="op-cal-media-mes-sub" onclick="event.stopPropagation();opCorregirVacTomadas()" style="font-size:12.5px;color:var(--gray);margin-top:2px;text-align:right;text-decoration:underline dotted;cursor:pointer"></div>
       </div>
     </div>
 
@@ -9938,17 +9933,17 @@ try{
 
   /* Vuelos hoy */
   #panel-operativa.active #op-fit-zone > p.op-sec:nth-of-type(1){
-    margin:6px 0 7px!important;
+    margin:8px 0 7px!important;
   }
 
   /* Día a día: abre aire después de vuelos */
   #panel-operativa.active #op-fit-zone > p.op-sec:nth-of-type(2){
-    margin:13px 0 8px!important;
+    margin:19px 0 8px!important;
   }
 
   /* Calendario empleado: más separación respecto a Día a Día */
   #panel-operativa.active #op-fit-zone > p.op-sec:nth-of-type(3){
-    margin:15px 0 8px!important;
+    margin:21px 0 8px!important;
   }
 
   /* Mi jornada baja al borde inferior; el espacio sobrante se queda encima */
@@ -10124,8 +10119,8 @@ try{
     font-size:11.5px!important;
   }
   #panel-operativa.active #op-turno-card .op-tc-bar-bg{
-    height:3px!important;
-    margin-top:1px!important;
+    height:7px!important;
+    margin-top:4px!important;
   }
 
   /* 3) Solo el texto de Día a Día · Compañeros un poco más pequeño */
@@ -10154,14 +10149,14 @@ try{
   /* Calendario: más aire en la parte inferior para que la frase entre paréntesis respire */
   #panel-operativa.active #op-cal-card{
     padding-bottom:12px!important;
-    margin-bottom:14px!important;
+    margin-bottom:16px!important;
     box-sizing:border-box!important;
   }
   #panel-operativa.active #op-cal-card div[onclick="event.stopPropagation()"]{
     margin-bottom:2px!important;
   }
   #panel-operativa.active #op-cal-media-mes-sub{
-    margin-top:4px!important;
+    margin-top:10px!important;
     margin-bottom:2px!important;
     line-height:1.12!important;
     max-width:72%!important;
@@ -10174,21 +10169,22 @@ try{
     box-sizing:border-box!important;
   }
   #panel-operativa.active #op-fit-zone > p.op-sec:nth-of-type(4){
-    margin-top:7px!important;
-    margin-bottom:5px!important;
+    margin-top:18px!important;
+    margin-bottom:6px!important;
     position:relative!important;
     z-index:4!important;
   }
   #panel-operativa.active #op-turno-card.op-turno-card.op-tc-horiz{
-    flex:0 0 78px!important;
-    height:78px!important;
-    min-height:78px!important;
-    max-height:78px!important;
+    flex:1 0 auto!important;
+    height:auto!important;
+    min-height:96px!important;
+    max-height:none!important;
     margin-bottom:0!important;
-    padding:5px 10px 6px!important;
+    padding:5px 10px 8px!important;
     box-sizing:border-box!important;
-    overflow:hidden!important;
+    overflow:visible!important;
     border-width:1px!important;
+    justify-content:center!important;
   }
   #panel-operativa.active #op-turno-card .op-tc-lbl{
     margin-bottom:2px!important;
@@ -10197,8 +10193,8 @@ try{
     margin-bottom:3px!important;
   }
   #panel-operativa.active #op-turno-card .op-tc-bar-bg{
-    height:3px!important;
-    margin-top:1px!important;
+    height:7px!important;
+    margin-top:4px!important;
   }
 </style>
 
