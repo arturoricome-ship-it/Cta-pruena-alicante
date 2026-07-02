@@ -1080,8 +1080,8 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 <div id="scroll-area">
 
   <div class="panel active" id="panel-operativa">
-    <div id="op-fit-outer" style="position:relative;overflow:hidden;height:calc(100% + 1cm)">
-    <div id="op-fit-zone" style="transform-origin:top left;padding-bottom:4px;display:flex;flex-direction:column;min-height:0;height:calc(100% + 1cm)">
+    <div id="op-fit-outer" style="position:relative;overflow:hidden;height:100%">
+    <div id="op-fit-zone" style="transform-origin:top left;padding-bottom:4px;display:flex;flex-direction:column;min-height:0;height:100%">
     <p class="op-sec">Vuelos hoy · ALC</p>
     <div class="op-vuelos" onclick="document.getElementById('btn-live').click()">
       <span class="op-plane">✈</span>
@@ -4971,8 +4971,8 @@ function _ajustarFitZoneOperativa(){
     // estire y absorba el espacio sobrante. A prueba de fallos de
     // medición: por diseño del navegador, SIEMPRE llega exacto hasta el
     // borde, sin cálculos que puedan fallar.
-    outer.style.height='calc(100% + 1cm)';
-    inner.style.height='calc(100% + 1cm)';
+    outer.style.height='100%';
+    inner.style.height='100%';
   }
 }
 window.addEventListener('resize',_ajustarFitZoneOperativa);
