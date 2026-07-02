@@ -1123,7 +1123,7 @@ body{font-size:14px}
       <div class="header-name">CTA Alicante</div>
       <div class="header-sub">Comision de Trabajadores Asamblearios</div>
       <div class="header-portal" id="header-welcome">Portal del Afiliado</div>
-      <div style="font-size:9px;color:rgba(255,255,255,.25);letter-spacing:.5px;margin-top:1px">build v2026-07-02-l</div>
+      <div style="font-size:9px;color:rgba(255,255,255,.25);letter-spacing:.5px;margin-top:1px">build v2026-07-02-m</div>
     </div>
   </div>
   <div id="nav-bar">
@@ -9836,6 +9836,322 @@ try{
   console.log('[CTA] click-tracker activo');
 }catch(errOuter){console.error('[CTA click-tracker] no se pudo activar:',errOuter);}
 </script>
+
+
+
+<!-- === AJUSTE FINAL CTA: portada compacta, Mi jornada al borde del menú, Más debajo === -->
+<style id="cta-ajuste-final-fit">
+  /* Reducimos un poco más la portada completa. El botón "Más" queda fuera del bloque visible. */
+  #scroll-area{
+    padding-top:6px!important;
+    padding-left:12px!important;
+    padding-right:12px!important;
+    padding-bottom:calc(72px + env(safe-area-inset-bottom))!important;
+  }
+  #panel-operativa.active{height:100%!important;min-height:0!important;overflow:visible!important;}
+  #op-fit-outer{overflow:hidden!important;position:relative!important;}
+  #op-fit-zone{transform-origin:top left!important;height:auto!important;min-height:0!important;}
+
+  .op-sec{font-size:11.5px!important;margin:7px 0 5px!important;line-height:1.05!important;}
+  .op-sec:first-child{margin-top:0!important;}
+
+  .op-vuelos{padding:9px 11px!important;border-radius:14px!important;gap:9px!important;}
+  .op-plane{font-size:25px!important;}
+  .op-v-title{font-size:17px!important;line-height:1!important;}
+  .op-vuelos [style*="grid-template-columns:1fr 1fr"]{margin-top:5px!important;gap:6px!important;}
+  .op-vuelos [style*="padding:22px 16px"]{padding:10px 10px!important;border-radius:12px!important;}
+  .op-vuelos [style*="font-size:15px"]{font-size:11px!important;margin-bottom:5px!important;}
+  .op-v-nval{font-size:30px!important;line-height:.92!important;}
+  .op-v-nlbl{font-size:11.5px!important;line-height:1.05!important;}
+
+  .op-comp-card[onclick*="abrirCompanerosPorDia"]{padding:13px 14px!important;gap:11px!important;border-radius:14px!important;}
+  .op-comp-card[onclick*="abrirCompanerosPorDia"] > span{font-size:31px!important;}
+  .op-comp-card[onclick*="abrirCompanerosPorDia"] div[style*="font-size:27px"]{font-size:19px!important;line-height:1.05!important;}
+  .op-comp-card[onclick*="abrirCompanerosPorDia"] div[style*="font-size:17.5px"]{font-size:12px!important;line-height:1.15!important;margin-top:2px!important;}
+
+  .op-cal-card{padding:7px 9px!important;border-radius:14px!important;}
+  #op-cal-card > div[style*="font-size:19px"]{font-size:15px!important;line-height:1!important;}
+  #op-cal-mes{font-size:10.5px!important;margin-top:0!important;line-height:1!important;}
+  #op-cal-card div[style*="grid-template-columns:1fr 1fr"]{gap:7px!important;margin-top:5px!important;}
+  #op-cal-card div[style*="font-size:13.5px"]{font-size:10px!important;margin-bottom:3px!important;line-height:1!important;}
+  .op-cal-rows{gap:3px!important;margin-top:3px!important;}
+  .op-cal-row{padding:4px 7px!important;border-radius:7px!important;min-height:0!important;}
+  .op-cal-rl{font-size:12px!important;line-height:1!important;}
+  .op-cal-rv{font-size:17px!important;line-height:1!important;}
+  #op-cal-card div[style*="margin-top:10px;padding-top:8px"]{margin-top:6px!important;padding-top:5px!important;}
+  #op-tope-parcial,#op-tope-fijo{font-size:11.5px!important;padding:2px 7px!important;border-radius:7px!important;}
+  #op-cal-card span[style*="font-size:20px"]{font-size:13px!important;line-height:1.08!important;}
+  #op-cal-restante,#op-cal-media-mes{font-size:16px!important;line-height:1!important;}
+  #op-cal-media-mes-sub{font-size:9.5px!important;line-height:1!important;margin-top:0!important;}
+
+  .op-turno-card.op-tc-horiz{padding:6px 11px!important;border-radius:14px!important;min-height:0!important;justify-content:center!important;}
+  .op-turno-card.op-tc-horiz .op-tc-lbl{font-size:9.5px!important;margin-bottom:3px!important;line-height:1!important;}
+  .op-turno-card.op-tc-horiz .op-tc-row{gap:8px!important;margin-bottom:4px!important;flex-wrap:nowrap!important;}
+  .op-turno-card.op-tc-horiz .op-tc-col-a{min-width:54px!important;flex-basis:54px!important;}
+  .op-turno-card.op-tc-horiz .op-tc-col-b{min-width:100px!important;flex:1 1 auto!important;}
+  .op-turno-card.op-tc-horiz .op-tc-col-c{min-width:78px!important;flex-basis:78px!important;}
+  .op-tc-pct{font-size:28px!important;line-height:.9!important;}
+  .op-tc-rem{font-size:9px!important;line-height:1!important;}
+  .op-tc-sub{font-size:12px!important;line-height:1.05!important;}
+  .op-tc-shift{font-size:19px!important;line-height:1.05!important;margin-top:0!important;}
+  .op-tc-times span{font-size:16.5px!important;padding:3px 6px!important;border-radius:7px!important;line-height:1!important;}
+  .op-turno-card.state-rest .op-tc-times span{font-size:20px!important;}
+  .op-turno-card.state-rest .op-tc-pct{font-size:27px!important;}
+  .op-tc-bar-bg{height:5px!important;margin-top:1px!important;}
+
+  /* El desplegable Más debe existir, pero debajo de la portada: se ve solo al hacer scroll. */
+  #op-v2-mas{margin-top:18px!important;}
+</style>
+<script id="cta-ajuste-final-fit-js">
+(function(){
+  function ajustar(){
+    var panel=document.getElementById('panel-operativa');
+    if(!panel||!panel.classList.contains('active'))return;
+    var outer=document.getElementById('op-fit-outer');
+    var inner=document.getElementById('op-fit-zone');
+    var scrollArea=document.getElementById('scroll-area');
+    var nav=document.getElementById('bottom-nav');
+    if(!outer||!inner||!scrollArea)return;
+
+    inner.style.transform='none';
+    inner.style.width='';
+    inner.style.height='auto';
+
+    var sr=scrollArea.getBoundingClientRect();
+    var navTop=nav ? nav.getBoundingClientRect().top : sr.bottom;
+    var cs=getComputedStyle(scrollArea);
+    var padTop=parseFloat(cs.paddingTop)||0;
+    var safeBottom=8;
+
+    /* Altura visible real hasta el borde superior de los botones inferiores. */
+    var disponible=Math.floor(navTop - sr.top - padTop - safeBottom);
+    if(disponible<260){
+      disponible=Math.floor(scrollArea.clientHeight - padTop - 72 - safeBottom);
+    }
+    if(disponible<260)return;
+
+    outer.style.height=disponible+'px';
+    outer.style.minHeight=disponible+'px';
+
+    var innerH=inner.scrollHeight;
+    if(!innerH)return;
+    var escala=disponible/innerH;
+
+    /* Permitimos bajar más la escala para que nunca corte Mi jornada. */
+    escala=Math.max(0.48,Math.min(1,escala));
+    inner.style.width=(100/escala)+'%';
+    inner.style.transform='scale('+escala+')';
+  }
+  window._ajustarFitZoneOperativa=ajustar;
+  window.addEventListener('resize',function(){setTimeout(ajustar,60);});
+  window.addEventListener('orientationchange',function(){setTimeout(ajustar,250);});
+  document.addEventListener('DOMContentLoaded',function(){[80,250,700,1300,2500,4500].forEach(function(ms){setTimeout(ajustar,ms);});});
+  [80,250,700,1300,2500,4500,7000].forEach(function(ms){setTimeout(ajustar,ms);});
+})();
+</script>
+
+
+
+<!-- === AJUSTE CTA: mismas alturas, fuentes un poco más pequeñas === -->
+<style id="cta-ajuste-fuentes-pequenas">
+  /* Solo tipografía: no tocamos alturas, márgenes ni lógica. */
+  #panel-operativa.active,
+  #panel-operativa.active *{
+    letter-spacing:inherit;
+  }
+
+  .op-sec{font-size:10.8px!important;}
+
+  .op-v-title{font-size:15.8px!important;}
+  .op-vuelos [style*="font-size:15px"]{font-size:10.2px!important;}
+  .op-v-nval{font-size:27.5px!important;}
+  .op-v-nlbl{font-size:10.6px!important;}
+  .op-plane{font-size:23px!important;}
+
+  .op-comp-card[onclick*="abrirCompanerosPorDia"] > span{font-size:28.5px!important;}
+  .op-comp-card[onclick*="abrirCompanerosPorDia"] div[style*="font-size:27px"]{font-size:17.8px!important;}
+  .op-comp-card[onclick*="abrirCompanerosPorDia"] div[style*="font-size:17.5px"]{font-size:11.2px!important;}
+
+  #op-cal-card > div[style*="font-size:19px"]{font-size:14px!important;}
+  #op-cal-mes{font-size:9.8px!important;}
+  #op-cal-card div[style*="font-size:13.5px"]{font-size:9.3px!important;}
+  .op-cal-rl{font-size:11.1px!important;}
+  .op-cal-rv{font-size:15.7px!important;}
+  #op-tope-parcial,#op-tope-fijo{font-size:10.6px!important;}
+  #op-cal-card span[style*="font-size:20px"]{font-size:12.1px!important;}
+  #op-cal-restante,#op-cal-media-mes{font-size:14.8px!important;}
+  #op-cal-media-mes-sub{font-size:8.8px!important;}
+
+  .op-turno-card.op-tc-horiz .op-tc-lbl{font-size:8.8px!important;}
+  .op-tc-pct{font-size:25.8px!important;}
+  .op-tc-rem{font-size:8.3px!important;}
+  .op-tc-sub{font-size:11.1px!important;}
+  .op-tc-shift{font-size:17.5px!important;}
+  .op-tc-times span{font-size:15.2px!important;}
+  .op-turno-card.state-rest .op-tc-times span{font-size:18.4px!important;}
+  .op-turno-card.state-rest .op-tc-pct{font-size:24.8px!important;}
+
+  #op-v2-mas,
+  #op-v2-mas *{
+    font-size:94%!important;
+  }
+</style>
+
+
+
+<!-- === AJUSTE CTA DEFINITIVO: fuentes más pequeñas y sin salto inicial === -->
+<style id="cta-ajuste-sin-salto-fuentes-xs">
+  /* Evita el movimiento raro de apertura: anulamos el escalado por JS anterior. */
+  #op-fit-outer{
+    height:100%!important;
+    min-height:0!important;
+    overflow:hidden!important;
+    position:relative!important;
+  }
+  #op-fit-zone{
+    transform:none!important;
+    width:100%!important;
+    height:100%!important;
+    min-height:0!important;
+    display:flex!important;
+    flex-direction:column!important;
+    padding-bottom:0!important;
+  }
+  #panel-operativa.active{height:100%!important;min-height:0!important;overflow:visible!important;}
+  #scroll-area{
+    padding-top:5px!important;
+    padding-left:11px!important;
+    padding-right:11px!important;
+    padding-bottom:calc(72px + env(safe-area-inset-bottom))!important;
+  }
+
+  /* Tipografía más pequeña que la versión anterior. */
+  .op-sec{font-size:9.8px!important;margin:5px 0 4px!important;line-height:1!important;letter-spacing:.25px!important;}
+  .op-sec:first-child{margin-top:0!important;}
+
+  .op-vuelos{padding:7px 9px!important;border-radius:13px!important;gap:7px!important;}
+  .op-plane{font-size:20px!important;}
+  .op-v-title{font-size:13.8px!important;line-height:1!important;}
+  .op-vuelos [style*="grid-template-columns:1fr 1fr"]{margin-top:4px!important;gap:5px!important;}
+  .op-vuelos [style*="padding:22px 16px"]{padding:8px 8px!important;border-radius:10px!important;}
+  .op-vuelos [style*="font-size:15px"]{font-size:9px!important;margin-bottom:3px!important;line-height:1!important;}
+  .op-v-nval{font-size:24px!important;line-height:.9!important;}
+  .op-v-nlbl{font-size:9.4px!important;line-height:1!important;}
+
+  .op-comp-card[onclick*="abrirCompanerosPorDia"]{padding:10px 12px!important;gap:9px!important;border-radius:13px!important;}
+  .op-comp-card[onclick*="abrirCompanerosPorDia"] > span{font-size:25px!important;}
+  .op-comp-card[onclick*="abrirCompanerosPorDia"] div[style*="font-size:27px"]{font-size:15.5px!important;line-height:1!important;}
+  .op-comp-card[onclick*="abrirCompanerosPorDia"] div[style*="font-size:17.5px"]{font-size:10px!important;line-height:1.1!important;margin-top:1px!important;}
+
+  .op-cal-card{padding:6px 8px!important;border-radius:13px!important;}
+  #op-cal-card > div[style*="font-size:19px"]{font-size:12.5px!important;line-height:1!important;}
+  #op-cal-mes{font-size:8.7px!important;margin-top:0!important;line-height:1!important;}
+  #op-cal-card div[style*="grid-template-columns:1fr 1fr"]{gap:5px!important;margin-top:4px!important;}
+  #op-cal-card div[style*="font-size:13.5px"]{font-size:8.2px!important;margin-bottom:2px!important;line-height:1!important;}
+  .op-cal-rows{gap:2px!important;margin-top:2px!important;}
+  .op-cal-row{padding:3px 6px!important;border-radius:7px!important;min-height:0!important;}
+  .op-cal-rl{font-size:9.8px!important;line-height:1!important;}
+  .op-cal-rv{font-size:13.8px!important;line-height:1!important;}
+  #op-cal-card div[style*="margin-top:10px;padding-top:8px"]{margin-top:4px!important;padding-top:4px!important;}
+  #op-tope-parcial,#op-tope-fijo{font-size:9.2px!important;padding:2px 6px!important;border-radius:7px!important;}
+  #op-cal-card span[style*="font-size:20px"]{font-size:10.5px!important;line-height:1!important;}
+  #op-cal-restante,#op-cal-media-mes{font-size:13px!important;line-height:1!important;}
+  #op-cal-media-mes-sub{font-size:7.8px!important;line-height:1!important;margin-top:0!important;}
+
+  /* Mi jornada: baja hasta el borde superior de los botones inferiores. */
+  #op-fit-zone .op-sec:has(+ #op-turno-card){
+    margin-top:auto!important;
+    margin-bottom:4px!important;
+  }
+  .op-turno-card.op-tc-horiz{padding:5px 9px!important;border-radius:13px!important;min-height:0!important;justify-content:center!important;}
+  .op-turno-card.op-tc-horiz .op-tc-lbl{font-size:7.8px!important;margin-bottom:2px!important;line-height:1!important;}
+  .op-turno-card.op-tc-horiz .op-tc-row{gap:7px!important;margin-bottom:3px!important;flex-wrap:nowrap!important;}
+  .op-turno-card.op-tc-horiz .op-tc-col-a{min-width:48px!important;flex-basis:48px!important;}
+  .op-turno-card.op-tc-horiz .op-tc-col-b{min-width:90px!important;flex:1 1 auto!important;}
+  .op-turno-card.op-tc-horiz .op-tc-col-c{min-width:70px!important;flex-basis:70px!important;}
+  .op-tc-pct{font-size:22px!important;line-height:.88!important;}
+  .op-tc-rem{font-size:7.4px!important;line-height:1!important;}
+  .op-tc-sub{font-size:9.8px!important;line-height:1!important;}
+  .op-tc-shift{font-size:15px!important;line-height:1!important;margin-top:0!important;}
+  .op-tc-times span{font-size:13px!important;padding:2px 5px!important;border-radius:6px!important;line-height:1!important;}
+  .op-turno-card.state-rest .op-tc-times span{font-size:15.5px!important;}
+  .op-turno-card.state-rest .op-tc-pct{font-size:21px!important;}
+  .op-tc-bar-bg{height:4px!important;margin-top:1px!important;}
+
+  /* Más queda debajo de la portada; solo aparece al hacer scroll. */
+  #op-v2-mas{margin-top:16px!important;}
+  #op-v2-mas,#op-v2-mas *{font-size:90%!important;}
+</style>
+<script id="cta-stop-fit-jump">
+(function(){
+  function stopJump(){
+    var z=document.getElementById('op-fit-zone');
+    var o=document.getElementById('op-fit-outer');
+    if(z){
+      z.style.setProperty('transform','none','important');
+      z.style.setProperty('width','100%','important');
+      z.style.setProperty('height','100%','important');
+    }
+    if(o){
+      o.style.setProperty('height','100%','important');
+      o.style.setProperty('min-height','0','important');
+    }
+  }
+  window._ajustarFitZoneOperativa=function(){stopJump();};
+  document.addEventListener('DOMContentLoaded',stopJump);
+  window.addEventListener('load',stopJump);
+  setTimeout(stopJump,0);
+  setTimeout(stopJump,80);
+  setTimeout(stopJump,300);
+})();
+</script>
+
+
+
+<!-- === AJUSTE CTA: fuente al tamaño de la captura de referencia === -->
+<style id="cta-fuente-referencia-160784">
+  /* Mantiene la estructura actual: solo afina tipografía a tamaño de la captura. */
+  #panel-operativa.active{font-size:12px!important;}
+
+  .op-sec{font-size:9.6px!important;line-height:1!important;font-weight:700!important;letter-spacing:.25px!important;}
+
+  /* Vuelos hoy */
+  .op-v-title{font-size:13.6px!important;line-height:1!important;}
+  .op-vuelos [style*="font-size:15px"]{font-size:8.8px!important;line-height:1!important;}
+  .op-v-nval{font-size:23.5px!important;line-height:.9!important;}
+  .op-v-nlbl{font-size:9px!important;line-height:1!important;}
+  .op-plane{font-size:19px!important;}
+
+  /* Día a día */
+  .op-comp-card[onclick*="abrirCompanerosPorDia"] > span{font-size:24px!important;}
+  .op-comp-card[onclick*="abrirCompanerosPorDia"] div[style*="font-size:27px"]{font-size:15.2px!important;line-height:1!important;}
+  .op-comp-card[onclick*="abrirCompanerosPorDia"] div[style*="font-size:17.5px"]{font-size:9.5px!important;line-height:1.08!important;}
+
+  /* Calendario empleado */
+  #op-cal-card > div[style*="font-size:19px"]{font-size:12.2px!important;line-height:1!important;}
+  #op-cal-mes{font-size:8.4px!important;line-height:1!important;}
+  #op-cal-card div[style*="font-size:13.5px"]{font-size:8px!important;line-height:1!important;}
+  .op-cal-rl{font-size:9.5px!important;line-height:1!important;}
+  .op-cal-rv{font-size:13.4px!important;line-height:1!important;}
+  #op-tope-parcial,#op-tope-fijo{font-size:8.8px!important;line-height:1!important;}
+  #op-cal-card span[style*="font-size:20px"]{font-size:10px!important;line-height:1!important;}
+  #op-cal-restante,#op-cal-media-mes{font-size:12.5px!important;line-height:1!important;}
+  #op-cal-media-mes-sub{font-size:7.4px!important;line-height:1!important;}
+
+  /* Mi jornada */
+  .op-turno-card.op-tc-horiz .op-tc-lbl{font-size:7.5px!important;line-height:1!important;}
+  .op-tc-pct{font-size:21px!important;line-height:.88!important;}
+  .op-tc-rem{font-size:7.1px!important;line-height:1!important;}
+  .op-tc-sub{font-size:9.2px!important;line-height:1!important;}
+  .op-tc-shift{font-size:14.3px!important;line-height:1!important;}
+  .op-tc-times span{font-size:12.2px!important;line-height:1!important;}
+  .op-turno-card.state-rest .op-tc-times span{font-size:14.8px!important;}
+  .op-turno-card.state-rest .op-tc-pct{font-size:20.5px!important;}
+
+  /* Barra inferior */
+  #bottom-nav .nav-label{font-size:8.5px!important;line-height:1!important;}
+  #bottom-nav .nav-icon{font-size:21px!important;line-height:1!important;}
+</style>
 
 </body>
 </html>
