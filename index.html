@@ -1036,7 +1036,7 @@ body{font-size:14px}
 #btn-home{width:30px!important;height:30px!important;font-size:15px!important}
 #btn-accesos{height:30px!important;padding:0 10px!important;font-size:10.5px!important}
 #scroll-area{padding:8px 12px calc(72px + env(safe-area-inset-bottom))!important}
-#panel-operativa.active{height:100%!important;min-height:0!important}
+#panel-operativa.active{height:auto!important;min-height:100%!important}
 #op-fit-outer{height:auto!important;overflow:visible!important;position:relative!important}
 #op-fit-zone{transform-origin:top left!important;padding-bottom:2px!important;display:flex!important;flex-direction:column!important;min-height:0!important;height:auto!important}
 .op-sec{font-size:12.5px!important;margin:9px 0 6px!important;letter-spacing:.35px!important}
@@ -1081,7 +1081,7 @@ body{font-size:14px}
 .op-turno-card.state-rest .op-tc-times span{font-size:23px!important}
 .op-turno-card.state-rest .op-tc-pct{font-size:29px!important}
 .op-tc-bar-bg{height:6px!important;margin-top:1px!important}
-#op-v2-mas{margin-top:110px!important}
+#op-v2-mas{margin-top:60px!important}
 #bottom-nav{padding:7px 0 max(7px,env(safe-area-inset-bottom))!important}
 .nav-ico{font-size:19px!important}.nav-btn{font-size:7.5px!important}
 @media(max-height:760px){
@@ -1259,7 +1259,7 @@ body{font-size:14px}
 
     <!-- ══ v2: todo lo demás (resumen operativo, detalles, historial) se ha
          quitado de la portada y queda aquí colapsado, por si hace falta ══ -->
-    <details class="op-details" id="op-v2-mas" style="margin-top:230px">
+    <details class="op-details" id="op-v2-mas" style="margin-top:60px">
       <summary><span class="op-summary-title">📊 Más · Resumen operativo, detalles e historial</span></summary>
       <div class="op-details-body" style="display:block">
 
@@ -9807,10 +9807,10 @@ try{
 <!-- === AJUSTE FINAL REAL: fuentes mucho más pequeñas, sin salto inicial === -->
 <style id="cta-fuente-muy-pequena-sin-salto">
   /* Sin escala visual: evita el movimiento raro al abrir. */
-  #panel-operativa.active{height:100%!important;min-height:0!important;overflow:visible!important;font-size:10px!important;}
+  #panel-operativa.active{height:auto!important;min-height:100%!important;overflow:visible!important;font-size:10px!important;}
   #scroll-area{padding-top:6px!important;padding-left:12px!important;padding-right:12px!important;padding-bottom:calc(72px + env(safe-area-inset-bottom))!important;}
   #op-fit-outer{overflow:visible!important;position:relative!important;}
-  #op-fit-zone{transform:none!important;width:100%!important;height:100%!important;min-height:0!important;display:flex!important;flex-direction:column!important;padding-bottom:0!important;}
+  #op-fit-zone{transform:none!important;width:100%!important;height:auto!important;min-height:0!important;display:flex!important;flex-direction:column!important;padding-bottom:0!important;}
 
   .op-sec{font-size:8.8px!important;line-height:1!important;margin:5px 0 4px!important;letter-spacing:.25px!important;font-weight:700!important;}
   .op-sec:first-child{margin-top:0!important;}
@@ -9869,7 +9869,7 @@ try{
   #bottom-nav .nav-icon{font-size:20px!important;line-height:1!important;}
 
   /* Más sigue debajo: solo aparece al hacer scroll hacia abajo */
-  #op-v2-mas{margin-top:110px!important;}
+  #op-v2-mas{margin-top:60px!important;}
 </style>
 <script id="cta-fit-estable-sin-salto-final">
 (function(){
@@ -10011,7 +10011,7 @@ try{
 
   /* El bloque Más queda debajo de los iconos; hace falta scroll para verlo */
   #op-v2-mas{
-    margin-top:110px!important;
+    margin-top:60px!important;
   }
 </style>
 
@@ -10186,10 +10186,9 @@ try{
 
   /* Mi Jornada: evitar que se corte el borde inferior y dejarla algo más fina */
   #op-turno-card{
-    flex:0 0 auto!important;
+    flex:1 1 auto!important;
     box-sizing:border-box!important;
     min-height:78px!important;
-    max-height:96px!important;
     margin-bottom:7px!important;
     overflow:visible!important;
   }
