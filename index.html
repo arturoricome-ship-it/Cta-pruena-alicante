@@ -9808,7 +9808,7 @@ try{
 <style id="cta-fuente-muy-pequena-sin-salto">
   /* Sin escala visual: evita el movimiento raro al abrir. */
   #panel-operativa.active{height:auto!important;min-height:100%!important;overflow:visible!important;font-size:10px!important;}
-  #scroll-area{padding-top:6px!important;padding-left:12px!important;padding-right:12px!important;padding-bottom:calc(72px + env(safe-area-inset-bottom))!important;}
+  #scroll-area{padding-top:6px!important;padding-left:12px!important;padding-right:12px!important;padding-bottom:calc(140px + env(safe-area-inset-bottom))!important;}
   #op-fit-outer{overflow:visible!important;position:relative!important;}
   #op-fit-zone{transform:none!important;width:100%!important;height:auto!important;min-height:0!important;display:flex!important;flex-direction:column!important;padding-bottom:0!important;}
 
@@ -10009,9 +10009,13 @@ try{
     margin-top:2px!important;
   }
 
-  /* El bloque Más queda debajo de los iconos; hace falta scroll para verlo */
+  /* El bloque Más queda debajo de los iconos; hace falta scroll para verlo.
+     El margin-bottom grande da "espacio de scroll" extra al final para que
+     el botón entero pueda subir por encima de la barra de iconos y verse
+     completo (si no, el navegador para el scroll con el botón aún tapado). */
   #op-v2-mas{
     margin-top:60px!important;
+    margin-bottom:120px!important;
   }
 </style>
 
