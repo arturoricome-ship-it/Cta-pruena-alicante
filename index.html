@@ -6779,24 +6779,48 @@ function _renderJornadaSinImportarTryp(card){
   var calCard=document.getElementById("op-cal-card");
   if(calCard)calCard.style.display="none";
   card.style.gridColumn="1 / -1";
+  card.classList.add("state-no-tryp");
   card.innerHTML=
-    '<div style="font-size:11px;font-weight:700;color:var(--gold);margin-bottom:8px">📥 Importa tu calendario del Tryp</div>'+
-    '<div style="font-size:10.5px;color:var(--gray);line-height:1.55;margin-bottom:12px">'+
+    '<div class="op-no-tryp-title">📥 Importa tu calendario del Tryp</div>'+
+    '<div class="op-no-tryp-steps">'+
       '1. Entra en la intranet y descarga el Excel de tu calendario del Tryp.<br>'+
       '2. Vuelve aquí y pulsa <b style="color:#e9e4f5">Importar TRYP</b>.'+
     '</div>'+
-    '<div style="display:flex;gap:8px;margin-bottom:14px">'+
-      '<a href="https://tryp.southeu.com/tryp/website/horarios/calendario" target="_blank" onclick="event.stopPropagation()" style="flex:1;text-align:center;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:9px 6px;color:var(--gray);font-size:11px;font-weight:700;text-decoration:none">🌐 Ir al Tryp</a>'+
-      '<button type="button" onclick="event.stopPropagation();openTrypImport()" style="flex:1;background:rgba(200,168,75,.18);border:1px solid rgba(200,168,75,.45);border-radius:10px;padding:9px 6px;color:var(--gold);font-family:inherit;font-size:11px;font-weight:700;cursor:pointer">📤 Importar TRYP</button>'+
+    '<div class="op-no-tryp-actions">'+
+      '<a href="https://tryp.southeu.com/tryp/website/horarios/calendario" target="_blank" onclick="event.stopPropagation()">🌐 Ir al Tryp</a>'+
+      '<button type="button" onclick="event.stopPropagation();openTrypImport()">📤 Importar TRYP</button>'+
     '</div>'+
-    '<div style="font-size:9px;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px">Con esto tendrás</div>'+
-    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;font-size:10.5px;color:var(--gray)">'+
+    '<div class="op-no-tryp-caption">Con esto tendrás</div>'+
+    '<div class="op-no-tryp-grid">'+
       '<div>📅 Calendario completo</div>'+
       '<div>⏱️ Horas mensuales</div>'+
       '<div>🔢 Horas contador</div>'+
       '<div>⚙️ Tus turnos cada día</div>'+
       '<div>📊 Total de horas</div>'+
     '</div>';
+}
+
+function _restaurarJornadaTryp(card){
+  if(!card)return;
+  card.classList.remove("state-no-tryp");
+  card.style.gridColumn="";
+  if(card.querySelector("#op-tc-lbl"))return;
+  card.innerHTML=
+    '<div class="op-tc-lbl" id="op-tc-lbl">Turno hoy</div>'+
+    '<div class="op-tc-row">'+
+      '<div class="op-tc-col op-tc-col-a">'+
+        '<div class="op-tc-pct" id="op-tc-pct">—</div>'+
+        '<div class="op-tc-rem" id="op-tc-rem"></div>'+
+      '</div>'+
+      '<div class="op-tc-col op-tc-col-b">'+
+        '<div class="op-tc-sub" id="op-tc-sub">—</div>'+
+        '<div class="op-tc-shift" id="op-tc-shift"></div>'+
+      '</div>'+
+      '<div class="op-tc-col op-tc-col-c">'+
+        '<div class="op-tc-times" id="op-tc-times"><span style="color:var(--gray);font-size:11px">Cargando...</span></div>'+
+      '</div>'+
+    '</div>'+
+    '<div class="op-tc-bar-bg"><div class="op-tc-bar" id="op-tc-bar" style="width:0%"></div></div>';
 }
 
 window.opSetDetalleDia=function(dia){
@@ -7662,7 +7686,7 @@ window.renderOperativa=function(){
   })();
 
   if(!card)return;
-  ["state-working","state-pausa","state-rest","state-next"].forEach(function(c){card.classList.remove(c);});
+  ["state-working","state-pausa","state-rest","state-next","state-no-tryp"].forEach(function(c){card.classList.remove(c);});
 
   // Si el usuario nunca ha importado su Tryp personal (ningún mes con datos en
   // absoluto, no solo que hoy sea descanso), se muestran instrucciones de
@@ -7671,7 +7695,7 @@ window.renderOperativa=function(){
   // se restaura aquí en cuanto vuelva a haber datos (sin necesitar recargar la página).
   var hayDatosTryp=Object.keys(ue).some(function(mk){var m=ue[mk];return m&&typeof m==='object'&&Object.keys(m).length>0;});
   if(hayDatosTryp){
-    card.style.gridColumn="";
+    _restaurarJornadaTryp(card);
     var calCardRestore=document.getElementById("op-cal-card");
     if(calCardRestore)calCardRestore.style.display="";
   } else {
@@ -10353,6 +10377,106 @@ try{
 
   #panel-operativa.active #op-v2-mas{
     margin-bottom:0!important;
+  }
+</style>
+<!-- === AJUSTE 2026-07-03: aviso Tryp sin importar legible === -->
+<style id="cta-mi-jornada-sin-tryp-legible-20260703">
+  #panel-operativa.active #op-turno-card.state-no-tryp,
+  #op-turno-card.state-no-tryp{
+    display:block!important;
+    height:auto!important;
+    min-height:0!important;
+    max-height:none!important;
+    flex:0 0 auto!important;
+    padding:12px 12px 14px!important;
+    overflow:visible!important;
+    justify-content:flex-start!important;
+    background:linear-gradient(160deg,rgba(200,168,75,.08),rgba(255,255,255,.025))!important;
+    border:2px solid rgba(200,168,75,.32)!important;
+    border-radius:13px!important;
+    cursor:default!important;
+  }
+
+  #op-turno-card.state-no-tryp .op-no-tryp-title{
+    display:block!important;
+    margin:0 0 8px!important;
+    color:var(--gold)!important;
+    font-size:12px!important;
+    font-weight:800!important;
+    line-height:1.25!important;
+    letter-spacing:.1px!important;
+    white-space:normal!important;
+  }
+
+  #op-turno-card.state-no-tryp .op-no-tryp-steps{
+    margin:0 0 12px!important;
+    color:var(--gray)!important;
+    font-size:11px!important;
+    line-height:1.55!important;
+    white-space:normal!important;
+  }
+
+  #op-turno-card.state-no-tryp .op-no-tryp-actions{
+    display:grid!important;
+    grid-template-columns:1fr 1fr!important;
+    gap:8px!important;
+    margin:0 0 13px!important;
+  }
+
+  #op-turno-card.state-no-tryp .op-no-tryp-actions a,
+  #op-turno-card.state-no-tryp .op-no-tryp-actions button{
+    min-width:0!important;
+    min-height:36px!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    padding:9px 8px!important;
+    border-radius:10px!important;
+    font-family:inherit!important;
+    font-size:11px!important;
+    font-weight:800!important;
+    line-height:1.15!important;
+    text-align:center!important;
+    text-decoration:none!important;
+    white-space:normal!important;
+  }
+
+  #op-turno-card.state-no-tryp .op-no-tryp-actions a{
+    background:rgba(255,255,255,.06)!important;
+    border:1px solid rgba(255,255,255,.12)!important;
+    color:var(--gray)!important;
+  }
+
+  #op-turno-card.state-no-tryp .op-no-tryp-actions button{
+    background:rgba(200,168,75,.18)!important;
+    border:1px solid rgba(200,168,75,.45)!important;
+    color:var(--gold)!important;
+    cursor:pointer!important;
+  }
+
+  #op-turno-card.state-no-tryp .op-no-tryp-caption{
+    margin:0 0 7px!important;
+    color:var(--gray)!important;
+    font-size:9px!important;
+    font-weight:800!important;
+    line-height:1.2!important;
+    text-transform:uppercase!important;
+    letter-spacing:.5px!important;
+  }
+
+  #op-turno-card.state-no-tryp .op-no-tryp-grid{
+    display:grid!important;
+    grid-template-columns:1fr 1fr!important;
+    gap:7px 10px!important;
+    color:var(--gray)!important;
+    font-size:10.5px!important;
+    line-height:1.25!important;
+  }
+
+  @media(max-width:360px){
+    #op-turno-card.state-no-tryp .op-no-tryp-grid{
+      grid-template-columns:1fr!important;
+    }
   }
 </style>
 </body>
