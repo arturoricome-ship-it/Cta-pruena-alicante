@@ -1123,7 +1123,6 @@ body{font-size:14px}
       <div class="header-name">CTA Alicante</div>
       <div class="header-sub">Comision de Trabajadores Asamblearios</div>
       <div class="header-portal" id="header-welcome">Portal del Afiliado</div>
-      <div style="font-size:9px;color:rgba(255,255,255,.25);letter-spacing:.5px;margin-top:1px">build v2026-07-02-m</div>
     </div>
   </div>
   <div id="nav-bar">
@@ -2910,14 +2909,6 @@ function handleCredentialResponse(response){
 }
 
 window.addEventListener("load",function(){
-  // ══ MODO PRUEBA (v2 layout): login desactivado temporalmente para poder
-  // tocar la app aquí sin pasar por Google Sign-In. El bloque real de
-  // comprobación de sesión se queda comentado justo debajo — cuando
-  // quieras volver a activarlo, dímelo y se restaura tal cual. ══
-  document.getElementById("login-screen").style.display="none";
-  setWelcome("Arturo");
-  return;
-  /* ---- código real de login (desactivado mientras dure la prueba) ----
   // Verificar sesión guardada
   var sess=null;
   try{sess=JSON.parse(localStorage.getItem("cta_session"));}catch(e){}
@@ -2941,15 +2932,14 @@ window.addEventListener("load",function(){
     // Sin sesión — mostrar login
     localStorage.removeItem("cta_session");
     document.getElementById("login-screen").style.display="flex";
-    if(typeof google!=="undefined"&&google.accounts){initGoogle();}
+    initGoogleWhenReady();
   }
-  ---- fin código real ---- */
 });
 
 // Si la lib de Google carga tarde
 window.onGoogleLibraryLoad=function(){
   var ls=document.getElementById("login-screen");
-  if(ls&&ls.style.display!=="none") initGoogle();
+  if(ls&&ls.style.display!=="none") initGoogleWhenReady();
 };
 
 function openDashModal(){switchTab("dashboard",null,null);}
@@ -2979,16 +2969,24 @@ function descargarDashboard(){
 }
 
 function initGoogle(){
+  if(!document.getElementById("google-btn")||document.getElementById("google-btn").dataset.ready==="1")return;
   google.accounts.id.initialize({
     client_id:CLIENT_ID,
     callback:handleCredentialResponse,
     auto_select:false,
     cancel_on_tap_outside:false
   });
+  document.getElementById("google-btn").dataset.ready="1";
   google.accounts.id.renderButton(
     document.getElementById("google-btn"),
     {theme:"outline",size:"large",width:260,text:"signin_with",shape:"rectangular"}
   );
+}
+
+function initGoogleWhenReady(intentos){
+  intentos=intentos||0;
+  if(typeof google!=="undefined"&&google.accounts&&google.accounts.id){initGoogle();return;}
+  if(intentos<30)setTimeout(function(){initGoogleWhenReady(intentos+1);},200);
 }
 </script>
 <script>
@@ -7690,7 +7688,7 @@ window.renderOperativa=function(){
     // Find next shift (up to 30 days)
     var nxtMinF=null,nxtStrF="",nxtDaysF=0;
     var ANXTF=["trabajado","h6","baja","rm","curso"]; // HL/HLP se tratan como libre: descanso, no próximo turno
-    var _DIAS=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+    var _DIAS=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
     for(var ddF=1;ddF<=30;ddF++){
       var nDF=new Date(now.getFullYear(),now.getMonth(),now.getDate()+ddF);
       var nMdF=(ue[MESES[nDF.getMonth()]]||{})[nDF.getDate()];
@@ -7786,7 +7784,7 @@ window.renderOperativa=function(){
     for(var dd2=1;dd2<=30;dd2++){
       var nD=new Date(now.getFullYear(),now.getMonth(),now.getDate()+dd2);
       var nMd=(ue[MESES[nD.getMonth()]]||{})[nD.getDate()];
-      if(nMd&&nMd.e1&&nMd.tipo&&ANXT.indexOf(nMd.tipo)>=0){var _D2=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];nxtMin=toM(nMd.e1);nxtStr=_D2[nD.getDay()]+' '+nD.getDate()+'  ·  '+nMd.e1+(nMd.s1?' → '+nMd.s1:'')+(nMd.e2&&nMd.s2?'  ·  '+nMd.e2+' → '+nMd.s2:'');nxtDays=dd2;break;}
+      if(nMd&&nMd.e1&&nMd.tipo&&ANXT.indexOf(nMd.tipo)>=0){var _D2=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];nxtMin=toM(nMd.e1);nxtStr=_D2[nD.getDay()]+' '+nD.getDate()+'  ·  '+nMd.e1+(nMd.s1?' → '+nMd.s1:'')+(nMd.e2&&nMd.s2?'  ·  '+nMd.e2+' → '+nMd.s2:'');nxtDays=dd2;break;}
     }
     // Calculate total minutes remaining (including full days)
     var restM=nxtMin!==null?(nxtDays*1440+nxtMin-nowMin):null;
@@ -7808,7 +7806,7 @@ window.renderOperativa=function(){
     // For multi-day: use raw HTML, otherwise wrap in span
     var cntHtml=restM!==null&&Math.floor(restM/1440)>0?cnt:"<span>"+(cnt||"💤")+"</span>";
     if(g("op-tc-times"))g("op-tc-times").innerHTML=cntHtml;
-    var _D2=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+    var _D2=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
     if(g("op-tc-sub"))g("op-tc-sub").textContent=nxtStr?("Próximo turno: "+_D2[nD.getDay()]+" "+nD.getDate()):"";
     var _shiftHours=nMd?(nMd.e1+(nMd.s1?" → "+nMd.s1:"")+(nMd.e2&&nMd.s2?"  ·  "+nMd.e2+" → "+nMd.s2:"")):"";
     if(g("op-tc-shift")){g("op-tc-shift").textContent=_shiftHours;g("op-tc-shift").style.color=_shiftHours?"var(--white)":"";}
@@ -7822,7 +7820,7 @@ window.renderOperativa=function(){
   } else if(notYet){
     card.classList.add("state-next");
     if(g("op-tc-times"))g("op-tc-times").innerHTML=th;
-    var _D3=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+    var _D3=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
     if(g("op-tc-sub"))g("op-tc-sub").textContent="Próximo turno: "+_D3[now.getDay()]+" "+now.getDate();
     var _shiftH3=d.e1+(d.s1?" → "+d.s1:"")+(d.e2&&d.s2?"  ·  "+d.e2+" → "+d.s2:"");
     if(g("op-tc-shift")){g("op-tc-shift").textContent=_shiftH3;g("op-tc-shift").style.color="var(--white)";}
@@ -10296,6 +10294,57 @@ try{
     text-align:right!important;
     line-height:1.05!important;
     opacity:.9!important;
+  }
+</style>
+<!-- === AJUSTE 2026-07-03: Mi jornada más legible sin cambiar tamaño de viñeta === -->
+<style id="cta-mi-jornada-fuente-mas-grande-20260703">
+  #panel-operativa.active #op-turno-card .op-tc-lbl{
+    font-size:8.4px!important;
+    line-height:1.05!important;
+  }
+
+  #panel-operativa.active #op-turno-card .op-tc-pct{
+    font-size:22px!important;
+    line-height:.9!important;
+  }
+
+  #panel-operativa.active #op-turno-card .op-tc-rem{
+    font-size:7.6px!important;
+    line-height:1.05!important;
+  }
+
+  #panel-operativa.active #op-turno-card .op-tc-sub{
+    font-size:9.8px!important;
+    line-height:1.05!important;
+  }
+
+  #panel-operativa.active #op-turno-card .op-tc-shift{
+    font-size:14.2px!important;
+    line-height:1.05!important;
+  }
+
+  #panel-operativa.active #op-turno-card .op-tc-times span{
+    font-size:12.2px!important;
+    line-height:1!important;
+  }
+
+  #panel-operativa.active #op-turno-card.state-rest .op-tc-times span{
+    font-size:13.2px!important;
+  }
+
+  #panel-operativa.active #op-turno-card .op-tc-bar-bg{
+    height:6px!important;
+    margin-top:3px!important;
+  }
+
+  #panel-operativa.active #op-turno-card.saliendo{
+    animation:cardPulseRed 1.4s ease-in-out infinite!important;
+  }
+
+  #panel-operativa.active #op-turno-card.state-rest .op-tc-sub,
+  #panel-operativa.active #op-turno-card.state-next .op-tc-sub{
+    position:relative!important;
+    top:-14px!important;
   }
 </style>
 </body>
