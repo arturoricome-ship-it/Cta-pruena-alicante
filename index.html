@@ -212,6 +212,61 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 .turno-file-fecha{font-size:10px;color:var(--gray)}
 .turno-file-fecha span{color:var(--gold);font-weight:600}
 .turno-empty{padding:14px;text-align:center;font-size:12px;color:var(--gray);border-top:1px solid var(--border)}
+#hp-modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:700;backdrop-filter:blur(6px)}
+#hp-modal-bg.show{display:block}
+#hp-modal{position:fixed;inset:auto 0 0 0;height:92vh;max-height:92vh;background:var(--bg);border-radius:20px 20px 0 0;z-index:701;transform:translateY(105%);transition:transform .25s ease;display:flex;flex-direction:column;overflow:hidden;border-top:1px solid rgba(200,168,75,.25)}
+#hp-modal.show{transform:translateY(0)}
+.hp-handle{width:38px;height:4px;border-radius:4px;background:rgba(255,255,255,.18);margin:12px auto 10px;flex-shrink:0}
+.hp-head{padding:0 14px 10px;border-bottom:1px solid rgba(255,255,255,.07);flex-shrink:0}
+.hp-title{font-family:"Bebas Neue",sans-serif;font-size:22px;letter-spacing:1px;color:var(--gold);line-height:1}
+.hp-sub{font-size:11px;color:var(--gray);margin-top:4px;line-height:1.35}
+.hp-close{position:absolute;right:12px;top:12px;width:32px;height:32px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:var(--gray);font-size:16px;cursor:pointer}
+.hp-toolbar{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.hp-search{flex:1;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:10px;color:var(--white);font-family:"Outfit",sans-serif;font-size:12px;padding:9px 10px;outline:none}
+.hp-import{flex:0 0 auto;background:rgba(200,168,75,.12);border:1px solid rgba(200,168,75,.45);border-radius:10px;color:var(--gold);font-family:"Outfit",sans-serif;font-size:11px;font-weight:800;padding:0 10px;cursor:pointer;white-space:nowrap}
+.hp-clear{flex:0 0 auto;background:rgba(239,68,68,.11);border:1px solid rgba(239,68,68,.32);border-radius:10px;color:#fca5a5;font-family:"Outfit",sans-serif;font-size:11px;font-weight:800;padding:0 10px;cursor:pointer;white-space:nowrap}
+.hp-body{overflow-y:auto;padding:10px 12px 90px;flex:1;min-height:0;-webkit-overflow-scrolling:touch}
+.hp-summary{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-bottom:10px}
+.hp-kpi{background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:8px;text-align:center}
+.hp-kpi-btn{width:100%;cursor:pointer;font-family:"Outfit",sans-serif;color:inherit}
+.hp-kpi-btn:active{transform:scale(.98)}
+.hp-kpi-v{font-size:16px;font-weight:800;color:var(--gold);line-height:1}
+.hp-kpi-l{font-size:8.5px;color:var(--gray);text-transform:uppercase;letter-spacing:.4px;margin-top:4px}
+.hp-change{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px;margin-bottom:8px}
+.hp-change-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:8px}
+.hp-change-day{font-size:10px;color:var(--gray);font-weight:700;text-transform:uppercase;letter-spacing:.35px}
+.hp-delta{font-size:12px;font-weight:900;border-radius:999px;padding:4px 8px;white-space:nowrap}
+.hp-delta.plus{color:#86efac;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.25)}
+.hp-delta.minus{color:#fca5a5;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.25)}
+.hp-delta.zero{color:#93c5fd;background:rgba(96,165,250,.12);border:1px solid rgba(96,165,250,.25)}
+.hp-change-lines{display:grid;grid-template-columns:1fr;gap:5px}
+.hp-change-line{display:flex;justify-content:space-between;gap:8px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.06);border-radius:8px;padding:6px 7px;font-size:10px;color:var(--gray)}
+.hp-change-line b{color:#e9e4f5;font-size:10.5px;text-align:right}
+.hp-back{width:100%;border:1px solid rgba(200,168,75,.35);background:rgba(200,168,75,.1);color:var(--gold);border-radius:10px;padding:9px 10px;margin-bottom:10px;font-family:"Outfit",sans-serif;font-size:11px;font-weight:800;cursor:pointer}
+.hp-emp{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px;margin-bottom:8px}
+.hp-emp-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px}
+.hp-name{font-size:13px;font-weight:800;color:var(--white);line-height:1.15}
+.hp-cat{font-size:9px;color:var(--gray);margin-top:3px;text-transform:uppercase;letter-spacing:.35px}
+.hp-total{text-align:right;flex-shrink:0}
+.hp-total-v{font-size:18px;font-weight:900;color:var(--gold);line-height:1}
+.hp-total-l{font-size:8.5px;color:var(--gray);text-transform:uppercase;letter-spacing:.4px;margin-top:2px}
+.hp-weeks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.hp-week{display:flex;align-items:center;justify-content:space-between;gap:6px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:6px 7px}
+.hp-week-l{font-size:9px;color:var(--gray);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hp-week-v{font-size:11px;font-weight:800;color:#e9e4f5;white-space:nowrap}
+.hp-badge{display:inline-flex;margin-top:7px;font-size:9px;font-weight:800;color:#60a5fa;background:rgba(96,165,250,.12);border:1px solid rgba(96,165,250,.25);border-radius:999px;padding:2px 7px}
+.hp-days{margin-top:8px;border-top:1px solid rgba(255,255,255,.07);padding-top:7px}
+.hp-days summary{font-size:10px;color:var(--gray);font-weight:700;cursor:pointer;list-style:none}
+.hp-days summary::-webkit-details-marker{display:none}
+.hp-day-list{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:7px}
+.hp-day{display:flex;align-items:center;justify-content:space-between;gap:6px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.06);border-radius:7px;padding:5px 6px}
+.hp-day.zero{opacity:.55;background:rgba(255,255,255,.02)}
+.hp-day.missing{opacity:.45;background:rgba(239,68,68,.035);border-color:rgba(239,68,68,.12)}
+.hp-day-l{font-size:9px;color:var(--gray);white-space:nowrap}
+.hp-day-r{font-size:9.5px;color:#e9e4f5;font-weight:800;text-align:right}
+.hp-day-r small{display:block;font-size:8px;color:#60a5fa;font-weight:700;margin-top:1px}
+.hp-empty{font-size:12px;color:var(--gray);text-align:center;padding:28px 12px;line-height:1.6}
+@media(max-width:360px){.hp-summary{grid-template-columns:1fr}.hp-weeks,.hp-day-list{grid-template-columns:1fr}}
 .aviso-card{background:var(--card);border:1px solid var(--border);border-radius:13px;padding:14px;margin-bottom:9px}
 .aviso-card.aviso-nuevo{border-color:rgba(200,168,75,.6);background:rgba(200,168,75,.06);box-shadow:0 0 12px rgba(200,168,75,.15)}
 .aviso-card.aviso-nuevo .aviso-tag::after{content:" · NUEVO";color:var(--gold);font-weight:900}
@@ -1134,6 +1189,7 @@ body{font-size:14px}
       }
     ">&#8592;</button>
     <button id="btn-home" onclick="
+      if(typeof _hpCasaGestoRapido==='function'&&_hpCasaGestoRapido(event))return;
       switchTab('operativa',document.getElementById('tab-operativa'),document.getElementById('nav-operativa'));document.getElementById('scroll-area').scrollTop=0;
     " title="Inicio" style="font-size:16px">🏠</button>
     <div id="breadcrumb" style="display:none"></div>
@@ -2140,6 +2196,447 @@ function makeTurnoBlock(icon,label){
   };
 }
 
+// Pantalla oculta: horas mensuales/semanales de todos los empleados importados.
+var _hpData=null;
+function cerrarHorasPlantilla(){
+  var bg=document.getElementById('hp-modal-bg'),modal=document.getElementById('hp-modal');
+  if(bg)bg.classList.remove('show');
+  if(modal)modal.classList.remove('show');
+}
+function abrirHorasPlantilla(){
+  var bg=document.getElementById('hp-modal-bg'),modal=document.getElementById('hp-modal'),body=document.getElementById('hp-body');
+  if(bg)bg.classList.add('show');
+  if(modal)modal.classList.add('show');
+  var search=document.getElementById('hp-search');
+  if(search)search.value='';
+  if(body)body.innerHTML='<div class="hp-empty">Actualizando cambios y calculando horas...</div>';
+  var year=new Date().getFullYear();
+  var p=(typeof cargarCambiosTurnosCompartidos==='function')?cargarCambiosTurnosCompartidos(year,true):Promise.resolve(null);
+  Promise.resolve(p).catch(function(){return null;}).then(function(){
+    _hpData=calcularHorasPlantilla(year);
+    renderHorasPlantillaLista();
+  });
+}
+function borrarDatosAntiguosPlantilla(){
+  if(!confirm('¿Borrar los grupos importados en este dispositivo?\\n\\nNo borra los cambios compartidos de Sheets. Después tendrás que importar de nuevo el Excel del grupo.'))return;
+  _hpBorrarDatosImportados();
+}
+function _hpBorrarDatosImportados(){
+  var key=(typeof _GRUPO_KEY!=='undefined'?_GRUPO_KEY:'cta_grupo_2026');
+  try{
+    localStorage.removeItem(key+'_map');
+    localStorage.removeItem('cta_mi_empleado');
+  }catch(e){}
+  _hpData={rows:[],weeks:[],totalHoras:0,totalCambios:0,monthLabel:'sin datos'};
+  var body=document.getElementById('hp-body');
+  var sub=document.getElementById('hp-sub');
+  var search=document.getElementById('hp-search');
+  if(search)search.value='';
+  if(sub)sub.textContent='Datos importados borrados · importa de nuevo el Excel del grupo';
+  if(body)body.innerHTML='<div class="hp-empty">Datos antiguos borrados.<br>Importa de nuevo el Excel del grupo para recalcular con datos limpios.</div>';
+  var btn=document.getElementById('btn-import-grupo');
+  if(btn)btn.classList.remove('has-data');
+  var hint=document.getElementById('grupo-import-hint');
+  if(hint)hint.style.display='none';
+  var panel=document.getElementById('grupo-panel');
+  if(panel){panel.innerHTML='';panel.classList.remove('open');}
+  var tl=document.getElementById('grupo-timeline');
+  if(tl){tl.innerHTML='';tl.classList.remove('open');}
+  var banner=document.getElementById('op-grupo-import-banner');
+  if(banner)banner.style.display='block';
+}
+var _hpLogoTapTs=0,_hpCasaGestoBloqueadoHasta=0;
+function _hpAbrirConGestoRapido(){
+  if(typeof abrirHorasPlantilla!=='function')return false;
+  abrirHorasPlantilla();
+  return true;
+}
+function _hpMarcarLogoGesto(){
+  _hpLogoTapTs=Date.now();
+}
+function _hpCasaGestoRapido(ev){
+  if(Date.now()<_hpCasaGestoBloqueadoHasta){
+    if(ev){
+      ev.preventDefault();
+      ev.stopPropagation();
+    }
+    return true;
+  }
+  if(Date.now()-_hpLogoTapTs>=2500)return false;
+  _hpLogoTapTs=0;
+  _hpCasaGestoBloqueadoHasta=Date.now()+900;
+  if(ev){
+    ev.preventDefault();
+    ev.stopPropagation();
+  }
+  return _hpAbrirConGestoRapido();
+}
+function registrarGestoRapidoPlantilla(){
+  var logo=document.querySelector('#app-header .logo');
+  var home=document.getElementById('btn-home');
+  if(logo&&!logo.dataset.hpGesture){
+    logo.dataset.hpGesture='1';
+    logo.addEventListener('pointerdown',_hpMarcarLogoGesto,{capture:true});
+    logo.addEventListener('touchstart',_hpMarcarLogoGesto,{capture:true,passive:true});
+    logo.addEventListener('click',_hpMarcarLogoGesto,true);
+  }
+  if(home&&!home.dataset.hpGesture){
+    home.dataset.hpGesture='1';
+    home.addEventListener('pointerdown',function(ev){_hpCasaGestoRapido(ev);},{capture:true});
+    home.addEventListener('touchstart',function(ev){_hpCasaGestoRapido(ev);},{capture:true});
+    home.addEventListener('click',function(ev){_hpCasaGestoRapido(ev);},true);
+  }
+}
+document.addEventListener('DOMContentLoaded',registrarGestoRapidoPlantilla);
+setTimeout(registrarGestoRapidoPlantilla,300);
+function _hpFmtHoras(h){
+  h=Math.round((Number(h)||0)*10)/10;
+  return String(h).replace(/\.0$/,'')+'h';
+}
+function _hpMonthNames(){
+  return ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+}
+function _hpGrupoMonths(){
+  return (typeof _GRUPO_MONTHS!=='undefined'&&_GRUPO_MONTHS.length)?_GRUPO_MONTHS:['ENERO','FEBRERO','MARZO','ABRIL','MAYO','JUNIO','JULIO','AGOSTO','SEPTIEMBRE','OCTUBRE','NOVIEMBRE','DICIEMBRE'];
+}
+function _hpLeerMapaGrupo(){
+  var key=(typeof _GRUPO_KEY!=='undefined'?_GRUPO_KEY:'cta_grupo_2026')+'_map';
+  try{return JSON.parse(localStorage.getItem(key)||'{}')||{};}catch(e){return {};}
+}
+function _hpElegirMes(nominaMap){
+  var months=_hpGrupoMonths(),actual=new Date().getMonth(),tieneActual=false,maxIdx=-1;
+  Object.keys(nominaMap||{}).forEach(function(k){
+    var meses=(nominaMap[k]&&nominaMap[k].meses)||{};
+    if(meses[months[actual]]&&Object.keys(meses[months[actual]]).length)tieneActual=true;
+    months.forEach(function(mk,idx){if(meses[mk]&&Object.keys(meses[mk]).length&&idx>maxIdx)maxIdx=idx;});
+  });
+  return tieneActual?actual:(maxIdx>=0?maxIdx:actual);
+}
+function _hpMin(t){
+  if(typeof _toMin==='function')return _toMin(t);
+  if(!t)return null;
+  var p=String(t).split(':');
+  return +p[0]*60+ +p[1];
+}
+function _hpDur(e,s){
+  if(e===null||s===null)return 0;
+  if(typeof _durMin==='function')return _durMin(e,s);
+  return s<e?s+1440-e:s-e;
+}
+function _hpTurnoHoras(turno){
+  if(!turno)return 0;
+  var e1=_hpMin(turno.e1),s1=_hpMin(turno.s1),e2=turno.e2?_hpMin(turno.e2):null,s2=turno.s2?_hpMin(turno.s2):null;
+  if(e1===null||s1===null){
+    var totalNum=parseFloat(String(turno.total||'').replace(',','.'));
+    return isNaN(totalNum)?0:totalNum;
+  }
+  return (_hpDur(e1,s1)+_hpDur(e2,s2))/60;
+}
+function _turnoGrupoTieneHoras(t){
+  return _hpTurnoHoras(t)>0||(!!(t&&t.e1&&t.s1));
+}
+function _mergeDiasGrupoPreferirHoras(prevDias,nuevosDias){
+  var res=Object.assign({},prevDias||{});
+  Object.keys(nuevosDias||{}).forEach(function(d){
+    var nuevo=nuevosDias[d],prev=res[d]||res[String(d)]||null;
+    if(!prev||_turnoGrupoTieneHoras(nuevo)||!_turnoGrupoTieneHoras(prev)){
+      res[d]=nuevo;
+    }
+  });
+  return res;
+}
+function _extraerDiasGrupoDeFila(row,rowRaw,dayColMap){
+  var dias={};
+  Object.keys(dayColMap||{}).forEach(function(d){
+    var col=dayColMap[d];
+    var t=_parseCeldaDiaGrupo(row&&row[col],rowRaw&&rowRaw[col]);
+    if(t)dias[parseInt(d,10)]=t;
+  });
+  return dias;
+}
+function _hpTurnoHorario(turno){
+  if(!turno)return 'Sin dato';
+  if(turno.e1&&turno.s1)return (turno.e1||'')+'-'+(turno.s1||'')+(turno.e2&&turno.s2?' / '+turno.e2+'-'+turno.s2:'');
+  var h=_hpTurnoHoras(turno);
+  if(h>0)return 'Total guardado';
+  return turno.rawGrupo?('Sin horas · '+turno.rawGrupo):'Sin horas';
+}
+function _hpFmtDelta(h){
+  h=Math.round((Number(h)||0)*10)/10;
+  if(h>0)return '+'+String(h).replace(/\.0$/,'')+'h';
+  if(h<0)return String(h).replace(/\.0$/,'')+'h';
+  return '0h';
+}
+function _hpFechaISO(d){
+  if(typeof _fechaISOPlantilla==='function')return _fechaISOPlantilla(d);
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function _hpDiaLocalPropio(year,monthKey,day){
+  var data={};
+  try{data=JSON.parse(localStorage.getItem('cta_ed_'+year)||'{}')||{};}catch(e){data={};}
+  return ((data[monthKey]||{})[day]||(data[monthKey]||{})[String(day)]||null);
+}
+function _hpMismoEmpleado(a,b){
+  if(!a||!b)return false;
+  var an=String(a.nomina||'').trim(),bn=String(b.nomina||'').trim();
+  if(an&&bn&&an===bn)return true;
+  var aa=_normPlantillaNombre(a.nombre||''),bb=_normPlantillaNombre(b.nombre||'');
+  return !!(aa&&bb&&(aa===bb||aa.indexOf(bb)>=0||bb.indexOf(aa)>=0));
+}
+function _hpEsEmpleadoLocal(emp,year,monthKey,day){
+  var cached=null;
+  try{cached=JSON.parse(localStorage.getItem('cta_mi_empleado')||'null');}catch(e){cached=null;}
+  if(_hpMismoEmpleado(emp,cached))return true;
+
+  var mi=null;
+  if(typeof _getMiEmpleadoGrupoActual==='function')mi=_getMiEmpleadoGrupoActual(year,monthKey,day);
+  if(_hpMismoEmpleado(emp,mi))return true;
+
+  var tryp=null;
+  try{tryp=JSON.parse(localStorage.getItem('cta_mi_nombre_tryp')||'null');}catch(e){tryp=null;}
+  if(_hpMismoEmpleado(emp,tryp))return true;
+
+  var sess=(typeof _ctaSession==='function')?_ctaSession():{};
+  if(sess&&sess.nombre&&_normPlantillaNombre(sess.nombre)!==_normPlantillaNombre('Modo prueba')){
+    if(_hpMismoEmpleado(emp,{nombre:sess.nombre}))return true;
+  }
+  return false;
+}
+function _hpTurnoLocalPropio(emp,dateObj,monthKey,day){
+  if(!_hpEsEmpleadoLocal(emp,dateObj.getFullYear(),monthKey,day))return null;
+  var local=_hpDiaLocalPropio(dateObj.getFullYear(),monthKey,day);
+  if(!local)return null;
+  if((local.e1&&local.s1)||parseFloat(String(local.total||'').replace(',','.'))>0){
+    return Object.assign({},local,{cambioCompartido:true,etiquetaCambio:'APP LOCAL'});
+  }
+  return null;
+}
+function _hpTurnoFinal(emp,dateObj,monthKey,day){
+  var dias=(emp.meses&&emp.meses[monthKey])||{};
+  var turno=dias[day]||null;
+  if(typeof _getCambioCompartidoEmpleado==='function'){
+    var cambio=_getCambioCompartidoEmpleado(emp,dateObj);
+    if(cambio)turno=_hpCambioToTurnoHoras(cambio,turno);
+  }
+  var local=_hpTurnoLocalPropio(emp,dateObj,monthKey,day);
+  if(local)turno=local;
+  return turno;
+}
+function _hpCambioToTurnoHoras(c,turnoOriginal){
+  if(!c)return turnoOriginal;
+  var tipo=String(c.tipo||'').toLowerCase();
+  var etiqueta=String(c.tipo||'Cambio').toUpperCase();
+  if(c.e1&&c.s1){
+    var turnoCambio={
+      tipo:tipo||'trabajado',
+      e1:c.e1||'',
+      s1:c.s1||'',
+      e2:c.e2||'',
+      s2:c.s2||'',
+      total:c.total||0,
+      cambioCompartido:true,
+      etiquetaCambio:etiqueta
+    };
+    return turnoCambio;
+  }
+  if(parseFloat(String(c.total||'').replace(',','.'))>0){
+    return {
+      tipo:tipo||'trabajado',
+      e1:'',
+      s1:'',
+      e2:'',
+      s2:'',
+      total:c.total,
+      cambioCompartido:true,
+      etiquetaCambio:etiqueta
+    };
+  }
+  if(_hpTurnoHoras(turnoOriginal)>0||(turnoOriginal&&turnoOriginal.e1&&turnoOriginal.s1)){
+    return Object.assign({},turnoOriginal,{tipo:tipo||turnoOriginal.tipo||'trabajado',cambioCompartido:true,etiquetaCambio:etiqueta});
+  }
+  return {tipo:tipo||'libre',e1:'',s1:'',e2:'',s2:'',cambioCompartido:true,etiquetaCambio:etiqueta||'LIBRE'};
+}
+function _hpSemanaInfo(dateObj){
+  var dow=(dateObj.getDay()+6)%7;
+  var lunes=new Date(dateObj.getFullYear(),dateObj.getMonth(),dateObj.getDate()-dow);
+  var domingo=new Date(lunes.getFullYear(),lunes.getMonth(),lunes.getDate()+6);
+  var meses=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  function dm(d){return d.getDate()+' '+meses[d.getMonth()];}
+  return {key:String(lunes.getTime()),order:lunes.getTime(),label:dm(lunes)+' a '+dm(domingo)};
+}
+function calcularHorasPlantilla(year){
+  var map=_hpLeerMapaGrupo(),months=_hpGrupoMonths(),monthIdx=_hpElegirMes(map),monthKey=months[monthIdx],monthNames=_hpMonthNames();
+  var lastDay=new Date(year,monthIdx+1,0).getDate();
+  var empleados=Object.keys(map).map(function(k){return map[k];}).filter(function(e){return e&&e.nombre&&!(typeof _esNombreBasuraGrupo==='function'&&_esNombreBasuraGrupo(e.nombre));});
+  var semanasOrden={},totalHoras=0,totalCambios=0,totalDeltaCambios=0,cambiosDetalle=[];
+  var rows=empleados.map(function(emp){
+    var semanas={},diasDetalle=[],mesTotal=0,cambios=0;
+    for(var d=1;d<=lastDay;d++){
+      var fecha=new Date(year,monthIdx,d);
+      var diasMesRaw=(emp.meses&&emp.meses[monthKey])||{};
+      var tieneDatoGuardado=Object.prototype.hasOwnProperty.call(diasMesRaw,String(d))||Object.prototype.hasOwnProperty.call(diasMesRaw,d);
+      var turnoBase=(diasMesRaw[d]||diasMesRaw[String(d)]||null);
+      var cambioCompartido=(typeof _getCambioCompartidoEmpleado==='function')?_getCambioCompartidoEmpleado(emp,fecha):null;
+      var turno=cambioCompartido?_hpCambioToTurnoHoras(cambioCompartido,turnoBase):turnoBase;
+      var local=_hpTurnoLocalPropio(emp,fecha,monthKey,d);
+      var origenCambio=cambioCompartido?cambioCompartido:null;
+      var etiquetaCambio=cambioCompartido?String(cambioCompartido.tipo||'Cambio').toUpperCase():'';
+      if(local){
+        turno=local;
+        origenCambio={tipo:'APP LOCAL',actualizado_por:'Este dispositivo'};
+        etiquetaCambio='APP LOCAL';
+      }
+      if(origenCambio){
+        cambios++;
+        var hAntes=_hpTurnoHoras(turnoBase),hDespues=_hpTurnoHoras(turno),delta=hDespues-hAntes;
+        totalDeltaCambios+=delta;
+        cambiosDetalle.push({
+          nombre:emp.nombre||'',
+          categoria:emp.categoria||'General',
+          dia:d,
+          fecha:_hpFechaISO(fecha),
+          antes:_hpTurnoHorario(turnoBase),
+          despues:_hpTurnoHorario(turno),
+          horasAntes:hAntes,
+          horasDespues:hDespues,
+          delta:delta,
+          tipo:etiquetaCambio,
+          por:(origenCambio.actualizado_por||origenCambio.email||origenCambio.nombre||'')
+        });
+      }
+      var horas=_hpTurnoHoras(turno);
+      diasDetalle.push({
+        dia:d,
+        horas:horas,
+        horario:turno?_hpTurnoHorario(turno):(tieneDatoGuardado?'Sin horas':'Sin dato'),
+        cambio:!!(turno&&turno.cambioCompartido),
+        etiqueta:turno&&turno.etiquetaCambio||'',
+        missing:!tieneDatoGuardado&&!turno,
+        zero:tieneDatoGuardado&&horas<=0
+      });
+      if(horas<=0)continue;
+      var wi=_hpSemanaInfo(fecha);
+      if(!semanas[wi.key])semanas[wi.key]={label:wi.label,order:wi.order,horas:0};
+      semanas[wi.key].horas+=horas;
+      semanasOrden[wi.key]={label:wi.label,order:wi.order};
+      mesTotal+=horas;
+    }
+    totalHoras+=mesTotal;
+    totalCambios+=cambios;
+    return {nombre:emp.nombre||'',categoria:emp.categoria||'General',horas:mesTotal,cambios:cambios,semanas:semanas,dias:diasDetalle};
+  });
+  var weekList=Object.keys(semanasOrden).map(function(k){return {key:k,label:semanasOrden[k].label,order:semanasOrden[k].order};}).sort(function(a,b){return a.order-b.order;});
+  rows.sort(function(a,b){
+    var ca=String(a.categoria||''),cb=String(b.categoria||'');
+    if(ca!==cb)return ca.localeCompare(cb,'es');
+    return String(a.nombre||'').localeCompare(String(b.nombre||''),'es');
+  });
+  cambiosDetalle.sort(function(a,b){
+    var na=String(a.nombre||''),nb=String(b.nombre||'');
+    if(na!==nb)return na.localeCompare(nb,'es');
+    return a.dia-b.dia;
+  });
+  return {year:year,monthIdx:monthIdx,monthKey:monthKey,monthLabel:monthNames[monthIdx]+' '+year,rows:rows,weeks:weekList,totalHoras:totalHoras,totalCambios:totalCambios,totalDeltaCambios:totalDeltaCambios,cambiosDetalle:cambiosDetalle};
+}
+function renderHorasPlantillaLista(){
+  var body=document.getElementById('hp-body'),sub=document.getElementById('hp-sub'),search=document.getElementById('hp-search');
+  if(!body)return;
+  var data=_hpData;
+  if(!data||!data.rows){
+    body.innerHTML='<div class="hp-empty">No hay datos calculados.</div>';
+    return;
+  }
+  if(search)search.setAttribute('oninput','renderHorasPlantillaLista()');
+  var q=(search&&search.value?search.value:'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+  if(sub)sub.textContent='Horas publicadas de grupos · '+data.monthLabel+' · cambios compartidos incluidos';
+  var rows=data.rows.filter(function(r){
+    if(!q)return true;
+    var txt=(r.nombre+' '+r.categoria).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+    return txt.indexOf(q)>=0;
+  });
+  if(!data.rows.length){
+    body.innerHTML='<div class="hp-empty">No hay empleados importados. Importa primero el Excel del grupo.</div>';
+    return;
+  }
+  var html='<div class="hp-summary">'
+    +'<div class="hp-kpi"><div class="hp-kpi-v">'+data.rows.length+'</div><div class="hp-kpi-l">Empleados</div></div>'
+    +'<div class="hp-kpi"><div class="hp-kpi-v">'+_hpFmtHoras(data.totalHoras)+'</div><div class="hp-kpi-l">Horas mes</div></div>'
+    +'<button class="hp-kpi hp-kpi-btn" onclick="renderHorasPlantillaCambios()"><div class="hp-kpi-v">'+data.totalCambios+'</div><div class="hp-kpi-l">Cambios</div></button>'
+    +'</div>';
+  if(!rows.length){
+    body.innerHTML=html+'<div class="hp-empty">Sin resultados para esa búsqueda.</div>';
+    return;
+  }
+  rows.forEach(function(r){
+    html+='<div class="hp-emp">'
+      +'<div class="hp-emp-top">'
+        +'<div><div class="hp-name">'+escH(r.nombre)+'</div><div class="hp-cat">'+escH(r.categoria||'General')+'</div>'+(r.cambios?'<div class="hp-badge">'+r.cambios+' cambio'+(r.cambios===1?'':'s')+' aplicado'+(r.cambios===1?'':'s')+'</div>':'')+'</div>'
+        +'<div class="hp-total"><div class="hp-total-v">'+_hpFmtHoras(r.horas)+'</div><div class="hp-total-l">Mes</div></div>'
+      +'</div><div class="hp-weeks">';
+    data.weeks.forEach(function(w){
+      var h=(r.semanas[w.key]&&r.semanas[w.key].horas)||0;
+      html+='<div class="hp-week"><span class="hp-week-l">'+escH(w.label)+'</span><span class="hp-week-v">'+_hpFmtHoras(h)+'</span></div>';
+    });
+    html+='</div>';
+    var diasContados=(r.dias||[]).filter(function(x){return x.horas>0;}).length;
+    html+='<details class="hp-days"><summary>Ver detalle días · '+diasContados+' contados</summary><div class="hp-day-list">';
+    (r.dias||[]).forEach(function(dia){
+      var cls='hp-day'+(dia.missing?' missing':(dia.zero?' zero':''));
+      html+='<div class="'+cls+'"><span class="hp-day-l">Día '+dia.dia+'</span><span class="hp-day-r">'+_hpFmtHoras(dia.horas)+'<small>'+escH(dia.horario)+(dia.cambio?' · '+escH(dia.etiqueta||'Cambio'):'')+'</small></span></div>';
+    });
+    html+='</div></details></div>';
+  });
+  body.innerHTML=html;
+}
+function renderHorasPlantillaCambios(){
+  var body=document.getElementById('hp-body'),sub=document.getElementById('hp-sub'),search=document.getElementById('hp-search');
+  if(!body)return;
+  var data=_hpData;
+  if(!data||!data.rows){
+    body.innerHTML='<div class="hp-empty">No hay datos calculados.</div>';
+    return;
+  }
+  if(search)search.setAttribute('oninput','renderHorasPlantillaCambios()');
+  if(sub)sub.textContent='Cambios aplicados · '+data.monthLabel+' · diferencia contra el Excel importado';
+  var q=(search&&search.value?search.value:'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+  var cambios=(data.cambiosDetalle||[]).filter(function(c){
+    if(!q)return true;
+    var txt=(c.nombre+' '+c.categoria+' '+c.fecha+' '+c.tipo).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+    return txt.indexOf(q)>=0;
+  });
+  var html='<div class="hp-summary">'
+    +'<div class="hp-kpi"><div class="hp-kpi-v">'+(data.cambiosDetalle||[]).length+'</div><div class="hp-kpi-l">Cambios</div></div>'
+    +'<div class="hp-kpi"><div class="hp-kpi-v">'+_hpFmtDelta(data.totalDeltaCambios||0)+'</div><div class="hp-kpi-l">Balance</div></div>'
+    +'<button class="hp-kpi hp-kpi-btn" onclick="renderHorasPlantillaLista()"><div class="hp-kpi-v">←</div><div class="hp-kpi-l">Volver</div></button>'
+    +'</div>';
+  html+='<button class="hp-back" onclick="renderHorasPlantillaLista()">Volver a empleados</button>';
+  if(!(data.cambiosDetalle||[]).length){
+    body.innerHTML=html+'<div class="hp-empty">No hay cambios aplicados para este mes.</div>';
+    return;
+  }
+  if(!cambios.length){
+    body.innerHTML=html+'<div class="hp-empty">Sin cambios para esa búsqueda.</div>';
+    return;
+  }
+  cambios.forEach(function(c){
+    var delta=Number(c.delta)||0;
+    var cls=delta>0?'plus':(delta<0?'minus':'zero');
+    var deltaTxt=delta===0?'Sin variación':_hpFmtDelta(delta);
+    html+='<div class="hp-change">'
+      +'<div class="hp-change-top">'
+        +'<div><div class="hp-name">'+escH(c.nombre)+'</div><div class="hp-cat">'+escH(c.categoria||'General')+'</div><div class="hp-change-day">Día '+c.dia+' · '+escH(c.fecha)+' · '+escH(c.tipo||'Cambio')+'</div></div>'
+        +'<div class="hp-delta '+cls+'">'+escH(deltaTxt)+'</div>'
+      +'</div>'
+      +'<div class="hp-change-lines">'
+        +'<div class="hp-change-line"><span>Excel</span><b>'+escH(c.antes)+' · '+_hpFmtHoras(c.horasAntes)+'</b></div>'
+        +'<div class="hp-change-line"><span>Cambio</span><b>'+escH(c.despues)+' · '+_hpFmtHoras(c.horasDespues)+'</b></div>'
+        +(c.por?'<div class="hp-change-line"><span>Guardado por</span><b>'+escH(c.por)+'</b></div>':'')
+      +'</div>'
+    +'</div>';
+  });
+  body.innerHTML=html;
+}
+
 // BADGE AVISOS
 var avisosHash="";
 var avisosLoaded=false;
@@ -2849,6 +3346,7 @@ document.getElementById("btn-logout").addEventListener("click",function(){
 <script>
 var CLIENT_ID="791335664842-8qor3a81pfbdd9cioqf8fdvnb3bilj9h.apps.googleusercontent.com";
 var SHEETS_URL="https://script.google.com/macros/s/AKfycby_IIimYE_dL1BolZrPdGdmslVW1gV-Ivj9E7H3jaJgxd4ZJq7IEcFEjBuVj3iy0qQo/exec";
+var CTA_LOGIN_DISABLED_FOR_TESTS=true;
 
 function parseJwt(token){
   try{var b=token.split(".")[1];var d=atob(b.replace(/-/g,"+").replace(/_/g,"/"));return JSON.parse(decodeURIComponent(escape(d)));}
@@ -2910,6 +3408,16 @@ function handleCredentialResponse(response){
 }
 
 window.addEventListener("load",function(){
+  if(CTA_LOGIN_DISABLED_FOR_TESTS){
+    var testSession={email:"prueba@cta.local",nombre:"Modo prueba",ts:Date.now()};
+    try{localStorage.setItem("cta_session",JSON.stringify(testSession));}catch(e){}
+    var loginScreen=document.getElementById("login-screen");
+    if(loginScreen)loginScreen.style.display="none";
+    var logoutBtn=document.getElementById("btn-logout");
+    if(logoutBtn)logoutBtn.style.display="none";
+    setWelcome(testSession.nombre);
+    return;
+  }
   // Verificar sesión guardada
   var sess=null;
   try{sess=JSON.parse(localStorage.getItem("cta_session"));}catch(e){}
@@ -4826,6 +5334,25 @@ document.addEventListener('DOMContentLoaded',function(){
   <div id="cambio-body"></div>
 </div>
 
+<!-- PANEL OCULTO HORAS PLANTILLA -->
+<div id="hp-modal-bg" onclick="cerrarHorasPlantilla()"></div>
+<div id="hp-modal">
+  <button class="hp-close" onclick="cerrarHorasPlantilla()">×</button>
+  <div class="hp-handle"></div>
+  <div class="hp-head">
+    <div class="hp-title">Horas plantilla</div>
+    <div class="hp-sub" id="hp-sub">Empleados importados de grupos · mes y semanas</div>
+    <div class="hp-toolbar">
+      <input class="hp-search" id="hp-search" placeholder="Buscar empleado..." oninput="renderHorasPlantillaLista()">
+      <button class="hp-import" onclick="importarGrupoDesdePlantilla()">Importar grupo</button>
+      <button class="hp-clear" onclick="borrarDatosAntiguosPlantilla()">Borrar importados</button>
+    </div>
+  </div>
+  <div class="hp-body" id="hp-body">
+    <div class="hp-empty">Calculando...</div>
+  </div>
+</div>
+
 
 <script>
 
@@ -4980,9 +5507,7 @@ function _fusionarDuplicadosGrupoSilencioso(map){
       Object.keys(otro.meses||{}).forEach(function(mk){
         var diasOtro=otro.meses[mk]||{};
         var diasBase=meses[mk]||{};
-        if(!meses[mk]||Object.keys(diasOtro).length>Object.keys(diasBase).length){
-          meses[mk]=diasOtro;
-        }
+        meses[mk]=_mergeDiasGrupoPreferirHoras(diasBase,diasOtro);
       });
       delete map[keys[i]];
     }
@@ -5028,37 +5553,38 @@ function abrirCompanerosPorDia(){
 function importarGrupo(){
   document.getElementById('grupo-file-input').click();
 }
+function importarGrupoDesdePlantilla(){
+  var input=document.getElementById('grupo-file-input');
+  if(input)input.click();
+}
 
 // Extrae el turno/tipo de una celda de día del Excel de grupo (DL, !, horas, etc.)
 // Devuelve null si el día no está publicado (no se guarda).
-// Códigos de ausencia que en el Excel de grupo vienen anotados entre paréntesis
-// (segundo formato, alternativo al de "!"), p.ej. "06:00 13:00 (V) (B0)": el turno con
-// horas que trae la celda quedó anulado por la baja/excedencia/vacaciones, así que no
-// cuenta como turno de trabajo real aunque haya horas escritas.
+// Códigos de ausencia que en el Excel de grupo vienen anotados entre paréntesis.
+// Si la celda trae horas, se conservan: para la pantalla oculta de horas todo día
+// con entrada/salida cuenta, aunque lleve MA, !, festivo, HL, baja, etc.
 var _CODIGOS_AUSENCIA_GRUPO=['B0','EXC','V','MA'];
-function _parseCeldaDiaGrupo(cellRaw){
+function _parseCeldaDiaGrupo(cellRaw,cellRawOriginal){
   var cell=String(cellRaw||'').trim();
+  var rawOrig=(cellRawOriginal===undefined||cellRawOriginal===null)?'':String(cellRawOriginal).trim();
+  if(rawOrig&&rawOrig!==cell)cell=(cell+' '+rawOrig).trim();
   if(cell==='')return null; // Celda vacía → sin publicar, no se guarda
-  // Exclamación → baja, vacaciones o similar → cuenta como día libre
-  if(cell.indexOf('!')!==-1){
-    return {tipo:'libre',e1:'',s1:'',e2:'',s2:'',ausencia:true};
-  }
-  // Formato alternativo: código de ausencia entre paréntesis, con o sin horas reales
-  // acompañándolo. El código manda: si está presente, es ausencia aunque haya horas.
+  var parsed=parseTurnoGrupo(cell);
+  if(parsed&&parsed.e1){parsed.rawGrupo=cell;return parsed;}
+
+  // Sin horas: los códigos de ausencia sí se guardan como libre/ausencia.
   var notasCelda=(cell.match(/\(([^)]+)\)/g)||[]).map(function(n){return n.replace(/[()]/g,'').toUpperCase().trim();});
   if(notasCelda.some(function(n){return _CODIGOS_AUSENCIA_GRUPO.indexOf(n)>=0;})){
-    return {tipo:'libre',e1:'',s1:'',e2:'',s2:'',ausencia:true};
+    return {tipo:'libre',e1:'',s1:'',e2:'',s2:'',ausencia:true,rawGrupo:cell};
   }
   var cellUp=cell.toUpperCase().replace(/[\s.]/g,'');
   var esLibre=(cellUp==='DL'||cellUp==='LIBRE'||cellUp==='DIALIBRE'||cellUp==='DESCANSO'||cellUp==='DESCANSOSEMANA'||cellUp==='MA'||cellUp==='FM'||cellUp==='FY');
   if(esLibre){
-    return {tipo:'libre',e1:'',s1:'',e2:'',s2:''};
+    return {tipo:'libre',e1:'',s1:'',e2:'',s2:'',rawGrupo:cell};
   }
-  var parsed=parseTurnoGrupo(cell);
-  if(parsed){
-    // Si no tiene horas válidas, tratarlo como libre (vacaciones, baja, etc. cuentan como no-trabajo ese día)
-    if(!parsed.e1)return {tipo:parsed.tipo||'libre',e1:'',s1:'',e2:'',s2:''};
-    return parsed;
+  // Exclamación sin horas → baja, vacaciones o similar: libre/ausencia.
+  if(cell.indexOf('!')!==-1){
+    return {tipo:'libre',e1:'',s1:'',e2:'',s2:'',ausencia:true,rawGrupo:cell};
   }
   return null;
 }
@@ -5097,6 +5623,28 @@ function _detectarMesGrupo(rows,sheetName){
   return detected;
 }
 
+function _detectarDiaColGrupo(headerCell){
+  var h=String(headerCell||'').trim();
+  if(!h)return null;
+  var m=h.match(/(?:^|[^0-9])([1-9]|[12][0-9]|3[01])(?:[^0-9]|$)/);
+  if(m)return parseInt(m[1],10);
+  var n=parseInt(h.replace(/^[^\d]*/,''),10);
+  return n>=1&&n<=31?n:null;
+}
+function _detectarDiaColGrupoEnCabecera(rows,rowsRaw,hIdx,c){
+  var piezas=[];
+  [hIdx,hIdx-1,hIdx-2].forEach(function(r){
+    if(r<0)return;
+    if(rows[r])piezas.push(rows[r][c]);
+    if(rowsRaw[r])piezas.push(rowsRaw[r][c]);
+  });
+  for(var i=0;i<piezas.length;i++){
+    var d=_detectarDiaColGrupo(piezas[i]);
+    if(d>=1&&d<=31)return d;
+  }
+  return null;
+}
+
 function procesarGrupoXlsx(file){
   if(!file)return;
   if(typeof XLSX==='undefined'){alert('Error: librería XLSX no cargada.');return;}
@@ -5106,6 +5654,7 @@ function procesarGrupoXlsx(file){
       var wb;try{wb=XLSX.read(e.target.result,{type:'array'});}catch(ex){alert('Error XLSX: '+ex.message);return;}
       var ws=wb.Sheets[wb.SheetNames[0]];
       var rows=XLSX.utils.sheet_to_json(ws,{header:1,raw:false,defval:''});
+      var rowsRaw=XLSX.utils.sheet_to_json(ws,{header:1,raw:true,defval:''});
 
       // Localizar la fila de cabecera buscando la celda "Empleado". Su columna nos dice
       // el formato: si "Empleado" está en la columna 0 → Excel "todos los grupos" (sin
@@ -5122,10 +5671,11 @@ function procesarGrupoXlsx(file){
 
       // Build day→col map from headers like "V1","S2","D3","L4"...
       var headerRow=rows[hIdx]||[];
+      var headerRaw=rowsRaw[hIdx]||[];
       var dayColMap={};
-      for(var c=empCol+1;c<headerRow.length;c++){
-        var h=String(headerRow[c]).trim();
-        var dayNum=parseInt(h.replace(/^[A-Za-z]+/,''));
+      var maxHeaderCols=Math.max(headerRow.length,headerRaw.length,(rows[hIdx-1]||[]).length,(rowsRaw[hIdx-1]||[]).length,(rows[hIdx-2]||[]).length,(rowsRaw[hIdx-2]||[]).length);
+      for(var c=empCol+1;c<maxHeaderCols;c++){
+        var dayNum=_detectarDiaColGrupoEnCabecera(rows,rowsRaw,hIdx,c);
         if(dayNum>=1&&dayNum<=31)dayColMap[dayNum]=c;
       }
 
@@ -5148,30 +5698,43 @@ function procesarGrupoXlsx(file){
         var isFD=/\bFDS?\b|FIJOS?\s+DISCONTINUOS?/i.test(_fdSource);
         if(isFD)categoria='FD';
 
+        var lastEmpSingle=null;
         for(var r=hIdx+1;r<rows.length;r++){
           var row=rows[r];
-          if(!row[nominaCol]||!row[empCol])continue;
+          var rowRaw=rowsRaw[r]||[];
+          if(!row[nominaCol]||!row[empCol]){
+            if(lastEmpSingle){
+              var diasExtra=_extraerDiasGrupoDeFila(row,rowRaw,dayColMap);
+              if(Object.keys(diasExtra).length)lastEmpSingle.dias=_mergeDiasGrupoPreferirHoras(lastEmpSingle.dias,diasExtra);
+            }
+            continue;
+          }
           var nomina=String(row[nominaCol]).trim();
           var nombreFull=String(row[empCol]).trim();
           if(nomina.toLowerCase().indexOf('calendario')>=0||nomina.toLowerCase().indexOf('fecha')>=0)continue;
           var nombre=formatNombre(nombreFull);
           if(_esNombreBasuraGrupo(nombre))continue; // p.ej. "(EXC)" colado como nombre, no es una persona
-          var diasMes={};
-          Object.keys(dayColMap).forEach(function(d){
-            var t=_parseCeldaDiaGrupo(row[dayColMap[d]]);
-            if(t)diasMes[parseInt(d)]=t;
-          });
-          empleados.push({nomina:nomina,nombre:nombre,categoria:categoria,dias:diasMes});
+          var diasMes=_extraerDiasGrupoDeFila(row,rowRaw,dayColMap);
+          lastEmpSingle={nomina:nomina,nombre:nombre,categoria:categoria,dias:diasMes};
+          empleados.push(lastEmpSingle);
         }
         gruposDetectados.push(categoria);
       } else {
         // ── Excel "todos los grupos" (varias categorías en la misma hoja, separadas por
         //    filas tipo "09 UAR-Ftp-Supervisores" que solo tienen texto en la columna A) ──
         var currentCategoria='FIJO OPERARIO';
+        var lastEmpMulti=null;
         for(var r2=hIdx+1;r2<rows.length;r2++){
           var rowM=rows[r2];
+          var rowMRaw=rowsRaw[r2]||[];
           var cellA=String((rowM&&rowM[empCol])||'').trim();
-          if(cellA==='')continue;
+          if(cellA===''){
+            if(lastEmpMulti){
+              var diasExtra2=_extraerDiasGrupoDeFila(rowM,rowMRaw,dayColMap);
+              if(Object.keys(diasExtra2).length)lastEmpMulti.dias=_mergeDiasGrupoPreferirHoras(lastEmpMulti.dias,diasExtra2);
+            }
+            continue;
+          }
 
           // Los nombres de empleado siempre vienen como "Apellido(s), Nombre" (con coma).
           // Lo que no lleva coma es cabecera de grupo (empieza por 2 dígitos) o un
@@ -5182,6 +5745,10 @@ function procesarGrupoXlsx(file){
             if(/^\d{1,2}\s/.test(cellA)){
               currentCategoria=_categoriaDesdeTextoGrupo(cellA);
               if(gruposDetectados.indexOf(currentCategoria)<0)gruposDetectados.push(currentCategoria);
+              lastEmpMulti=null;
+            } else if(lastEmpMulti){
+              var diasExtraNoNombre=_extraerDiasGrupoDeFila(rowM,rowMRaw,dayColMap);
+              if(Object.keys(diasExtraNoNombre).length)lastEmpMulti.dias=_mergeDiasGrupoPreferirHoras(lastEmpMulti.dias,diasExtraNoNombre);
             }
             continue;
           }
@@ -5190,12 +5757,9 @@ function procesarGrupoXlsx(file){
           var nomina2=_nominaSinteticaDesdeNombre(nombreFull2);
           var nombre2=formatNombre(nombreFull2);
           if(_esNombreBasuraGrupo(nombre2))continue; // p.ej. "(EXC)" colado como nombre, no es una persona
-          var diasMes2={};
-          Object.keys(dayColMap).forEach(function(d){
-            var t=_parseCeldaDiaGrupo(rowM[dayColMap[d]]);
-            if(t)diasMes2[parseInt(d)]=t;
-          });
-          empleados.push({nomina:nomina2,nombre:nombre2,categoria:currentCategoria,dias:diasMes2});
+          var diasMes2=_extraerDiasGrupoDeFila(rowM,rowMRaw,dayColMap);
+          lastEmpMulti={nomina:nomina2,nombre:nombre2,categoria:currentCategoria,dias:diasMes2};
+          empleados.push(lastEmpMulti);
         }
       }
 
@@ -5217,7 +5781,7 @@ function procesarGrupoXlsx(file){
         // Store month data under the detected month key
         var prev=nominaMap[key]||{};
         var meses=prev.meses||{};
-        meses[monthKey]=emp.dias;
+        meses[monthKey]=_mergeDiasGrupoPreferirHoras(meses[monthKey]||{},emp.dias);
         nominaMap[key]={
           nomina:key,
           nombre:emp.nombre,
@@ -5236,9 +5800,19 @@ function procesarGrupoXlsx(file){
       var etiqueta=(formato==='MULTI')?(gruposDetectados.length+' grupos'):gruposDetectados[0];
       if(hint&&txt){
         hint.style.display='block';txt.style.color='#4ade80';txt.style.fontSize='11px';
-        txt.textContent='✅ '+etiqueta+': +'+added+' nuevos, '+updated+' actualizados · '+total+' total';
+        var diasDetectados=Object.keys(dayColMap).length;
+        txt.textContent='✅ '+etiqueta+': +'+added+' nuevos, '+updated+' actualizados · '+total+' total · '+diasDetectados+' días detectados';
+        if(diasDetectados<28){
+          txt.style.color='#fbbf24';
+          txt.textContent+=' ⚠️ faltan columnas de días en el Excel/importación';
+        }
       }
       if(typeof logActividad==='function')logActividad('importar_companeros',etiqueta+': +'+added+' nuevos, '+updated+' actualizados');
+      var hp=document.getElementById('hp-modal');
+      if(hp&&hp.classList.contains('show')&&typeof calcularHorasPlantilla==='function'){
+        _hpData=calcularHorasPlantilla(new Date().getFullYear());
+        if(typeof renderHorasPlantillaLista==='function')renderHorasPlantillaLista();
+      }
     }catch(err){alert('Error al leer el Excel del grupo: '+err.message);}
   };
   reader.readAsArrayBuffer(file);
@@ -5302,7 +5876,18 @@ function parseTurnoGrupo(cell){
   // Extract all HH:MM patterns from cell regardless of separator
   var hasExclamation=String(cell||'').indexOf('!')!==-1;
   var hasQuestion=String(cell||'').indexOf('?')!==-1;
-  var times=(cell.match(/\d{1,2}:\d{2}/g)||[]).map(function(t){return t.replace('!','').trim();}).filter(function(t){return /^\d{1,2}:\d{2}$/.test(t);});
+  var raw=String(cell||'');
+  var times=(raw.match(/\d{1,2}:\d{2}/g)||[]).map(function(t){return t.replace('!','').trim();}).filter(function(t){return /^\d{1,2}:\d{2}$/.test(t);});
+  if(times.length<2){
+    var sinNotas=raw.replace(/\([^)]*\)/g,' ');
+    times=(sinNotas.match(/\b(?:[01]?\d|2[0-3])(?::[0-5]\d|[\.,][0-5]\d)?\b/g)||[]).map(function(t){
+      t=String(t).replace(',','.');
+      var p=t.indexOf(':')>=0?t.split(':'):t.split('.');
+      var h=parseInt(p[0],10),m=p.length>1?parseInt(p[1],10):0;
+      if(isNaN(h)||isNaN(m)||h<0||h>23||m<0||m>59)return '';
+      return (h<10?'0':'')+h+':'+(m<10?'0':'')+m;
+    }).filter(Boolean);
+  }
   if(times.length<2)return null;
   return{e1:times[0],s1:times[1],e2:times.length>=4?times[2]:null,s2:times.length>=4?times[3]:null,disponibilidadNoConfirmada:hasExclamation,noVieneInterrogacion:hasQuestion};
 }
