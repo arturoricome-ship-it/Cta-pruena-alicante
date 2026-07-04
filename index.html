@@ -224,6 +224,7 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 .hp-toolbar{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
 .hp-search{flex:1;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:10px;color:var(--white);font-family:"Outfit",sans-serif;font-size:12px;padding:9px 10px;outline:none}
 .hp-import{flex:0 0 auto;background:rgba(200,168,75,.12);border:1px solid rgba(200,168,75,.45);border-radius:10px;color:var(--gold);font-family:"Outfit",sans-serif;font-size:11px;font-weight:800;padding:0 10px;cursor:pointer;white-space:nowrap}
+.hp-sort{flex:0 0 auto;background:rgba(96,165,250,.11);border:1px solid rgba(96,165,250,.32);border-radius:10px;color:#93c5fd;font-family:"Outfit",sans-serif;font-size:11px;font-weight:800;padding:0 10px;cursor:pointer;white-space:nowrap}
 .hp-clear{flex:0 0 auto;background:rgba(239,68,68,.11);border:1px solid rgba(239,68,68,.32);border-radius:10px;color:#fca5a5;font-family:"Outfit",sans-serif;font-size:11px;font-weight:800;padding:0 10px;cursor:pointer;white-space:nowrap}
 .hp-body{overflow-y:auto;padding:10px 12px 90px;flex:1;min-height:0;-webkit-overflow-scrolling:touch}
 .hp-summary{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-bottom:10px}
@@ -505,6 +506,28 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 .cambio-card-val{color:var(--white);font-weight:600}
 .cambio-card-val.yo{color:#60a5fa}
 .cambio-card-val.el{color:#4ade80}
+.cambio-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:9px}
+.cambio-card-nombre{min-width:0}
+.cambio-chip{flex-shrink:0;font-size:9px;font-weight:800;letter-spacing:.35px;text-transform:uppercase;padding:3px 7px;border-radius:100px;background:rgba(200,168,75,.13);color:var(--gold);border:1px solid rgba(200,168,75,.25)}
+.cambio-columns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.cambio-person{background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:9px;min-width:0}
+.cambio-person.me{border-color:rgba(96,165,250,.24);background:rgba(96,165,250,.055)}
+.cambio-person.other{border-color:rgba(74,222,128,.22);background:rgba(74,222,128,.045)}
+.cambio-person-title{font-size:10px;font-weight:900;letter-spacing:.6px;text-transform:uppercase;margin-bottom:7px;color:var(--white);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cambio-person.me .cambio-person-title{color:#93c5fd}
+.cambio-person.other .cambio-person-title{color:#86efac}
+.cambio-mini-row{display:flex;flex-direction:column;gap:2px;padding:6px 0;border-top:1px solid rgba(255,255,255,.06)}
+.cambio-mini-row:first-of-type{border-top:0;padding-top:0}
+.cambio-mini-lbl{font-size:9px;color:var(--gray);text-transform:uppercase;letter-spacing:.35px}
+.cambio-mini-val{font-size:12px;line-height:1.25;color:var(--white);font-weight:800;overflow-wrap:anywhere}
+.cambio-shift-lines{display:flex;flex-direction:column;gap:4px}
+.cambio-shift-line{display:flex;align-items:baseline;gap:5px;line-height:1.2;flex-wrap:wrap}
+.cambio-shift-day{font-size:11px;font-weight:900;color:var(--gold)}
+.cambio-person.me .cambio-shift-day{color:#60a5fa}
+.cambio-person.other .cambio-shift-day{color:#4ade80}
+.cambio-shift-turno{font-size:12px;font-weight:900;color:var(--white)}
+.cambio-mini-note{font-size:9px;color:var(--gray);margin-top:7px;line-height:1.25}
+@media(max-width:360px){.cambio-columns{grid-template-columns:1fr}.cambio-card{padding:11px}}
 .cambio-error{font-size:10px;color:#f87171;margin-top:5px;padding-top:5px;border-top:1px solid rgba(255,255,255,.06)}
 .cambio-badge{display:inline-block;font-size:9px;font-weight:700;padding:2px 7px;border-radius:100px;background:rgba(74,222,128,.15);color:#4ade80;margin-left:6px}
 .cambio-empty{text-align:center;padding:30px 16px;font-size:13px;color:var(--gray)}
@@ -2197,7 +2220,7 @@ function makeTurnoBlock(icon,label){
 }
 
 // Pantalla oculta: horas mensuales/semanales de todos los empleados importados.
-var _hpData=null;
+var _hpData=null,_hpOrdenHorasDesc=false;
 function cerrarHorasPlantilla(){
   var bg=document.getElementById('hp-modal-bg'),modal=document.getElementById('hp-modal');
   if(bg)bg.classList.remove('show');
@@ -2366,6 +2389,14 @@ function _hpFmtDelta(h){
   if(h>0)return '+'+String(h).replace(/\.0$/,'')+'h';
   if(h<0)return String(h).replace(/\.0$/,'')+'h';
   return '0h';
+}
+function toggleOrdenHorasPlantilla(){
+  _hpOrdenHorasDesc=!_hpOrdenHorasDesc;
+  renderHorasPlantillaLista();
+}
+function _hpActualizarBotonOrden(){
+  var btn=document.getElementById('hp-sort-btn');
+  if(btn)btn.textContent=_hpOrdenHorasDesc?'Horas ↓':'Orden actual';
 }
 function _hpFechaISO(d){
   if(typeof _fechaISOPlantilla==='function')return _fechaISOPlantilla(d);
@@ -2547,6 +2578,7 @@ function renderHorasPlantillaLista(){
     return;
   }
   if(search)search.setAttribute('oninput','renderHorasPlantillaLista()');
+  _hpActualizarBotonOrden();
   var q=(search&&search.value?search.value:'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
   if(sub)sub.textContent='Horas publicadas de grupos · '+data.monthLabel+' · cambios compartidos incluidos';
   var rows=data.rows.filter(function(r){
@@ -2554,6 +2586,13 @@ function renderHorasPlantillaLista(){
     var txt=(r.nombre+' '+r.categoria).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
     return txt.indexOf(q)>=0;
   });
+  if(_hpOrdenHorasDesc){
+    rows=rows.slice().sort(function(a,b){
+      var diff=(Number(b.horas)||0)-(Number(a.horas)||0);
+      if(diff)return diff;
+      return String(a.nombre||'').localeCompare(String(b.nombre||''),'es');
+    });
+  }
   if(!data.rows.length){
     body.innerHTML='<div class="hp-empty">No hay empleados importados. Importa primero el Excel del grupo.</div>';
     return;
@@ -5322,7 +5361,7 @@ document.addEventListener('DOMContentLoaded',function(){
     <button id="cambio-modo-btn" onclick="toggleModoCambioCategorias()" style="margin-top:8px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:6px 10px;color:var(--gray);font-family:'Outfit',sans-serif;font-size:11px;font-weight:600;cursor:pointer">🔒 Solo mi categoría</button>
     <div style="margin-top:10px;display:flex;gap:8px;align-items:center">
       <div style="flex:1;position:relative">
-        <input id="cambio-ia-input" type="text" placeholder="¿Qué buscas? Ej: tarde el lunes, salir antes de las 14h..." 
+        <input id="cambio-ia-input" type="text" placeholder="Ej: tarde el lunes, salir antes d las 9:30..." 
           style="width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:12px;color:var(--white);font-family:'Outfit',sans-serif;font-size:12px;padding:10px 40px 10px 12px;outline:none"
           onkeydown="if(event.key==='Enter')filtrarConIA()">
         <button onclick="filtrarConIA()" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;padding:0;line-height:1" id="cambio-ia-btn">✨</button>
@@ -5345,6 +5384,7 @@ document.addEventListener('DOMContentLoaded',function(){
     <div class="hp-toolbar">
       <input class="hp-search" id="hp-search" placeholder="Buscar empleado..." oninput="renderHorasPlantillaLista()">
       <button class="hp-import" onclick="importarGrupoDesdePlantilla()">Importar grupo</button>
+      <button class="hp-sort" id="hp-sort-btn" onclick="toggleOrdenHorasPlantilla()">Orden actual</button>
       <button class="hp-clear" onclick="borrarDatosAntiguosPlantilla()">Borrar importados</button>
     </div>
   </div>
@@ -6187,11 +6227,31 @@ function _esTipoNoTrabaja(tipo){
   tipo=String(tipo||'').toLowerCase();
   return tipo==='libre'||tipo==='permiso';
 }
+function _normTipoCambioTurno(tipo){
+  return String(tipo||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+}
+function _esTipoTurnoNormalCambio(tipo){
+  tipo=_normTipoCambioTurno(tipo);
+  return !tipo||tipo==='trabajado'||tipo==='trabajo'||tipo==='normal'||tipo==='turno';
+}
+function _esTurnoNormalCambio(t){
+  if(!t||!t.e1||!t.s1)return false;
+  if(t.ausencia||t.disponibilidadNoConfirmada)return false;
+  return _esTipoTurnoNormalCambio(t.tipo);
+}
+function _esLibreRealCambio(t){
+  if(!t)return true;
+  if(t.ausencia||t.disponibilidadNoConfirmada)return false;
+  var tipo=_normTipoCambioTurno(t.tipo);
+  if(t.e1&&t.s1)return false;
+  return !tipo||tipo==='libre'||tipo==='dl'||tipo==='descanso';
+}
 function _cambioToTurno(c){
   if(!c)return null;
   var tipo=String(c.tipo||'').toLowerCase();
   if(_tipoCambioEsLibre(tipo)||(!c.e1&&!c.s1)){
-    return{tipo:'libre',e1:'',s1:'',e2:'',s2:'',cambioCompartido:true,etiquetaCambio:String(c.tipo||'Libre').toUpperCase(),actualizadoPor:c.actualizado_por||c.email||''};
+    var tipoLibreReal=(!tipo||tipo==='libre'||tipo==='dl'||tipo==='descanso')?'libre':tipo;
+    return{tipo:tipoLibreReal,e1:'',s1:'',e2:'',s2:'',cambioCompartido:true,etiquetaCambio:String(c.tipo||'Libre').toUpperCase(),actualizadoPor:c.actualizado_por||c.email||''};
   }
   var turno={tipo:(tipo==='curso'?'curso':'trabajado'),e1:c.e1||'',s1:c.s1||'',e2:c.e2||'',s2:c.s2||'',total:c.total||0,cambioCompartido:true,etiquetaCambio:String(c.tipo||'TRABAJA').toUpperCase(),actualizadoPor:c.actualizado_por||c.email||''};
   // HL parcial recibido de Sheets: recorta solo ese tramo, igual que en el propio dispositivo.
@@ -8843,7 +8903,7 @@ function _horasLVSemana(empDias, monthKey, dia, e1nuevo, s1nuevo, e2nuevo, s2nue
       if(e2!==null&&s2!==null)total+=_durMin(e2,s2);
     } else {
       turno=empDias[d];
-      if(turno&&turno.e1&&turno.s1){
+      if(_esTurnoNormalCambio(turno)){
         total+=_durMin(_toMin(turno.e1),_toMin(turno.s1));
         if(turno.e2&&turno.s2)total+=_durMin(_toMin(turno.e2),_toMin(turno.s2));
       }
@@ -8885,10 +8945,7 @@ function _aplicarTurnoSimCambio(dias,dia,e1,s1,e2,s2){
   return dias;
 }
 function _trabajaTurnoCambio(t){
-  if(!t)return false;
-  var tipo=String(t.tipo||'').toLowerCase();
-  if(tipo==='libre'||(typeof _tipoCambioEsLibre==='function'&&_tipoCambioEsLibre(tipo)))return false;
-  return !!(t.e1&&t.s1);
+  return _esTurnoNormalCambio(t);
 }
 function _turnoMinutosCambio(t){
   if(!_trabajaTurnoCambio(t))return{e1:null,s1:null,e2:null,s2:null};
@@ -9033,7 +9090,7 @@ function _validarDescanso10h(empDias, monthKey, dia, e1n, s1n, e2n, s2n, etiquet
   if(miSalida<miEntrada)miSalida+=1440; // turno nocturno: salida al dia siguiente
   function turnoDe(d){
     var t=empDias[d];
-    if(!t||!t.e1)return null;
+    if(!_esTurnoNormalCambio(t))return null;
     var e1=_toMin(t.e1), s1=_toMin(t.s1);
     var e2=t.e2?_toMin(t.e2):null, s2=t.s2?_toMin(t.s2):null;
     var sal=(e2!==null&&s2!==null)?s2:s1;
@@ -9074,7 +9131,7 @@ function _validarLibreSemana(empDias, monthKey, dia, e1n, etiqueta){
       var t=empDias[d];
       if(t===undefined||t===null){continue;} // sin publicar, podria ser libre
       diasPublicados++;
-      trabaja=!!(t&&t.e1);
+      trabaja=_esTurnoNormalCambio(t);
     }
     if(!trabaja)libres++;
   }
@@ -9093,6 +9150,7 @@ function _validarDescansoSemanal(empDias, monthKey, dia, e1n, s1n, e2n, s2n, eti
 
   function entradaDe(d){
     var t=d===dia?{e1:e1n!==null?_fmtMin(e1n):null}:(empDias[d]||null);
+    if(d!==dia&&!_esTurnoNormalCambio(t))return null;
     return t&&t.e1?_toMin(t.e1):null;
   }
   function salidaDe(d){
@@ -9101,7 +9159,7 @@ function _validarDescansoSemanal(empDias, monthKey, dia, e1n, s1n, e2n, s2n, eti
       return (e2n!==null&&s2n!==null)?s2n:s1n;
     }
     var t=empDias[d]||null;
-    if(!t||!t.e1)return null;
+    if(!_esTurnoNormalCambio(t))return null;
     var s=t.e2&&t.s2?_toMin(t.s2):_toMin(t.s1);
     return s;
   }
@@ -9134,10 +9192,7 @@ function _validarDescansoSemanal(empDias, monthKey, dia, e1n, s1n, e2n, s2n, eti
 // Empleados sin ningún turno real de trabajo en el mes = baja larga/excedencia.
 // Pueden aparecer como libres en eventos, pero NO deben ofrecerse para cambios de turno.
 function _esTurnoTrabajoRealCambio(t){
-  if(!t)return false;
-  var tipo=String(t.tipo||'').toLowerCase();
-  if(tipo==='libre'||_tipoCambioEsLibre(tipo))return false;
-  return !!(t.e1&&t.s1);
+  return _esTurnoNormalCambio(t);
 }
 function _empleadoTieneTurnosRealesMesCambio(emp, monthKey, year){
   if(!emp||!emp.meses)return false;
@@ -9206,11 +9261,21 @@ function calcularCambios(){
   // Si ese día tengo HL, ajusto mi disponibilidad: día completo → sin turno;
   // parcial → se descuenta solo el tramo marcado, el resto sigue contando como trabajo.
   var myDayObj=_ajustarTurnoConHLPersonal(myDayObjOriginal,myDayObjOriginal);
-  var myE1=myDayObj&&myDayObj.e1?_toMin(myDayObj.e1):null;
-  var myS1=myDayObj&&myDayObj.s1?_toMin(myDayObj.s1):null;
-  var myE2=myDayObj&&myDayObj.e2?_toMin(myDayObj.e2):null;
-  var myS2=myDayObj&&myDayObj.s2?_toMin(myDayObj.s2):null;
-  var esLibre=(myE1===null);
+  var yoTrabajaDia=_esTurnoNormalCambio(myDayObj);
+  var esLibre=_esLibreRealCambio(myDayObj);
+  var myE1=yoTrabajaDia?_toMin(myDayObj.e1):null;
+  var myS1=yoTrabajaDia?_toMin(myDayObj.s1):null;
+  var myE2=yoTrabajaDia&&myDayObj.e2?_toMin(myDayObj.e2):null;
+  var myS2=yoTrabajaDia&&myDayObj.s2?_toMin(myDayObj.s2):null;
+  if(!yoTrabajaDia&&!esLibre){
+    _todosResultados=[];
+    _todosParciales=[];
+    _todosNoImportados=[];
+    _filtroIA=null;
+    subTxt.textContent='Día bloqueado para cambios';
+    body.innerHTML='<div class="cambio-empty">Ese día no es un turno normal ni un libre real.<br><small style="font-size:10px">Vacaciones, baja, HL, festivo, MA, curso, permiso y similares no se ofrecen para cambios.</small></div><button onclick="cerrarBuscadorCambio()" style="width:100%;background:none;border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px;font-family:Outfit,sans-serif;font-size:13px;color:var(--gray);cursor:pointer;margin-top:8px">Cerrar</button>';
+    return;
+  }
 
   // Mi categoría
   var nominaMap;try{nominaMap=JSON.parse(localStorage.getItem(_GRUPO_KEY+'_map')||'{}')}catch(e){nominaMap={};}
@@ -9279,16 +9344,16 @@ function calcularCambios(){
     // El compañero ese día
     var compTurnoMiDia=compDias[day]||null;
     compTurnoMiDia=_turnoGrupoConCambioCompartido(comp,new Date(year,_cambioMonth,day),compTurnoMiDia);
-    // Día libre: turno con tipo libre o e1 vacío
-    if(compTurnoMiDia&&(!compTurnoMiDia.e1||_esTipoNoTrabaja(compTurnoMiDia.tipo)))compTurnoMiDia=null;
-    var compE1=compTurnoMiDia?_toMin(compTurnoMiDia.e1):null;
-    var compS1=compTurnoMiDia?_toMin(compTurnoMiDia.s1):null;
-    var compE2=compTurnoMiDia&&compTurnoMiDia.e2?_toMin(compTurnoMiDia.e2):null;
-    var compS2=compTurnoMiDia&&compTurnoMiDia.s2?_toMin(compTurnoMiDia.s2):null;
-    var compLibreMiDia=(compE1===null);
+    var compTrabajaMiDia=_esTurnoNormalCambio(compTurnoMiDia);
+    var compLibreMiDia=_esLibreRealCambio(compTurnoMiDia);
+    if(!compTrabajaMiDia&&!compLibreMiDia)return;
+    var compE1=compTrabajaMiDia?_toMin(compTurnoMiDia.e1):null;
+    var compS1=compTrabajaMiDia?_toMin(compTurnoMiDia.s1):null;
+    var compE2=compTrabajaMiDia&&compTurnoMiDia.e2?_toMin(compTurnoMiDia.e2):null;
+    var compS2=compTrabajaMiDia&&compTurnoMiDia.s2?_toMin(compTurnoMiDia.s2):null;
 
     // CASO A: Ambos tienen turno ese día → intercambio directo
-    if(!esLibre&&!compLibreMiDia&&!_esPasado(day,monthKey,year)){
+    if(yoTrabajaDia&&compTrabajaMiDia&&!_esPasado(day,monthKey,year)){
       var errA=[];
       errA=errA.concat(_validarTurno(compE1,compS1,compE2,compS2).errores);
       errA=errA.concat(_validarTurno(myE1,myS1,myE2,myS2).errores);
@@ -9314,7 +9379,7 @@ function calcularCambios(){
 
     // CASO B: Yo tengo turno, comp libra ese día
     // Comp trabaja MI turno. A cambio yo trabajo un día futuro del comp.
-    if(!esLibre&&compLibreMiDia&&!_esPasado(day,monthKey,year)){
+    if(yoTrabajaDia&&compLibreMiDia&&!_esPasado(day,monthKey,year)){
       var myCatB=_parseCategoria(myCat);
       var ccB=_parseCategoria(comp.categoria||'');
       var nombreCortoB=comp.nombre.split(' ')[0];
@@ -9323,13 +9388,12 @@ function calcularCambios(){
       for(var d2=1;d2<=maxDiaCambioB;d2++){
         if(d2===day||_esPasado(d2,monthKey,year))continue;
         var myT2=(myRaw[monthKey]||{})[d2];
-        // Yo debo librar ese día: sin turno, o turno tipo libre, o e1 vacío
-        var yoTrabajoD2=!!(myT2&&myT2.e1&&!_esTipoNoTrabaja(myT2.tipo));
-        if(yoTrabajoD2)continue;
+        // Yo debo librar ese día de verdad. Vacaciones/baja/HL/etc. no cuentan como hueco para cambios.
+        if(!_esLibreRealCambio(myT2))continue;
         var cT2=compDias[d2];
         cT2=_turnoGrupoConCambioCompartido(comp,new Date(year,_cambioMonth,d2),cT2);
-        // Comp debe trabajar ese día
-        if(!cT2||!cT2.e1||_esTipoNoTrabaja(cT2.tipo))continue;
+        // Comp debe tener un turno normal ese día.
+        if(!_esTurnoNormalCambio(cT2))continue;
         var cE1=_toMin(cT2.e1),cS1=_toMin(cT2.s1),cE2=cT2.e2?_toMin(cT2.e2):null,cS2=cT2.s2?_toMin(cT2.s2):null;
 
         // Simulación real del intercambio:
@@ -9376,7 +9440,7 @@ function calcularCambios(){
 
     // CASO C: Yo libro ese día, comp trabaja
     // Yo trabajo turno del comp. A cambio comp trabaja mi turno un día futuro.
-    if(esLibre&&!compLibreMiDia&&!_esPasado(day,monthKey,year)){
+    if(esLibre&&compTrabajaMiDia&&!_esPasado(day,monthKey,year)){
       var myCatC=_parseCategoria(myCat);
       var ccC=_parseCategoria(comp.categoria||'');
       var nombreCortoC=comp.nombre.split(' ')[0];
@@ -9385,14 +9449,13 @@ function calcularCambios(){
       for(var d3=1;d3<=maxDiaCambioC;d3++){
         if(d3===day||_esPasado(d3,monthKey,year))continue;
         var myT3=(myRaw[monthKey]||{})[d3];
-        // Yo debo trabajar ese día
-        if(!myT3||!myT3.e1||_esTipoNoTrabaja(myT3.tipo))continue;
+        // Yo debo ceder un turno normal ese día.
+        if(!_esTurnoNormalCambio(myT3))continue;
         if(!_diaImportadoCambio(comp,monthKey,year,d3))continue;
         var cT3=compDias[d3];
         cT3=_turnoGrupoConCambioCompartido(comp,new Date(year,_cambioMonth,d3),cT3);
-        // Comp debe librar ese día: sin turno, tipo libre o e1 vacío
-        var compTrabajaD3=!!(cT3&&cT3.e1&&!_esTipoNoTrabaja(cT3.tipo));
-        if(compTrabajaD3)continue;
+        // Comp debe librar de verdad ese día; vacaciones/baja/HL/etc. bloquean el cambio.
+        if(!_esLibreRealCambio(cT3))continue;
         var mE1=_toMin(myT3.e1),mS1=_toMin(myT3.s1),mE2=myT3.e2?_toMin(myT3.e2):null,mS2=myT3.s2?_toMin(myT3.s2):null;
 
         // Simulación real del intercambio:
@@ -9433,11 +9496,11 @@ function calcularCambios(){
     var compDias=(comp.meses&&comp.meses[monthKey])||{};
     var compT=compDias[day]||null;
     compT=_turnoGrupoConCambioCompartido(comp,new Date(year,_cambioMonth,day),compT);
-    if(compT&&(!compT.e1||_esTipoNoTrabaja(compT.tipo)))compT=null;
-    var compE1=compT?_toMin(compT.e1):null;
-    var compS1=compT?_toMin(compT.s1):null;
-    var compE2=compT&&compT.e2?_toMin(compT.e2):null;
-    var compS2=compT&&compT.s2?_toMin(compT.s2):null;
+    var compTNormal=_esTurnoNormalCambio(compT);
+    var compE1=compTNormal?_toMin(compT.e1):null;
+    var compS1=compTNormal?_toMin(compT.s1):null;
+    var compE2=compTNormal&&compT.e2?_toMin(compT.e2):null;
+    var compS2=compTNormal&&compT.s2?_toMin(compT.s2):null;
     if(_esPasado(day,monthKey,year))return;
 
     // Helper: validar turno resultante completo y devolver errores
@@ -9547,7 +9610,7 @@ function calcularCambios(){
     var compDias2=(comp.meses&&comp.meses[monthKey])||{};
     var compT2c=compDias2[day]||null;
     compT2c=_turnoGrupoConCambioCompartido(comp,new Date(year,_cambioMonth,day),compT2c);
-    var compLibre2=!compT2c||!compT2c.e1||_esTipoNoTrabaja(compT2c.tipo);
+    var compLibre2=_esLibreRealCambio(compT2c);
     if(!compLibre2)return; // solo si el comp libra ese día
     if(myE2===null||myS2===null)return; // solo si mi turno es partido
 
@@ -9669,17 +9732,17 @@ function _interpretarLocal(texto, myS1ref, myE1ref){
   var mDia=t.match(/\bdia\s+(\d{1,2})\b|\bel\s+(\d{1,2})\b/);
   if(mDia)f.diaNumero=parseInt(mDia[1]||mDia[2]);
   // "salir antes" sin hora = antes de mi salida actual
-  var mSalAntes=t.match(/salir?\s+antes\s+(?:de\s+las?\s+)?(\d{1,2})(?::(\d{2}))?/);
+  var mSalAntes=t.match(/(?:salir|terminar|acabar)\s+(?:antes|hasta|como\s+tarde)\s+(?:(?:d|de)\s+)?(?:las?\s+)?(\d{1,2})(?:(?::|\.|,)(\d{2}))?/);
   if(mSalAntes){
     f.salidaAntesDe=(mSalAntes[1].length<2?'0':'')+mSalAntes[1]+':'+(mSalAntes[2]||'00');
-  } else if(/salir?\s+antes/.test(t)&&myS1ref!==null){
+  } else if(/(?:salir|terminar|acabar)\s+(?:antes|hasta|como\s+tarde)/.test(t)&&myS1ref!==null){
     f.salidaAntesDe=_fmtMin(myS1ref); // antes de mi salida actual
   }
   // "salir despues" sin hora = despues de mi salida actual
-  var mSalDespues=t.match(/salir?\s+despues\s+(?:de\s+las?\s+)?(\d{1,2})(?::(\d{2}))?/);
+  var mSalDespues=t.match(/(?:salir|terminar|acabar)\s+despues\s+(?:(?:d|de)\s+)?(?:las?\s+)?(\d{1,2})(?:(?::|\.|,)(\d{2}))?/);
   if(mSalDespues){
     f.salidaDespuesDe=(mSalDespues[1].length<2?'0':'')+mSalDespues[1]+':'+(mSalDespues[2]||'00');
-  } else if(/salir?\s+despues/.test(t)&&myS1ref!==null){
+  } else if(/(?:salir|terminar|acabar)\s+despues/.test(t)&&myS1ref!==null){
     f.salidaDespuesDe=_fmtMin(myS1ref);
   }
   var mEntDespues=t.match(/entrar?\s+(?:mas\s+tarde|despues)\s+(?:de\s+las?\s+)?(\d{1,2})(?::(\d{2}))?/);
@@ -9754,7 +9817,7 @@ function _aplicarFiltro(filtro,texto,estado){
     if(filtro.entradaDespuesDe&&tE1!==null&&tE1<_toMin(filtro.entradaDespuesDe))return false;
     if(filtro.entradaAntesDe&&tE1!==null&&tE1>=_toMin(filtro.entradaAntesDe))return false;
     if(filtro.salidaDespuesDe&&tS1!==null&&tS1<_toMin(filtro.salidaDespuesDe))return false;
-    if(filtro.salidaAntesDe&&tS1!==null&&tS1>=_toMin(filtro.salidaAntesDe))return false;
+    if(filtro.salidaAntesDe&&tS1!==null&&tS1>_toMin(filtro.salidaAntesDe))return false;
     return true;
   });
   // Si filtro librar, añadir también las cesiones parciales donde acabo con menos turno? No: librar = libro entero.
@@ -9775,7 +9838,7 @@ async function filtrarConIA(){
     'Eres un filtro de turnos de trabajo. El usuario quiere encontrar un cambio de turno.',
     'Definiciones: MANANA=entrada antes de 12:00 y salida antes de 15:00. TARDE=salida hasta las 20:00. NOCHE=resto hasta las 03:00.',
     'Devuelve SOLO un objeto JSON, sin texto adicional ni markdown, con estas propiedades:',
-    'turnoTipo (manana|tarde|noche|null), diaSemana (lunes|martes|miercoles|jueves|viernes|sabado|domingo|null), diaNumero (numero o null), entradaDespuesDe (HH:MM o null), entradaAntesDe (HH:MM o null), salidaDespuesDe (HH:MM o null), salidaAntesDe (HH:MM o null), nombre (texto parcial o null).',
+    'turnoTipo (manana|tarde|noche|null), diaSemana (lunes|martes|miercoles|jueves|viernes|sabado|domingo|null), diaNumero (numero o null), entradaDespuesDe (HH:MM o null), entradaAntesDe (HH:MM o null), salidaDespuesDe (HH:MM o null), salidaAntesDe (HH:MM o null), nombre (texto parcial o null). salidaAntesDe significa terminar como tarde a esa hora, incluida.',
     'Consulta del usuario: "'+texto+'"'
   ].join(' ');
 
@@ -9817,48 +9880,90 @@ function _fmtTurno(e1,s1,e2,s2){
   return s;
 }
 
+function _cambioTipoLabel(tipo){
+  if(tipo==='mismo_dia')return'Intercambio';
+  if(tipo==='yo_libro'||tipo==='comp_libro')return'Con contrapartida';
+  if(tipo==='parcial')return'Parcial';
+  if(tipo==='cesion_total'||tipo==='cesion_parcial')return'Cesión';
+  if(tipo==='no_importado')return'No importado';
+  return'Cambio';
+}
+function _cambioValorDias(items){
+  var html='<div class="cambio-shift-lines">';
+  (items||[]).forEach(function(it){
+    html+='<div class="cambio-shift-line"><span class="cambio-shift-day">'+escH(it.dia||'')+'</span><span class="cambio-shift-turno">'+escH(it.turno||'Libre')+'</span></div>';
+  });
+  html+='</div>';
+  return{html:html};
+}
+function _cambioMiniRow(label,value){
+  var valHtml=(value&&typeof value==='object'&&value.html)?value.html:escH(value||'Libre');
+  return '<div class="cambio-mini-row"><span class="cambio-mini-lbl">'+escH(label)+'</span><span class="cambio-mini-val">'+valHtml+'</span></div>';
+}
+function _cambioPersonaCol(cls,title,rows,note){
+  var html='<div class="cambio-person '+cls+'"><div class="cambio-person-title">'+escH(title)+'</div>';
+  rows.forEach(function(row){html+=_cambioMiniRow(row[0],row[1]);});
+  if(note)html+='<div class="cambio-mini-note">'+escH(note)+'</div>';
+  html+='</div>';
+  return html;
+}
+
 function _renderCambioCard(r,ok){
-  var nom=r.nombre.split(' ')[0];
+  var nom=(r.nombre||'').split(' ')[0]||'Compañero';
   var html='<div class="cambio-card '+(ok?'valido':'invalido')+'">';
-  html+='<div class="cambio-card-nombre">'+r.nombre+'<span style="font-size:9px;color:var(--gray);font-weight:400;margin-left:6px">'+r.cat+'</span></div>';
+  html+='<div class="cambio-card-head"><div class="cambio-card-nombre">'+escH(r.nombre||'')+'<span style="font-size:9px;color:var(--gray);font-weight:400;margin-left:6px">'+escH(r.cat||'')+'</span></div><span class="cambio-chip">'+escH(_cambioTipoLabel(r.tipo))+'</span></div>';
   if(r.tipo==='no_importado'){
-    html+='<div class="cambio-card-row"><span class="cambio-card-lbl">Día:</span><span class="cambio-card-val">'+r.labelDia+'</span></div>';
+    html+='<div class="cambio-card-row"><span class="cambio-card-lbl">Día:</span><span class="cambio-card-val">'+escH(r.labelDia)+'</span></div>';
     html+='<div class="cambio-card-row"><span class="cambio-card-lbl">Estado:</span><span class="cambio-card-val" style="color:#fbbf24">No importado</span></div>';
     html+='<div style="font-size:9px;color:var(--gray);margin-top:4px">No se ofrece como opción porque ese día aún no está publicado/importado para FD.</div>';
   } else if(r.tipo==='mismo_dia'){
-    html+='<div class="cambio-card-row"><span class="cambio-card-lbl">Día:</span><span class="cambio-card-val">'+r.labelDia+'</span></div>';
-    html+='<div class="cambio-card-row"><span class="cambio-card-lbl">Tú harías:</span><span class="cambio-card-val el">'+r.turnoComp+'</span></div>';
-    html+='<div class="cambio-card-row"><span class="cambio-card-lbl">'+nom+' haría:</span><span class="cambio-card-val yo">'+r.turnoYo+'</span></div>';
+    html+='<div class="cambio-card-row"><span class="cambio-card-lbl">Día:</span><span class="cambio-card-val">'+escH(r.labelDia)+'</span></div>';
+    html+='<div class="cambio-columns">';
+    html+=_cambioPersonaCol('me','Tú',[['Turno actual',r.turnoYo],['Se quedaría',r.turnoComp]]);
+    html+=_cambioPersonaCol('other',nom,[['Turno actual',r.turnoComp],['Se quedaría',r.turnoYo]]);
+    html+='</div>';
   } else if(r.tipo==='yo_libro'){
-    html+='<div class="cambio-card-row"><span class="cambio-card-lbl">Tú libras:</span><span class="cambio-card-val el">'+r.labelDia+'</span></div>';
-    html+='<div class="cambio-card-row"><span class="cambio-card-lbl">'+nom+' trabaja:</span><span class="cambio-card-val yo">'+r.labelDia+' · '+r.turnoYo+'</span></div>';
-    html+='<div style="border-top:1px solid rgba(255,255,255,.06);margin:6px 0"></div>';
-    html+='<div class="cambio-card-row"><span class="cambio-card-lbl">A cambio:</span><span class="cambio-card-val el">Tú trabajas '+r.labelComp+' · '+r.turnoComp+'</span></div>';
+    html+='<div class="cambio-columns">';
+    html+=_cambioPersonaCol('me','Tú',[
+      ['Turno actual',_cambioValorDias([{dia:r.labelDia,turno:r.turnoYo}])],
+      ['Se quedaría',_cambioValorDias([{dia:r.labelDia,turno:'Libre'},{dia:r.labelComp,turno:r.turnoComp}])]
+    ]);
+    html+=_cambioPersonaCol('other',nom,[
+      ['Turno actual',_cambioValorDias([{dia:r.labelDia,turno:'Libre'},{dia:r.labelComp,turno:r.turnoComp}])],
+      ['Se quedaría',_cambioValorDias([{dia:r.labelDia,turno:r.turnoYo},{dia:r.labelComp,turno:'Libre'}])]
+    ]);
+    html+='</div>';
   } else if(r.tipo==='comp_libro'){
-    html+='<div class="cambio-card-row"><span class="cambio-card-lbl">Tú trabajas:</span><span class="cambio-card-val el">'+r.labelDia+' · '+r.turnoYo+'</span></div>';
-    html+='<div class="cambio-card-row"><span class="cambio-card-lbl">'+nom+' libra:</span><span class="cambio-card-val yo">'+r.labelDia+'</span></div>';
-    html+='<div style="border-top:1px solid rgba(255,255,255,.06);margin:6px 0"></div>';
-    html+='<div class="cambio-card-row"><span class="cambio-card-lbl">A cambio:</span><span class="cambio-card-val el">'+nom+' trabaja '+r.labelComp+' · '+r.turnoComp+'</span></div>';
+    html+='<div class="cambio-columns">';
+    html+=_cambioPersonaCol('me','Tú',[
+      ['Turno actual',_cambioValorDias([{dia:r.labelDia,turno:'Libre'},{dia:r.labelComp,turno:r.turnoComp}])],
+      ['Se quedaría',_cambioValorDias([{dia:r.labelDia,turno:r.turnoYo},{dia:r.labelComp,turno:'Libre'}])]
+    ]);
+    html+=_cambioPersonaCol('other',nom,[
+      ['Turno actual',_cambioValorDias([{dia:r.labelDia,turno:r.turnoYo},{dia:r.labelComp,turno:'Libre'}])],
+      ['Se quedaría',_cambioValorDias([{dia:r.labelDia,turno:'Libre'},{dia:r.labelComp,turno:r.turnoComp}])]
+    ]);
+    html+='</div>';
   } else if(r.tipo==='parcial'){
-    html+='<div class="cambio-card-row"><span class="cambio-card-lbl">Día:</span><span class="cambio-card-val">'+r.labelDia+'</span></div>';
-    html+='<div class="cambio-card-row"><span class="cambio-card-lbl">Tú cedes:</span><span class="cambio-card-val yo">'+r.pMiaLabel+'</span></div>';
-    html+='<div class="cambio-card-row"><span class="cambio-card-lbl">'+nom+' cede:</span><span class="cambio-card-val yo">'+r.pCompLabel+'</span></div>';
-    html+='<div style="border-top:1px solid rgba(255,255,255,.06);margin:6px 0"></div>';
-    html+='<div class="cambio-card-row"><span class="cambio-card-lbl">Tú quedas:</span><span class="cambio-card-val el">'+r.turnoYoRes+'</span></div>';
-    html+='<div class="cambio-card-row"><span class="cambio-card-lbl">'+nom+' queda:</span><span class="cambio-card-val el">'+r.turnoCompRes+'</span></div>';
+    html+='<div class="cambio-card-row"><span class="cambio-card-lbl">Día:</span><span class="cambio-card-val">'+escH(r.labelDia)+'</span></div>';
+    html+='<div class="cambio-columns">';
+    html+=_cambioPersonaCol('me','Tú',[['Cedes ahora',r.pMiaLabel],['Se quedaría',r.turnoYoRes]]);
+    html+=_cambioPersonaCol('other',nom,[['Cede ahora',r.pCompLabel],['Se quedaría',r.turnoCompRes]]);
+    html+='</div>';
   } else if(r.tipo==='cesion_total'){
-    html+='<div class="cambio-card-row"><span class="cambio-card-lbl">Día:</span><span class="cambio-card-val">'+r.labelDia+'</span></div>';
-    html+='<div class="cambio-card-row"><span class="cambio-card-lbl">Tú libras:</span><span class="cambio-card-val el">'+r.labelDia+' (cedes el turno)</span></div>';
-    html+='<div class="cambio-card-row"><span class="cambio-card-lbl">'+nom+' trabaja:</span><span class="cambio-card-val yo">'+r.turnoYo+'</span></div>';
-    html+='<div style="font-size:9px;color:var(--gray);margin-top:4px">Cesión sin contrapartida</div>';
+    html+='<div class="cambio-card-row"><span class="cambio-card-lbl">Día:</span><span class="cambio-card-val">'+escH(r.labelDia)+'</span></div>';
+    html+='<div class="cambio-columns">';
+    html+=_cambioPersonaCol('me','Tú',[['Turno actual',r.turnoYo],['Se quedaría','Libre']]);
+    html+=_cambioPersonaCol('other',nom,[['Turno actual','Libre'],['Se quedaría',r.turnoYo]]);
+    html+='</div><div class="cambio-mini-note">Cesión sin contrapartida.</div>';
   } else if(r.tipo==='cesion_parcial'){
-    html+='<div class="cambio-card-row"><span class="cambio-card-lbl">Día:</span><span class="cambio-card-val">'+r.labelDia+'</span></div>';
-    html+='<div class="cambio-card-row"><span class="cambio-card-lbl">Tú cedes:</span><span class="cambio-card-val el">'+r.pMiaLabel+'</span></div>';
-    html+='<div class="cambio-card-row"><span class="cambio-card-lbl">'+nom+' trabaja:</span><span class="cambio-card-val yo">'+r.turnoCompRes+'</span></div>';
-    html+='<div class="cambio-card-row"><span class="cambio-card-lbl">Tú quedas:</span><span class="cambio-card-val el">'+r.turnoYoRes+'</span></div>';
-    html+='<div style="font-size:9px;color:var(--gray);margin-top:4px">Cesión sin contrapartida</div>';
+    html+='<div class="cambio-card-row"><span class="cambio-card-lbl">Día:</span><span class="cambio-card-val">'+escH(r.labelDia)+'</span></div>';
+    html+='<div class="cambio-columns">';
+    html+=_cambioPersonaCol('me','Tú',[['Cedes ahora',r.pMiaLabel],['Se quedaría',r.turnoYoRes]]);
+    html+=_cambioPersonaCol('other',nom,[['Turno actual','Libre'],['Se quedaría',r.turnoCompRes]]);
+    html+='</div><div class="cambio-mini-note">Cesión sin contrapartida.</div>';
   }
-  if(!ok&&r.errores&&r.errores.length)html+='<div class="cambio-error">'+r.errores.join('<br>')+'</div>';
+  if(!ok&&r.errores&&r.errores.length)html+='<div class="cambio-error">'+r.errores.map(function(e){return escH(e);}).join('<br>')+'</div>';
   html+='</div>';
   return html;
 }
