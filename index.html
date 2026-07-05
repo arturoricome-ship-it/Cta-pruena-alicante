@@ -4813,6 +4813,32 @@ function taSumDiaMin(p){
   if(!p)return 0;
   return taDurMin(p.e1,p.s1)+taDurMin(p.e2,p.s2);
 }
+function taSegmentosMin(p){
+  var segs=[];
+  function add(e,s){
+    var a=tiToMin(e),b=tiToMin(s);
+    if(a===null||b===null)return;
+    if(b<a)b+=1440;
+    segs.push({e:a,s:b});
+  }
+  if(p){
+    add(p.e1,p.s1);
+    add(p.e2,p.s2);
+  }
+  return segs;
+}
+function taEsNoche(p){
+  var segs=taSegmentosMin(p);
+  return segs.some(function(seg){
+    var salida=seg.s>=1440?seg.s-1440:seg.s;
+    return seg.s>1440&&salida>=180;
+  });
+}
+function taEsNocturna(p){
+  return taSegmentosMin(p).some(function(seg){
+    return seg.s>1260;
+  });
+}
 function taCuentaContador(p){
   var tipo=String((p&&p.tipo)||'trabajado').toLowerCase();
   return ['trabajado','hl','hlp','baja','rm','curso','permiso'].indexOf(tipo)>=0;
@@ -4822,14 +4848,14 @@ function taMesVacio(){
 }
 function taAddStats(dest,p){
   if(!p||!p.e1||!p.s1)return;
-  var e1=tiToMin(p.e1),sFinal=tiToMin(p.s2||p.s1);
-  if(e1===null||sFinal===null)return;
+  var e1=tiToMin(p.e1);
+  if(e1===null)return;
   var mins=taSumDiaMin(p);
   if(mins<=0)return;
   var partido=!!(p.e2&&p.s2);
   var madruga=e1<=360;
-  var nocturna=e1>=1260;
-  var noche=e1>=1260&&e1<=1439&&(sFinal<e1||sFinal<=420);
+  var noche=taEsNoche(p);
+  var nocturna=taEsNocturna(p);
   dest.turnos++;
   if(partido)dest.partidos++;
   if(madruga)dest.madrugas++;
@@ -4860,6 +4886,7 @@ function taAnalizarSheet(sheet,filename,leyenda){
     var monthKey=_MONTHS_MAP[monthRaw.toLowerCase()];
     if(!monthKey)continue;
     var mes=taMesVacio();
+    mes.monthKey=monthKey;
     mes.nombre=monthKey.charAt(0)+monthKey.slice(1).toLowerCase();
     for(var col=1;col<=31;col++){
       var parsed=taParseDia(sheet,row,col);
@@ -5033,11 +5060,23 @@ function taValorOrden(item,campo){
   if(campo==='horasTurno')return src.horasTurnoMin||0;
   return src[campo]||0;
 }
+function taOrdenMes(item){
+  var key=String((item&&item.monthKey)||'').toUpperCase();
+  var idx=_MONTHS_ALL.indexOf(key);
+  if(idx>=0)return idx;
+  var nombre=String((item&&item.nombre)||'').toUpperCase();
+  for(var i=0;i<_MONTHS_ALL.length;i++){
+    if(nombre===_MONTHS_ALL[i]||nombre.indexOf(_MONTHS_ALL[i].slice(0,3))===0)return i;
+  }
+  return 99;
+}
 function taSortBar(tipo){
+  var primerCampo=tipo==='meses'?'month':'alpha';
+  var primerLabel=tipo==='meses'?'Por meses':'Alfabético ↓';
   var horasCampo=tipo==='meses'?'horasTurno':'horas';
   var horasLabel=tipo==='meses'?'Horas totales ↓':'Horas contador ↓';
   return '<div class="ta-sort-row">'+
-    '<button class="ta-sort-chip" onclick="taOrdenarSeccion(\''+tipo+'\',\'alpha\')">Alfabético ↓</button>'+
+    '<button class="ta-sort-chip" onclick="taOrdenarSeccion(\''+tipo+'\',\''+primerCampo+'\')">'+primerLabel+'</button>'+
     '<button class="ta-sort-chip" onclick="taOrdenarSeccion(\''+tipo+'\',\'partidos\')">Partidos ↓</button>'+
     '<button class="ta-sort-chip" onclick="taOrdenarSeccion(\''+tipo+'\',\'madrugas\')">Madrugues ↓</button>'+
     '<button class="ta-sort-chip" onclick="taOrdenarSeccion(\''+tipo+'\',\'nocturnas\')">Nocturnas ↓</button>'+
@@ -5055,7 +5094,9 @@ function taOrdenarSeccion(tipo,campo){
     }
   }
   if(tipo==='meses'&&_taResultado.meses){
-    if(campo==='alpha'){
+    if(campo==='month'){
+      _taResultado.meses.sort(function(a,b){return taOrdenMes(a)-taOrdenMes(b);});
+    }else if(campo==='alpha'){
       _taResultado.meses.sort(function(a,b){return String(a.nombre||'').localeCompare(String(b.nombre||''),'es',{sensitivity:'base'});});
     }else{
       _taResultado.meses.sort(function(a,b){return taValorOrden(b,campo)-taValorOrden(a,campo);});
@@ -5098,7 +5139,7 @@ function taRenderResultadoGrupo(r){
     taRenderKpi(t.partidos,'Partidos')+
     taRenderKpi(t.madrugas,'Madrugues <=06','#fbbf24')+
     taRenderKpi(t.nocturnas,'Nocturnas >=21','#c084fc')+
-    taRenderKpi(t.noches,'Noches 21-23 a 5-7','#38bdf8')+
+    taRenderKpi(t.noches,'Noches hasta >=03','#38bdf8')+
     taRenderKpi(taFmtHoras(t.horasContadorMin),'Horas contador','#4ade80')+
     taRenderKpi(taFmtHoras(t.horasTurnoMin),'Horas turnos','#93c5fd')+
   '</div>';
@@ -5139,7 +5180,7 @@ function taRenderResultado(r){
     taRenderKpi(t.partidos,'Partidos')+
     taRenderKpi(t.madrugas,'Madrugues <=06','#fbbf24')+
     taRenderKpi(t.nocturnas,'Nocturnas >=21','#c084fc')+
-    taRenderKpi(t.noches,'Noches 21-23 a 5-7','#38bdf8')+
+    taRenderKpi(t.noches,'Noches hasta >=03','#38bdf8')+
     taRenderKpi(taFmtHoras(t.horasTurnoMin),'Horas totales','#4ade80')+
     taRenderKpi(taFmtHoras(t.horasContadorMin),'Horas contador','#93c5fd')+
     taRenderKpi(r.meses.filter(function(m){return m.turnos>0;}).length,'Meses con datos','#e5e7eb')+
@@ -6113,7 +6154,26 @@ function importarGrupoDesdePlantilla(){
 // Códigos de ausencia que en el Excel de grupo vienen anotados entre paréntesis.
 // Si la celda trae horas, se conservan: para la pantalla oculta de horas todo día
 // con entrada/salida cuenta, aunque lleve MA, !, festivo, HL, baja, etc.
-var _CODIGOS_AUSENCIA_GRUPO=['B0','EXC','V','MA'];
+var _CODIGOS_AUSENCIA_GRUPO=['B0','B1','B2','B4','B6','AC','ACI','EXC','V','V-','V+','MA','FM','FY','RM','HL','HLP','H6','AL','BP','BL','PP','NH'];
+function _tipoAusenciaGrupoDesdeTexto(texto){
+  var t=String(texto||'').toUpperCase();
+  var notas=(t.match(/\(([^)]+)\)/g)||[]).map(function(n){return n.replace(/[()]/g,'').trim();});
+  var piezas=notas.concat(t.split(/[^A-Z0-9+-]+/)).filter(Boolean);
+  for(var i=0;i<piezas.length;i++){
+    var p=piezas[i];
+    if(typeof _NOTA_TIPO!=='undefined'&&_NOTA_TIPO[p])return _NOTA_TIPO[p];
+    if(_CODIGOS_AUSENCIA_GRUPO.indexOf(p)>=0){
+      if(/^B\d*$|^AC|^ACI$|^EXC$/.test(p))return 'baja';
+      if(/^V/.test(p))return 'vacaciones';
+      if(p==='RM')return 'rm';
+      if(p==='HL'||p==='HLP')return p.toLowerCase();
+      if(p==='H6')return 'h6';
+      if(p==='AL')return 'perentorias';
+      return 'libre';
+    }
+  }
+  return '';
+}
 function _parseCeldaDiaGrupo(cellRaw,cellRawOriginal){
   var cell=String(cellRaw||'').trim();
   var rawOrig=(cellRawOriginal===undefined||cellRawOriginal===null)?'':String(cellRawOriginal).trim();
@@ -6121,6 +6181,8 @@ function _parseCeldaDiaGrupo(cellRaw,cellRawOriginal){
   if(cell==='')return null; // Celda vacía → sin publicar, no se guarda
   var parsed=parseTurnoGrupo(cell);
   if(parsed&&parsed.e1){
+    var tipoAusencia=_tipoAusenciaGrupoDesdeTexto(cell);
+    if(tipoAusencia)parsed.tipo=tipoAusencia;
     parsed.rawGrupo=cell;
     if(typeof _tieneMarcaNoCambiableCambio==='function'&&_tieneMarcaNoCambiableCambio(parsed))parsed.noCambiableCambio=true;
     return parsed;
@@ -6128,10 +6190,11 @@ function _parseCeldaDiaGrupo(cellRaw,cellRawOriginal){
 
   // Sin horas: los códigos de ausencia sí se guardan como libre/ausencia.
   var notasCelda=(cell.match(/\(([^)]+)\)/g)||[]).map(function(n){return n.replace(/[()]/g,'').toUpperCase().trim();});
-  if(notasCelda.some(function(n){return _CODIGOS_AUSENCIA_GRUPO.indexOf(n)>=0;})){
-    return {tipo:'libre',e1:'',s1:'',e2:'',s2:'',ausencia:true,rawGrupo:cell};
-  }
   var cellUp=cell.toUpperCase().replace(/[\s.]/g,'');
+  var tipoAusenciaSinHoras=_tipoAusenciaGrupoDesdeTexto(cell);
+  if(tipoAusenciaSinHoras||notasCelda.some(function(n){return _CODIGOS_AUSENCIA_GRUPO.indexOf(n)>=0;})){
+    return {tipo:tipoAusenciaSinHoras||'libre',e1:'',s1:'',e2:'',s2:'',ausencia:true,rawGrupo:cell,noCambiableCambio:(cellUp==='MA'||cellUp==='FM'||cellUp==='FY')};
+  }
   var esLibre=(cellUp==='DL'||cellUp==='LIBRE'||cellUp==='DIALIBRE'||cellUp==='DESCANSO'||cellUp==='DESCANSOSEMANA'||cellUp==='MA'||cellUp==='FM'||cellUp==='FY');
   if(esLibre){
     return {tipo:'libre',e1:'',s1:'',e2:'',s2:'',rawGrupo:cell,noCambiableCambio:(cellUp==='MA'||cellUp==='FM'||cellUp==='FY')};
@@ -6433,14 +6496,16 @@ function parseTurnoGrupo(cell){
   var raw=String(cell||'');
   var times=(raw.match(/\d{1,2}:\d{2}/g)||[]).map(function(t){return t.replace('!','').trim();}).filter(function(t){return /^\d{1,2}:\d{2}$/.test(t);});
   if(times.length<2){
-    var sinNotas=raw.replace(/\([^)]*\)/g,' ');
-    times=(sinNotas.match(/\b(?:[01]?\d|2[0-3])(?::[0-5]\d|[\.,][0-5]\d)?\b/g)||[]).map(function(t){
-      t=String(t).replace(',','.');
-      var p=t.indexOf(':')>=0?t.split(':'):t.split('.');
-      var h=parseInt(p[0],10),m=p.length>1?parseInt(p[1],10):0;
-      if(isNaN(h)||isNaN(m)||h<0||h>23||m<0||m>59)return '';
-      return (h<10?'0':'')+h+':'+(m<10?'0':'')+m;
-    }).filter(Boolean);
+    var candidatos=[raw,raw.replace(/[()]/g,' '),raw.replace(/\([^)]*\)/g,' ')];
+    for(var ci=0;ci<candidatos.length&&times.length<2;ci++){
+      times=(candidatos[ci].match(/\b(?:[01]?\d|2[0-3])(?::[0-5]\d|[\.,][0-5]\d)?\b/g)||[]).map(function(t){
+        t=String(t).replace(',','.');
+        var p=t.indexOf(':')>=0?t.split(':'):t.split('.');
+        var h=parseInt(p[0],10),m=p.length>1?parseInt(p[1],10):0;
+        if(isNaN(h)||isNaN(m)||h<0||h>23||m<0||m>59)return '';
+        return (h<10?'0':'')+h+':'+(m<10?'0':'')+m;
+      }).filter(Boolean);
+    }
   }
   if(times.length<2)return null;
   return{e1:times[0],s1:times[1],e2:times.length>=4?times[2]:null,s2:times.length>=4?times[3]:null,disponibilidadNoConfirmada:hasExclamation,noVieneInterrogacion:hasQuestion};
@@ -6734,12 +6799,11 @@ function _tipoCambioEsLibre(tipo){
   tipo=String(tipo||'').toLowerCase();
   return ['hl','hlp','libre','dl','descanso','festivo','vacaciones','baja','perentorias','h6','hfun','rm','bp','nh','cp','permiso'].indexOf(tipo)>=0;
 }
-// Permiso cuenta horas (e1/s1/e2/s2 reales, para nómina) pero para todo lo
-// que sea "¿esta persona viene a trabajar?" (coincidencias, buscador de
-// cambio de turno, etc.) se trata exactamente igual que Libre.
+// Algunas ausencias conservan e1/s1 para sumar horas de plantilla, pero para todo lo
+// que sea "¿esta persona viene a trabajar?" no deben aparecer como operativas.
 function _esTipoNoTrabaja(tipo){
   tipo=String(tipo||'').toLowerCase();
-  return tipo==='libre'||tipo==='permiso';
+  return ['libre','dl','descanso','festivo','vacaciones','baja','perentorias','h6','hfun','rm','bp','nh','cp','permiso','hl','hlp','curso'].indexOf(tipo)>=0;
 }
 function _normTipoCambioTurno(tipo){
   return String(tipo||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
@@ -6763,6 +6827,42 @@ function _tieneMarcaNoCambiableCambio(t){
   for(var i=0;i<tokens.length;i++){if(bloquea[tokens[i]])return true;}
   var compact=up.replace(/[^A-Z0-9]+/g,'');
   return /HFUN|HFUNCION|HORASFUNCION/.test(compact);
+}
+function _turnoGrupoOperativo(t){
+  if(!t||!t.e1||!t.s1)return false;
+  if(_esTipoNoTrabaja(t.tipo))return false;
+  if(_turnoGrupoTieneMarcaNoOperativa(t))return false;
+  return true;
+}
+function _dedupeCompanerosDia(lista){
+  var vistos={},out=[];
+  (lista||[]).forEach(function(c){
+    var key=[
+      _normPlantillaNombre(c.nombre||''),
+      _normPlantillaNombre(c.categoria||''),
+      c.e1,c.s1,c.e2||'',c.s2||'',
+      c.nocheDiaFin?'ayer':'hoy'
+    ].join('|');
+    if(vistos[key])return;
+    vistos[key]=true;
+    out.push(c);
+  });
+  return out;
+}
+function _turnoGrupoTieneMarcaNoOperativa(t){
+  if(!t)return false;
+  if(t.ausencia)return true;
+  var up=_textoMarcaCambioTurno(t).toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  var tokens=up.replace(/[^A-Z0-9]+/g,' ').trim().split(/\s+/).filter(Boolean);
+  var bloquea={
+    V:1,VAC:1,VACACION:1,VACACIONES:1,'V-':1,'V+':1,
+    MA:1,FM:1,FY:1,EXC:1,BAJA:1,
+    B0:1,B1:1,B2:1,B4:1,B6:1,AC:1,ACI:1,
+    HL:1,HLP:1,FESTIVO:1,FT:1,
+    RM:1,CURSO:1,H6:1,HFUN:1,NH:1,BP:1,CP:1,PERMISO:1
+  };
+  for(var i=0;i<tokens.length;i++){if(bloquea[tokens[i]])return true;}
+  return /HFUN|HFUNCION|HORASFUNCION/.test(up.replace(/[^A-Z0-9]+/g,''));
 }
 function _esTipoTurnoNormalCambio(tipo){
   tipo=_normTipoCambioTurno(tipo);
@@ -6991,7 +7091,7 @@ function renderCompanerosDia(offsetDias,toggleIfOpen){
     if(_esArturoPlantilla(emp.nombre||emp.nomina)){
       turno=_arturoHLPubFecha(target)?null:_ajustarTurnoConHLPersonal(turno,_miCalendarioDiaArturo(target));
     }
-    if(turno&&turno.e1&&!_esTipoNoTrabaja(turno.tipo)){
+    if(_turnoGrupoOperativo(turno)){
       var grE1=toMinG(turno.e1),grS1=toMinG(turno.s1);
       var grE2=turno.e2?toMinG(turno.e2):null,grS2=turno.s2?toMinG(turno.s2):null;
       var solapa=turnosSeSuperponen(myE1,myS1,myE2,myS2,grE1,grS1,grE2,grS2);
@@ -7025,7 +7125,7 @@ function renderCompanerosDia(offsetDias,toggleIfOpen){
     var diasAyer=(emp.meses&&emp.meses[monthKeyAyer])||emp.dias||{};
     var turnoAyer=diasAyer[dayAyer];
     turnoAyer=_turnoGrupoConCambioCompartido(emp,fechaAyer,turnoAyer);
-    if(turnoAyer&&turnoAyer.e1&&turnoAyer.s1){
+    if(_turnoGrupoOperativo(turnoAyer)){
       var yE1=toMinG(turnoAyer.e1),yS1=toMinG(turnoAyer.s1);
       var yE2=turnoAyer.e2?toMinG(turnoAyer.e2):null,yS2=turnoAyer.s2?toMinG(turnoAyer.s2):null;
       var _nocheAyer=_turnoTieneNocheReal(yE1,yS1,yE2,yS2);
@@ -7047,6 +7147,8 @@ function renderCompanerosDia(offsetDias,toggleIfOpen){
       }
     }
   });
+
+  coinciden=_dedupeCompanerosDia(coinciden);
 
   if(!coinciden.length){
     panel.innerHTML=navHtml+'<div class="grupo-empty">'+(modoToda?'No hay nadie con turno ese día':'No coincides con nadie del grupo ese día')+'</div>';
@@ -7234,7 +7336,7 @@ function _buildCompanerosTimelineData(offsetDias){
     if(_esArturoPlantilla(emp.nombre||emp.nomina)){
       turno=_arturoHLPubFecha(target)?null:_ajustarTurnoConHLPersonal(turno,_miCalendarioDiaArturo(target));
     }
-    if(turno&&turno.e1&&!_esTipoNoTrabaja(turno.tipo)){
+    if(_turnoGrupoOperativo(turno)){
       var grE1=toMinG(turno.e1),grS1=toMinG(turno.s1);
       var grE2=turno.e2?toMinG(turno.e2):null,grS2=turno.s2?toMinG(turno.s2):null;
       var solapa=turnosSeSuperponen(myE1,myS1,myE2,myS2,grE1,grS1,grE2,grS2);
@@ -7262,7 +7364,7 @@ function _buildCompanerosTimelineData(offsetDias){
     var diasAyer=(emp.meses&&emp.meses[monthKeyAyer])||emp.dias||{};
     var turnoAyer=diasAyer[dayAyer];
     turnoAyer=_turnoGrupoConCambioCompartido(emp,fechaAyer,turnoAyer);
-    if(turnoAyer&&turnoAyer.e1&&turnoAyer.s1){
+    if(_turnoGrupoOperativo(turnoAyer)){
       var yE1=toMinG(turnoAyer.e1),yS1=toMinG(turnoAyer.s1);
       var yE2=turnoAyer.e2?toMinG(turnoAyer.e2):null,yS2=turnoAyer.s2?toMinG(turnoAyer.s2):null;
       // Fin del/los tramo(s) que de verdad cruzan medianoche (s<e). Cualquier
@@ -7289,6 +7391,8 @@ function _buildCompanerosTimelineData(offsetDias){
       }
     }
   });
+
+  coinciden=_dedupeCompanerosDia(coinciden);
 
   if(!coinciden.length) return {error:'no-match',modoToda:modoToda};
 
@@ -8201,7 +8305,7 @@ window.renderOperativa=function(){
     if(_esArturoPlantilla((emp&&emp.nombre)||nom)){
       t=_arturoHLPubFecha(now)?null:_ajustarTurnoConHLPersonal(t,_miCalendarioDiaArturo(now));
     }
-    if(!t||!t.e1)return;
+    if(!_turnoGrupoOperativo(t))return;
     var excl=!!(t.noVieneInterrogacion||t.disponibilidadNoConfirmada);if(excl)return;
     var gE1=toM(t.e1),gS1=toM(t.s1),gE2=t.e2?toM(t.e2):null,gS2=t.s2?toM(t.s2):null;
     trabajanHoy.push({nombre:nom,e1:gE1,s1:gS1,e2:gE2,s2:gS2});
@@ -8224,7 +8328,7 @@ window.renderOperativa=function(){
       if(_esArturoPlantilla((emp&&emp.nombre)||nom)){
         t=_arturoHLPubFecha(dateObj)?null:_ajustarTurnoConHLPersonal(t,_miCalendarioDiaArturo(dateObj));
       }
-      if(!t||!t.e1)return;
+      if(!_turnoGrupoOperativo(t))return;
       var excl=!!(t.noVieneInterrogacion||t.disponibilidadNoConfirmada);if(excl)return;
       out.push({nombre:nom,e1:toM(t.e1),s1:toM(t.s1),e2:t.e2?toM(t.e2):null,s2:t.s2?toM(t.s2):null});
     });
