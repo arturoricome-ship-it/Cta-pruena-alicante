@@ -267,6 +267,16 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 .hp-day-r{font-size:9.5px;color:#e9e4f5;font-weight:800;text-align:right}
 .hp-day-r small{display:block;font-size:8px;color:#60a5fa;font-weight:700;margin-top:1px}
 .hp-empty{font-size:12px;color:var(--gray);text-align:center;padding:28px 12px;line-height:1.6}
+#cta-secret-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:704;backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:22px}
+#cta-secret-bg.show{display:flex}
+.cta-secret-menu{width:100%;max-width:340px;background:var(--card);border:1px solid rgba(200,168,75,.28);border-radius:18px;padding:16px;box-shadow:0 18px 60px rgba(0,0,0,.45)}
+.cta-secret-title{font-family:"Bebas Neue",sans-serif;font-size:24px;letter-spacing:1px;color:var(--gold);line-height:1;margin-bottom:5px}
+.cta-secret-sub{font-size:11px;color:var(--gray);line-height:1.35;margin-bottom:12px}
+.cta-secret-option{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.045);border-radius:12px;padding:12px 13px;margin-bottom:8px;color:var(--white);font-family:"Outfit",sans-serif;cursor:pointer;text-align:left}
+.cta-secret-option b{display:block;font-size:14px;color:var(--white)}
+.cta-secret-option span{display:block;font-size:10px;color:var(--gray);margin-top:2px;line-height:1.25}
+.cta-secret-option strong{color:var(--gold);font-size:18px;line-height:1}
+.cta-secret-close{width:100%;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);border-radius:10px;padding:10px;color:var(--gray);font-family:"Outfit",sans-serif;font-size:12px;font-weight:800;cursor:pointer;margin-top:3px}
 @media(max-width:360px){.hp-summary{grid-template-columns:1fr}.hp-weeks,.hp-day-list{grid-template-columns:1fr}}
 .aviso-card{background:var(--card);border:1px solid var(--border);border-radius:13px;padding:14px;margin-bottom:9px}
 .aviso-card.aviso-nuevo{border-color:rgba(200,168,75,.6);background:rgba(200,168,75,.06);box-shadow:0 0 12px rgba(200,168,75,.15)}
@@ -1368,15 +1378,6 @@ body{font-size:14px}
     </div>
     </div><!-- /op-fit-outer -->
 
-    <div class="ta-card" onclick="abrirAnalizadorTurnos(event)" style="margin-top:10px">
-      <div class="ta-card-ico">📈</div>
-      <div style="min-width:0">
-        <div class="ta-card-title">Analizador anual</div>
-        <div class="ta-card-sub">Cuenta Excel anual o grupo sin guardar nada</div>
-      </div>
-      <div class="ta-card-arr">›</div>
-    </div>
-
     <!-- ══ v2: todo lo demás (resumen operativo, detalles, historial) se ha
          quitado de la portada y queda aquí colapsado, por si hace falta ══ -->
     <details class="op-details" id="op-v2-mas" style="margin-top:55px">
@@ -1827,6 +1828,20 @@ body{font-size:14px}
     </button>
     <button class="acceso-close" onclick="closeAccesoDirecto()">Cerrar</button>
 
+  </div>
+</div>
+
+<div id="cta-secret-bg" onclick="cerrarMenuSecretoCta()">
+  <div class="cta-secret-menu" onclick="event.stopPropagation()">
+    <div class="cta-secret-title">Herramientas CTA</div>
+    <div class="cta-secret-sub">Elige que herramienta quieres abrir.</div>
+    <button class="cta-secret-option" onclick="abrirOpcionSecretaCta('analizador')">
+      <div><b>Analizador</b><span>Excel anual o grupo, sin guardar datos.</span></div><strong>&rsaquo;</strong>
+    </button>
+    <button class="cta-secret-option" onclick="abrirOpcionSecretaCta('horas')">
+      <div><b>Horas plantilla</b><span>Resumen mensual de empleados importados.</span></div><strong>&rsaquo;</strong>
+    </button>
+    <button class="cta-secret-close" onclick="cerrarMenuSecretoCta()">Cerrar</button>
   </div>
 </div>
 
@@ -2310,10 +2325,24 @@ function _hpBorrarDatosImportados(){
   if(banner)banner.style.display='block';
 }
 var _hpLogoTapTs=0,_hpCasaGestoBloqueadoHasta=0;
-function _hpAbrirConGestoRapido(){
-  if(typeof abrirHorasPlantilla!=='function')return false;
-  abrirHorasPlantilla();
+function abrirMenuSecretoCta(){
+  var bg=document.getElementById('cta-secret-bg');
+  if(bg)bg.classList.add('show');
   return true;
+}
+function cerrarMenuSecretoCta(){
+  var bg=document.getElementById('cta-secret-bg');
+  if(bg)bg.classList.remove('show');
+}
+function abrirOpcionSecretaCta(tipo){
+  cerrarMenuSecretoCta();
+  setTimeout(function(){
+    if(tipo==='analizador'&&typeof abrirAnalizadorTurnos==='function')abrirAnalizadorTurnos();
+    else if(tipo==='horas'&&typeof abrirHorasPlantilla==='function')abrirHorasPlantilla();
+  },60);
+}
+function _hpAbrirConGestoRapido(){
+  return abrirMenuSecretoCta();
 }
 function _hpMarcarLogoGesto(){
   _hpLogoTapTs=Date.now();
@@ -5005,13 +5034,15 @@ function taValorOrden(item,campo){
   return src[campo]||0;
 }
 function taSortBar(tipo){
+  var horasCampo=tipo==='meses'?'horasTurno':'horas';
+  var horasLabel=tipo==='meses'?'Horas totales ↓':'Horas contador ↓';
   return '<div class="ta-sort-row">'+
     '<button class="ta-sort-chip" onclick="taOrdenarSeccion(\''+tipo+'\',\'alpha\')">Alfabético ↓</button>'+
     '<button class="ta-sort-chip" onclick="taOrdenarSeccion(\''+tipo+'\',\'partidos\')">Partidos ↓</button>'+
     '<button class="ta-sort-chip" onclick="taOrdenarSeccion(\''+tipo+'\',\'madrugas\')">Madrugues ↓</button>'+
     '<button class="ta-sort-chip" onclick="taOrdenarSeccion(\''+tipo+'\',\'nocturnas\')">Nocturnas ↓</button>'+
     '<button class="ta-sort-chip" onclick="taOrdenarSeccion(\''+tipo+'\',\'noches\')">Noches ↓</button>'+
-    '<button class="ta-sort-chip" onclick="taOrdenarSeccion(\''+tipo+'\',\'horas\')">Horas contador ↓</button>'+
+    '<button class="ta-sort-chip" onclick="taOrdenarSeccion(\''+tipo+'\',\''+horasCampo+'\')">'+horasLabel+'</button>'+
   '</div>';
 }
 function taOrdenarSeccion(tipo,campo){
@@ -5109,15 +5140,15 @@ function taRenderResultado(r){
     taRenderKpi(t.madrugas,'Madrugues <=06','#fbbf24')+
     taRenderKpi(t.nocturnas,'Nocturnas >=21','#c084fc')+
     taRenderKpi(t.noches,'Noches 21-23 a 5-7','#38bdf8')+
-    taRenderKpi(taFmtHoras(t.horasContadorMin),'Horas contador','#4ade80')+
-    taRenderKpi(taFmtHoras(t.horasTurnoMin),'Horas turnos','#93c5fd')+
+    taRenderKpi(taFmtHoras(t.horasTurnoMin),'Horas totales','#4ade80')+
+    taRenderKpi(taFmtHoras(t.horasContadorMin),'Horas contador','#93c5fd')+
     taRenderKpi(r.meses.filter(function(m){return m.turnos>0;}).length,'Meses con datos','#e5e7eb')+
   '</div>';
   html+='<div class="ta-section-head"><div class="ta-section-title">Desglose mensual</div></div>'+taSortBar('meses');
   r.meses.forEach(function(m){
     if(!m.turnos)return;
     html+='<div class="ta-month">'+
-      '<div class="ta-month-top"><div class="ta-month-name">'+escH(m.nombre)+'</div><div class="ta-month-hours">'+taFmtHoras(m.horasContadorMin)+'</div></div>'+
+      '<div class="ta-month-top"><div class="ta-month-name">'+escH(m.nombre)+'</div><div class="ta-month-hours">'+taFmtHoras(m.horasTurnoMin)+'</div></div>'+
       '<div class="ta-mini-grid">'+
         '<div class="ta-mini"><b>'+m.turnos+'</b><span>Turnos</span></div>'+
         '<div class="ta-mini"><b>'+m.partidos+'</b><span>Partidos</span></div>'+
