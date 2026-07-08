@@ -247,7 +247,7 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 .hp-emp{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px;margin-bottom:8px}
 .hp-emp-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px}
 .hp-name{font-size:13px;font-weight:800;color:var(--white);line-height:1.15}
-.hp-cat{font-size:9px;color:var(--gray);margin-top:3px;text-transform:uppercase;letter-spacing:.35px}
+.hp-cat{display:block;font-size:9px;color:var(--gray);margin-top:3px;text-transform:uppercase;letter-spacing:.35px;line-height:1.15}
 .hp-total{text-align:right;flex-shrink:0}
 .hp-total-v{font-size:18px;font-weight:900;color:var(--gold);line-height:1}
 .hp-total-l{font-size:8.5px;color:var(--gray);text-transform:uppercase;letter-spacing:.4px;margin-top:2px}
@@ -266,8 +266,11 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 .hp-day-l{font-size:9px;color:var(--gray);white-space:nowrap}
 .hp-day-r{font-size:9.5px;color:#e9e4f5;font-weight:800;text-align:right}
 .hp-day-r small{display:block;font-size:8px;color:#60a5fa;font-weight:700;margin-top:1px}
-.hp-name-btn{display:block;background:none;border:0;padding:0;margin:0;text-align:left;font-family:"Outfit",sans-serif;cursor:pointer}
-.hp-name-btn .hp-name{text-decoration:underline dotted rgba(200,168,75,.55);text-underline-offset:3px}
+.hp-name-btn{display:block;width:100%;background:none;border:0;padding:4px 6px 6px 0;margin:-4px 0 0;text-align:left;font-family:"Outfit",sans-serif;cursor:pointer;border-radius:10px;touch-action:manipulation;-webkit-tap-highlight-color:rgba(200,168,75,.18)}
+.hp-name-btn .hp-name{display:block;text-decoration:underline dotted rgba(200,168,75,.55);text-underline-offset:3px}
+.hp-name-btn .hp-cat{display:block}
+.hp-name-btn .hp-badge{display:inline-flex}
+.hp-name-btn:active{background:rgba(200,168,75,.08)}
 .hp-name-btn:active .hp-name{color:var(--gold)}
 .hp-cal-head{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin:9px 0 4px}
 .hp-cal-dow{text-align:center;font-size:8px;color:var(--gray);font-weight:800;letter-spacing:.35px}
@@ -348,7 +351,7 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 #calc-btn:hover{background:rgba(200,168,75,.28);transform:scale(1.05)}
 #calc-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;backdrop-filter:blur(4px)}
 #calc-overlay.show{display:block}
-#calc-panel{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-radius:20px 20px 0 0;padding:24px 20px 40px;z-index:301;transform:translateY(100%);transition:transform .3s cubic-bezier(.4,0,.2,1)}
+#calc-panel{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-radius:20px 20px 0 0;padding:24px 20px calc(112px + env(safe-area-inset-bottom));z-index:301;transform:translateY(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);max-height:calc(100vh - 8px);overflow-y:auto;box-sizing:border-box;-webkit-overflow-scrolling:touch}
 #calc-panel.show{transform:translateY(0)}
 .calc-handle{width:40px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 20px}
 .calc-title{font-family:"Bebas Neue",sans-serif;font-size:22px;letter-spacing:1px;margin-bottom:4px}
@@ -592,37 +595,6 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 .mc-wl-range{font-size:10px;color:var(--gray);margin-bottom:2px}
 .mc-wl-types{font-size:9px;color:rgba(255,255,255,.35)}
 .mc-wl-h{font-size:17px;font-weight:800;color:var(--gold)}
-.mc-year-wrap{display:none;margin-bottom:10px}
-.mc-year-wrap.open{display:block}
-.mc-year-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:9px}
-.mc-year-filters{display:flex;gap:5px;overflow-x:auto;margin:0 0 9px;padding-bottom:2px;-webkit-overflow-scrolling:touch}
-.mc-year-filter{flex:0 0 auto;border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.045);color:var(--gray);border-radius:999px;padding:6px 8px;font-family:'Outfit',sans-serif;font-size:9px;font-weight:900;cursor:pointer;white-space:nowrap}
-.mc-year-filter.on{background:rgba(200,168,75,.18);border-color:rgba(200,168,75,.45);color:var(--gold)}
-.mc-year-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
-.mc-year-card{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:7px;min-width:0}
-.mc-year-title{font-size:10px;font-weight:900;color:var(--gold);letter-spacing:.4px;text-transform:uppercase;margin-bottom:5px}
-.mc-year-days{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
-.mc-year-cell{aspect-ratio:1;border-radius:4px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.045);cursor:pointer}
-.mc-year-cell.empty{background:transparent;border-color:transparent;pointer-events:none}
-.mc-year-cell.libre{background:rgba(255,255,255,.035)}
-.mc-year-cell.work{background:rgba(59,130,246,.42);border-color:rgba(96,165,250,.38)}
-.mc-year-cell.vacaciones{background:rgba(34,197,94,.38);border-color:rgba(74,222,128,.32)}
-.mc-year-cell.hl,.mc-year-cell.hlp,.mc-year-cell.hl-parcial{background:rgba(168,85,247,.42);border-color:rgba(192,132,252,.35)}
-.mc-year-cell.perentorias,.mc-year-cell.cp,.mc-year-cell.hfun{background:rgba(251,146,60,.42);border-color:rgba(251,146,60,.35)}
-.mc-year-cell.festivo{background:rgba(251,191,36,.40);border-color:rgba(251,191,36,.34)}
-.mc-year-cell.baja{background:rgba(239,68,68,.36);border-color:rgba(248,113,113,.32)}
-.mc-year-cell.rm,.mc-year-cell.bp,.mc-year-cell.nh{background:rgba(20,184,166,.34);border-color:rgba(45,212,191,.28)}
-.mc-year-cell.curso{background:rgba(56,189,248,.36);border-color:rgba(56,189,248,.30)}
-.mc-year-cell.permiso{background:rgba(244,114,182,.38);border-color:rgba(244,114,182,.32)}
-.mc-year-cell.today{outline:2px solid var(--gold);outline-offset:-1px}
-.mc-year-cell.filtered-out{opacity:.14;filter:saturate(.25)}
-.mc-year-cell.filtered-hit{box-shadow:0 0 0 1px rgba(255,255,255,.42),0 0 8px rgba(200,168,75,.35)}
-.mc-year-legend{display:flex;flex-wrap:wrap;gap:5px;margin-top:9px;font-size:8px;color:var(--gray)}
-.mc-year-legend span{display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.06);border-radius:999px;padding:3px 6px}
-.mc-year-dot{width:8px;height:8px;border-radius:3px;display:inline-block;background:rgba(255,255,255,.12)}
-.mc-year-dot.work{background:#3b82f6}.mc-year-dot.free{background:rgba(255,255,255,.18)}.mc-year-dot.hl{background:#a855f7}.mc-year-dot.per{background:#fb923c}.mc-year-dot.off{background:#22c55e}
-.mc-year-dot.night{background:#1d4ed8}.mc-year-dot.part{background:#f59e0b}
-@media(max-width:370px){.mc-year-grid{grid-template-columns:1fr}.mc-year-summary{grid-template-columns:1fr 1fr}}
 
 /* ─── Grupo compañeros ────────────────────────────────── */
 .calc-group-row{display:flex;gap:8px;margin-top:10px;border-top:1px solid rgba(255,255,255,.07);padding-top:10px}
@@ -646,7 +618,9 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 .grupo-nombre{font-size:13px;font-weight:600;color:var(--white);flex:1}
 .grupo-horario{font-size:11px;color:var(--gray);text-align:right}
 .grupo-empty{font-size:12px;color:var(--gray);text-align:center;padding:12px 0;opacity:.7}
-.grupo-import-wrap{margin-top:6px;font-size:10px;color:var(--gray);text-align:center}
+.grupo-import-wrap{margin-top:10px;font-size:10px;color:var(--gray);text-align:center;line-height:1.45;white-space:normal;overflow-wrap:anywhere;padding:0 6px 4px;box-sizing:border-box}
+#calc-panel .grupo-import-wrap{margin-bottom:calc(14px + env(safe-area-inset-bottom));}
+#grupo-import-txt{display:block;max-width:100%;}
 #grupo-panel{max-height:min(72vh,560px);overflow-y:auto;overflow-x:hidden;padding-right:2px;padding-bottom:20px;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.1) transparent}
 .grupo-clickable{cursor:pointer}
 .grupo-clickable:active{opacity:.85}
@@ -1670,11 +1644,9 @@ body{font-size:14px}
     <div class="mc-mode-toggle">
       <button class="mc-mode-btn on" id="mc-btn-mes" onclick="mcSetMode('mes')">📅 Mes</button>
       <button class="mc-mode-btn" id="mc-btn-sem" onclick="mcSetMode('sem')">📊 Semanas</button>
-      <button class="mc-mode-btn" id="mc-btn-anio" onclick="mcSetMode('anio')">Año</button>
     </div>
     <div id="mc-grid-wrap"><div class="mc-grid" id="mc-grid"></div></div>
     <div class="mc-weeks-list" id="mc-weeks-list"></div>
-    <div class="mc-year-wrap" id="mc-year-wrap"></div>
     <div id="mc-nodata" class="mc-no-data" style="display:none">
       📅 No hay turnos importados para este mes.<br>
       <span style="font-size:11px">Importa tu calendario desde <b style="color:var(--gold)">Accesos Directos → Importar TRYP</b></span>
@@ -2482,6 +2454,95 @@ function _hpFmtHoras(h){
   if(mins===0)return sign+horas+'h';
   return sign+horas+','+String(mins).padStart(2,'0')+'min';
 }
+function _hpNormPrivado(v){
+  return String(v||'')
+    .toUpperCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g,'')
+    .replace(/[^A-Z0-9 ]+/g,' ')
+    .replace(/\s+/g,' ')
+    .trim();
+}
+function _hpTokensPrivado(v){
+  return _hpNormPrivado(v).split(' ').filter(Boolean);
+}
+function _hpTextoPrivado(emp){
+  if(typeof emp==='string')return emp;
+  if(!emp)return '';
+  return [
+    emp.nombre,
+    emp.empleado,
+    emp.apellidos,
+    emp.nomina,
+    emp.empleado_norm,
+    emp.norm,
+    emp.nombreNorm,
+    emp.categoria,
+    emp.email
+  ].filter(Boolean).join(' ');
+}
+function _hpNombreCategoriaLimpio(emp){
+  var nombre=String((emp&&emp.nombre)||emp||'').replace(/\s+/g,' ').trim();
+  var categoria=String((emp&&emp.categoria)||'General').replace(/\s+/g,' ').trim()||'General';
+  var original=nombre;
+
+  // Algunos nombres vienen pegados a la categoría, por ejemplo:
+  // "Arturo RicoFTP OPERARIO" o "Jorge Rico VicenteFTP OPERARIO".
+  // Aquí se separa para que se vea como el resto: nombre arriba y categoría abajo.
+  var m=nombre.match(/^(.+?)(?:\s*)(FTP|FD|FDT|FIJO(?:\s+DISCONTINUO)?|FIJA(?:\s+DISCONTINUA)?|EVENTUAL|TEMPORAL)\s+(OPERARIO|OPERARIA|AGENTE\s+JEFE|SUPERVISOR|SUPERVISORA|ADMINISTRATIVO|ADMINISTRATIVA|AUXILIAR|PASAJE|RAMPA)$/i);
+  if(m){
+    nombre=m[1].replace(/[\s·•-]+$/,'').trim();
+    categoria=(m[2]+' '+m[3]).replace(/\s+/g,' ').trim();
+  }
+
+  // Caso más genérico: categoría profesional pegada sin prefijo claro.
+  if(nombre===original){
+    var m2=nombre.match(/^(.+?)(?:\s*)(OPERARIO|OPERARIA|AGENTE\s+JEFE|SUPERVISOR|SUPERVISORA|ADMINISTRATIVO|ADMINISTRATIVA|AUXILIAR)$/i);
+    if(m2 && m2[1].trim().split(/\s+/).length>=2){
+      nombre=m2[1].replace(/[\s·•-]+$/,'').trim();
+      categoria=m2[2].replace(/\s+/g,' ').trim();
+    }
+  }
+
+  return {nombre:nombre||original||'',categoria:categoria||'General'};
+}
+function _hpEsEmpleadoPrivado(emp){
+  var n=_hpNormPrivado(_hpTextoPrivado(emp));
+  if(!n)return false;
+  var c=n.replace(/\s+/g,'');
+
+  // Privacidad SOLO para Arturo Rico / Arturo Rico Vicente en Horas plantilla.
+  // Jorge Rico Vicente NO se bloquea: debe verse y funcionar como cualquier empleado.
+  if((/\bARTURO\b/.test(n)||c.indexOf('ARTURO')>=0) && (/\bRICO\b/.test(n)||c.indexOf('RICO')>=0))return true;
+  if(c.indexOf('ARTURORICO')>=0||c.indexOf('ARTURORICOVICENTE')>=0)return true;
+  if(/ARTURORICOME/.test(c))return true;
+  return false;
+}
+function _hpAbrirCalendarioEmpleado(rowIdx){
+  var data=_hpData;
+  var r=data&&data.rows&&data.rows[rowIdx];
+  if(_hpEsEmpleadoPrivado(r)||r&&r.privado)return false;
+  renderHorasPlantillaCalendario(rowIdx);
+  return false;
+}
+function _hpAplicarPrivacidadDOM(){
+  var body=document.getElementById('hp-body');
+  if(!body)return;
+  Array.prototype.slice.call(body.querySelectorAll('.hp-emp')).forEach(function(card){
+    if(card.getAttribute('data-hp-privado')==='1'||_hpEsEmpleadoPrivado(card.textContent||'')){
+      card.setAttribute('data-hp-privado','1');
+      Array.prototype.slice.call(card.querySelectorAll('.hp-name-btn')).forEach(function(btn){
+        var span=document.createElement('span');
+        span.className='hp-name';
+        span.textContent=(btn.querySelector('.hp-name')&&btn.querySelector('.hp-name').textContent)||btn.textContent||'';
+        btn.parentNode.replaceChild(span,btn);
+      });
+      Array.prototype.slice.call(card.querySelectorAll('.hp-days,.hp-badge')).forEach(function(el){
+        if(el&&el.parentNode)el.parentNode.removeChild(el);
+      });
+    }
+  });
+}
 function _hpMonthNames(){
   return ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 }
@@ -2667,6 +2728,9 @@ function calcularHorasPlantilla(year){
   var empleados=Object.keys(map).map(function(k){return map[k];}).filter(function(e){return e&&e.nombre&&!(typeof _esNombreBasuraGrupo==='function'&&_esNombreBasuraGrupo(e.nombre));});
   var semanasOrden={},totalHoras=0,totalCambios=0,totalDeltaCambios=0,cambiosDetalle=[];
   var rows=empleados.map(function(emp){
+    var empNC=_hpNombreCategoriaLimpio(emp);
+    var empNombre=empNC.nombre||emp.nombre||'';
+    var empCategoria=empNC.categoria||emp.categoria||'General';
     var semanas={},diasDetalle=[],mesTotal=0,cambios=0;
     for(var d=1;d<=lastDay;d++){
       var fecha=new Date(year,monthIdx,d);
@@ -2688,8 +2752,11 @@ function calcularHorasPlantilla(year){
         var hAntes=_hpTurnoHoras(turnoBase),hDespues=_hpTurnoHoras(turno),delta=hDespues-hAntes;
         totalDeltaCambios+=delta;
         cambiosDetalle.push({
-          nombre:emp.nombre||'',
-          categoria:emp.categoria||'General',
+          nombre:empNombre,
+          categoria:empCategoria,
+          nomina:emp.nomina||'',
+          empleado_norm:emp.empleado_norm||emp.norm||'',
+          privado:_hpEsEmpleadoPrivado(emp),
           dia:d,
           fecha:_hpFechaISO(fecha),
           antes:_hpTurnoHorario(turnoBase),
@@ -2720,7 +2787,17 @@ function calcularHorasPlantilla(year){
     }
     totalHoras+=mesTotal;
     totalCambios+=cambios;
-    return {nombre:emp.nombre||'',categoria:emp.categoria||'General',horas:mesTotal,cambios:cambios,semanas:semanas,dias:diasDetalle};
+    return {
+      nombre:empNombre,
+      categoria:empCategoria,
+      nomina:emp.nomina||'',
+      empleado_norm:emp.empleado_norm||emp.norm||'',
+      privado:_hpEsEmpleadoPrivado(emp),
+      horas:mesTotal,
+      cambios:cambios,
+      semanas:semanas,
+      dias:diasDetalle
+    };
   });
   var weekList=Object.keys(semanasOrden).map(function(k){return {key:k,label:semanasOrden[k].label,order:semanasOrden[k].order};}).sort(function(a,b){return a.order-b.order;});
   rows.sort(function(a,b){
@@ -2763,10 +2840,11 @@ function renderHorasPlantillaLista(){
     body.innerHTML='<div class="hp-empty">No hay empleados importados. Importa primero el Excel del grupo.</div>';
     return;
   }
+  var cambiosVisiblesTotal=(data.cambiosDetalle||[]).filter(function(c){return !(c.privado||_hpEsEmpleadoPrivado(c));}).length;
   var html='<div class="hp-summary">'
     +'<div class="hp-kpi"><div class="hp-kpi-v">'+data.rows.length+'</div><div class="hp-kpi-l">Empleados</div></div>'
     +'<div class="hp-kpi"><div class="hp-kpi-v">'+_hpFmtHoras(data.totalHoras)+'</div><div class="hp-kpi-l">Horas mes</div></div>'
-    +'<button class="hp-kpi hp-kpi-btn" onclick="renderHorasPlantillaCambios()"><div class="hp-kpi-v">'+data.totalCambios+'</div><div class="hp-kpi-l">Cambios</div></button>'
+    +'<button class="hp-kpi hp-kpi-btn" onclick="renderHorasPlantillaCambios()"><div class="hp-kpi-v">'+cambiosVisiblesTotal+'</div><div class="hp-kpi-l">Cambios</div></button>'
     +'</div>';
   if(!rows.length){
     body.innerHTML=html+'<div class="hp-empty">Sin resultados para esa búsqueda.</div>';
@@ -2774,9 +2852,16 @@ function renderHorasPlantillaLista(){
   }
   rows.forEach(function(r){
     var rowIdx=data.rows.indexOf(r);
-    html+='<div class="hp-emp">'
+    var rNC=_hpNombreCategoriaLimpio(r);
+    var rNombre=rNC.nombre||r.nombre||'';
+    var rCategoria=rNC.categoria||r.categoria||'General';
+    var privado=!!(r.privado||_hpEsEmpleadoPrivado(r));
+    var bloqueNombre=privado
+      ? '<div style="flex:1;min-width:0"><div class="hp-name">'+escH(rNombre)+'</div><div class="hp-cat">'+escH(rCategoria||'General')+'</div></div>'
+      : '<div style="flex:1;min-width:0"><button type="button" class="hp-name-btn" onclick="event.stopPropagation();return _hpAbrirCalendarioEmpleado('+rowIdx+')"><span class="hp-name">'+escH(rNombre)+'</span><span class="hp-cat">'+escH(rCategoria||'General')+'</span>'+(r.cambios?'<span class="hp-badge">'+r.cambios+' cambio'+(r.cambios===1?'':'s')+' aplicado'+(r.cambios===1?'':'s')+'</span>':'')+'</button></div>';
+    html+='<div class="hp-emp"'+(privado?' data-hp-privado="1"':'')+'>'
       +'<div class="hp-emp-top">'
-        +'<div><button class="hp-name-btn" onclick="renderHorasPlantillaCalendario('+rowIdx+')"><div class="hp-name">'+escH(r.nombre)+'</div></button><div class="hp-cat">'+escH(r.categoria||'General')+'</div>'+(r.cambios?'<div class="hp-badge">'+r.cambios+' cambio'+(r.cambios===1?'':'s')+' aplicado'+(r.cambios===1?'':'s')+'</div>':'')+'</div>'
+        +bloqueNombre
         +'<div class="hp-total"><div class="hp-total-v">'+_hpFmtHoras(r.horas)+'</div><div class="hp-total-l">Mes</div></div>'
       +'</div><div class="hp-weeks">';
     data.weeks.forEach(function(w){
@@ -2784,23 +2869,31 @@ function renderHorasPlantillaLista(){
       html+='<div class="hp-week"><span class="hp-week-l">'+escH(w.label)+'</span><span class="hp-week-v">'+_hpFmtHoras(h)+'</span></div>';
     });
     html+='</div>';
-    var diasContados=(r.dias||[]).filter(function(x){return x.horas>0;}).length;
-    html+='<details class="hp-days"><summary>Ver detalle días · '+diasContados+' contados</summary><div class="hp-day-list">';
-    (r.dias||[]).forEach(function(dia){
-      var cls='hp-day'+(dia.missing?' missing':(dia.zero?' zero':''));
-      html+='<div class="'+cls+'"><span class="hp-day-l">Día '+dia.dia+'</span><span class="hp-day-r">'+_hpFmtHoras(dia.horas)+'<small>'+escH(dia.horario)+(dia.cambio?' · '+escH(dia.etiqueta||'Cambio'):'')+'</small></span></div>';
-    });
-    html+='</div></details></div>';
+    if(!privado){
+      var diasContados=(r.dias||[]).filter(function(x){return x.horas>0;}).length;
+      html+='<details class="hp-days"><summary>Ver detalle días · '+diasContados+' contados</summary><div class="hp-day-list">';
+      (r.dias||[]).forEach(function(dia){
+        var cls='hp-day'+(dia.missing?' missing':(dia.zero?' zero':''));
+        html+='<div class="'+cls+'"><span class="hp-day-l">Día '+dia.dia+'</span><span class="hp-day-r">'+_hpFmtHoras(dia.horas)+'<small>'+escH(dia.horario)+(dia.cambio?' · '+escH(dia.etiqueta||'Cambio'):'')+'</small></span></div>';
+      });
+      html+='</div></details>';
+    }
+    html+='</div>';
   });
   body.innerHTML=html;
+  _hpAplicarPrivacidadDOM();
 }
 function renderHorasPlantillaCalendario(rowIdx){
   var body=document.getElementById('hp-body'),sub=document.getElementById('hp-sub'),search=document.getElementById('hp-search');
   var data=_hpData;
   if(!body||!data||!data.rows||!data.rows[rowIdx])return;
   var r=data.rows[rowIdx];
+  if(r.privado||_hpEsEmpleadoPrivado(r)){renderHorasPlantillaLista();return;}
+  var rNC=_hpNombreCategoriaLimpio(r);
+  var rNombre=rNC.nombre||r.nombre||'Empleado';
+  var rCategoria=rNC.categoria||r.categoria||'General';
   if(search)search.setAttribute('oninput','renderHorasPlantillaLista()');
-  if(sub)sub.textContent='Calendario de '+(r.nombre||'Empleado')+' · '+data.monthLabel;
+  if(sub)sub.textContent='Calendario de '+(rNombre||'Empleado')+' · '+data.monthLabel;
   var lastDay=new Date(data.year,data.monthIdx+1,0).getDate();
   var dias=r.dias||[];
   var contados=dias.filter(function(x){return x.horas>0;}).length;
@@ -2808,10 +2901,10 @@ function renderHorasPlantillaCalendario(rowIdx){
   var esMesActual=hoy.getFullYear()===data.year&&hoy.getMonth()===data.monthIdx;
   var primer=new Date(data.year,data.monthIdx,1).getDay();
   var offset=primer===0?6:primer-1;
-  var html='<button class="hp-back" onclick="renderHorasPlantillaLista()">← Volver a empleados</button>'
+  var html='<button type="button" class="hp-back" onclick="renderHorasPlantillaLista()">← Volver a empleados</button>'
     +'<div class="hp-emp">'
       +'<div class="hp-emp-top">'
-        +'<div><div class="hp-name">'+escH(r.nombre||'Empleado')+'</div><div class="hp-cat">'+escH(r.categoria||'General')+'</div></div>'
+        +'<div><div class="hp-name">'+escH(rNombre||'Empleado')+'</div><div class="hp-cat">'+escH(rCategoria||'General')+'</div></div>'
         +'<div class="hp-total"><div class="hp-total-v">'+_hpFmtHoras(r.horas||0)+'</div><div class="hp-total-l">Mes</div></div>'
       +'</div>'
       +'<div class="hp-summary" style="margin-bottom:0">'
@@ -2856,18 +2949,20 @@ function renderHorasPlantillaCambios(){
   if(search)search.setAttribute('oninput','renderHorasPlantillaCambios()');
   if(sub)sub.textContent='Cambios aplicados · '+data.monthLabel+' · diferencia contra el Excel importado';
   var q=(search&&search.value?search.value:'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
-  var cambios=(data.cambiosDetalle||[]).filter(function(c){
+  var cambiosBase=(data.cambiosDetalle||[]).filter(function(c){return !(c.privado||_hpEsEmpleadoPrivado(c));});
+  var balanceVisible=cambiosBase.reduce(function(acc,c){return acc+(Number(c.delta)||0);},0);
+  var cambios=cambiosBase.filter(function(c){
     if(!q)return true;
     var txt=(c.nombre+' '+c.categoria+' '+c.fecha+' '+c.tipo).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
     return txt.indexOf(q)>=0;
   });
   var html='<div class="hp-summary">'
-    +'<div class="hp-kpi"><div class="hp-kpi-v">'+(data.cambiosDetalle||[]).length+'</div><div class="hp-kpi-l">Cambios</div></div>'
-    +'<div class="hp-kpi"><div class="hp-kpi-v">'+_hpFmtDelta(data.totalDeltaCambios||0)+'</div><div class="hp-kpi-l">Balance</div></div>'
+    +'<div class="hp-kpi"><div class="hp-kpi-v">'+cambiosBase.length+'</div><div class="hp-kpi-l">Cambios</div></div>'
+    +'<div class="hp-kpi"><div class="hp-kpi-v">'+_hpFmtDelta(balanceVisible)+'</div><div class="hp-kpi-l">Balance</div></div>'
     +'<button class="hp-kpi hp-kpi-btn" onclick="renderHorasPlantillaLista()"><div class="hp-kpi-v">←</div><div class="hp-kpi-l">Volver</div></button>'
     +'</div>';
   html+='<button class="hp-back" onclick="renderHorasPlantillaLista()">Volver a empleados</button>';
-  if(!(data.cambiosDetalle||[]).length){
+  if(!cambiosBase.length){
     body.innerHTML=html+'<div class="hp-empty">No hay cambios aplicados para este mes.</div>';
     return;
   }
@@ -2876,12 +2971,15 @@ function renderHorasPlantillaCambios(){
     return;
   }
   cambios.forEach(function(c){
+    var cNC=_hpNombreCategoriaLimpio(c);
+    var cNombre=cNC.nombre||c.nombre||'';
+    var cCategoria=cNC.categoria||c.categoria||'General';
     var delta=Number(c.delta)||0;
     var cls=delta>0?'plus':(delta<0?'minus':'zero');
     var deltaTxt=delta===0?'Sin variación':_hpFmtDelta(delta);
     html+='<div class="hp-change">'
       +'<div class="hp-change-top">'
-        +'<div><div class="hp-name">'+escH(c.nombre)+'</div><div class="hp-cat">'+escH(c.categoria||'General')+'</div><div class="hp-change-day">Día '+c.dia+' · '+escH(c.fecha)+' · '+escH(c.tipo||'Cambio')+'</div></div>'
+        +'<div><div class="hp-name">'+escH(cNombre)+'</div><div class="hp-cat">'+escH(cCategoria||'General')+'</div><div class="hp-change-day">Día '+c.dia+' · '+escH(c.fecha)+' · '+escH(c.tipo||'Cambio')+'</div></div>'
         +'<div class="hp-delta '+cls+'">'+escH(deltaTxt)+'</div>'
       +'</div>'
       +'<div class="hp-change-lines">'
@@ -5885,11 +5983,6 @@ function _mcGo(dir){
   if(_mcNavLock)return;
   _mcNavLock=true;
   setTimeout(function(){_mcNavLock=false;},350);
-  if(typeof _mcMode!=='undefined'&&_mcMode==='anio'){
-    _mcYear+=dir<0?-1:1;
-    mcRender();
-    return;
-  }
   if(dir<0){_mcMonth--;if(_mcMonth<0){_mcMonth=11;_mcYear--;}}
   else{_mcMonth++;if(_mcMonth>11){_mcMonth=0;_mcYear++;}}
   mcRender();
@@ -5901,11 +5994,11 @@ function mcRender(){
   var grid=document.getElementById('mc-grid');
   var nodata=document.getElementById('mc-nodata');
   if(!title||!grid)return;
-  title.textContent=(typeof _mcMode!=='undefined'&&_mcMode==='anio')?'Año '+_mcYear:(_MC_NAMES[_mcMonth]+' '+_mcYear);
+  title.textContent=_MC_NAMES[_mcMonth]+' '+_mcYear;
   var raw;try{raw=localStorage.getItem('cta_ed_'+_mcYear);}catch(e){raw=null;}
   var ue;try{ue=raw?JSON.parse(raw):{};}catch(e){ue={};}
   var mData=ue[_MC_MONTHS[_mcMonth]]||{};
-  var hasAnyData=(typeof _mcMode!=='undefined'&&_mcMode==='anio')?_mcYearHasData(ue):Object.keys(mData).length>0;
+  var hasAnyData=Object.keys(mData).length>0;
   var dows=['L','M','X','J','V','S','D'];
   var html=dows.map(function(d){return '<div class="mc-dow">'+d+'</div>';}).join('');
   var firstDate=new Date(_mcYear,_mcMonth,1);
@@ -5943,21 +6036,13 @@ function mcRender(){
   // Restore mode: sem hides grid, shows weeks; mes shows grid
   var _gw=document.getElementById('mc-grid-wrap');
   var _wl2=document.getElementById('mc-weeks-list');
-  var _yw=document.getElementById('mc-year-wrap');
-  if(typeof _mcMode!=='undefined'&&_mcMode==='anio'){
-    if(_gw)_gw.style.display='none';
-    if(_wl2)_wl2.classList.remove('open');
-    if(_yw)_yw.classList.add('open');
-    mcRenderYear(ue);
-  } else if(typeof _mcMode!=='undefined'&&_mcMode==='sem'){
+  if(typeof _mcMode!=='undefined'&&_mcMode==='sem'){
     if(_gw)_gw.style.display='none';
     if(_wl2)_wl2.classList.add('open');
-    if(_yw)_yw.classList.remove('open');
     mcRenderWeeks();
   } else {
     if(_gw)_gw.style.display='block';
     if(_wl2)_wl2.classList.remove('open');
-    if(_yw)_yw.classList.remove('open');
   }
   mcRenderSummary(ue);
 }
@@ -5965,155 +6050,18 @@ function mcRender(){
 
 
 var _mcMode='mes';
-var _mcYearFilter='todo';
 function mcSetMode(mode){
+  if(mode!=='sem')mode='mes';
   _mcMode=mode;
-  document.getElementById('mc-btn-mes').classList.toggle('on',mode==='mes');
-  document.getElementById('mc-btn-sem').classList.toggle('on',mode==='sem');
-  var btnAnio=document.getElementById('mc-btn-anio');
-  if(btnAnio)btnAnio.classList.toggle('on',mode==='anio');
-  document.getElementById('mc-grid-wrap').style.display=mode==='mes'?'block':'none';
+  var btnMes=document.getElementById('mc-btn-mes');
+  var btnSem=document.getElementById('mc-btn-sem');
+  if(btnMes)btnMes.classList.toggle('on',mode==='mes');
+  if(btnSem)btnSem.classList.toggle('on',mode==='sem');
+  var gw=document.getElementById('mc-grid-wrap');
   var wl=document.getElementById('mc-weeks-list');
-  var yw=document.getElementById('mc-year-wrap');
-  if(mode==='sem'){wl.classList.add('open');if(yw)yw.classList.remove('open');mcRender();}
-  else if(mode==='anio'){wl.classList.remove('open');if(yw)yw.classList.add('open');mcRender();}
-  else{wl.classList.remove('open');if(yw)yw.classList.remove('open');mcRender();}
-}
-
-function _mcYearHasData(ue){
-  return _MC_MONTHS.some(function(m){return Object.keys((ue&&ue[m])||{}).length>0;});
-}
-function _mcDayMinutes(day){
-  if(!day)return 0;
-  var mins=_mcMin(day.e1,day.s1)+_mcMin(day.e2,day.s2);
-  return mins>0?mins:(day.total?Math.round(Number(day.total)*60):0);
-}
-function _mcYearCellClass(day){
-  if(!day)return 'libre';
-  if(day.hlParcial&&day.hlParcial.ini&&day.hlParcial.fin)return 'hl-parcial';
-  if(day.perenDur&&day.perenDur!=='0:00')return day.perenTipo==='cp'?'cp':'perentorias';
-  if(day.hfunDur&&day.hfunDur!=='0:00')return 'hfun';
-  if(day.tipo&&day.tipo!=='libre')return day.tipo;
-  return _mcDayMinutes(day)>0?'work':'libre';
-}
-function _mcIsRealWorkedDay(day){
-  if(!day)return false;
-  if(day.hlParcial&&day.hlParcial.ini&&day.hlParcial.fin)return true;
-  return String(day.tipo||'').toLowerCase()==='trabajado';
-}
-function _mcClockMin(t){
-  if(!t)return null;
-  var p=String(t).split(':');
-  if(p.length<2)return null;
-  return (+p[0]||0)*60+(+p[1]||0);
-}
-function _mcTurnoRanges(day){
-  var ranges=[];
-  [['e1','s1'],['e2','s2']].forEach(function(pair){
-    var e=_mcClockMin(day&&day[pair[0]]),s=_mcClockMin(day&&day[pair[1]]);
-    if(e===null||s===null)return;
-    if(s<e)s+=1440;
-    if(s>e)ranges.push([e,s]);
-  });
-  return ranges;
-}
-function _mcRangeOverlap(a,b,c,d){return a<d&&b>c;}
-function _mcIsMadrugue(day){
-  return _mcTurnoRanges(day).some(function(r){return r[0]<=360;});
-}
-function _mcIsNoche(day){
-  return _mcTurnoRanges(day).some(function(r){
-    return _mcRangeOverlap(r[0],r[1],0,360)||_mcRangeOverlap(r[0],r[1],1260,1440);
-  });
-}
-function _mcIsPartido(day){
-  return !!(day&&day.e1&&day.s1&&day.e2&&day.s2);
-}
-function _mcIsHL(day){
-  var tipo=String(day&&day.tipo||'').toLowerCase();
-  return tipo==='hl'||tipo==='hlp'||!!(day&&day.hlParcial&&day.hlParcial.ini&&day.hlParcial.fin);
-}
-function _mcYearMatchesFilter(day,cls,filter){
-  filter=filter||'todo';
-  if(filter==='todo')return true;
-  if(filter==='madrugues')return _mcIsMadrugue(day);
-  if(filter==='noches')return _mcIsNoche(day);
-  if(filter==='partidos')return _mcIsPartido(day);
-  if(filter==='hl')return _mcIsHL(day);
-  if(filter==='festivos')return String(day&&day.tipo||'').toLowerCase()==='festivo';
-  if(filter==='libres')return cls==='libre'&&!_mcDayMinutes(day);
-  return true;
-}
-function mcSetYearFilter(filter){
-  _mcYearFilter=filter||'todo';
-  var raw;try{raw=localStorage.getItem('cta_ed_'+_mcYear);}catch(e){raw=null;}
-  var ue;try{ue=raw?JSON.parse(raw):{};}catch(e){ue={};}
-  mcRenderYear(ue);
-}
-function mcRenderYear(ue){
-  var yw=document.getElementById('mc-year-wrap');
-  if(!yw)return;
-  var today=new Date();
-  var totalMin=0,turnos=0,trabReales=0,libres=0;
-  _MC_MONTHS.forEach(function(m){
-    var mData=(ue&&ue[m])||{};
-    Object.keys(mData).forEach(function(k){
-      var day=mData[k],mins=_mcDayMinutes(day),cls=_mcYearCellClass(day);
-      if(mins>0){totalMin+=mins;turnos++;}
-      if(_mcIsRealWorkedDay(day))trabReales++;
-      else if(cls==='libre')libres++;
-    });
-  });
-  var html='<div class="mc-year-summary">'
-    +'<div class="mc-stat gold"><div class="mc-stat-val">'+_mcFmtH(totalMin)+'</div><div class="mc-stat-lbl">Horas año</div></div>'
-    +'<div class="mc-stat blue"><div class="mc-stat-val">'+turnos+'</div><div class="mc-stat-lbl">Turnos</div></div>'
-    +'<div class="mc-stat green"><div class="mc-stat-val">'+trabReales+'</div><div class="mc-stat-lbl">Trab. reales</div></div>'
-    +'<div class="mc-stat green"><div class="mc-stat-val">'+libres+'</div><div class="mc-stat-lbl">Libres</div></div>'
-    +'</div><div class="mc-year-filters">';
-  [
-    ['todo','Todo'],
-    ['madrugues','Madrugues'],
-    ['noches','Noches'],
-    ['partidos','Partidos'],
-    ['hl','HL'],
-    ['festivos','Festivos'],
-    ['libres','Libres']
-  ].forEach(function(f){
-    html+='<button class="mc-year-filter '+(_mcYearFilter===f[0]?'on':'')+'" onclick="mcSetYearFilter(\''+f[0]+'\')">'+f[1]+'</button>';
-  });
-  html+='</div><div class="mc-year-grid">';
-  _MC_MONTHS.forEach(function(m,mIdx){
-    var mData=(ue&&ue[m])||{};
-    var first=new Date(_mcYear,mIdx,1);
-    var offset=(first.getDay()+6)%7;
-    var days=new Date(_mcYear,mIdx+1,0).getDate();
-    html+='<div class="mc-year-card"><div class="mc-year-title">'+_MC_NAMES[mIdx]+'</div><div class="mc-year-days">';
-    for(var i=0;i<offset;i++)html+='<div class="mc-year-cell empty"></div>';
-    for(var d=1;d<=days;d++){
-      var day=mData[d]||null;
-      var cls=_mcYearCellClass(day);
-      var isToday=today.getFullYear()===_mcYear&&today.getMonth()===mIdx&&today.getDate()===d;
-      var match=_mcYearMatchesFilter(day,cls,_mcYearFilter);
-      var fcls=_mcYearFilter==='todo'?'':(match?' filtered-hit':' filtered-out');
-      html+='<div class="mc-year-cell '+cls+(isToday?' today':'')+fcls+'" title="'+_MC_NAMES[mIdx]+' '+d+'" onclick="mcOpenYearDay('+mIdx+','+d+')"></div>';
-    }
-    html+='</div></div>';
-  });
-  html+='</div><div class="mc-year-legend">'
-    +'<span><i class="mc-year-dot work"></i>Trabaja</span>'
-    +'<span><i class="mc-year-dot free"></i>Libre</span>'
-    +'<span><i class="mc-year-dot hl"></i>HL</span>'
-    +'<span><i class="mc-year-dot night"></i>Noche</span>'
-    +'<span><i class="mc-year-dot part"></i>Partido</span>'
-    +'<span><i class="mc-year-dot per"></i>Perentorias</span>'
-    +'<span><i class="mc-year-dot off"></i>Vacaciones</span>'
-    +'</div>';
-  yw.innerHTML=html;
-}
-function mcOpenYearDay(monthIdx,day){
-  _mcMonth=monthIdx;
-  mcSetMode('mes');
-  setTimeout(function(){mcEditDay(day,{preventDefault:function(){},stopPropagation:function(){}});},60);
+  if(gw)gw.style.display=mode==='mes'?'block':'none';
+  if(wl)wl.classList.toggle('open',mode==='sem');
+  mcRender();
 }
 
 function mcRenderWeeks(){
@@ -7428,8 +7376,8 @@ function _arturoHLPubFecha(dateObj){
   return !!(_ARTURO_HL_PUBLICO&&_ARTURO_HL_PUBLICO[k]);
 }
 function _esArturoPlantilla(nombre){
-  var n=_normPlantillaNombre(nombre);
-  return n==='ARTURO RICO'||n==='ARTURO RICO GARCIA'||n.indexOf('ARTURO RICO')>=0;
+  var n=(typeof _hpNormPrivado==='function')?_hpNormPrivado(nombre):_normPlantillaNombre(nombre);
+  return /\bARTURO\b/.test(n)&&/\bRICO\b/.test(n);
 }
 // Devuelve el día del calendario PERSONAL de Arturo (este dispositivo) para una fecha,
 // o null si no hay datos. Usado tanto para el chequeo HL como para leer el hlParcial.
