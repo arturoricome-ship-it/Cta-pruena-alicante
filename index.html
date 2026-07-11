@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
 <!-- CTA_OPERATIVA_V73_CAMBIO_TURNO_SIMULADO_2026-06-19 -->
+<!-- CTA_ERRORES_TURNO_SEMANAL_V2_2026-07-11 -->
 <meta charset="UTF-8">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -226,6 +227,7 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 .hp-import{flex:0 0 auto;background:rgba(200,168,75,.12);border:1px solid rgba(200,168,75,.45);border-radius:10px;color:var(--gold);font-family:"Outfit",sans-serif;font-size:11px;font-weight:800;padding:0 10px;cursor:pointer;white-space:nowrap}
 .hp-sort{flex:0 0 auto;background:rgba(96,165,250,.11);border:1px solid rgba(96,165,250,.32);border-radius:10px;color:#93c5fd;font-family:"Outfit",sans-serif;font-size:11px;font-weight:800;padding:0 10px;cursor:pointer;white-space:nowrap}
 .hp-clear{flex:0 0 auto;background:rgba(239,68,68,.11);border:1px solid rgba(239,68,68,.32);border-radius:10px;color:#fca5a5;font-family:"Outfit",sans-serif;font-size:11px;font-weight:800;padding:0 10px;cursor:pointer;white-space:nowrap}
+.hp-bad{flex:0 0 auto;background:rgba(251,146,60,.12);border:1px solid rgba(251,146,60,.38);border-radius:10px;color:#fb923c;font-family:"Outfit",sans-serif;font-size:11px;font-weight:800;padding:0 10px;cursor:pointer;white-space:nowrap}
 .hp-body{overflow-y:auto;padding:10px 12px 90px;flex:1;min-height:0;-webkit-overflow-scrolling:touch}
 .hp-summary{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-bottom:10px}
 .hp-kpi{background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:8px;text-align:center}
@@ -353,6 +355,10 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 #calc-overlay.show{display:block}
 #calc-panel{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-radius:20px 20px 0 0;padding:24px 20px calc(112px + env(safe-area-inset-bottom));z-index:301;transform:translateY(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);max-height:calc(100vh - 8px);overflow-y:auto;box-sizing:border-box;-webkit-overflow-scrolling:touch}
 #calc-panel.show{transform:translateY(0)}
+#calc-panel:not(.show){
+  transform:translateY(calc(100% + 100px))!important;
+  pointer-events:none!important;
+}
 .calc-handle{width:40px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 20px}
 .calc-title{font-family:"Bebas Neue",sans-serif;font-size:22px;letter-spacing:1px;margin-bottom:4px}
 .calc-sub{font-size:11px;color:var(--gray);margin-bottom:20px}
@@ -448,6 +454,7 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 .tw-lbl{font-size:8px;color:var(--gray);letter-spacing:.8px;text-transform:uppercase;margin-bottom:2px}
 .tw-times{font-size:13px;font-weight:700;color:var(--white);line-height:1;white-space:nowrap}
 .tw-subtipo{font-size:9px;color:var(--gold);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tw-subtipo.trabajando-activo{font-size:11px;font-weight:800;letter-spacing:.25px}
 .tw-right{text-align:right;flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:2px}
 .tw-pct{font-size:22px;font-weight:800;line-height:1}
 .tw-remain{font-size:9px;color:var(--gray);line-height:1.2}
@@ -626,6 +633,11 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 .grupo-clickable:active{opacity:.85}
 .grupo-exclamacion{display:inline-block;margin-left:2px;color:#b7a57a;font-weight:700;font-size:12px;opacity:.8}
 .grupo-no-viene{color:#b7a57a;text-decoration:line-through;text-decoration-thickness:1px;text-decoration-color:#b7a57a}
+.grupo-hl-visible{background:rgba(192,132,252,.10);border:1px solid rgba(192,132,252,.24);border-radius:10px;padding:8px 10px;margin:4px 0}
+.grupo-hl-visible .grupo-nombre,.grupo-hl-visible .grupo-horario{color:#c084fc!important}
+.grupo-hl-chip{display:inline-flex;align-items:center;margin-left:5px;padding:1px 6px;border-radius:999px;border:1px solid rgba(192,132,252,.45);background:rgba(192,132,252,.16);color:#e9d5ff;font-size:8px;font-weight:900;letter-spacing:.3px;vertical-align:middle}
+.grupo-tl-name.is-hl{background:rgba(192,132,252,.10)}
+.grupo-tl-name.is-hl .nm,.grupo-tl-name.is-hl .sch{color:#c084fc!important}
 #disp-cartel{position:fixed;left:50%;bottom:88px;transform:translate(-50%,20px);background:rgba(13,22,35,.96);border:1px solid rgba(200,168,75,.45);color:var(--white);padding:9px 12px;border-radius:10px;font-size:12px;z-index:950;opacity:0;pointer-events:none;transition:all .2s ease;max-width:88vw;text-align:center}
 #disp-cartel.on{opacity:1;transform:translate(-50%,0)}
 
@@ -853,6 +865,10 @@ body{font-family:"Outfit",sans-serif;background:var(--bg);color:var(--white);dis
 .ta-month-tabs::-webkit-scrollbar{display:none}
 .ta-month-tab{border:1px solid rgba(96,165,250,.28);background:rgba(96,165,250,.08);color:#bfdbfe;border-radius:999px;padding:7px 11px;font-family:'Outfit',sans-serif;font-size:10px;font-weight:900;white-space:nowrap;cursor:pointer;flex:0 0 auto}
 .ta-month-tab.active{background:rgba(200,168,75,.18);border-color:rgba(200,168,75,.48);color:var(--gold)}
+.ta-group-tabs{margin-top:-2px;margin-bottom:10px}
+.ta-group-tabs::before{content:'Filtrar grupo';flex:0 0 auto;align-self:center;font-size:8px;color:var(--gray);font-weight:900;text-transform:uppercase;letter-spacing:.45px;margin-right:2px}
+.ta-group-tab{border-color:rgba(74,222,128,.25);background:rgba(74,222,128,.07);color:#bbf7d0}
+.ta-group-tab.active{background:rgba(74,222,128,.15);border-color:rgba(74,222,128,.45);color:#6ee7b7}
 .ta-empty-memory{border:1px solid rgba(96,165,250,.22);background:rgba(96,165,250,.07);border-radius:14px;padding:13px;color:#bfdbfe;font-size:12px;line-height:1.45;margin-top:10px}
 .op-comp-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:10px 14px;cursor:pointer;display:flex;align-items:center;gap:12px;-webkit-tap-highlight-color:transparent}
 .op-comp-card:active{transform:scale(.98)}
@@ -1243,7 +1259,7 @@ body{font-size:14px}
 #op-cal-card div[style*="font-size:13.5px"]{font-size:11px!important;margin-bottom:4px!important;line-height:1.05!important}
 .op-cal-rows{gap:4px!important;margin-top:4px!important}
 .op-cal-row{padding:5px 8px!important;border-radius:8px!important;min-height:0!important}
-.op-cal-rl{font-size:13.5px!important;line-height:1.05!important}
+.op-cal-rl{font-size:11.5px!important;line-height:1.05!important}
 .op-cal-rv{font-size:19.5px!important;line-height:1!important}
 #op-cal-card div[style*="margin-top:10px;padding-top:8px"]{margin-top:7px!important;padding-top:6px!important}
 #op-tope-parcial,#op-tope-fijo{font-size:13px!important;padding:3px 8px!important;border-radius:8px!important}
@@ -1275,6 +1291,223 @@ body{font-size:14px}
   .op-cal-card{padding:8px 9px!important}.op-cal-row{padding:4px 7px!important}.op-cal-rl{font-size:12.5px!important}.op-cal-rv{font-size:18px!important}
   #op-cal-card span[style*="font-size:20px"]{font-size:14px!important}#op-cal-restante,#op-cal-media-mes{font-size:17px!important}
   .op-turno-card.op-tc-horiz{padding:6px 11px!important}.op-tc-pct{font-size:29px!important}.op-tc-shift{font-size:19px!important}.op-tc-times span{font-size:18px!important}
+}
+
+
+/* === Ajuste Compañeros por día: panel fijo, solo scroll en lista/timeline === */
+#calc-panel{
+  top:max(8px, env(safe-area-inset-top));
+  bottom:calc(72px + env(safe-area-inset-bottom));
+  height:auto;
+  max-height:none;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  min-height:0;
+  padding:12px 20px 8px;
+}
+#calc-panel.show{transform:translateY(0)}
+#calc-panel > div[style*="justify-content:center"],
+#calc-panel > div[style*="justify-content:space-between"],
+#calc-panel .calc-sub,
+#calc-panel .calc-btn-row,
+#grupo-import-hint{flex:0 0 auto}
+#calc-panel .calc-sub{margin-bottom:8px}
+#calc-panel .calc-btn-row{margin-bottom:8px}
+#grupo-panel.open,#grupo-timeline.open{
+  flex:1 1 auto;
+  min-height:0;
+  max-height:none!important;
+  overflow-y:auto;
+  overflow-x:hidden;
+  padding-bottom:8px;
+  margin-top:6px;
+}
+#grupo-import-hint{margin-top:6px!important;margin-bottom:0!important;padding-bottom:0!important}
+@media(max-height:720px){
+  #calc-panel{padding-top:8px}
+  #calc-panel .calc-sub{margin-bottom:6px}
+  #calc-panel .calc-btn-row{gap:5px;margin-bottom:6px}
+  #calc-panel .calc-small-btn{padding:5px 9px;font-size:10.5px}
+}
+
+
+/* === Compañeros por día: botones compactos sin quitar acciones === */
+#calc-panel > div:first-child{padding:3px 0 2px!important}
+#calc-panel > div:first-child button{padding:3px 24px!important;font-size:10px!important;line-height:1!important}
+#calc-panel > div[style*="justify-content:space-between"]{margin-bottom:2px!important;align-items:flex-end!important}
+#calc-panel .calc-title{font-size:24px!important;line-height:.95!important;letter-spacing:.9px!important}
+#calc-panel #btn-toda-plantilla2{height:28px!important;padding:0 9px!important;font-size:9.5px!important;border-radius:9px!important}
+#calc-panel .calc-sub{font-size:10.5px!important;line-height:1.25!important;margin-bottom:5px!important}
+#calc-panel .calc-btn-row{
+  display:grid!important;
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  gap:4px!important;
+  margin-bottom:5px!important;
+}
+#calc-panel .calc-btn-row > button{
+  width:100%!important;
+  min-width:0!important;
+  height:31px!important;
+  padding:0 5px!important;
+  border-radius:9px!important;
+  font-size:9.8px!important;
+  line-height:1!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  font-weight:800!important;
+}
+#calc-panel #btn-sort-salida{font-size:13px!important;padding:0!important}
+@media(max-width:360px){
+  #calc-panel .calc-btn-row > button{font-size:9.2px!important;height:30px!important;padding:0 3px!important}
+  #calc-panel .calc-title{font-size:22px!important}
+}
+
+/* === Compañeros por día: botones ultra compactos v2 === */
+#calc-panel{
+  padding-top:7px!important;
+}
+#calc-panel > div:first-child{
+  padding:0!important;
+  margin:0 0 2px!important;
+  height:24px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+}
+#calc-panel > div:first-child button{
+  height:22px!important;
+  padding:0 22px!important;
+  font-size:9px!important;
+  line-height:1!important;
+  border-radius:999px!important;
+}
+#calc-panel > div[style*="justify-content:space-between"]{
+  margin-bottom:1px!important;
+  gap:6px!important;
+  align-items:center!important;
+}
+#calc-panel .calc-title{
+  font-size:21px!important;
+  line-height:.9!important;
+  letter-spacing:.75px!important;
+  white-space:nowrap!important;
+}
+#calc-panel #btn-toda-plantilla2{
+  height:23px!important;
+  min-height:23px!important;
+  padding:0 8px!important;
+  font-size:8.5px!important;
+  border-radius:8px!important;
+  line-height:1!important;
+  max-width:145px!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+#calc-panel .calc-sub{
+  font-size:9px!important;
+  line-height:1.12!important;
+  margin:0 0 4px!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+#calc-panel .calc-btn-row{
+  display:grid!important;
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  gap:3px!important;
+  margin:0 0 4px!important;
+}
+#calc-panel .calc-btn-row > button{
+  height:25px!important;
+  min-height:25px!important;
+  padding:0 3px!important;
+  border-radius:8px!important;
+  font-size:8.7px!important;
+  line-height:1!important;
+  letter-spacing:-.15px!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+#calc-panel #btn-sort-salida{
+  height:25px!important;
+  min-height:25px!important;
+  font-size:12px!important;
+  padding:0!important;
+}
+#grupo-panel.open,#grupo-timeline.open{
+  margin-top:4px!important;
+}
+.grupo-tl-hint{
+  margin-bottom:4px!important;
+  font-size:8.8px!important;
+  line-height:1.1!important;
+}
+@media(max-width:360px){
+  #calc-panel .calc-title{font-size:19px!important;letter-spacing:.55px!important}
+  #calc-panel #btn-toda-plantilla2{max-width:130px!important;font-size:8px!important;padding:0 6px!important}
+  #calc-panel .calc-btn-row > button{height:24px!important;min-height:24px!important;font-size:8px!important;padding:0 2px!important}
+  #calc-panel .calc-sub{font-size:8.5px!important}
+}
+@media(max-height:720px){
+  #calc-panel{padding-top:5px!important}
+  #calc-panel > div:first-child{height:20px!important;margin-bottom:1px!important}
+  #calc-panel > div:first-child button{height:19px!important;font-size:8.5px!important}
+  #calc-panel .calc-title{font-size:19px!important}
+  #calc-panel .calc-sub{display:none!important}
+  #calc-panel .calc-btn-row > button{height:23px!important;min-height:23px!important;font-size:8px!important}
+  #calc-panel #btn-sort-salida{height:23px!important;min-height:23px!important}
+}
+
+
+/* Calendario: evita scroll muerto debajo del resumen */
+body[data-panel="afiliate"] #scroll-area{
+  padding-bottom:calc(76px + env(safe-area-inset-bottom))!important;
+  overscroll-behavior-y:contain;
+}
+body[data-panel="afiliate"] #panel-afiliate{
+  margin-bottom:0!important;
+}
+
+
+/* Mi jornada: destacar el estado Trabajando */
+.op-turno-card.state-working.op-tc-horiz .op-tc-col-b{
+  flex:1 1 150px!important;
+  min-width:130px!important;
+  align-items:center!important;
+  justify-content:center!important;
+  text-align:center!important;
+}
+.op-turno-card.state-working.op-tc-horiz .op-tc-sub{
+  font-size:25px!important;
+  font-weight:900!important;
+  line-height:.95!important;
+  letter-spacing:.25px!important;
+  text-transform:uppercase!important;
+  white-space:nowrap!important;
+  color:var(--gold)!important;
+}
+@media(max-width:360px){
+  .op-turno-card.state-working.op-tc-horiz .op-tc-col-b{min-width:116px!important;flex-basis:116px!important}
+  .op-turno-card.state-working.op-tc-horiz .op-tc-sub{font-size:22px!important;letter-spacing:.1px!important}
+}
+
+
+/* === Compañeros por día: dejar zona superior libre para cerrar tocando fuera === */
+#calc-panel{
+  top:max(48px, calc(env(safe-area-inset-top) + 44px))!important;
+  bottom:calc(32px + env(safe-area-inset-bottom))!important;
+}
+@media(max-height:720px){
+  #calc-panel{
+    top:max(42px, calc(env(safe-area-inset-top) + 38px))!important;
+    bottom:calc(28px + env(safe-area-inset-bottom))!important;
+  }
 }
 
 </style>
@@ -2048,6 +2281,10 @@ function driveList(params){
 var currentPanel='documentos';
 function switchTab(name,tabEl,navEl){
   currentPanel=name;
+  try{
+    document.body.setAttribute('data-panel',name);
+    if(typeof cerrarCompanerosPorDia==='function')cerrarCompanerosPorDia();
+  }catch(e){}
   document.querySelectorAll(".panel").forEach(function(p){p.classList.remove("active")});
   document.querySelectorAll(".tab").forEach(function(t){t.classList.remove("active")});
   document.querySelectorAll(".nav-btn").forEach(function(n){n.classList.remove("active")});
@@ -2364,10 +2601,9 @@ function borrarDatosAntiguosPlantilla(){
   _hpBorrarDatosImportados();
 }
 function _hpBorrarDatosImportados(){
-  var key=(typeof _GRUPO_KEY!=='undefined'?_GRUPO_KEY:'cta_grupo_2026');
+  var key=(typeof _HP_GRUPO_KEY!=='undefined'?_HP_GRUPO_KEY:'cta_hp_grupo_2026');
   try{
     localStorage.removeItem(key+'_map');
-    localStorage.removeItem('cta_mi_empleado');
   }catch(e){}
   _hpData={rows:[],weeks:[],totalHoras:0,totalCambios:0,monthLabel:'sin datos'};
   var body=document.getElementById('hp-body');
@@ -2376,16 +2612,7 @@ function _hpBorrarDatosImportados(){
   if(search)search.value='';
   if(sub)sub.textContent='Datos importados borrados · importa de nuevo el Excel del grupo';
   if(body)body.innerHTML='<div class="hp-empty">Datos antiguos borrados.<br>Importa de nuevo el Excel del grupo para recalcular con datos limpios.</div>';
-  var btn=document.getElementById('btn-import-grupo');
-  if(btn)btn.classList.remove('has-data');
-  var hint=document.getElementById('grupo-import-hint');
-  if(hint)hint.style.display='none';
-  var panel=document.getElementById('grupo-panel');
-  if(panel){panel.innerHTML='';panel.classList.remove('open');}
-  var tl=document.getElementById('grupo-timeline');
-  if(tl){tl.innerHTML='';tl.classList.remove('open');}
-  var banner=document.getElementById('op-grupo-import-banner');
-  if(banner)banner.style.display='block';
+  // No tocamos Compañeros por día: Horas plantilla tiene su propia memoria.
 }
 var _hpLogoTapTs=0,_hpCasaGestoBloqueadoHasta=0;
 function abrirMenuSecretoCta(){
@@ -2550,7 +2777,7 @@ function _hpGrupoMonths(){
   return (typeof _GRUPO_MONTHS!=='undefined'&&_GRUPO_MONTHS.length)?_GRUPO_MONTHS:['ENERO','FEBRERO','MARZO','ABRIL','MAYO','JUNIO','JULIO','AGOSTO','SEPTIEMBRE','OCTUBRE','NOVIEMBRE','DICIEMBRE'];
 }
 function _hpLeerMapaGrupo(){
-  var key=(typeof _GRUPO_KEY!=='undefined'?_GRUPO_KEY:'cta_grupo_2026')+'_map';
+  var key=(typeof _HP_GRUPO_KEY!=='undefined'?_HP_GRUPO_KEY:'cta_hp_grupo_2026')+'_map';
   try{return JSON.parse(localStorage.getItem(key)||'{}')||{};}catch(e){return {};}
 }
 function _hpElegirMes(nominaMap){
@@ -2683,7 +2910,20 @@ function _hpTurnoFinal(emp,dateObj,monthKey,day){
 function _hpCambioToTurnoHoras(c,turnoOriginal){
   if(!c)return turnoOriginal;
   var tipo=String(c.tipo||'').toLowerCase();
-  var etiqueta=String(c.tipo||'Cambio').toUpperCase();
+  var esHL=(typeof _cambioCompartidoEsHL==='function')?_cambioCompartidoEsHL(c):(tipo==='hl'||tipo==='hlp'||(c.hlIni&&c.hlFin));
+  var puedeVerHL=(typeof _usuarioPuedeVerHLCompartido==='function')?_usuarioPuedeVerHLCompartido():false;
+  var etiqueta=esHL?(puedeVerHL?_labelHLCompartido(c):'Libre'):String(c.tipo||'Cambio').toUpperCase();
+
+  // Protección sindical: para usuarios normales, una HL compartida no se etiqueta como HL.
+  // HL completa se muestra como día no operativo; HL parcial solo recorta el tramo afectado.
+  if(esHL&&!puedeVerHL){
+    if(c.hlIni&&c.hlFin&&turnoOriginal){
+      var rec=_restarRangoDeTurno(Object.assign({},turnoOriginal),{ini:c.hlIni,fin:c.hlFin});
+      return Object.assign({},rec,{cambioCompartido:false,etiquetaCambio:''});
+    }
+    return {tipo:'libre',e1:'',s1:'',e2:'',s2:'',total:0,cambioCompartido:false,etiquetaCambio:''};
+  }
+
   if(c.e1&&c.s1){
     var turnoCambio={
       tipo:tipo||'trabajado',
@@ -2693,8 +2933,13 @@ function _hpCambioToTurnoHoras(c,turnoOriginal){
       s2:c.s2||'',
       total:c.total||0,
       cambioCompartido:true,
-      etiquetaCambio:etiqueta
+      etiquetaCambio:etiqueta,
+      hlVisible:esHL&&puedeVerHL
     };
+    if(c.hlIni&&c.hlFin){
+      turnoCambio=_restarRangoDeTurno(turnoCambio,{ini:c.hlIni,fin:c.hlFin});
+      turnoCambio=Object.assign({},turnoCambio,{cambioCompartido:true,etiquetaCambio:etiqueta,hlVisible:esHL&&puedeVerHL});
+    }
     return turnoCambio;
   }
   if(parseFloat(String(c.total||'').replace(',','.'))>0){
@@ -2706,13 +2951,14 @@ function _hpCambioToTurnoHoras(c,turnoOriginal){
       s2:'',
       total:c.total,
       cambioCompartido:true,
-      etiquetaCambio:etiqueta
+      etiquetaCambio:etiqueta,
+      hlVisible:esHL&&puedeVerHL
     };
   }
   if(_hpTurnoHoras(turnoOriginal)>0||(turnoOriginal&&turnoOriginal.e1&&turnoOriginal.s1)){
-    return Object.assign({},turnoOriginal,{tipo:tipo||turnoOriginal.tipo||'trabajado',cambioCompartido:true,etiquetaCambio:etiqueta});
+    return Object.assign({},turnoOriginal,{tipo:tipo||turnoOriginal.tipo||'trabajado',cambioCompartido:true,etiquetaCambio:etiqueta,hlVisible:esHL&&puedeVerHL});
   }
-  return {tipo:tipo||'libre',e1:'',s1:'',e2:'',s2:'',cambioCompartido:true,etiquetaCambio:etiqueta||'LIBRE'};
+  return {tipo:tipo||'libre',e1:'',s1:'',e2:'',s2:'',cambioCompartido:true,etiquetaCambio:etiqueta||'LIBRE',hlVisible:esHL&&puedeVerHL};
 }
 function _hpSemanaInfo(dateObj){
   var dow=(dateObj.getDay()+6)%7;
@@ -2738,10 +2984,11 @@ function calcularHorasPlantilla(year){
       var tieneDatoGuardado=Object.prototype.hasOwnProperty.call(diasMesRaw,String(d))||Object.prototype.hasOwnProperty.call(diasMesRaw,d);
       var turnoBase=(diasMesRaw[d]||diasMesRaw[String(d)]||null);
       var cambioCompartido=(typeof _getCambioCompartidoEmpleado==='function')?_getCambioCompartidoEmpleado(emp,fecha):null;
+      var cambioHLProtegido=!!(cambioCompartido&&typeof _cambioCompartidoEsHL==='function'&&_cambioCompartidoEsHL(cambioCompartido)&&!(typeof _usuarioPuedeVerHLCompartido==='function'&&_usuarioPuedeVerHLCompartido()));
       var turno=cambioCompartido?_hpCambioToTurnoHoras(cambioCompartido,turnoBase):turnoBase;
       var local=_hpTurnoLocalPropio(emp,fecha,monthKey,d);
-      var origenCambio=cambioCompartido?cambioCompartido:null;
-      var etiquetaCambio=cambioCompartido?String(cambioCompartido.tipo||'Cambio').toUpperCase():'';
+      var origenCambio=(cambioCompartido&&!cambioHLProtegido)?cambioCompartido:null;
+      var etiquetaCambio=(cambioCompartido&&!cambioHLProtegido)?((typeof _cambioCompartidoEsHL==='function'&&_cambioCompartidoEsHL(cambioCompartido)&&typeof _labelHLCompartido==='function')?_labelHLCompartido(cambioCompartido):String(cambioCompartido.tipo||'Cambio').toUpperCase()):'';
       if(local){
         turno=local;
         origenCambio={tipo:'APP LOCAL',actualizado_por:'Este dispositivo'};
@@ -2773,6 +3020,10 @@ function calcularHorasPlantilla(year){
         dia:d,
         horas:horas,
         horario:turno?_hpTurnoHorario(turno):(tieneDatoGuardado?'Sin horas':'Sin dato'),
+        e1:turno&&turno.e1||'',
+        s1:turno&&turno.s1||'',
+        e2:turno&&turno.e2||'',
+        s2:turno&&turno.s2||'',
         cambio:!!(turno&&turno.cambioCompartido),
         etiqueta:turno&&turno.etiquetaCambio||'',
         missing:!tieneDatoGuardado&&!turno,
@@ -2812,6 +3063,104 @@ function calcularHorasPlantilla(year){
   });
   return {year:year,monthIdx:monthIdx,monthKey:monthKey,monthLabel:monthNames[monthIdx]+' '+year,rows:rows,weeks:weekList,totalHoras:totalHoras,totalCambios:totalCambios,totalDeltaCambios:totalDeltaCambios,cambiosDetalle:cambiosDetalle};
 }
+
+function _hpBadFmtMin(m){
+  m=Math.max(0,Math.round(Number(m)||0));
+  var h=Math.floor(m/60),mm=m%60;
+  if(h&&mm)return h+'h '+mm+'m';
+  if(h)return h+'h';
+  return mm+'m';
+}
+function _hpBadMin(t){
+  if(!t)return null;
+  if(typeof _hpMin==='function')return _hpMin(t);
+  var m=String(t).match(/(\d{1,2}):(\d{2})/);
+  return m?(+m[1]*60+ +m[2]):null;
+}
+function _hpBadClasificarDia(dia){
+  if(!dia||!dia.e1||!dia.s1||!dia.e2||!dia.s2)return null;
+  var e1=_hpBadMin(dia.e1),s1=_hpBadMin(dia.s1),e2=_hpBadMin(dia.e2),s2=_hpBadMin(dia.s2);
+  if(e1===null||s1===null||e2===null||s2===null)return null;
+  var e2a=e2, s2a=s2;
+  if(e2a<s1)e2a+=1440;
+  if(s2a<e1)s2a+=1440;
+  var gap=e2a-s1;
+  var span=s2a-e1;
+  var trabajo=(typeof _hpDur==='function'?_hpDur(e1,s1):((s1<e1?s1+1440:s1)-e1))+(typeof _hpDur==='function'?_hpDur(e2,s2):((s2<e2?s2+1440:s2)-e2));
+  // Criterio fuerte: partido largo, bastantes horas reales y día partido de mañana a tarde-noche.
+  // Ejemplo: 08:00→11:00 / 15:00→20:00 = pausa 4h, trabajo 8h, empieza mañana y sale tarde-noche.
+  var empiezaManana=e1<720;        // antes de las 12:00
+  var terminaTardeNoche=s2a>=1200; // 20:00 o más tarde
+  if(gap>=240 && trabajo>=480 && empiezaManana && terminaTardeNoche){
+    var nivel=(gap>=300 || span>=780)?'Excesivo':'Muy malo';
+    var score=gap*2+span+trabajo;
+    var motivo='Pausa '+_hpBadFmtMin(gap)+' · trabajo '+_hpBadFmtMin(trabajo)+' · presencia '+_hpBadFmtMin(span)+' · mañana→noche';
+    return {nivel:nivel,gap:gap,span:span,trabajo:trabajo,score:score,motivo:motivo};
+  }
+  return null;
+}
+function renderHorasPlantillaTurnosMalos(){
+  var body=document.getElementById('hp-body'),sub=document.getElementById('hp-sub'),search=document.getElementById('hp-search');
+  if(!body)return;
+  var data=_hpData;
+  if(!data||!data.rows||!data.rows.length){
+    body.innerHTML='<div class="hp-empty">No hay empleados importados. Importa primero el Excel del grupo.</div>';
+    return;
+  }
+  if(search)search.setAttribute('oninput','renderHorasPlantillaTurnosMalos()');
+  if(sub)sub.textContent='Turnos partidos excesivamente malos · '+data.monthLabel;
+  var q=(search&&search.value?search.value:'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+  var puedeVerPrivados=(typeof _usuarioActualEsArturo==='function')?_usuarioActualEsArturo():false;
+  var malos=[];
+  (data.rows||[]).forEach(function(r){
+    if((r.privado||_hpEsEmpleadoPrivado(r))&&!puedeVerPrivados)return;
+    var rNC=_hpNombreCategoriaLimpio(r);
+    var nombre=rNC.nombre||r.nombre||'';
+    var categoria=rNC.categoria||r.categoria||'General';
+    (r.dias||[]).forEach(function(dia){
+      var bad=_hpBadClasificarDia(dia);
+      if(!bad)return;
+      var txt=(nombre+' '+categoria+' dia '+dia.dia+' '+dia.horario+' '+bad.motivo).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+      if(q&&txt.indexOf(q)<0)return;
+      malos.push({nombre:nombre,categoria:categoria,dia:dia.dia,horario:dia.horario,bad:bad});
+    });
+  });
+  malos.sort(function(a,b){
+    if(a.dia!==b.dia)return a.dia-b.dia;
+    var sd=(b.bad.score||0)-(a.bad.score||0);
+    if(sd)return sd;
+    return String(a.nombre||'').localeCompare(String(b.nombre||''),'es');
+  });
+  var totalBase=0;
+  (data.rows||[]).forEach(function(r){(r.dias||[]).forEach(function(d){if(_hpBadClasificarDia(d))totalBase++;});});
+  var html='<div class="hp-summary">'
+    +'<div class="hp-kpi"><div class="hp-kpi-v">'+malos.length+'</div><div class="hp-kpi-l">Detectados</div></div>'
+    +'<div class="hp-kpi"><div class="hp-kpi-v">4h+</div><div class="hp-kpi-l">Pausa</div></div>'
+    +'<button class="hp-kpi hp-kpi-btn" onclick="renderHorasPlantillaLista()"><div class="hp-kpi-v">←</div><div class="hp-kpi-l">Volver</div></button>'
+    +'</div>'
+    +'<button class="hp-back" onclick="renderHorasPlantillaLista()">← Volver a empleados</button>'
+    +'<div class="hp-empty" style="padding:8px 4px 12px;text-align:left">Criterio usado: partido de 4h o más, trabajo real de 8h o más, empieza por la mañana y sale por la tarde-noche, desde las 20:00. Ejemplo malo: 08:00→11:00 / 15:00→20:00.</div>';
+  if(!malos.length){
+    body.innerHTML=html+'<div class="hp-empty">No encuentro turnos excesivamente malos con ese criterio'+(q?' y ese filtro.':'.')+'</div>';
+    return;
+  }
+  malos.forEach(function(x){
+    var cls=x.bad.nivel==='Excesivo'?' minus':' zero';
+    html+='<div class="hp-change">'
+      +'<div class="hp-change-top">'
+        +'<div><div class="hp-name">'+escH(x.nombre)+'</div><div class="hp-cat">'+escH(x.categoria)+' · Día '+x.dia+'</div></div>'
+        +'<div class="hp-delta'+cls+'">'+escH(x.bad.nivel)+'</div>'
+      +'</div>'
+      +'<div class="hp-change-lines">'
+        +'<div class="hp-change-line"><span>Turno</span><b>'+escH(String(x.horario||'').replace(/-/g,'→'))+'</b></div>'
+        +'<div class="hp-change-line"><span>Motivo</span><b>'+escH(x.bad.motivo)+'</b></div>'
+      +'</div>'
+    +'</div>';
+  });
+  body.innerHTML=html;
+  body.scrollTop=0;
+}
+
 function renderHorasPlantillaLista(){
   var body=document.getElementById('hp-body'),sub=document.getElementById('hp-sub'),search=document.getElementById('hp-search');
   if(!body)return;
@@ -3656,10 +4005,10 @@ document.getElementById("btn-logout").addEventListener("click",function(){
     <rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="10" y2="10"/><line x1="14" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="10" y2="14"/><line x1="14" y1="14" x2="16" y2="14"/><line x1="8" y1="18" x2="10" y2="18"/><line x1="14" y1="18" x2="16" y2="18"/>
   </svg>
 </button>
-<div id="calc-overlay"></div>
+<div id="calc-overlay" onclick="if(typeof cerrarCompanerosPorDia==='function')cerrarCompanerosPorDia()"></div>
 <div id="calc-panel">
   <div style="display:flex;justify-content:center;padding:6px 0 4px">
-    <button onclick="document.getElementById('calc-panel').classList.remove('show');document.getElementById('calc-overlay').classList.remove('show')" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:20px;color:var(--gray);font-size:11px;font-weight:600;padding:4px 28px;cursor:pointer;font-family:'Outfit',sans-serif;letter-spacing:.3px">✕</button>
+    <button onclick="(typeof cerrarCompanerosPorDia==='function'?cerrarCompanerosPorDia():(document.getElementById('calc-panel').classList.remove('show'),document.getElementById('calc-overlay').classList.remove('show')))" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:20px;color:var(--gray);font-size:11px;font-weight:600;padding:4px 28px;cursor:pointer;font-family:'Outfit',sans-serif;letter-spacing:.3px">✕</button>
   </div>
   <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px">
     <div class="calc-title" style="margin:0">Compañeros por día</div>
@@ -3668,6 +4017,7 @@ document.getElementById("btn-logout").addEventListener("click",function(){
   <div class="calc-sub">Importa el Excel del grupo y consulta quién coincide contigo</div>
   <div class="calc-btn-row">
     <button class="calc-small-btn" id="btn-import-grupo" onclick="importarGrupo()">📥 Importar</button>
+    <button class="calc-small-btn" id="btn-gestionar-grupo" onclick="gestionarImportacionesCompaneros()" title="Borrar una importación equivocada">🧹 Gestionar</button>
     <button class="calc-small-btn" id="btn-mismo-turno" onclick="filtrarMismoTurno()">🎯 Mismo turno</button>
     <button class="calc-small-btn" id="btn-en-turno" onclick="filtrarEnTurno()">⚡ En turno</button>
     <button id="btn-sort-salida" onclick="toggleSortSalida()" title="Ordenar por próxima salida" style="background:rgba(200,168,75,.12);border:1px solid rgba(200,168,75,.3);border-radius:8px;padding:5px 9px;cursor:pointer;font-size:13px;line-height:1">⇅</button>
@@ -3875,6 +4225,8 @@ function initGoogleWhenReady(intentos){
     var d=getDay(now.getFullYear(),now.getMonth(),now.getDate());
     var bar=document.getElementById('bottom-turno');
     var nav=document.getElementById('bottom-nav');
+    var twSubBase=document.getElementById('tw-subtipo');
+    if(twSubBase)twSubBase.classList.remove('trabajando-activo');
 
     // Festivo/HL/vacaciones → rest countdown
     var _restTipos=['festivo','hl','hlp','vacaciones'];
@@ -3984,6 +4336,7 @@ function initGoogleWhenReady(intentos){
       document.getElementById('tw-subtipo').style.color='#c8a84b';
       document.getElementById('tw-times').textContent=timeStr;
       document.getElementById('tw-subtipo').textContent=subtipo;
+      document.getElementById('tw-subtipo').classList.add('trabajando-activo');
       var pctEl=document.getElementById('tw-pct');
       pctEl.textContent=pct+'%';pctEl.style.color='#c8a84b';pctEl.style.fontSize='22px';
       document.getElementById('tw-remain').textContent='Quedan '+fmtLeft(Math.max(0,totalMin-elapsedMin));
@@ -4271,7 +4624,7 @@ function initGoogleWhenReady(intentos){
       style="border:2px dashed rgba(96,165,250,.3);border-radius:14px;padding:24px 16px;text-align:center;cursor:pointer;margin-bottom:12px;transition:border-color .2s;background:rgba(96,165,250,.05)">
       <div style="font-size:34px;margin-bottom:8px">📂</div>
       <div id="ta-drop-txt" style="font-size:13px;color:var(--gray);font-weight:700">Toca para seleccionar un Excel</div>
-      <div style="font-size:10px;color:var(--gray);margin-top:4px;opacity:.75">Si el mes ya existe, se sustituye. Si no, se añade.</div>
+      <div style="font-size:10px;color:var(--gray);margin-top:4px;opacity:.75">Grupo: si el mes ya existe, se acumula por empleado. Personal: actualiza ese mes.</div>
     </div>
     <input type="file" id="ta-file" accept=".xlsx,.xls" style="display:none" onchange="taHandleFile(this.files[0])">
     <div id="ta-status" style="font-size:11px;color:var(--gray);margin-bottom:10px;line-height:1.45">Sin datos cargados.</div>
@@ -4559,6 +4912,7 @@ function _ctaLogHumanizar(tipo,detalle){
     ver_companeros:'Abrir compañeros por día',
     abrirCompanerosPorDia:'Abrir compañeros por día',
     importar_companeros:'Importar compañeros',
+    gestionarImportacionesCompaneros:'Compañeros: gestionar importaciones',
     importarGrupoDesdePlantilla:'Horas plantilla: importar grupo',
     borrarDatosAntiguosPlantilla:'Horas plantilla: borrar importados',
     cerrarHorasPlantilla:'Cerrar horas plantilla',
@@ -5091,10 +5445,12 @@ function tiToMin(t){if(!t||t.indexOf(':')<0)return null;var p=t.split(':');retur
 var _taResultado=null;
 var _taBusquedaNombre='';
 var _taMesSeleccionado='ALL';
+var _taGrupoSeleccionado='ALL';
 var _taAvisoMemoria='';
 var _taDetalleStore={};
 var _taDetalleSeq=0;
 var _TA_MEMORY_KEY='cta_ta_memory_v1';
+var _TA_MEMORY_BACKUP_KEY='cta_ta_memory_v1_backup';
 var _TA_HORAS_MODO_KEY='cta_ta_horas_modo_v1';
 var _taHorasModo=taLeerModoHorasAnalizador();
 var _TA_STATS_KEYS=['turnos','partidos','madrugas','nocturnas','noches','horasTurnoMin','horasContadorMin'];
@@ -5148,6 +5504,7 @@ function taLimpiarDatos(){
   _taResultado=null;
   _taBusquedaNombre='';
   _taMesSeleccionado='ALL';
+  _taGrupoSeleccionado='ALL';
   _taAvisoMemoria='';
   var result=document.getElementById('ta-result');
   var status=document.getElementById('ta-status');
@@ -5179,6 +5536,30 @@ function taGuardarMemoria(mem){
     alert('No he podido guardar la memoria interna. Puede que el navegador tenga el almacenamiento lleno.');
     return false;
   }
+}
+function taGuardarBackupMemoria(rawMem,filename){
+  try{
+    var before=rawMem?JSON.parse(rawMem):taCrearMemoria();
+    localStorage.setItem(_TA_MEMORY_BACKUP_KEY,JSON.stringify({ts:new Date().toISOString(),filename:String(filename||''),before:before}));
+  }catch(e){}
+}
+function taFusionarMesGrupoAnalizador(existing,incoming){
+  if(!existing||existing.kind!=='grupo')return incoming;
+  var empMap={};
+  (existing.empleados||[]).forEach(function(emp){
+    var key=emp.key||taEmpleadoKey(emp);
+    empMap[key]={key:key,nomina:emp.nomina||'',nombre:emp.nombre||'',categoria:emp.categoria||'',total:taStatsClone(emp.total)};
+  });
+  (incoming.empleados||[]).forEach(function(emp){
+    var key=emp.key||taEmpleadoKey(emp);
+    empMap[key]={key:key,nomina:emp.nomina||'',nombre:emp.nombre||'',categoria:emp.categoria||'',total:taStatsClone(emp.total)};
+  });
+  var empleados=Object.keys(empMap).map(function(k){return empMap[k];}).filter(function(e){return taStatsTieneDatos(e.total);});
+  var campo=taHorasCampoAnalizador();
+  empleados.sort(function(a,b){return ((b.total&&b.total[campo])||0)-((a.total&&a.total[campo])||0);});
+  var total=taMesVacio();
+  empleados.forEach(function(emp){taSumaStats(total,emp.total);});
+  return{kind:'grupo',monthKey:incoming.monthKey,nombre:incoming.nombre||existing.nombre||taMesNombre(incoming.monthKey),filename:incoming.filename||existing.filename||'',total:total,empleados:empleados,updatedAt:new Date().toISOString(),acumulado:true};
 }
 function taMesesMemoria(mem){
   var months=(mem&&mem.months)||{};
@@ -5276,6 +5657,83 @@ function taSetMesAnalizador(monthKey){
   }
   taRenderDesdeMemoria();
 }
+
+function taGrupoLabel(cat){
+  var g=String(cat||'').trim();
+  return g||'Sin grupo';
+}
+function taGroupKeysResultado(r){
+  var map={};
+  (r&&r.empleados||[]).forEach(function(emp){
+    map[taGrupoLabel(emp&&emp.categoria)]=true;
+  });
+  return Object.keys(map).sort(function(a,b){return a.localeCompare(b,'es',{sensitivity:'base'});});
+}
+function taGruposSeleccionadosArray(keys){
+  keys=keys||[];
+  if(_taGrupoSeleccionado==='ALL')return keys;
+  if(Array.isArray(_taGrupoSeleccionado)){
+    return _taGrupoSeleccionado.filter(function(k){return keys.indexOf(k)>=0;}).sort(function(a,b){return keys.indexOf(a)-keys.indexOf(b);});
+  }
+  if(_taGrupoSeleccionado&&keys.indexOf(_taGrupoSeleccionado)>=0)return[_taGrupoSeleccionado];
+  return keys;
+}
+function taTextoGruposSeleccionados(gd){
+  if(!gd||!gd.groups||gd.groups.length<=1)return '';
+  if(gd.allActive)return 'Todos los grupos';
+  if(!gd.selected.length)return 'Ningún grupo';
+  if(gd.selected.length===1)return gd.selected[0];
+  return gd.selected.join(', ');
+}
+function taAplicarFiltroGrupoResultado(r){
+  var groups=taGroupKeysResultado(r);
+  var selected=taGruposSeleccionadosArray(groups);
+  var allActive=(_taGrupoSeleccionado==='ALL')||!groups.length||selected.length===groups.length;
+  if(!selected.length){allActive=true;selected=groups;_taGrupoSeleccionado='ALL';}
+  var empleados=(r&&r.empleados||[]).filter(function(emp){
+    return allActive||selected.indexOf(taGrupoLabel(emp&&emp.categoria))>=0;
+  });
+  var total=taMesVacio();
+  empleados.forEach(function(emp){taSumaStats(total,emp.total);});
+  return{groups:groups,selected:selected,allActive:allActive,empleados:empleados,total:total};
+}
+function taGroupTabsHtml(r,gd){
+  gd=gd||taAplicarFiltroGrupoResultado(r);
+  var groups=gd.groups||[];
+  if(groups.length<=1)return '';
+  var html='<div class="ta-month-tabs ta-group-tabs">';
+  html+='<button class="ta-month-tab ta-group-tab '+(gd.allActive?'active':'')+'" onclick="taSetGrupoAnalizador(\'ALL\')">Todos</button>';
+  groups.forEach(function(g,i){
+    var active=gd.allActive||gd.selected.indexOf(g)>=0;
+    html+='<button class="ta-month-tab ta-group-tab '+(active?'active':'')+'" onclick="taSetGrupoAnalizadorIndex('+i+')">'+escH(g)+'</button>';
+  });
+  html+='</div>';
+  return html;
+}
+function taSetGrupoAnalizador(groupKey){
+  if(groupKey==='ALL'){
+    _taGrupoSeleccionado='ALL';
+  }else{
+    var keys=taGroupKeysResultado(_taResultado);
+    if(keys.indexOf(groupKey)<0){_taGrupoSeleccionado='ALL';}
+    else{
+      var sel=(_taGrupoSeleccionado==='ALL')?[]:taGruposSeleccionadosArray(keys);
+      var idx=sel.indexOf(groupKey);
+      if(idx>=0)sel.splice(idx,1);else sel.push(groupKey);
+      sel.sort(function(a,b){return keys.indexOf(a)-keys.indexOf(b);});
+      _taGrupoSeleccionado=sel.length?sel:'ALL';
+      if(sel.length===keys.length)_taGrupoSeleccionado='ALL';
+    }
+  }
+  taRenderDesdeMemoria();
+}
+function taSetGrupoAnalizadorIndex(idx){
+  var keys=taGroupKeysResultado(_taResultado);
+  var g=keys[Number(idx)];
+  if(!g)return;
+  taSetGrupoAnalizador(g);
+}
+
 function taBuildPersonaDesdeMemoria(mem){
   var keys=taSelectedMonthKeys(mem),allKeys=taMesesMemoria(mem),total=taMesVacio(),meses=[];
   keys.forEach(function(k){
@@ -5329,7 +5787,10 @@ function taRenderDesdeMemoria(){
   taRenderResultado(r);
 }
 function taGuardarImportacionEnMemoria(r){
+  var rawMemPrev=null;
+  try{rawMemPrev=localStorage.getItem(_TA_MEMORY_KEY);}catch(e){rawMemPrev=null;}
   var mem=taCargarMemoria();
+  if(!rawMemPrev){try{rawMemPrev=JSON.stringify(mem);}catch(e){rawMemPrev='';}}
   var importKind=(r&&r.kind==='grupo')?'grupo':'persona';
   var existingKeys=taMesesMemoria(mem);
   var changedKind=!!(mem.kind&&mem.kind!==importKind&&existingKeys.length);
@@ -5351,7 +5812,9 @@ function taGuardarImportacionEnMemoria(r){
         empleados.push({key:taEmpleadoKey(emp),nomina:emp.nomina||'',nombre:emp.nombre||'',categoria:emp.categoria||'',total:st});
         taSumaStats(total,st);
       });
-      markMonth(k,{kind:'grupo',monthKey:k,nombre:taMesNombre(k),filename:r.filename||'',total:total,empleados:empleados,updatedAt:new Date().toISOString()});
+      var incoming={kind:'grupo',monthKey:k,nombre:taMesNombre(k),filename:r.filename||'',total:total,empleados:empleados,updatedAt:new Date().toISOString()};
+      var monthData=mem.months[k]?taFusionarMesGrupoAnalizador(mem.months[k],incoming):incoming;
+      markMonth(k,monthData);
     });
   }else{
     (r.meses||[]).forEach(function(m){
@@ -5363,10 +5826,16 @@ function taGuardarImportacionEnMemoria(r){
     _taAvisoMemoria='No he detectado meses validos para guardar.';
     return false;
   }
+  taGuardarBackupMemoria(rawMemPrev,r&&r.filename);
   if(!taGuardarMemoria(mem))return false;
   _taMesSeleccionado=mesesImportados.length===1?[mesesImportados[0]]:'ALL';
-  _taAvisoMemoria=(changedKind?'Tipo de archivo distinto: he reiniciado la memoria del analizador. ':'')+
-    anadidos+' mes(es) añadido(s) · '+sustituidos+' mes(es) sustituido(s).';
+  if(importKind==='grupo'){
+    _taAvisoMemoria=(changedKind?'Tipo de archivo distinto: he reiniciado la memoria del analizador. ':'')+
+      anadidos+' mes(es) añadido(s) · '+sustituidos+' mes(es) acumulado(s).';
+  }else{
+    _taAvisoMemoria=(changedKind?'Tipo de archivo distinto: he reiniciado la memoria del analizador. ':'')+
+      anadidos+' mes(es) añadido(s) · '+sustituidos+' mes(es) sustituido(s).';
+  }
   return true;
 }
 function taRestaurarMemoria(){
@@ -5375,12 +5844,23 @@ function taRestaurarMemoria(){
   if(!keys.length){alert('No hay meses guardados para borrar.');return;}
   var seleccionActual=taSelectedMonthKeys(mem);
   var def=(_taMesSeleccionado!=='ALL'&&seleccionActual.length)?seleccionActual.map(taMesNombre).join(', '):'';
-  var msg='Escribe TODO para borrar toda la memoria.\n\nO escribe los meses que quieras borrar separados por coma.\nGuardados: '+keys.map(taMesNombre).join(', ');
+  var msg='Escribe ULTIMA para deshacer la última importación.\n\nEscribe TODO para borrar toda la memoria.\n\nO escribe los meses que quieras borrar separados por coma.\nGuardados: '+keys.map(taMesNombre).join(', ');
   var resp=prompt(msg,def);
   if(resp===null)return;
   resp=String(resp||'').trim();
   if(!resp)return;
   var upper=resp.toUpperCase();
+  if(upper==='ULTIMA'||upper==='DESHACER'){
+    var backup=null;
+    try{backup=JSON.parse(localStorage.getItem(_TA_MEMORY_BACKUP_KEY)||'null');}catch(e){backup=null;}
+    if(!backup||!backup.before||!backup.before.months){alert('No hay copia anterior disponible. Se guarda a partir de las próximas importaciones.');return;}
+    if(!confirm('Se restaurará el analizador al estado anterior a la última importación.\n\n¿Continuar?'))return;
+    try{localStorage.setItem(_TA_MEMORY_KEY,JSON.stringify(backup.before));localStorage.removeItem(_TA_MEMORY_BACKUP_KEY);}catch(e){alert('No he podido restaurar: '+e.message);return;}
+    _taMesSeleccionado='ALL';
+    _taAvisoMemoria='Restaurada la memoria anterior a la última importación.';
+    taRenderDesdeMemoria();
+    return;
+  }
   if(upper==='TODO'||upper==='TODOS'||upper==='ALL'){
     if(!confirm('Se borraran todos los meses guardados del analizador.'))return;
     try{localStorage.removeItem(_TA_MEMORY_KEY);}catch(e){}
@@ -5846,19 +6326,24 @@ function taRenderResultadoGrupo(r){
   var status=document.getElementById('ta-status');
   var result=document.getElementById('ta-result');
   if(!r||!result)return;
-  var t=r.total;
+  var gd=taAplicarFiltroGrupoResultado(r);
+  var t=gd.total;
+  var empleadosFiltrados=gd.empleados||[];
+  var grupoTxt=taTextoGruposSeleccionados(gd);
   if(status){
     if(r.memory){
-      status.innerHTML='Memoria interna: <b style="color:var(--white)">'+(r.availableMonths||[]).length+' mes(es) guardado(s)</b>'+
-        '<br>Viendo: <b style="color:var(--white)">'+escH(taTextoMesesSeleccionados(r))+'</b> · '+r.empleados.length+' empleados'+
+      status.innerHTML='Memoria interna: <b style="color:var(--white)">'+(r.availableMonths||[]).length+' mes(es) guardado(s)</b>'+ 
+        '<br>Viendo: <b style="color:var(--white)">'+escH(taTextoMesesSeleccionados(r))+'</b> · '+empleadosFiltrados.length+(gd.allActive?' empleados':' de '+r.empleados.length+' empleados')+
+        (grupoTxt?'<br>Grupo: <b style="color:var(--white)">'+escH(grupoTxt)+'</b>':'')+
         (_taAvisoMemoria?'<br><span style="color:#4ade80">'+escH(_taAvisoMemoria)+'</span>':'');
     }else{
-      status.innerHTML='Archivo de grupo: <b style="color:var(--white)">'+escH(r.filename||'Excel')+'</b>'+
-        '<br>'+r.empleados.length+' empleados con turno · '+(r.meses.length?r.meses.join(', '):'mes detectado');
+      status.innerHTML='Archivo de grupo: <b style="color:var(--white)">'+escH(r.filename||'Excel')+'</b>'+ 
+        '<br>'+empleadosFiltrados.length+(gd.allActive?' empleados con turno':' de '+r.empleados.length+' empleados')+' · '+(r.meses.length?r.meses.join(', '):'mes detectado')+
+        (grupoTxt?'<br>Grupo: <b style="color:var(--white)">'+escH(grupoTxt)+'</b>':'');
     }
   }
-  var html=taMonthTabsHtml(r)+'<div class="ta-kpis">'+
-    taRenderKpi(r.empleados.length,'Empleados','#e5e7eb')+
+  var html=taMonthTabsHtml(r)+taGroupTabsHtml(r,gd)+'<div class="ta-kpis">'+
+    taRenderKpi(empleadosFiltrados.length,'Empleados','#e5e7eb')+
     taRenderKpi(t.turnos,'Turnos','#60a5fa',t,'turnos','Turnos contabilizados')+
     taRenderKpi(t.partidos,'Partidos',null,t,'partidos','Turnos partidos contabilizados')+
     taRenderKpi(t.madrugas,'Madrugues <=06','#fbbf24',t,'madrugas','Madrugues contabilizados')+
@@ -5867,27 +6352,27 @@ function taRenderResultadoGrupo(r){
     taRenderKpi(taFmtHoras(t.horasContadorMin),'Horas contador','#4ade80',t,'horasContadorMin','Horas contador contabilizadas')+
     taRenderKpi(taFmtHoras(t.horasTurnoMin),'Horas totales','#93c5fd',t,'horasTurnoMin','Horas totales contabilizadas')+
   '</div>';
-  html+='<div class="ta-section-head"><div class="ta-section-title">Por empleado</div></div>'+
+  html+='<div class="ta-section-head"><div class="ta-section-title">Por empleado</div></div>'+ 
     taHorasModoHtml()+
     taSearchEmpleadoHtml()+
     taSortBar('empleados');
   var horasCampoEmp=taHorasCampoAnalizador();
   var horasLabelEmp=taHorasLabelAnalizador();
-  r.empleados.forEach(function(emp){
+  empleadosFiltrados.forEach(function(emp){
     var e=emp.total;
     var empSub=(r.memory&&((r.selectedMonths||[]).length!==1))?'Total '+((r.selectedMonths||[]).length)+' meses':(emp.categoria||'Grupo');
     html+='<div class="ta-emp" data-name="'+escH(taNormBuscaNombre(emp.nombre))+'">'+
-      '<div class="ta-emp-top"><div style="min-width:0"><div class="ta-emp-name">'+escH(emp.nombre||'Empleado')+'</div><div class="ta-emp-cat">'+escH(empSub)+'</div></div><div class="ta-emp-hours">'+taFmtHoras(e[horasCampoEmp]||0)+'<small>'+escH(horasLabelEmp)+'</small></div></div>'+
+      '<div class="ta-emp-top"><div style="min-width:0"><div class="ta-emp-name">'+escH(emp.nombre||'Empleado')+'</div><div class="ta-emp-cat">'+escH(empSub)+'</div></div><div class="ta-emp-hours">'+taFmtHoras(e[horasCampoEmp]||0)+'<small>'+escH(horasLabelEmp)+'</small></div></div>'+ 
       '<div class="ta-mini-grid">'+
         taMiniStat(e,'turnos','Turnos',(emp.nombre||'Empleado')+' · turnos')+
         taMiniStat(e,'partidos','Partidos',(emp.nombre||'Empleado')+' · partidos')+
         taMiniStat(e,'madrugas','Madrugues',(emp.nombre||'Empleado')+' · madrugues')+
         taMiniStat(e,'nocturnas','Noct.',(emp.nombre||'Empleado')+' · nocturnas')+
         taMiniStat(e,'noches','Noches',(emp.nombre||'Empleado')+' · noches')+
-      '</div>'+
+      '</div>'+ 
     '</div>';
   });
-  if(!r.empleados.length)html+='<div style="border:1px solid rgba(239,68,68,.25);background:rgba(239,68,68,.08);border-radius:12px;padding:12px;color:#fca5a5;font-size:12px;line-height:1.35">He detectado formato de grupo, pero no empleados con horas.</div>';
+  if(!empleadosFiltrados.length)html+='<div style="border:1px solid rgba(239,68,68,.25);background:rgba(239,68,68,.08);border-radius:12px;padding:12px;color:#fca5a5;font-size:12px;line-height:1.35">No hay empleados con horas en el grupo seleccionado.</div>';
   else html+='<div id="ta-search-empty" style="display:none;border:1px solid rgba(96,165,250,.25);background:rgba(96,165,250,.08);border-radius:12px;padding:12px;color:#bfdbfe;font-size:12px;line-height:1.35">No hay empleados con ese nombre.</div>';
   result.innerHTML=html;
   taAplicarFiltroNombre();
@@ -6674,6 +7159,7 @@ document.addEventListener('DOMContentLoaded',function(){
       <input class="hp-search" id="hp-search" placeholder="Buscar empleado..." oninput="renderHorasPlantillaLista()">
       <button class="hp-import" onclick="importarGrupoDesdePlantilla()">Importar grupo</button>
       <button class="hp-sort" id="hp-sort-btn" onclick="toggleOrdenHorasPlantilla()">Orden actual</button>
+      <button class="hp-bad" onclick="renderHorasPlantillaTurnosMalos()">Turnos malos</button>
       <button class="hp-clear" onclick="borrarDatosAntiguosPlantilla()">Borrar importados</button>
     </div>
   </div>
@@ -6687,6 +7173,13 @@ document.addEventListener('DOMContentLoaded',function(){
 
 // ─── GRUPO COMPAÑEROS ────────────────────────────────────────────
 var _GRUPO_KEY='cta_grupo_2026';
+// Datos independientes para el menú oculto "Horas plantilla".
+// No se mezclan con Compañeros por día.
+var _HP_GRUPO_KEY='cta_hp_grupo_2026';
+var _grupoImportDestino='companeros';
+function _grupoMapStorageKey(destino){
+  return ((destino==='horas'||destino==='plantilla'||destino==='hp')?_HP_GRUPO_KEY:_GRUPO_KEY)+'_map';
+}
 var _GRUPO_MONTHS=['ENERO','FEBRERO','MARZO','ABRIL','MAYO','JUNIO','JULIO','AGOSTO','SEPTIEMBRE','OCTUBRE','NOVIEMBRE','DICIEMBRE'];
 
 
@@ -6724,12 +7217,143 @@ function _estaExcluidoPlantilla(nombre,fechaISO){
 function resetGrupo(){
   if(!confirm('¿Borrar todos los datos del grupo importados?'))return;
   localStorage.removeItem(_GRUPO_KEY+'_map');
+  localStorage.removeItem(_GRUPO_KEY+'_map_backup');
   var btn=document.getElementById('btn-import-grupo');
   if(btn)btn.classList.remove('has-data');
   var hint=document.getElementById('grupo-import-hint');
   if(hint)hint.style.display='none';
   var panel=document.getElementById('grupo-panel');
   if(panel){panel.innerHTML='';panel.classList.remove('open');}
+}
+function _grupoLeerMapCompaneros(){
+  var map={};
+  try{map=JSON.parse(localStorage.getItem(_GRUPO_KEY+'_map')||'{}')||{};}catch(e){map={};}
+  return map;
+}
+function _grupoGuardarMapCompaneros(map){
+  try{localStorage.setItem(_GRUPO_KEY+'_map',JSON.stringify(map||{}));return true;}catch(e){alert('No he podido guardar los cambios: '+e.message);return false;}
+}
+function _grupoGuardarBackupCompaneros(rawMap,fileName,monthKey,etiqueta){
+  try{
+    var before=JSON.parse(rawMap||'{}')||{};
+    localStorage.setItem(_GRUPO_KEY+'_map_backup',JSON.stringify({ts:new Date().toISOString(),fileName:String(fileName||''),monthKey:String(monthKey||''),etiqueta:String(etiqueta||''),before:before}));
+  }catch(e){}
+}
+function _grupoNormalizarMesInput(txt){
+  var s=String(txt||'').trim();
+  if(!s)return '';
+  if(/^\d+$/.test(s))return _GRUPO_MONTHS[parseInt(s,10)-1]||'';
+  var n=s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  for(var i=0;i<_GRUPO_MONTHS.length;i++){
+    var m=_GRUPO_MONTHS[i].toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+    if(m===n||m.indexOf(n)===0||n.indexOf(m.slice(0,3))===0)return _GRUPO_MONTHS[i];
+  }
+  return '';
+}
+function _grupoResumenImportadosCompaneros(map){
+  var res={};
+  Object.keys(map||{}).forEach(function(k){
+    var emp=map[k]||{},cat=String(emp.categoria||'Sin categoría').trim()||'Sin categoría';
+    Object.keys(emp.meses||{}).forEach(function(mk){
+      if(!res[mk])res[mk]={total:0,cats:{}};
+      res[mk].total++;
+      res[mk].cats[cat]=(res[mk].cats[cat]||0)+1;
+    });
+  });
+  var meses=Object.keys(res).sort(function(a,b){return _GRUPO_MONTHS.indexOf(a)-_GRUPO_MONTHS.indexOf(b);});
+  if(!meses.length)return 'Sin meses guardados';
+  return meses.map(function(mk){
+    var cats=Object.keys(res[mk].cats).sort().map(function(c){return c+'('+res[mk].cats[c]+')';}).join(', ');
+    return mk+': '+res[mk].total+' empleados · '+cats;
+  }).join('\n');
+}
+function _grupoBorrarMesCategoriaCompaneros(map,monthKey,categoriaFiltro){
+  var catNorm=_normNombreGrupo(categoriaFiltro||'');
+  var empleadosAfectados=0,diasBorrados=0;
+  Object.keys(map||{}).forEach(function(k){
+    var emp=map[k]||{};
+    if(!emp.meses||!emp.meses[monthKey])return;
+    if(catNorm){
+      var empCat=_normNombreGrupo(emp.categoria||'');
+      if(empCat.indexOf(catNorm)<0&&catNorm.indexOf(empCat)<0)return;
+    }
+    diasBorrados+=Object.keys(emp.meses[monthKey]||{}).length;
+    delete emp.meses[monthKey];
+    empleadosAfectados++;
+    if(!Object.keys(emp.meses||{}).length)delete map[k];
+    else map[k]=emp;
+  });
+  return{empleados:empleadosAfectados,dias:diasBorrados};
+}
+function _grupoRefrescarTrasGestion(){
+  var map=_grupoLeerMapCompaneros();
+  var total=Object.keys(map).length;
+  var btn=document.getElementById('btn-import-grupo');
+  if(btn)btn.classList.toggle('has-data',total>0);
+  var hint=document.getElementById('grupo-import-hint');
+  var txt=document.getElementById('grupo-import-txt');
+  if(hint&&txt){
+    hint.style.display='block';
+    txt.style.color=total?'#4ade80':'#f87171';
+    txt.style.fontSize='11px';
+    txt.textContent=total?'Importaciones ajustadas · '+total+' empleados guardados':'Importaciones borradas';
+  }
+  if(typeof refrescarCompanerosPanel==='function'&&document.getElementById('calc-panel')&&document.getElementById('calc-panel').classList.contains('show')){
+    refrescarCompanerosPanel(window._grupoOffsetDias||0,false);
+  }
+}
+function gestionarImportacionesCompaneros(){
+  var map=_grupoLeerMapCompaneros();
+  if(!Object.keys(map).length){alert('No hay importaciones guardadas en Compañeros por día.');return;}
+  var resumen=_grupoResumenImportadosCompaneros(map);
+  var msg='Gestión de importaciones de Compañeros por día\n\n'+
+    'Escribe una opción:\n'+
+    'ULTIMA = deshacer la última importación hecha desde ahora en adelante\n'+
+    'TODO = borrar todo Compañeros por día\n'+
+    'JULIO = borrar ese mes completo\n'+
+    'JULIO/FTP OPERARIO = borrar solo esa categoría de ese mes\n\n'+
+    'Guardado ahora:\n'+resumen;
+  var resp=prompt(msg,'');
+  if(resp===null)return;
+  resp=String(resp||'').trim();
+  if(!resp)return;
+  var up=resp.toUpperCase();
+  if(up==='ULTIMA'||up==='DESHACER'){
+    var backup=null;
+    try{backup=JSON.parse(localStorage.getItem(_GRUPO_KEY+'_map_backup')||'null');}catch(e){backup=null;}
+    if(!backup||!backup.before){alert('No hay copia anterior disponible. La copia se guarda a partir de las próximas importaciones.');return;}
+    var label=(backup.monthKey?backup.monthKey+' · ':'')+(backup.etiqueta||backup.fileName||'última importación');
+    if(!confirm('Se restaurará el estado anterior a: '+label+'\n\n¿Continuar?'))return;
+    if(_grupoGuardarMapCompaneros(backup.before)){
+      try{localStorage.removeItem(_GRUPO_KEY+'_map_backup');}catch(e){}
+      _grupoRefrescarTrasGestion();
+    }
+    return;
+  }
+  if(up==='TODO'||up==='TODOS'||up==='ALL'){
+    if(!confirm('Se borrarán todos los datos importados en Compañeros por día.'))return;
+    localStorage.removeItem(_GRUPO_KEY+'_map');
+    localStorage.removeItem(_GRUPO_KEY+'_map_backup');
+    _grupoRefrescarTrasGestion();
+    return;
+  }
+  var totalEmp=0,totalDias=0,fallidos=[];
+  resp.split(/[;,\n]+/).forEach(function(part){
+    part=String(part||'').trim();
+    if(!part)return;
+    var piezas=part.split(/[\/|]+/);
+    var monthKey=_grupoNormalizarMesInput(piezas[0]);
+    var categoria=piezas.slice(1).join('/').trim();
+    if(!monthKey){fallidos.push(part);return;}
+    var res=_grupoBorrarMesCategoriaCompaneros(map,monthKey,categoria);
+    if(!res.empleados)fallidos.push(part);else{totalEmp+=res.empleados;totalDias+=res.dias;}
+  });
+  if(!totalEmp){alert('No he encontrado coincidencias para borrar.'+(fallidos.length?'\nNo encontrado: '+fallidos.join(', '):''));return;}
+  if(!confirm('Se borrarán '+totalDias+' día(s) de '+totalEmp+' empleado(s).\n\n¿Confirmas?'))return;
+  if(_grupoGuardarMapCompaneros(map)){
+    _grupoRefrescarTrasGestion();
+    if(fallidos.length)alert('Borrado realizado. No encontrado: '+fallidos.join(', '));
+  }
 }
 
 // Códigos de día que nunca son un nombre real, por si se han colado como "nombre"
@@ -6870,19 +7494,30 @@ document.addEventListener('DOMContentLoaded',function(){setTimeout(_ajustarFitZo
 setTimeout(_ajustarFitZoneOperativa,120);
 setTimeout(_ajustarFitZoneOperativa,900);
 
+function cerrarCompanerosPorDia(){
+  var p=document.getElementById('calc-panel');
+  var o=document.getElementById('calc-overlay');
+  if(p)p.classList.remove('show');
+  if(o)o.classList.remove('show');
+}
+
 function abrirCompanerosPorDia(){
   if(typeof verCompanerosHoy!=='function')return;
   var p=document.getElementById('calc-panel');
   var o=document.getElementById('calc-overlay');
   if(!p)return;
+  p.scrollTop=0;
   p.classList.add('show');
   if(o)o.classList.add('show');
   setTimeout(function(){verCompanerosHoy();},80);
 }
 function importarGrupo(){
-  document.getElementById('grupo-file-input').click();
+  _grupoImportDestino='companeros';
+  var input=document.getElementById('grupo-file-input');
+  if(input)input.click();
 }
 function importarGrupoDesdePlantilla(){
+  _grupoImportDestino='horas';
   var input=document.getElementById('grupo-file-input');
   if(input)input.click();
 }
@@ -7000,8 +7635,11 @@ function _detectarDiaColGrupoEnCabecera(rows,rowsRaw,hIdx,c){
   return null;
 }
 
-function procesarGrupoXlsx(file){
+function procesarGrupoXlsx(file,destino){
   if(!file)return;
+  var destinoImport=destino||_grupoImportDestino||'companeros';
+  _grupoImportDestino='companeros';
+  var esImportHoras=(destinoImport==='horas'||destinoImport==='plantilla'||destinoImport==='hp');
   if(typeof XLSX==='undefined'){alert('Error: librería XLSX no cargada.');return;}
   var reader=new FileReader();
   reader.onload=function(e){
@@ -7118,27 +7756,20 @@ function procesarGrupoXlsx(file){
         }
       }
 
-      // Merge: flat map by nomina — si el mes ya existe, se sustituye completo.
+      // Merge acumulativo: cada importación se añade a lo ya guardado.
+      // Si el mismo empleado/día ya existía, se conserva el dato más completo
+      // o se actualiza con el turno nuevo cuando trae horas. No se borra el mes entero.
       var nominaMap={};
-      var _rawMap=localStorage.getItem(_GRUPO_KEY+'_map');
+      var _storageKey=_grupoMapStorageKey(esImportHoras?'horas':'companeros');
+      var _rawMap=localStorage.getItem(_storageKey);
       try{nominaMap=JSON.parse(_rawMap||'{}')}catch(ex){}
       _fusionarDuplicadosGrupoSilencioso(nominaMap);
 
-      var mesYaExistia=false,empleadosLimpiados=0;
+      var mesYaExistia=false;
       Object.keys(nominaMap).forEach(function(k){
         var empOld=nominaMap[k]||{};
         var mesesOld=empOld.meses||{};
-        if(Object.prototype.hasOwnProperty.call(mesesOld,monthKey)){
-          mesYaExistia=true;
-          delete mesesOld[monthKey];
-          empleadosLimpiados++;
-        }
-        empOld.meses=mesesOld;
-        if(Object.keys(mesesOld).length){
-          nominaMap[k]=empOld;
-        }else{
-          delete nominaMap[k];
-        }
+        if(Object.prototype.hasOwnProperty.call(mesesOld,monthKey))mesYaExistia=true;
       });
 
       var _porNombreExistente={};
@@ -7163,29 +7794,34 @@ function procesarGrupoXlsx(file){
         };
         _porNombreExistente[_normNombreGrupo(emp.nombre)]=key;
       });
-      try{localStorage.setItem(_GRUPO_KEY+'_map',JSON.stringify(nominaMap));}catch(ex){alert('Error guardando: '+ex.message);}
+      if(!esImportHoras)_grupoGuardarBackupCompaneros(_rawMap,file&&file.name,monthKey,'');
+      try{localStorage.setItem(_storageKey,JSON.stringify(nominaMap));}catch(ex){alert('Error guardando: '+ex.message);}
 
       var total=0;for(var _k2 in nominaMap){if(nominaMap.hasOwnProperty(_k2))total++;}
-      var btn=document.getElementById('btn-import-grupo');
-      if(btn)btn.classList.add('has-data');
-      var hint=document.getElementById('grupo-import-hint');
-      var txt=document.getElementById('grupo-import-txt');
       var etiqueta=(formato==='MULTI')?(gruposDetectados.length+' grupos'):gruposDetectados[0];
-      if(hint&&txt){
-        hint.style.display='block';txt.style.color='#4ade80';txt.style.fontSize='11px';
-        var diasDetectados=Object.keys(dayColMap).length;
-        txt.textContent='✅ '+etiqueta+': '+monthKey+(mesYaExistia?' sustituido':' añadido')+' · +'+added+' nuevos, '+updated+' actualizados · '+total+' total · '+diasDetectados+' días detectados';
-        if(mesYaExistia)txt.textContent+=' · se borró el '+monthKey+' anterior ('+empleadosLimpiados+' empleados)';
-        if(diasDetectados<28){
-          txt.style.color='#fbbf24';
-          txt.textContent+=' ⚠️ faltan columnas de días en el Excel/importación';
+      var diasDetectados=Object.keys(dayColMap).length;
+      var msg='✅ '+etiqueta+': '+monthKey+(mesYaExistia?' acumulado':' añadido')+' · +'+added+' nuevos, '+updated+' actualizados · '+total+' total · '+diasDetectados+' días detectados';
+      if(diasDetectados<28)msg+=' ⚠️ faltan columnas de días en el Excel/importación';
+
+      if(esImportHoras){
+        var hp=document.getElementById('hp-modal');
+        if(hp&&hp.classList.contains('show')&&typeof calcularHorasPlantilla==='function'){
+          _hpData=calcularHorasPlantilla(new Date().getFullYear());
+          if(typeof renderHorasPlantillaLista==='function')renderHorasPlantillaLista();
+          var hpSub=document.getElementById('hp-sub');
+          if(hpSub)hpSub.textContent='Importado en Horas plantilla · '+etiqueta+' · '+monthKey+(mesYaExistia?' acumulado':' añadido')+' · '+total+' empleados';
         }
-      }
-      if(typeof logActividad==='function')logActividad('importar_companeros',etiqueta+' '+monthKey+(mesYaExistia?' sustituido':' añadido')+': +'+added+' nuevos, '+updated+' actualizados');
-      var hp=document.getElementById('hp-modal');
-      if(hp&&hp.classList.contains('show')&&typeof calcularHorasPlantilla==='function'){
-        _hpData=calcularHorasPlantilla(new Date().getFullYear());
-        if(typeof renderHorasPlantillaLista==='function')renderHorasPlantillaLista();
+        if(typeof logActividad==='function')logActividad('importarGrupoDesdePlantilla',etiqueta+' '+monthKey+(mesYaExistia?' acumulado':' añadido')+': '+added+' nuevos, '+updated+' actualizados');
+      }else{
+        var btn=document.getElementById('btn-import-grupo');
+        if(btn)btn.classList.add('has-data');
+        var hint=document.getElementById('grupo-import-hint');
+        var txt=document.getElementById('grupo-import-txt');
+        if(hint&&txt){
+          hint.style.display='block';txt.style.color=diasDetectados<28?'#fbbf24':'#4ade80';txt.style.fontSize='11px';
+          txt.textContent=msg;
+        }
+        if(typeof logActividad==='function')logActividad('importar_companeros',etiqueta+' '+monthKey+(mesYaExistia?' acumulado':' añadido')+': +'+added+' nuevos, '+updated+' actualizados');
       }
     }catch(err){alert('Error al leer el Excel del grupo: '+err.message);}
   };
@@ -7401,6 +8037,92 @@ function _miCalendarioMarcaHL(dateObj){
 }
 function _arturoDebeTratarseLibre(nombre,dateObj){
   return _esArturoPlantilla(nombre)&&(_miCalendarioMarcaHL(dateObj)||_arturoHLPubFecha(dateObj));
+}
+
+function _usuarioActualEsArturo(){
+  var textos=[];
+  try{
+    var sess=(typeof _ctaSession==='function')?_ctaSession():JSON.parse(localStorage.getItem('cta_session')||'{}');
+    textos.push(sess&&sess.nombre||'',sess&&sess.email||'');
+  }catch(e){}
+  try{var tryp=JSON.parse(localStorage.getItem('cta_mi_nombre_tryp')||'null');if(tryp)textos.push(tryp.nombre||'',tryp.email||'',tryp.nomina||'');}catch(e){}
+  try{var emp=JSON.parse(localStorage.getItem('cta_mi_empleado')||'null');if(emp)textos.push(emp.nombre||'',emp.email||'',emp.nomina||'');}catch(e){}
+  var t=textos.join(' ');
+  if(/arturoricome/i.test(t))return true;
+  return _esArturoPlantilla(t);
+}
+function _cambioCompartidoEsHL(c){
+  if(!c)return false;
+  var tipo=String(c.tipo||'').toLowerCase();
+  if(tipo==='hl'||tipo==='hlp')return true;
+  return !!(c.hlIni&&c.hlFin);
+}
+function _labelHLCompartido(c){
+  if(!c)return 'HL';
+  var tipo=String(c.tipo||'HL').toUpperCase();
+  if(tipo!=='HL'&&tipo!=='HLP')tipo='HL';
+  if(c.hlIni&&c.hlFin)return tipo+' '+c.hlIni+'–'+c.hlFin;
+  return tipo;
+}
+function _usuarioPuedeVerHLCompartido(){
+  return _usuarioActualEsArturo();
+}
+function _miCalendarioDiaLocal(dateObj){
+  if(!dateObj)return null;
+  var meses=(typeof _MC_MONTHS!=='undefined'&&_MC_MONTHS.length)?_MC_MONTHS:((typeof _GRUPO_MONTHS!=='undefined'&&_GRUPO_MONTHS.length)?_GRUPO_MONTHS:['ENERO','FEBRERO','MARZO','ABRIL','MAYO','JUNIO','JULIO','AGOSTO','SEPTIEMBRE','OCTUBRE','NOVIEMBRE','DICIEMBRE']);
+  var raw=null;
+  try{raw=localStorage.getItem('cta_ed_'+dateObj.getFullYear());}catch(e){raw=null;}
+  var ue={};
+  try{ue=raw?JSON.parse(raw):{};}catch(e){ue={};}
+  var mData=(ue&&ue[meses[dateObj.getMonth()]])||{};
+  return mData[dateObj.getDate()]||mData[String(dateObj.getDate())]||null;
+}
+function _mismoEmpleadoPlantillaFlexible(a,b){
+  if(!a||!b)return false;
+  var an=String(a.nomina||'').trim(),bn=String(b.nomina||'').trim();
+  if(an&&bn&&an===bn)return true;
+  var aa=_normPlantillaNombre(a.nombre||a.empleado||''),bb=_normPlantillaNombre(b.nombre||b.empleado||'');
+  return !!(aa&&bb&&(aa===bb||aa.indexOf(bb)>=0||bb.indexOf(aa)>=0));
+}
+function _empleadoEsUsuarioActual(emp,dateObj){
+  if(!emp||!dateObj)return false;
+  var monthKey=(typeof _GRUPO_MONTHS!=='undefined'&&_GRUPO_MONTHS[dateObj.getMonth()])||((typeof _MC_MONTHS!=='undefined'&&_MC_MONTHS[dateObj.getMonth()])||'');
+  var day=dateObj.getDate();
+  var cached=null;try{cached=JSON.parse(localStorage.getItem('cta_mi_empleado')||'null');}catch(e){cached=null;}
+  if(_mismoEmpleadoPlantillaFlexible(emp,cached))return true;
+  var tryp=null;try{tryp=JSON.parse(localStorage.getItem('cta_mi_nombre_tryp')||'null');}catch(e){tryp=null;}
+  var sess=(typeof _ctaSession==='function')?_ctaSession():{};
+  if(tryp&&(!tryp.email||!sess.email||tryp.email===sess.email)&&_mismoEmpleadoPlantillaFlexible(emp,{nombre:tryp.nombre,nomina:tryp.nomina}))return true;
+  if(typeof _getMiEmpleadoGrupoActual==='function'){
+    var mi=_getMiEmpleadoGrupoActual(dateObj.getFullYear(),monthKey,day);
+    if(_mismoEmpleadoPlantillaFlexible(emp,mi))return true;
+  }
+  if(sess&&sess.nombre&&_normPlantillaNombre(sess.nombre)!==_normPlantillaNombre('Modo prueba')){
+    if(_mismoEmpleadoPlantillaFlexible(emp,{nombre:sess.nombre}))return true;
+  }
+  return false;
+}
+function _esFilaPropiaParaHL(emp,dateObj){
+  // Para privacidad: el HL propio nunca debe pintarse como HL en Día a día.
+  // Aunque falle el cruce por nómina/nombre, si el usuario actual es Arturo y la fila es Arturo, cuenta como propia.
+  try{if(typeof _empleadoEsUsuarioActual==='function'&&_empleadoEsUsuarioActual(emp,dateObj))return true;}catch(e){}
+  try{if(typeof _usuarioActualEsArturo==='function'&&_usuarioActualEsArturo()&&_esArturoPlantilla((emp&&emp.nombre)||emp||''))return true;}catch(e){}
+  return false;
+}
+function _aplicarHLPersonalLocalAEmpleado(emp,dateObj,turno){
+  // Arturo mantiene la protección local antigua.
+  if(_esArturoPlantilla((emp&&emp.nombre)||emp||'')){
+    if(_arturoHLPubFecha(dateObj))return null;
+    turno=_ajustarTurnoConHLPersonal(turno,_miCalendarioDiaArturo(dateObj));
+  }
+  // Nueva regla general: si el usuario identificado como ese empleado marca HL/HLP
+  // en su calendario personal, se trata igual que Arturo: no aparece operativo al resto.
+  // En otros dispositivos llegará por Sheets como cambio compartido; aquí se aplica
+  // inmediatamente también en el propio móvil.
+  if(_empleadoEsUsuarioActual(emp,dateObj)){
+    turno=_ajustarTurnoConHLPersonal(turno,_miCalendarioDiaLocal(dateObj));
+  }
+  return turno;
 }
 
 function _minToHHMM(min){
@@ -7628,6 +8350,10 @@ function _dedupeCompanerosDia(lista){
 function _turnoGrupoTieneMarcaNoOperativa(t){
   if(!t)return false;
   if(t.ausencia)return true;
+  // HL parcial no debe bloquear el turno restante.
+  // Si Arturo puede ver la etiqueta "HL 12:00–15:00", antes el token HL hacía
+  // que el empleado desapareciera completo aunque quedara tramo operativo.
+  if(t.hlParcialRecortada&&t.e1&&t.s1)return false;
   var up=_textoMarcaCambioTurno(t).toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
   var tokens=up.replace(/[^A-Z0-9]+/g,' ').trim().split(/\s+/).filter(Boolean);
   var bloquea={
@@ -7656,22 +8382,41 @@ function _esLibreRealCambio(t){
   if(t.e1&&t.s1)return false;
   return !tipo||tipo==='libre'||tipo==='dl'||tipo==='descanso';
 }
-function _cambioToTurno(c){
+function _cambioToTurno(c,turnoBase,ocultarHLPropia){
   if(!c)return null;
   var tipo=String(c.tipo||'').toLowerCase();
-  if(_tipoCambioEsLibre(tipo)||(!c.e1&&!c.s1)){
-    var tipoLibreReal=(!tipo||tipo==='libre'||tipo==='dl'||tipo==='descanso')?'libre':tipo;
-    return{tipo:tipoLibreReal,e1:'',s1:'',e2:'',s2:'',cambioCompartido:true,etiquetaCambio:String(c.tipo||'Libre').toUpperCase(),actualizadoPor:c.actualizado_por||c.email||''};
+  var base=turnoBase||{};
+  var baseE1=c.e1||base.e1||'',baseS1=c.s1||base.s1||'';
+  var baseE2=c.e2||base.e2||'',baseS2=c.s2||base.s2||'';
+  var esHL=(typeof _cambioCompartidoEsHL==='function')?_cambioCompartidoEsHL(c):(tipo==='hl'||tipo==='hlp'||(c.hlIni&&c.hlFin));
+  var esHLParcial=!!(esHL&&c.hlIni&&c.hlFin&&baseE1&&baseS1);
+  var puedeVerHL=(!ocultarHLPropia&&(typeof _usuarioPuedeVerHLCompartido==='function'))?_usuarioPuedeVerHLCompartido():false;
+  var etiqueta=esHL?(puedeVerHL?_labelHLCompartido(c):''):String(c.tipo||'Libre').toUpperCase();
+
+  // Importante: HL/HLP suele estar en la lista de tipos "libres".
+  // Pero si trae hlIni/hlFin, aunque Sheets no devuelva e1/s1, usamos el turno
+  // original del Excel del grupo como base y recortamos solo ese tramo.
+  if((_tipoCambioEsLibre(tipo)&&!esHLParcial)||(!esHLParcial&&!c.e1&&!c.s1)){
+    var tipoLibreReal=(!tipo||tipo==='libre'||tipo==='dl'||tipo==='descanso'||(esHL&&!puedeVerHL))?'libre':tipo;
+    return{tipo:tipoLibreReal,e1:'',s1:'',e2:'',s2:'',cambioCompartido:true,etiquetaCambio:etiqueta,actualizadoPor:c.actualizado_por||c.email||'',hlVisible:esHL&&puedeVerHL};
   }
-  var turno={tipo:(tipo==='curso'?'curso':'trabajado'),e1:c.e1||'',s1:c.s1||'',e2:c.e2||'',s2:c.s2||'',total:c.total||0,cambioCompartido:true,etiquetaCambio:String(c.tipo||'TRABAJA').toUpperCase(),actualizadoPor:c.actualizado_por||c.email||''};
-  // HL parcial recibido de Sheets: recorta solo ese tramo, igual que en el propio dispositivo.
-  if(c.hlIni&&c.hlFin)turno=Object.assign({},_restarRangoDeTurno(turno,{ini:c.hlIni,fin:c.hlFin}),{cambioCompartido:true,etiquetaCambio:turno.etiquetaCambio,actualizadoPor:turno.actualizadoPor});
+  var turno={tipo:(tipo==='curso'?'curso':'trabajado'),e1:baseE1,s1:baseS1,e2:baseE2,s2:baseS2,total:c.total||base.total||0,cambioCompartido:true,etiquetaCambio:etiqueta,actualizadoPor:c.actualizado_por||c.email||'',hlVisible:esHL&&puedeVerHL};
+  // HL parcial recibido de Sheets: recorta solo ese tramo. Arturo verá la etiqueta HL;
+  // el resto solo verá el turno restante, sin exponer la causa sindical.
+  if(c.hlIni&&c.hlFin)turno=Object.assign({},_restarRangoDeTurno(turno,{ini:c.hlIni,fin:c.hlFin}),{cambioCompartido:true,etiquetaCambio:etiqueta,actualizadoPor:turno.actualizadoPor,hlVisible:esHL&&puedeVerHL,hlParcialRecortada:true,hlIni:c.hlIni,hlFin:c.hlFin});
   return turno;
 }
 function _turnoGrupoConCambioCompartido(emp,dateObj,turnoOriginal){
   var c=_getCambioCompartidoEmpleado(emp,dateObj);
   if(!c)return turnoOriginal;
-  return _cambioToTurno(c);
+  // Si el cambio HL es del propio usuario, en compañeros se muestra solo el tramo trabajado,
+  // sin etiqueta HL ni color morado. Arturo podrá ver HL de otros delegados, pero no se marca a sí mismo.
+  var ocultarHLPropia=!!(typeof _cambioCompartidoEsHL==='function'&&_cambioCompartidoEsHL(c)&&typeof _esFilaPropiaParaHL==='function'&&_esFilaPropiaParaHL(emp,dateObj));
+  var t=_cambioToTurno(c,turnoOriginal,ocultarHLPropia);
+  if(ocultarHLPropia&&t){
+    t=Object.assign({},t,{hlVisible:false,hlLabel:'',etiquetaCambio:''});
+  }
+  return t;
 }
 function _turnoMatchKey(t){
   if(!t)return '';
@@ -7687,6 +8432,31 @@ function _getMiEmpleadoGrupoActual(year,monthKey,day){
   var nominaMap={};
   try{nominaMap=JSON.parse(localStorage.getItem(_GRUPO_KEY+'_map')||'{}')||{};}catch(e){nominaMap={};}
   if(cached&&cached.nomina&&nominaMap[cached.nomina])return {nomina:cached.nomina,nombre:nominaMap[cached.nomina].nombre||cached.nombre||'',categoria:nominaMap[cached.nomina].categoria||cached.categoria||''};
+
+  // Identidad oficial extraída del Tryp personal. Es la vía más fiable para que
+  // cualquier delegado que marque HL en su propio calendario quede protegido para todos.
+  var sessTryp=_ctaSession();
+  var trypId=null;try{trypId=JSON.parse(localStorage.getItem('cta_mi_nombre_tryp')||'null');}catch(e){trypId=null;}
+  if(trypId&&trypId.nombre&&(!trypId.email||!sessTryp.email||trypId.email===sessTryp.email)){
+    if(trypId.nomina&&nominaMap[trypId.nomina]){
+      var empNom=nominaMap[trypId.nomina];
+      var resNom={nomina:trypId.nomina,nombre:empNom.nombre||trypId.nombre||'',categoria:empNom.categoria||''};
+      try{localStorage.setItem('cta_mi_empleado',JSON.stringify(resNom));}catch(e){}
+      return resNom;
+    }
+    var trypNorm=_normPlantillaNombre(trypId.nombre);
+    var foundKey='',foundCount=0;
+    Object.keys(nominaMap).forEach(function(k){
+      var en=_normPlantillaNombre((nominaMap[k]&&nominaMap[k].nombre)||'');
+      if(en&&(en===trypNorm||en.indexOf(trypNorm)>=0||trypNorm.indexOf(en)>=0)){foundKey=k;foundCount++;}
+    });
+    if(foundCount===1&&foundKey){
+      var empTryp=nominaMap[foundKey];
+      var resTryp={nomina:empTryp.nomina||foundKey,nombre:empTryp.nombre||trypId.nombre||'',categoria:empTryp.categoria||''};
+      try{localStorage.setItem('cta_mi_empleado',JSON.stringify(resTryp));}catch(e){}
+      return resTryp;
+    }
+  }
 
   var personal={};
   try{personal=JSON.parse(localStorage.getItem('cta_ed_'+year)||'{}')||{};}catch(e){personal={};}
@@ -7831,6 +8601,11 @@ function renderCompanerosDia(offsetDias,toggleIfOpen){
   var myData={};
   try{myData=JSON.parse(localStorage.getItem('cta_ed_'+target.getFullYear())||'{}')}catch(e){}
   var myDay=(myData[monthKey]||{})[day];
+  // Si mi propio calendario tiene HL parcial, en compañeros se usa solo el tramo real de trabajo.
+  // No debe mostrarse ni contar el tramo HL dentro del turno propio.
+  var _miDiaLocalHL=(typeof _miCalendarioDiaLocal==='function')?_miCalendarioDiaLocal(target):null;
+  var _myDayAjustado=(typeof _ajustarTurnoConHLPersonal==='function')?_ajustarTurnoConHLPersonal(myDay,_miDiaLocalHL):myDay;
+  if(_myDayAjustado!==undefined)myDay=_myDayAjustado;
   var myE1=myDay&&myDay.e1?toMinG(myDay.e1):null;
   var myS1=myDay&&myDay.s1?toMinG(myDay.s1):null;
   var myE2=myDay&&myDay.e2?toMinG(myDay.e2):null;
@@ -7861,12 +8636,15 @@ function renderCompanerosDia(offsetDias,toggleIfOpen){
   empleados.forEach(function(emp){
     // Today's shift
     var turno=emp.dias[day];
+    var cambioDia=(typeof _getCambioCompartidoEmpleado==='function')?_getCambioCompartidoEmpleado(emp,target):null;
+    var esMiFilaGrupo=!!(typeof _esFilaPropiaParaHL==='function'&&_esFilaPropiaParaHL(emp,target));
+    var puedeVerHLDia=!!(!esMiFilaGrupo&&cambioDia&&typeof _cambioCompartidoEsHL==='function'&&_cambioCompartidoEsHL(cambioDia)&&typeof _usuarioPuedeVerHLCompartido==='function'&&_usuarioPuedeVerHLCompartido());
+    var labelHLDia=puedeVerHLDia?_labelHLCompartido(cambioDia):'';
     turno=_turnoGrupoConCambioCompartido(emp,target,turno);
     // Si es Arturo y su calendario personal marca HL ese día, se ajusta su turno:
     // día completo → sin turno; parcial → se descuenta solo ese tramo.
-    if(_esArturoPlantilla(emp.nombre||emp.nomina)){
-      turno=_arturoHLPubFecha(target)?null:_ajustarTurnoConHLPersonal(turno,_miCalendarioDiaArturo(target));
-    }
+    turno=_aplicarHLPersonalLocalAEmpleado(emp,target,turno);
+    if(esMiFilaGrupo&&turno){turno=Object.assign({},turno,{hlVisible:false,hlLabel:'',etiquetaCambio:''});}
     if(_turnoGrupoOperativo(turno)){
       var grE1=toMinG(turno.e1),grS1=toMinG(turno.s1);
       var grE2=turno.e2?toMinG(turno.e2):null,grS2=turno.s2?toMinG(turno.s2):null;
@@ -7881,6 +8659,7 @@ function renderCompanerosDia(offsetDias,toggleIfOpen){
       var _esExcl=!!(turno&&(turno.noVieneInterrogacion||turno.disponibilidadNoConfirmada));
       if((modoToda||solapa)&&mismoTurno&&trabAhora&&(!_esExcl||window._showExcl)){
         var horario=turno.e1+'→'+turno.s1+(turno.e2&&turno.s2?' / '+turno.e2+'→'+turno.s2:'');
+        if(puedeVerHLDia&&labelHLDia)horario+=' · '+labelHLDia;
         var enT1=minutoEnTramo(ahoraMin,grE1,grS1),enT2=minutoEnTramo(ahoraMin,grE2,grS2);
         // TODAY overnight: only active if already started (nowMin >= e1)
         // After-midnight portion handled by yesterday's data block
@@ -7890,8 +8669,10 @@ function renderCompanerosDia(offsetDias,toggleIfOpen){
         // Marca solo noches reales largas: 22/23 → 05/06/07 del día siguiente.
         var _nocheReal=_turnoTieneNocheReal(grE1,grS1,grE2,grS2);
         var _futOvn=_nocheReal&&nowMinReal<grE1;
-        coinciden.push({nombre:emp.nombre,horario:horario,e1:grE1,s1:grS1,e2:grE2,s2:grS2,categoria:emp.categoria||'General',disponibilidadNoConfirmada:!!turno.disponibilidadNoConfirmada,noVieneInterrogacion:!!turno.noVieneInterrogacion,operativoAhora:opAhora,overnight:false,futuraNoche:_futOvn,nocheReal:_nocheReal,nocheDiaFin:false,origenDia:'actual'});
+        coinciden.push({nombre:emp.nombre,horario:horario,e1:grE1,s1:grS1,e2:grE2,s2:grS2,categoria:emp.categoria||'General',disponibilidadNoConfirmada:!!turno.disponibilidadNoConfirmada,noVieneInterrogacion:!!turno.noVieneInterrogacion,operativoAhora:opAhora,overnight:false,futuraNoche:_futOvn,nocheReal:_nocheReal,nocheDiaFin:false,origenDia:'actual',hlVisible:puedeVerHLDia,hlLabel:labelHLDia});
       }
+    }else if(puedeVerHLDia&&modoToda&&!modoEnTurno&&!modoMismoTurno){
+      coinciden.push({nombre:emp.nombre,horario:labelHLDia||'HL',e1:1440,s1:1440,e2:null,s2:null,categoria:emp.categoria||'General',disponibilidadNoConfirmada:false,noVieneInterrogacion:false,operativoAhora:false,overnight:false,futuraNoche:false,nocheReal:false,nocheDiaFin:false,origenDia:'actual',hlVisible:true,hlLabel:labelHLDia||'HL'});
     }
     // Turno de noche real empezado el día anterior y terminado en el día consultado.
     // Debe verse también en el día de salida, siempre marcado como noche.
@@ -7975,16 +8756,17 @@ function renderCompanerosDia(offsetDias,toggleIfOpen){
     // - El distintivo 🌙 solo se marca cuando el turno se está reflejando en el día que termina de madrugada.
     //   Así evitamos duplicados confusos tipo misma persona marcada dos veces el mismo día.
     var _esNocheMadrugada=!!c.nocheDiaFin;
-    var _dot=_esNocheMadrugada?'#fb923c':'#60a5fa';
+    var _dot=c.hlVisible?'#c084fc':(_esNocheMadrugada?'#fb923c':'#60a5fa');
     var _nameExtra=_esNocheMadrugada?' 🌙':'';
-    var _nameColor=_esNocheMadrugada?'color:#fb923c;':'';
+    if(c.hlVisible)_nameExtra+=' <span class="grupo-hl-chip">'+escH(c.hlLabel||'HL')+'</span>';
+    var _nameColor=c.hlVisible?'color:#c084fc;':(_esNocheMadrugada?'color:#fb923c;':'');
     var _nightStyle='';
     if(_esNocheMadrugada&&!c.operativoAhora){
       _nightStyle='background:rgba(251,146,60,.10);border:1px solid rgba(251,146,60,.35);border-radius:10px;padding:8px 10px;margin:4px 0;';
     }
     var _finalStyle=(extraStyle||'')+_nightStyle;
     var _hor=buildHorarioHtml(c);
-    return '<div class="grupo-item'+(c.operativoAhora?' grupo-item-operativo':'')+'" '+(_finalStyle?'style="'+_finalStyle+'"':'')+(c.futuraNoche?' data-futura-noche="1"':'')+'>'+ 
+    return '<div class="grupo-item'+(c.operativoAhora?' grupo-item-operativo':'')+(c.hlVisible?' grupo-hl-visible':'')+'" '+(_finalStyle?'style="'+_finalStyle+'"':'')+(c.futuraNoche?' data-futura-noche="1"':'')+'>'+ 
       '<div class="grupo-solapamiento" style="background:'+_dot+'"></div>'+
       '<div class="grupo-nombre'+((c.noVieneInterrogacion||c.disponibilidadNoConfirmada)?' grupo-no-viene':'')+'" style="'+_nameColor+'">'+c.nombre+_nameExtra+(c.disponibilidadNoConfirmada?'<span class="grupo-exclamacion grupo-clickable" onclick="showDisponibilidadCartel()">  !</span>':'')+'</div>'+ 
       '<div class="grupo-horario" style="'+_nameColor+'">'+_hor+'</div></div>';
@@ -8088,6 +8870,11 @@ function _buildCompanerosTimelineData(offsetDias){
   var myData={};
   try{myData=JSON.parse(localStorage.getItem('cta_ed_'+target.getFullYear())||'{}')}catch(e){}
   var myDay=(myData[monthKey]||{})[day];
+  // Si mi propio calendario tiene HL parcial, en vista por horas se usa solo el tramo real de trabajo.
+  // No debe aparecer el tramo HL ni en la fila TÚ ni como fila propia dentro de la plantilla.
+  var _miDiaLocalHLTimeline=(typeof _miCalendarioDiaLocal==='function')?_miCalendarioDiaLocal(target):null;
+  var _myDayTimelineAjustado=(typeof _ajustarTurnoConHLPersonal==='function')?_ajustarTurnoConHLPersonal(myDay,_miDiaLocalHLTimeline):myDay;
+  if(_myDayTimelineAjustado!==undefined)myDay=_myDayTimelineAjustado;
   var myE1=myDay&&myDay.e1?toMinG(myDay.e1):null;
   var myS1=myDay&&myDay.s1?toMinG(myDay.s1):null;
   var myE2=myDay&&myDay.e2?toMinG(myDay.e2):null;
@@ -8108,10 +8895,13 @@ function _buildCompanerosTimelineData(offsetDias){
   var coinciden=[];
   empleados.forEach(function(emp){
     var turno=emp.dias[day];
+    var cambioDia=(typeof _getCambioCompartidoEmpleado==='function')?_getCambioCompartidoEmpleado(emp,target):null;
+    var esMiFilaGrupo=!!(typeof _esFilaPropiaParaHL==='function'&&_esFilaPropiaParaHL(emp,target));
+    var puedeVerHLDia=!!(!esMiFilaGrupo&&cambioDia&&typeof _cambioCompartidoEsHL==='function'&&_cambioCompartidoEsHL(cambioDia)&&typeof _usuarioPuedeVerHLCompartido==='function'&&_usuarioPuedeVerHLCompartido());
+    var labelHLDia=puedeVerHLDia?_labelHLCompartido(cambioDia):'';
     turno=_turnoGrupoConCambioCompartido(emp,target,turno);
-    if(_esArturoPlantilla(emp.nombre||emp.nomina)){
-      turno=_arturoHLPubFecha(target)?null:_ajustarTurnoConHLPersonal(turno,_miCalendarioDiaArturo(target));
-    }
+    turno=_aplicarHLPersonalLocalAEmpleado(emp,target,turno);
+    if(esMiFilaGrupo&&turno){turno=Object.assign({},turno,{hlVisible:false,hlLabel:'',etiquetaCambio:''});}
     if(_turnoGrupoOperativo(turno)){
       var grE1=toMinG(turno.e1),grS1=toMinG(turno.s1);
       var grE2=turno.e2?toMinG(turno.e2):null,grS2=turno.s2?toMinG(turno.s2):null;
@@ -8125,14 +8915,17 @@ function _buildCompanerosTimelineData(offsetDias){
       var _esExcl=!!(turno&&(turno.noVieneInterrogacion||turno.disponibilidadNoConfirmada));
       if((modoToda||solapa)&&mismoTurno&&trabAhora&&(!_esExcl||window._showExcl)){
         var horario=turno.e1+'→'+turno.s1+(turno.e2&&turno.s2?' / '+turno.e2+'→'+turno.s2:'');
+        if(puedeVerHLDia&&labelHLDia)horario+=' · '+labelHLDia;
         var enT1=minutoEnTramo(ahoraMin,grE1,grS1),enT2=minutoEnTramo(ahoraMin,grE2,grS2);
         if(esDiaActual&&grE1!==null&&grS1!==null&&grS1<grE1)enT1=(ahoraMin>=grE1);
         if(esDiaActual&&grE2!==null&&grS2!==null&&grS2<grE2)enT2=(ahoraMin>=grE2);
         var opAhora=esDiaActual&&(enT1||enT2)&&!turno.disponibilidadNoConfirmada&&!turno.noVieneInterrogacion;
         var _nocheReal=_turnoTieneNocheReal(grE1,grS1,grE2,grS2);
         var _futOvn=_nocheReal&&nowMinReal<grE1;
-        coinciden.push({nombre:emp.nombre,horario:horario,e1:grE1,s1:grS1,e2:grE2,s2:grS2,categoria:emp.categoria||'General',disponibilidadNoConfirmada:!!turno.disponibilidadNoConfirmada,noVieneInterrogacion:!!turno.noVieneInterrogacion,operativoAhora:opAhora,overnight:false,futuraNoche:_futOvn,nocheReal:_nocheReal,nocheDiaFin:false,origenDia:'actual'});
+        coinciden.push({nombre:emp.nombre,horario:horario,e1:grE1,s1:grS1,e2:grE2,s2:grS2,categoria:emp.categoria||'General',disponibilidadNoConfirmada:!!turno.disponibilidadNoConfirmada,noVieneInterrogacion:!!turno.noVieneInterrogacion,operativoAhora:opAhora,overnight:false,futuraNoche:_futOvn,nocheReal:_nocheReal,nocheDiaFin:false,origenDia:'actual',hlVisible:puedeVerHLDia,hlLabel:labelHLDia});
       }
+    }else if(puedeVerHLDia&&modoToda&&!modoEnTurno&&!modoMismoTurno){
+      coinciden.push({nombre:emp.nombre,horario:labelHLDia||'HL',e1:null,s1:null,e2:null,s2:null,categoria:emp.categoria||'General',disponibilidadNoConfirmada:false,noVieneInterrogacion:false,operativoAhora:false,overnight:false,futuraNoche:false,nocheReal:false,nocheDiaFin:false,origenDia:'actual',hlVisible:true,hlLabel:labelHLDia||'HL'});
     }
     var fechaAyer=new Date(target.getFullYear(),target.getMonth(),target.getDate()-1);
     var monthKeyAyer=_GRUPO_MONTHS[fechaAyer.getMonth()];
@@ -8656,7 +9449,7 @@ function renderCompanerosTimeline(offsetDias,toggleIfOpen){
     catGroups[cat].slice().sort(function(a,b){return (a.e1||0)-(b.e1||0);}).forEach(function(c){
       var segs=_tlSegmentos(c);
       var activaFila=esDiaActual&&segs.some(function(seg){return _tlEstadoSegmento(seg,nowMin,true)==='active';});
-      namesHtml+='<div class="grupo-tl-name'+(activaFila?' is-active':'')+'"><span class="nm">'+c.nombre+(c.nocheReal?' 🌙':'')+'</span><span class="sch">'+c.horario+'</span></div>';
+      namesHtml+='<div class="grupo-tl-name'+(activaFila?' is-active':'')+(c.hlVisible?' is-hl':'')+'"><span class="nm">'+c.nombre+(c.nocheReal?' 🌙':'')+(c.hlVisible?' 🤝':'')+'</span><span class="sch">'+c.horario+'</span></div>';
       rowsHtml+=_tlFilaHtml(segs,c.nocheReal?'is-night':'',esDiaActual,nowMin);
     });
   });
@@ -9146,6 +9939,20 @@ window.renderOperativa=function(){
   }
 
   var d=mD[now.getDate()]||null;
+  // Si el día tiene HL parcial, Mi jornada debe mostrar solo la parte realmente trabajada.
+  // Ej.: 05:00→11:00 / 12:00→15:00 con HL 12:00→15:00 queda 05:00→11:00.
+  function _opDiaConHLParcial(dia){
+    if(!dia||!dia.hlParcial||typeof _restarRangoDeTurno!=="function")return dia;
+    var adj=_restarRangoDeTurno(Object.assign({},dia),dia.hlParcial);
+    if(!adj)return dia;
+    var out=Object.assign({},dia,{
+      e1:adj.e1||'',s1:adj.s1||'',e2:adj.e2||'',s2:adj.s2||''
+    });
+    var _hm1=mcMinOp2(out.e1,out.s1),_hm2=mcMinOp2(out.e2,out.s2);
+    out.total=(_hm1+_hm2)/60;
+    return out;
+  }
+  d=_opDiaConHLParcial(d);
   var card=g("op-turno-card");
   // ─ Resumen Operativo ─────────────────────────────────────
   var gmap={};try{gmap=JSON.parse(localStorage.getItem("cta_grupo_2026_map")||"{}");}catch(e){}
@@ -9160,9 +9967,7 @@ window.renderOperativa=function(){
     if(_estaExcluidoPlantilla((emp&&emp.nombre)||nom,_fechaISOPlantilla(now)))return;
     if(!dias)return;
     var t=dias[todayNum];t=_turnoGrupoConCambioCompartido(emp,now,t);
-    if(_esArturoPlantilla((emp&&emp.nombre)||nom)){
-      t=_arturoHLPubFecha(now)?null:_ajustarTurnoConHLPersonal(t,_miCalendarioDiaArturo(now));
-    }
+    t=_aplicarHLPersonalLocalAEmpleado(emp,now,t);
     if(!_turnoGrupoOperativo(t))return;
     var excl=!!(t.noVieneInterrogacion||t.disponibilidadNoConfirmada);if(excl)return;
     var gE1=toM(t.e1),gS1=toM(t.s1),gE2=t.e2?toM(t.e2):null,gS2=t.s2?toM(t.s2):null;
@@ -9183,9 +9988,7 @@ window.renderOperativa=function(){
     Object.keys(gmap).forEach(function(nom){
       var emp=gmap[nom],dias=(emp.meses&&emp.meses[mk])||null;if(_estaExcluidoPlantilla((emp&&emp.nombre)||nom,_fechaISOPlantilla(dateObj)))return;if(!dias)return;
       var t=dias[dn];t=_turnoGrupoConCambioCompartido(emp,dateObj,t);
-      if(_esArturoPlantilla((emp&&emp.nombre)||nom)){
-        t=_arturoHLPubFecha(dateObj)?null:_ajustarTurnoConHLPersonal(t,_miCalendarioDiaArturo(dateObj));
-      }
+      t=_aplicarHLPersonalLocalAEmpleado(emp,dateObj,t);
       if(!_turnoGrupoOperativo(t))return;
       var excl=!!(t.noVieneInterrogacion||t.disponibilidadNoConfirmada);if(excl)return;
       out.push({nombre:nom,e1:toM(t.e1),s1:toM(t.s1),e2:t.e2?toM(t.e2):null,s2:t.s2?toM(t.s2):null});
@@ -9861,7 +10664,7 @@ window.renderOperativa=function(){
     var _DIAS=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
     for(var ddF=1;ddF<=30;ddF++){
       var nDF=new Date(now.getFullYear(),now.getMonth(),now.getDate()+ddF);
-      var nMdF=(ue[MESES[nDF.getMonth()]]||{})[nDF.getDate()];
+      var nMdF=_opDiaConHLParcial((ue[MESES[nDF.getMonth()]]||{})[nDF.getDate()]);
       if(nMdF&&nMdF.e1&&nMdF.tipo&&ANXTF.indexOf(nMdF.tipo)>=0){nxtMinF=toM(nMdF.e1);nxtStrF=_DIAS[nDF.getDay()]+' '+nDF.getDate()+'  ·  '+nMdF.e1+(nMdF.s1?' → '+nMdF.s1:'')+(nMdF.e2&&nMdF.s2?'  ·  '+nMdF.e2+' → '+nMdF.s2:'');nxtDaysF=ddF;break;}
     }
     var restMF=nxtMinF!==null?(nxtDaysF*1440+nxtMinF-nowMin):null;
@@ -9887,7 +10690,7 @@ window.renderOperativa=function(){
     var lastShiftEnd=null;
     for(var ddB=1;ddB<=30;ddB++){
       var pDB=new Date(now.getFullYear(),now.getMonth(),now.getDate()-ddB);
-      var pMdB=(ue[MESES[pDB.getMonth()]]||{})[pDB.getDate()];
+      var pMdB=_opDiaConHLParcial((ue[MESES[pDB.getMonth()]]||{})[pDB.getDate()]);
       if(pMdB&&pMdB.e1&&pMdB.tipo&&ANXTF.indexOf(pMdB.tipo)>=0){
         var lastS=pMdB.s2?toM(pMdB.s2):toM(pMdB.s1);
         if(lastS!==null)lastShiftEnd=ddB*1440-lastS+nowMin; // minutes elapsed since last shift ended
@@ -9923,14 +10726,15 @@ window.renderOperativa=function(){
 
   if(inS1||inS2){
     card.classList.add("state-working");
-    if(g("op-tc-times"))g("op-tc-times").innerHTML=th;
     var el2=inS1?nowMin-e1:(s1-e1)+(nowMin-e2);
     var pct=Math.min(100,Math.round(el2/totMin*100));
-    var rem=shEnd-nowMin+(inS1&&e2?Math.max(0,e2-s1):0);
+    var rem=Math.max(0,shEnd-nowMin+(inS1&&e2?Math.max(0,e2-s1):0));
+    var turnoCentro=d.e1+" → "+d.s1+(d.e2&&d.s2?"  ·  "+d.e2+" → "+d.s2:"");
+    if(g("op-tc-times"))g("op-tc-times").textContent=fmtT(rem);
     if(g("op-tc-sub"))g("op-tc-sub").textContent="Trabajando";
-    if(g("op-tc-shift"))g("op-tc-shift").textContent="";
+    if(g("op-tc-shift")){g("op-tc-shift").textContent=turnoCentro;g("op-tc-shift").style.color="var(--white)";}
     if(g("op-tc-pct"))g("op-tc-pct").textContent=pct+"%";
-    if(g("op-tc-rem"))g("op-tc-rem").textContent="Quedan "+fmtT(Math.max(0,rem));
+    if(g("op-tc-rem"))g("op-tc-rem").textContent="";
     if(g("op-tc-bar"))g("op-tc-bar").style.width=pct+"%";
     // Pulse red if ≤10min to end of any tramo
     var salidas2=[];if(s1!==null)salidas2.push(s1);if(s2!==null)salidas2.push(s2);
@@ -9953,7 +10757,7 @@ window.renderOperativa=function(){
     var ANXT=["trabajado","h6","baja","rm","curso"]; // HL/HLP se tratan como libre: descanso, no próximo turno
     for(var dd2=1;dd2<=30;dd2++){
       var nD=new Date(now.getFullYear(),now.getMonth(),now.getDate()+dd2);
-      var nMd=(ue[MESES[nD.getMonth()]]||{})[nD.getDate()];
+      var nMd=_opDiaConHLParcial((ue[MESES[nD.getMonth()]]||{})[nD.getDate()]);
       if(nMd&&nMd.e1&&nMd.tipo&&ANXT.indexOf(nMd.tipo)>=0){var _D2=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];nxtMin=toM(nMd.e1);nxtStr=_D2[nD.getDay()]+' '+nD.getDate()+'  ·  '+nMd.e1+(nMd.s1?' → '+nMd.s1:'')+(nMd.e2&&nMd.s2?'  ·  '+nMd.e2+' → '+nMd.s2:'');nxtDays=dd2;break;}
     }
     // Calculate total minutes remaining (including full days)
@@ -9989,13 +10793,20 @@ window.renderOperativa=function(){
     if(g("op-tc-bar"))g("op-tc-bar").style.width=restRemPct+"%";
   } else if(notYet){
     card.classList.add("state-next");
-    if(g("op-tc-times"))g("op-tc-times").innerHTML=th;
+    var minsToStart=Math.max(0,e1-nowMin);
+    // Cuando falta menos de 1h, el chip derecho no debe repetir el turno:
+    // muestra el tiempo restante en azul, como en descanso.
+    if(g("op-tc-times")){
+      g("op-tc-times").innerHTML=minsToStart<=60
+        ? '<span class="op-tc-start-count">'+fmtT(minsToStart)+'</span>'
+        : th;
+    }
     var _D3=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
     if(g("op-tc-sub"))g("op-tc-sub").textContent="Próximo turno: "+_D3[now.getDay()]+" "+now.getDate();
     var _shiftH3=d.e1+(d.s1?" → "+d.s1:"")+(d.e2&&d.s2?"  ·  "+d.e2+" → "+d.s2:"");
     if(g("op-tc-shift")){g("op-tc-shift").textContent=_shiftH3;g("op-tc-shift").style.color="var(--white)";}
     if(g("op-tc-pct"))g("op-tc-pct").textContent="0%";
-    if(g("op-tc-rem"))g("op-tc-rem").textContent="Empieza en "+fmtT(e1-nowMin);
+    if(g("op-tc-rem"))g("op-tc-rem").textContent="Empieza en "+fmtT(minsToStart);
     if(g("op-tc-bar"))g("op-tc-bar").style.width="0%";
   }
 
@@ -11624,9 +12435,7 @@ function _evClasificarEmpleadoEvento(emp, mes, dia, hDesde, hHasta, mesPublicado
   // día completo → sin turno; parcial → se descuenta solo ese tramo. Igual que en
   // Vista compañeros, esto faltaba aquí y por eso Buscar Evento seguía mostrando el
   // turno entero aunque hubiera HL parcial marcado.
-  if(_esArturoPlantilla(emp.nombre||emp.nomina)){
-    turno=_arturoHLPubFecha(fechaEvento)?null:_ajustarTurnoConHLPersonal(turno,_miCalendarioDiaArturo(fechaEvento));
-  }
+  turno=_aplicarHLPersonalLocalAEmpleado(emp,fechaEvento,turno);
   var nombre=emp.nombre;
   var diasGuardados=Object.keys(diasMes).length;
   var mesVacioEmpleado=tieneMesEmp&&diasGuardados===0;
@@ -12336,7 +13145,7 @@ try{
     border-radius:6px!important;
   }
   #panel-operativa.active #op-turno-card.state-rest .op-tc-times span{
-    font-size:11.5px!important;
+    font-size:13.5px!important;
   }
   #panel-operativa.active #op-turno-card .op-tc-bar-bg{
     height:7px!important;
@@ -12720,5 +13529,1120 @@ try{
     }
   }
 </style>
+
+<style id="cta-fix-calendario-sin-cruz-calc-panel">
+  body[data-panel="afiliate"] #calc-panel,
+  body[data-panel="afiliate"] #calc-overlay{
+    display:none!important;
+    visibility:hidden!important;
+    pointer-events:none!important;
+    transform:translateY(140%)!important;
+  }
+</style>
+
+<style id="cta-fix-companeros-sin-cruz-abajo">
+  /* La cruz superior de Compañeros por día no debe aparecer como pestaña flotante. */
+  #calc-panel > div:first-child{
+    display:none!important;
+    height:0!important;
+    min-height:0!important;
+    padding:0!important;
+    margin:0!important;
+    overflow:hidden!important;
+  }
+  #calc-panel{
+    padding-top:10px!important;
+  }
+</style>
+
+
+<style id="cta-mijornada-countdown-azul-20260709">
+  #panel-operativa.active #op-turno-card.state-next .op-tc-times span.op-tc-start-count,
+  #op-turno-card.state-next .op-tc-times span.op-tc-start-count{
+    color:#60a5fa!important;
+    font-size:22px!important; /* mismo tamaño que el % de la izquierda */
+    line-height:.9!important;
+    font-weight:800!important;
+    padding:2px 7px!important;
+    border-color:rgba(96,165,250,.35)!important;
+  }
+</style>
+
+<style id="cta-mijornada-working-layout-final-20260709">
+  /* Mi jornada trabajando: % izquierda, turno centrado y tiempo restante derecha */
+  #panel-operativa.active #op-turno-card.state-working .op-tc-row,
+  #op-turno-card.state-working .op-tc-row{
+    align-items:center!important;
+    gap:8px!important;
+    flex-wrap:nowrap!important;
+  }
+  #panel-operativa.active #op-turno-card.state-working .op-tc-col-a,
+  #op-turno-card.state-working .op-tc-col-a{
+    flex:0 0 52px!important;
+    min-width:52px!important;
+    align-items:flex-start!important;
+    text-align:left!important;
+  }
+  #panel-operativa.active #op-turno-card.state-working .op-tc-pct,
+  #op-turno-card.state-working .op-tc-pct{
+    font-size:26px!important;
+    line-height:.9!important;
+    font-weight:900!important;
+    color:var(--gold)!important;
+    white-space:nowrap!important;
+    text-align:left!important;
+  }
+  #panel-operativa.active #op-turno-card.state-working .op-tc-rem,
+  #op-turno-card.state-working .op-tc-rem{
+    display:none!important;
+  }
+  #panel-operativa.active #op-turno-card.state-working .op-tc-col-b,
+  #op-turno-card.state-working .op-tc-col-b{
+    flex:1 1 auto!important;
+    min-width:0!important;
+    align-items:center!important;
+    justify-content:center!important;
+    text-align:center!important;
+  }
+  #panel-operativa.active #op-turno-card.state-working .op-tc-shift,
+  #op-turno-card.state-working .op-tc-shift{
+    display:block!important;
+    order:0!important;
+    font-size:12px!important;
+    line-height:1.08!important;
+    font-weight:800!important;
+    color:var(--white)!important;
+    margin:0 0 3px!important;
+    max-width:100%!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+  }
+  #panel-operativa.active #op-turno-card.state-working .op-tc-sub,
+  #op-turno-card.state-working .op-tc-sub{
+    display:block!important;
+    order:1!important;
+    font-size:11.5px!important;
+    line-height:1!important;
+    font-weight:900!important;
+    letter-spacing:.25px!important;
+    text-transform:uppercase!important;
+    color:var(--gold)!important;
+    white-space:nowrap!important;
+    margin:0!important;
+  }
+  #panel-operativa.active #op-turno-card.state-working .op-tc-col-c,
+  #op-turno-card.state-working .op-tc-col-c{
+    display:flex!important;
+    flex:0 0 60px!important;
+    min-width:60px!important;
+    align-items:flex-end!important;
+    text-align:right!important;
+  }
+  #panel-operativa.active #op-turno-card.state-working .op-tc-times,
+  #op-turno-card.state-working .op-tc-times{
+    width:100%!important;
+    display:block!important;
+    font-size:18px!important;
+    line-height:.95!important;
+    font-weight:900!important;
+    color:var(--gold)!important;
+    white-space:nowrap!important;
+    text-align:right!important;
+  }
+  #panel-operativa.active #op-turno-card.state-working .op-tc-times::before,
+  #op-turno-card.state-working .op-tc-times::before{
+    content:"Tiempo restante";
+    display:block!important;
+    margin-bottom:3px!important;
+    font-size:7.5px!important;
+    line-height:1!important;
+    font-weight:800!important;
+    letter-spacing:.45px!important;
+    text-transform:uppercase!important;
+    color:var(--gray)!important;
+    white-space:nowrap!important;
+  }
+  #panel-operativa.active #op-turno-card.state-working .op-tc-times span,
+  #op-turno-card.state-working .op-tc-times span{
+    border:0!important;
+    padding:0!important;
+    font-size:inherit!important;
+    color:inherit!important;
+  }
+  #panel-operativa.active #op-turno-card.state-working .op-tc-row,
+  #op-turno-card.state-working .op-tc-row{
+    margin-bottom:9px!important;
+  }
+  #panel-operativa.active #op-turno-card.state-working .op-tc-bar-bg,
+  #op-turno-card.state-working .op-tc-bar-bg{
+    margin-top:7px!important;
+  }
+</style>
+
+
+<style id="cta-fix-mijornada-tiempo-restante-fit-20260709">
+  /* Corrección Mi jornada trabajando: que no se desborde ni se coma la viñeta */
+  #scroll-area,
+  #panel-operativa,
+  #panel-operativa.active #op-fit-zone,
+  #panel-operativa.active #op-turno-card{
+    max-width:100%!important;
+    overflow-x:hidden!important;
+    box-sizing:border-box!important;
+  }
+
+  #panel-operativa.active #op-turno-card.state-working .op-tc-row,
+  #op-turno-card.state-working .op-tc-row{
+    display:grid!important;
+    grid-template-columns:52px minmax(0,1fr) 78px!important;
+    width:100%!important;
+    max-width:100%!important;
+    gap:7px!important;
+    align-items:center!important;
+    margin-bottom:10px!important;
+    overflow:hidden!important;
+  }
+
+  #panel-operativa.active #op-turno-card.state-working .op-tc-col-a,
+  #panel-operativa.active #op-turno-card.state-working .op-tc-col-b,
+  #panel-operativa.active #op-turno-card.state-working .op-tc-col-c,
+  #op-turno-card.state-working .op-tc-col-a,
+  #op-turno-card.state-working .op-tc-col-b,
+  #op-turno-card.state-working .op-tc-col-c{
+    min-width:0!important;
+    width:auto!important;
+    max-width:100%!important;
+    flex:initial!important;
+    flex-basis:auto!important;
+    overflow:hidden!important;
+  }
+
+  #panel-operativa.active #op-turno-card.state-working .op-tc-col-a,
+  #op-turno-card.state-working .op-tc-col-a{
+    align-items:flex-start!important;
+    text-align:left!important;
+  }
+
+  #panel-operativa.active #op-turno-card.state-working .op-tc-pct,
+  #op-turno-card.state-working .op-tc-pct{
+    font-size:24px!important;
+    line-height:.9!important;
+    font-weight:900!important;
+    white-space:nowrap!important;
+  }
+
+  #panel-operativa.active #op-turno-card.state-working .op-tc-col-b,
+  #op-turno-card.state-working .op-tc-col-b{
+    align-items:center!important;
+    justify-content:center!important;
+    text-align:center!important;
+  }
+
+  #panel-operativa.active #op-turno-card.state-working .op-tc-shift,
+  #op-turno-card.state-working .op-tc-shift{
+    font-size:12.5px!important;
+    line-height:1.08!important;
+    font-weight:850!important;
+    color:var(--white)!important;
+    margin:0 0 3px!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+    max-width:100%!important;
+  }
+
+  #panel-operativa.active #op-turno-card.state-working .op-tc-sub,
+  #op-turno-card.state-working .op-tc-sub{
+    font-size:10.2px!important;
+    line-height:1!important;
+    font-weight:900!important;
+    letter-spacing:.18px!important;
+    white-space:nowrap!important;
+    margin:0!important;
+  }
+
+  #panel-operativa.active #op-turno-card.state-working .op-tc-col-c,
+  #op-turno-card.state-working .op-tc-col-c{
+    align-items:flex-end!important;
+    text-align:right!important;
+  }
+
+  #panel-operativa.active #op-turno-card.state-working .op-tc-times,
+  #op-turno-card.state-working .op-tc-times{
+    width:100%!important;
+    max-width:100%!important;
+    display:block!important;
+    font-size:15px!important;
+    line-height:1!important;
+    font-weight:900!important;
+    color:var(--gold)!important;
+    white-space:nowrap!important;
+    text-align:right!important;
+    overflow:hidden!important;
+    text-overflow:clip!important;
+  }
+
+  #panel-operativa.active #op-turno-card.state-working .op-tc-times::before,
+  #op-turno-card.state-working .op-tc-times::before{
+    content:"Tiempo restante";
+    display:block!important;
+    margin-bottom:3px!important;
+    font-size:6.3px!important;
+    line-height:1!important;
+    font-weight:900!important;
+    letter-spacing:.25px!important;
+    text-transform:uppercase!important;
+    color:var(--gray)!important;
+    white-space:nowrap!important;
+  }
+
+  #panel-operativa.active #op-turno-card.state-working .op-tc-times span,
+  #op-turno-card.state-working .op-tc-times span{
+    font-size:15px!important;
+    line-height:1!important;
+    border:0!important;
+    padding:0!important;
+    color:inherit!important;
+  }
+
+  #panel-operativa.active #op-turno-card.state-working .op-tc-bar-bg,
+  #op-turno-card.state-working .op-tc-bar-bg{
+    margin-top:8px!important;
+  }
+
+  @media(max-width:360px){
+    #panel-operativa.active #op-turno-card.state-working .op-tc-row,
+    #op-turno-card.state-working .op-tc-row{
+      grid-template-columns:48px minmax(0,1fr) 72px!important;
+      gap:6px!important;
+    }
+    #panel-operativa.active #op-turno-card.state-working .op-tc-pct,
+    #op-turno-card.state-working .op-tc-pct{font-size:22px!important;}
+    #panel-operativa.active #op-turno-card.state-working .op-tc-shift,
+    #op-turno-card.state-working .op-tc-shift{font-size:11.8px!important;}
+    #panel-operativa.active #op-turno-card.state-working .op-tc-sub,
+    #op-turno-card.state-working .op-tc-sub{font-size:9.5px!important;}
+    #panel-operativa.active #op-turno-card.state-working .op-tc-times,
+    #op-turno-card.state-working .op-tc-times{font-size:14px!important;}
+    #panel-operativa.active #op-turno-card.state-working .op-tc-times::before,
+    #op-turno-card.state-working .op-tc-times::before{font-size:5.9px!important;letter-spacing:.18px!important;}
+  }
+</style>
+
+
+<!-- CTA_ERRORES_TURNO_V3 -->
+<style>
+
+/* CTA_ERRORES_TURNO_V3 */
+#et-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.62);z-index:120000;backdrop-filter:blur(4px)}
+#et-bg.show{display:block}
+#et-panel{position:fixed;left:0;right:0;bottom:0;height:92vh;max-height:92vh;background:var(--bg,#0d1623);border-radius:22px 22px 0 0;border:1px solid rgba(255,255,255,.09);transform:translateY(105%);transition:transform .28s ease;display:flex;flex-direction:column;overflow:hidden;color:var(--white,#f0eee8);font-family:"Outfit",sans-serif}
+#et-panel.show{transform:translateY(0)}
+.et-handle{width:42px;height:4px;border-radius:3px;background:rgba(255,255,255,.16);margin:10px auto 6px;flex-shrink:0}
+.et-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:4px 16px 10px;flex-shrink:0}
+.et-title{font-family:"Bebas Neue",sans-serif;font-size:24px;letter-spacing:1px;color:var(--gold,#c8a84b)}
+.et-sub{font-size:11px;color:var(--gray,#8a93a8);margin-top:1px}
+.et-x{width:36px;height:36px;border-radius:10px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.05);color:var(--white,#f0eee8);font-size:24px;line-height:1;cursor:pointer}
+.et-rules{display:flex;gap:6px;overflow-x:auto;padding:0 14px 9px;flex-shrink:0;scrollbar-width:none}
+.et-rules::-webkit-scrollbar{display:none}
+.et-rules span{white-space:nowrap;border:1px solid rgba(200,168,75,.25);background:rgba(200,168,75,.08);color:var(--gold,#c8a84b);border-radius:999px;padding:5px 8px;font-size:10px;font-weight:700}
+.et-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;padding:0 14px 9px;flex-shrink:0}
+.et-kpi{background:var(--card,#182135);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:9px 7px;text-align:center}
+.et-kpi b{display:block;font-size:20px;color:var(--white,#f0eee8)}
+.et-kpi span{display:block;font-size:9px;color:var(--gray,#8a93a8);margin-top:2px}
+.et-tools{display:flex;gap:7px;padding:0 14px 8px;flex-shrink:0}
+.et-tools input{min-width:0;flex:1;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:11px;padding:10px 11px;color:var(--white,#f0eee8);font:500 12px "Outfit",sans-serif;outline:none}
+.et-tools input:focus{border-color:rgba(200,168,75,.55)}
+.et-tools button{border:1px solid rgba(200,168,75,.35);background:rgba(200,168,75,.12);color:var(--gold,#c8a84b);border-radius:11px;padding:0 11px;font:700 11px "Outfit",sans-serif;cursor:pointer}
+.et-note{font-size:9.5px;line-height:1.35;color:var(--gray,#8a93a8);padding:0 15px 8px;flex-shrink:0}
+#et-body{overflow-y:auto;flex:1;min-height:0;padding:0 14px calc(22px + env(safe-area-inset-bottom));-webkit-overflow-scrolling:touch}
+.et-employee{position:sticky;top:0;z-index:2;background:rgba(13,22,35,.96);backdrop-filter:blur(8px);padding:10px 3px 7px;font-size:14px;font-weight:800;color:var(--white,#f0eee8)}
+.et-employee span{font-size:10px;color:var(--gray,#8a93a8);font-weight:600;margin-left:5px}
+.et-card{background:var(--card,#182135);border:1px solid rgba(239,68,68,.28);border-left:4px solid #ef4444;border-radius:13px;padding:11px 12px;margin-bottom:8px}
+.et-card-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.et-card-top b{display:block;font-size:13px;color:#fca5a5}
+.et-card-top span{display:block;font-size:9.5px;color:var(--gray,#8a93a8);margin-top:2px}
+.et-card-top strong{white-space:nowrap;font-size:12px;color:var(--gold,#c8a84b)}
+.et-shift,.et-prev,.et-next{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:8px;padding-top:7px;border-top:1px solid rgba(255,255,255,.06)}
+.et-shift span,.et-prev span,.et-next span{font-size:10px;color:var(--gray,#8a93a8)}
+.et-shift b,.et-prev b,.et-next b{font-size:12px;color:var(--white,#f0eee8);text-align:right}
+.et-prev b,.et-next b{font-size:10.5px}
+.et-message{margin-top:8px;background:rgba(239,68,68,.1);border-radius:9px;padding:8px 9px;color:#fecaca;font-size:11.5px;line-height:1.35;font-weight:600}
+.et-ok,.et-empty{margin:18px 0;background:var(--card,#182135);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:24px 16px;text-align:center;color:var(--gray,#8a93a8);font-size:12px;line-height:1.5}
+.et-ok{border-color:rgba(74,222,128,.25);color:#86efac}
+.et-ok b,.et-empty b{display:block;font-size:15px;margin-bottom:4px;color:inherit}
+
+/* Presentación agrupada y más legible de empleados y errores */
+.et-employee-group{margin:10px 0 16px;border:1px solid rgba(255,255,255,.085);border-radius:17px;background:linear-gradient(180deg,rgba(31,45,71,.78),rgba(18,29,47,.72));overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,.18)}
+.et-employee-head{position:sticky;top:0;z-index:3;display:flex;align-items:center;gap:10px;padding:11px 12px;background:rgba(24,33,53,.97);border-bottom:1px solid rgba(255,255,255,.08);backdrop-filter:blur(10px)}
+.et-avatar{width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:linear-gradient(135deg,rgba(200,168,75,.28),rgba(200,168,75,.09));border:1px solid rgba(200,168,75,.38);color:var(--gold,#c8a84b);font-size:13px;font-weight:900;letter-spacing:.5px}
+.et-employee-main{min-width:0;flex:1}
+.et-employee-name{font-size:14px;font-weight:900;color:var(--white,#f0eee8);line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.et-employee-meta{font-size:9.5px;color:var(--gray,#8a93a8);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.et-employee-count{flex-shrink:0;min-width:54px;text-align:center;border-radius:999px;padding:5px 8px;background:rgba(239,68,68,.13);border:1px solid rgba(239,68,68,.3);color:#fca5a5;font-size:10px;font-weight:900}
+.et-error-list{padding:10px}
+.et-card{position:relative;background:rgba(13,22,35,.72);border:1px solid rgba(255,255,255,.08);border-left:4px solid #ef4444;border-radius:13px;padding:11px 11px 10px;margin:0 0 9px;box-shadow:none}
+.et-card:last-child{margin-bottom:0}
+.et-card.et-descanso_46h{border-left-color:#f59e0b}
+.et-card.et-descanso_10h{border-left-color:#ef4444}
+.et-card.et-turno_maximo{border-left-color:#a78bfa}
+.et-card.et-partido_minimo,.et-card.et-partido_maximo{border-left-color:#60a5fa}
+.et-card-top{display:flex;justify-content:space-between;gap:8px;align-items:flex-start;margin-bottom:8px}
+.et-rule-wrap{display:flex;gap:8px;align-items:flex-start;min-width:0}
+.et-rule-icon{width:25px;height:25px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:rgba(239,68,68,.13);color:#fca5a5;font-size:13px;font-weight:900}
+.et-descanso_46h .et-rule-icon{background:rgba(245,158,11,.13);color:#fbbf24}
+.et-turno_maximo .et-rule-icon{background:rgba(167,139,250,.13);color:#c4b5fd}
+.et-partido_minimo .et-rule-icon,.et-partido_maximo .et-rule-icon{background:rgba(96,165,250,.13);color:#93c5fd}
+.et-rule-title{font-size:12.5px;font-weight:900;color:var(--white,#f0eee8);line-height:1.15}
+.et-source{font-size:9px;color:var(--gray,#8a93a8);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.et-date-pill{white-space:nowrap;border-radius:999px;padding:4px 7px;background:rgba(200,168,75,.11);border:1px solid rgba(200,168,75,.24);color:var(--gold,#c8a84b);font-size:9.5px;font-weight:900}
+.et-detail{display:grid;grid-template-columns:92px minmax(0,1fr);gap:7px;align-items:start;padding:6px 0;border-top:1px solid rgba(255,255,255,.055)}
+.et-detail:first-of-type{border-top:0}
+.et-detail span{font-size:9px;color:var(--gray,#8a93a8);font-weight:700;text-transform:uppercase;letter-spacing:.25px}
+.et-detail b{font-size:10.5px;line-height:1.3;color:#eef1f7;text-align:right;word-break:break-word}
+.et-metrics{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}
+.et-metric{border-radius:9px;padding:7px 8px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.065)}
+.et-metric span{display:block;font-size:8px;color:var(--gray,#8a93a8);text-transform:uppercase;letter-spacing:.3px}
+.et-metric b{display:block;font-size:12px;color:var(--white,#f0eee8);margin-top:2px}
+.et-metric.bad b{color:#fca5a5}
+.et-message{margin-top:8px;background:rgba(239,68,68,.075);border:1px solid rgba(239,68,68,.13);border-radius:9px;padding:8px 9px;color:#fecaca;font-size:10.8px;line-height:1.4;font-weight:600}
+.et-descanso_46h .et-message{background:rgba(245,158,11,.075);border-color:rgba(245,158,11,.14);color:#fde68a}
+@media(max-width:380px){.et-detail{grid-template-columns:78px minmax(0,1fr)}.et-employee-count{min-width:48px;padding:5px 6px}.et-metrics{grid-template-columns:1fr}}
+@media(min-width:720px){
+  #et-panel{left:50%;right:auto;width:min(720px,96vw);transform:translate(-50%,105%);border-radius:22px 22px 0 0}
+  #et-panel.show{transform:translate(-50%,0)}
+}
+
+</style>
+<script>
+
+/* CTA_ERRORES_TURNO_V3 */
+(function(){
+'use strict';
+if(window.__CTA_ERRORES_TURNO_V3__)return;
+window.__CTA_ERRORES_TURNO_V3__=true;
+
+var ET_RAW_KEY='cta_turn_errors_raw_v1';
+var ET_RESULT_KEY='cta_turn_errors_result_v1';
+var ET_MONTHS=['ENERO','FEBRERO','MARZO','ABRIL','MAYO','JUNIO','JULIO','AGOSTO','SEPTIEMBRE','OCTUBRE','NOVIEMBRE','DICIEMBRE'];
+var ET_MONTH_LABELS=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+var ET_NO_WORK=['libre','vacaciones','festivo','hl','hlp','baja','rm','curso','permiso','perentorias','hfun','nh','bp','h6','excedencia'];
+var ET_TIMER=null;
+var ET_FILTER='';
+var ET_LAST_RESULT={errors:[],employees:0,datasets:0,generatedAt:''};
+
+function etEsc(v){
+  return String(v==null?'':v)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+function etNorm(v){
+  return String(v||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+}
+function etToMin(v){
+  if(v===null||v===undefined||v==='')return null;
+  var s=String(v).trim().replace('.',':');
+  var m=s.match(/^(\d{1,2}):(\d{2})$/);
+  if(!m)return null;
+  var h=Number(m[1]),mm=Number(m[2]);
+  if(h<0||h>23||mm<0||mm>59)return null;
+  return h*60+mm;
+}
+function etFmtClock(min){
+  min=((Math.round(min)%1440)+1440)%1440;
+  var h=Math.floor(min/60),m=min%60;
+  return (h<10?'0':'')+h+':'+(m<10?'0':'')+m;
+}
+function etFmtDur(min){
+  min=Math.max(0,Math.round(Number(min)||0));
+  var h=Math.floor(min/60),m=min%60;
+  return h+' h'+(m?' '+m+' min':'');
+}
+function etFmtDate(date){
+  return (date.getDate()<10?'0':'')+date.getDate()+'/'+
+    (date.getMonth()+1<10?'0':'')+(date.getMonth()+1)+'/'+date.getFullYear();
+}
+function etDateKey(date){
+  return date.getFullYear()+'-'+(date.getMonth()+1<10?'0':'')+(date.getMonth()+1)+'-'+
+    (date.getDate()<10?'0':'')+date.getDate();
+}
+function etInferYear(text){
+  var m=String(text||'').match(/\b(20\d{2})\b/);
+  return m?Number(m[1]):new Date().getFullYear();
+}
+function etMonthIndex(key){
+  var n=etNorm(key).toUpperCase();
+  for(var i=0;i<ET_MONTHS.length;i++){
+    if(etNorm(ET_MONTHS[i]).toUpperCase()===n)return i;
+  }
+  return -1;
+}
+function etClone(v){
+  try{return JSON.parse(JSON.stringify(v));}catch(e){return v;}
+}
+function etReadJSON(key,fallback){
+  try{
+    var raw=localStorage.getItem(key);
+    return raw?JSON.parse(raw):fallback;
+  }catch(e){return fallback;}
+}
+function etWriteJSON(key,value){
+  try{localStorage.setItem(key,JSON.stringify(value));return true;}catch(e){return false;}
+}
+function etEmployeeKey(emp){
+  var id=String((emp&&emp.nomina)||'').trim();
+  if(id)return 'id:'+id;
+  return 'n:'+etNorm((emp&&emp.nombre)||'sin nombre');
+}
+function etIsWorkDay(day){
+  if(!day)return false;
+  var tipo=etNorm(day.tipo||day.estado||'');
+  if(ET_NO_WORK.indexOf(tipo)>=0)return false;
+  return etToMin(day.e1)!==null&&etToMin(day.s1)!==null;
+}
+function etShiftLabel(day){
+  if(!day)return 'Sin turno';
+  var txt=(day.e1||'')+'–'+(day.s1||'');
+  if(day.e2&&day.s2)txt+=' / '+day.e2+'–'+day.s2;
+  return txt;
+}
+function etShiftInfo(day,date){
+  if(!etIsWorkDay(day))return null;
+  var e1=etToMin(day.e1),s1=etToMin(day.s1);
+  var base=Math.floor(new Date(date.getFullYear(),date.getMonth(),date.getDate()).getTime()/60000);
+  var start1=base+e1,end1=base+s1;
+  if(end1<start1)end1+=1440;
+  var total=end1-start1;
+  var start=start1,end=end1,gap=null;
+  var hasSplit=etToMin(day.e2)!==null&&etToMin(day.s2)!==null;
+  if(hasSplit){
+    var e2=etToMin(day.e2),s2=etToMin(day.s2);
+    var offset2=e2<e1?1440:0;
+    var start2=base+offset2+e2;
+    var end2=base+offset2+s2;
+    if(end2<start2)end2+=1440;
+    gap=start2-end1;
+    total+=(end2-start2);
+    end=end2;
+  }
+  return{
+    start:start,end:end,total:total,gap:gap,hasSplit:hasSplit,
+    label:etShiftLabel(day),date:new Date(date.getTime())
+  };
+}
+function etLooksLikeEmployeeMap(obj){
+  if(!obj||typeof obj!=='object'||Array.isArray(obj))return false;
+  var keys=Object.keys(obj);
+  for(var i=0;i<Math.min(keys.length,8);i++){
+    var e=obj[keys[i]];
+    if(e&&typeof e==='object'&&e.meses&&typeof e.meses==='object')return true;
+  }
+  return false;
+}
+function etGroupStorageKeys(){
+  var keys=[];
+  function add(k){if(k&&keys.indexOf(k)<0)keys.push(k);}
+  try{
+    if(typeof window._HP_GRUPO_KEY!=='undefined')add(window._HP_GRUPO_KEY+'_map');
+    if(typeof window._GRUPO_KEY!=='undefined')add(window._GRUPO_KEY+'_map');
+  }catch(e){}
+  add('cta_hp_grupo_2026_map');
+  add('cta_grupo_2026_map');
+  try{
+    for(var i=0;i<localStorage.length;i++){
+      var k=localStorage.key(i);
+      if(!k||!/_map$/i.test(k)||!/grupo|plantilla/i.test(k))continue;
+      var parsed=etReadJSON(k,null);
+      if(etLooksLikeEmployeeMap(parsed))add(k);
+    }
+  }catch(e){}
+  return keys;
+}
+function etDatasetFromMap(map,key){
+  var year=etInferYear(key),employees={};
+  Object.keys(map||{}).forEach(function(k){
+    var src=map[k]||{};
+    var ek=etEmployeeKey(src);
+    if(!employees[ek])employees[ek]={
+      nomina:src.nomina||'',nombre:src.nombre||k||'Sin nombre',
+      categoria:src.categoria||'',meses:{}
+    };
+    Object.keys(src.meses||{}).forEach(function(mk){
+      var idx=etMonthIndex(mk);
+      if(idx<0)return;
+      employees[ek].meses[ET_MONTHS[idx]]=etClone(src.meses[mk]||{});
+    });
+  });
+  return{
+    id:'horas:'+key,source:'Horas plantilla',filename:key,year:year,employees:employees
+  };
+}
+function etReadHoursDatasets(){
+  var out=[];
+  etGroupStorageKeys().forEach(function(key){
+    var map=etReadJSON(key,null);
+    if(etLooksLikeEmployeeMap(map))out.push(etDatasetFromMap(map,key));
+  });
+  return out;
+}
+function etRawMemory(){
+  var mem=etReadJSON(ET_RAW_KEY,null);
+  if(!mem||!mem.datasets)mem={version:1,updatedAt:'',datasets:{}};
+  return mem;
+}
+function etSaveRawMonth(meta,employees,monthKey){
+  var idx=etMonthIndex(monthKey);
+  if(idx<0||!employees||!employees.length)return;
+  var mem=etRawMemory();
+  var id='analizador:'+(meta.filename||'archivo')+':'+(meta.year||new Date().getFullYear());
+  if(!mem.datasets[id])mem.datasets[id]={
+    id:id,source:'Analizador',filename:meta.filename||'Excel',
+    year:meta.year||new Date().getFullYear(),employees:{}
+  };
+  var ds=mem.datasets[id];
+  employees.forEach(function(emp){
+    var ek=etEmployeeKey(emp);
+    if(!ds.employees[ek])ds.employees[ek]={
+      nomina:emp.nomina||'',nombre:emp.nombre||meta.persona||'Sin nombre',
+      categoria:emp.categoria||'',meses:{}
+    };
+    ds.employees[ek].nombre=emp.nombre||ds.employees[ek].nombre;
+    ds.employees[ek].categoria=emp.categoria||ds.employees[ek].categoria;
+    var mesPrev=ds.employees[ek].meses[ET_MONTHS[idx]]||{};
+    var mesNuevo=etClone(emp.dias||{});
+    Object.keys(mesNuevo).forEach(function(d){mesPrev[d]=mesNuevo[d];});
+    ds.employees[ek].meses[ET_MONTHS[idx]]=mesPrev;
+  });
+  mem.updatedAt=new Date().toISOString();
+  etWriteJSON(ET_RAW_KEY,mem);
+}
+function etReadAnalyzerDatasets(){
+  var mem=etRawMemory(),out=[];
+  Object.keys(mem.datasets||{}).forEach(function(k){
+    var d=mem.datasets[k];
+    if(d&&d.employees)out.push(d);
+  });
+  return out;
+}
+function etCalendarForEmployee(ds,emp){
+  var year=Number(ds.year)||new Date().getFullYear();
+  var coverage={},work=[];
+  Object.keys(emp.meses||{}).forEach(function(mk){
+    var mi=etMonthIndex(mk);
+    if(mi<0)return;
+    var days=emp.meses[mk]||{};
+    var maxDay=new Date(year,mi+1,0).getDate();
+    for(var d=1;d<=maxDay;d++){
+      var date=new Date(year,mi,d),key=etDateKey(date);
+      var has=Object.prototype.hasOwnProperty.call(days,d)||Object.prototype.hasOwnProperty.call(days,String(d));
+      // Si el mes está importado, todos sus días se consideran conocidos.
+      // Una celda sin turno se trata como día no trabajado; un mes no importado no se compara.
+      coverage[key]=has?(days[d]||days[String(d)]||null):null;
+      if(has&&etIsWorkDay(coverage[key])){
+        var info=etShiftInfo(coverage[key],date);
+        if(info)work.push({date:date,key:key,day:coverage[key],info:info});
+      }
+    }
+  });
+  work.sort(function(a,b){return a.info.start-b.info.start;});
+  return{coverage:coverage,work:work};
+}
+function etDayStart(date){
+  return new Date(date.getFullYear(),date.getMonth(),date.getDate());
+}
+function etAddDays(date,days){
+  return new Date(date.getFullYear(),date.getMonth(),date.getDate()+days);
+}
+function etMonday(date){
+  var d=etDayStart(date),dow=(d.getDay()+6)%7;
+  return etAddDays(d,-dow);
+}
+function etWeekLabel(monday){
+  return etFmtDate(monday)+'–'+etFmtDate(etAddDays(monday,6));
+}
+function etWeekIsComplete(coverage,monday){
+  for(var i=0;i<7;i++){
+    if(!Object.prototype.hasOwnProperty.call(coverage,etDateKey(etAddDays(monday,i))))return false;
+  }
+  return true;
+}
+function etRestStartDate(prev){
+  return new Date(prev.info.end*60000);
+}
+function etGapDaysStatus(coverage,prevDate,nextDate){
+  var cur=etAddDays(etDayStart(prevDate),1);
+  var end=etDayStart(nextDate);
+  var count=0;
+  while(cur<end){
+    var key=etDateKey(cur);
+    if(!Object.prototype.hasOwnProperty.call(coverage,key))return{known:false,count:count};
+    if(etIsWorkDay(coverage[key]))return{known:true,count:count,hasWork:true};
+    count++;
+    cur=etAddDays(cur,1);
+  }
+  return{known:true,count:count,hasWork:false};
+}
+function etBuildWeeklyRests(cal){
+  var byWeek={},unknownWeeks={};
+  function addPeriod(key,period){
+    if(!byWeek[key])byWeek[key]=[];
+    byWeek[key].push(period);
+  }
+  function markUnknown(key){unknownWeeks[key]=true;}
+
+  for(var i=1;i<cal.work.length;i++){
+    var prev=cal.work[i-1],next=cal.work[i];
+    var calendarGap=Math.round((etDayStart(next.date).getTime()-etDayStart(prev.date).getTime())/86400000)-1;
+    if(calendarGap<1)continue;
+    var gap=etGapDaysStatus(cal.coverage,prev.date,next.date);
+
+    // El descanso se asigna exclusivamente a la semana en la que comienza
+    // realmente: justo al terminar el turno anterior, aunque cruce al lunes.
+    var restStart=etRestStartDate(prev);
+    var weekKey=etDateKey(etMonday(restStart));
+    if(!gap.known||gap.hasWork){markUnknown(weekKey);continue;}
+
+    addPeriod(weekKey,{
+      rest:next.info.start-prev.info.end,
+      prev:prev,next:next,
+      restStart:restStart,
+      restEnd:new Date(next.info.start*60000),
+      freeDays:gap.count
+    });
+  }
+
+  // Si el último turno queda seguido por uno o más días libres cargados, pero
+  // todavía no existe un turno posterior con el que cerrar el cálculo, esa
+  // semana no se marca: el descanso podría acabar alcanzando las 46 horas.
+  if(cal.work.length){
+    var last=cal.work[cal.work.length-1];
+    var cur=etAddDays(etDayStart(last.date),1),sawFree=false;
+    while(Object.prototype.hasOwnProperty.call(cal.coverage,etDateKey(cur))){
+      if(etIsWorkDay(cal.coverage[etDateKey(cur)]))break;
+      sawFree=true;
+      cur=etAddDays(cur,1);
+    }
+    if(sawFree){
+      markUnknown(etDateKey(etMonday(etRestStartDate(last))));
+    }
+  }
+  return{byWeek:byWeek,unknownWeeks:unknownWeeks};
+}
+function etWeekly46Errors(cal,meta){
+  var errors=[],weeks={};
+  var restData=etBuildWeeklyRests(cal);
+
+  Object.keys(cal.coverage||{}).forEach(function(key){
+    var p=key.split('-'),date=new Date(Number(p[0]),Number(p[1])-1,Number(p[2]));
+    var monday=etMonday(date);
+    weeks[etDateKey(monday)]=monday;
+  });
+
+  Object.keys(weeks).sort().forEach(function(key){
+    var monday=weeks[key],sunday=etAddDays(monday,6),nextMonday=etAddDays(monday,7);
+    if(!etWeekIsComplete(cal.coverage,monday))return;
+
+    var weekWork=cal.work.filter(function(w){
+      var t=etDayStart(w.date).getTime();
+      return t>=monday.getTime()&&t<nextMonday.getTime();
+    });
+    if(weekWork.length<=1)return;
+
+    var periods=(restData.byWeek[key]||[]).slice();
+    var base={
+      employee:meta.employee,nomina:meta.nomina||'',categoria:meta.categoria||'',
+      source:meta.source||'',filename:meta.filename||'',
+      date:etFmtDate(monday),shift:'Semana '+etWeekLabel(monday)
+    };
+
+    // Basta una única libranza de 46 h o más para validar la semana.
+    if(periods.some(function(p){return p.rest>=2760;}))return;
+
+    // Evita falsos errores cuando existe una libranza iniciada esta semana
+    // cuyo turno posterior todavía no está cargado.
+    if(restData.unknownWeeks[key])return;
+
+    if(!periods.length){
+      etPushError(errors,base,'descanso_46h',
+        'No hay ninguna libranza continua que comience en esta semana y alcance las 46 h mínimas. Los descansos iniciados en otra semana no se vuelven a contabilizar.',
+        {actualMinutes:0,requiredMinutes:2760,weekStart:etFmtDate(monday),weekEnd:etFmtDate(sunday)});
+      return;
+    }
+
+    periods.sort(function(a,b){return b.rest-a.rest;});
+    var best=periods[0];
+    var rests=periods.map(function(p){return etFmtDur(p.rest);}).join(', ');
+    etPushError(errors,base,'descanso_46h',
+      'Ninguna de las '+periods.length+' libranza'+(periods.length===1?'':'s')+
+      ' que '+(periods.length===1?'comienza':'comienzan')+' esta semana alcanza 46 h. Descansos calculados: '+rests+'. La mayor es '+etFmtDur(best.rest)+'.',
+      {
+        previousDate:etFmtDate(best.prev.date),previousShift:best.prev.info.label,
+        nextDate:etFmtDate(best.next.date),nextShift:best.next.info.label,
+        actualMinutes:best.rest,requiredMinutes:2760,
+        restStart:etFmtDate(best.restStart),restEnd:etFmtDate(best.restEnd),
+        weekStart:etFmtDate(monday),weekEnd:etFmtDate(sunday)
+      });
+  });
+  return errors;
+}
+function etPushError(errors,base,type,message,extra){
+  var e={
+    employee:base.employee,nomina:base.nomina||'',categoria:base.categoria||'',
+    source:base.source||'',filename:base.filename||'',type:type,
+    date:base.date,shift:base.shift,message:message,
+    previousDate:'',previousShift:'',nextDate:'',nextShift:'',actualMinutes:null,requiredMinutes:null
+  };
+  Object.keys(extra||{}).forEach(function(k){e[k]=extra[k];});
+  errors.push(e);
+}
+function etAnalyzeDataset(ds){
+  var errors=[];
+  Object.keys(ds.employees||{}).forEach(function(ek){
+    var emp=ds.employees[ek]||{};
+    var cal=etCalendarForEmployee(ds,emp);
+    cal.work.forEach(function(w){
+      var base={
+        employee:emp.nombre||emp.nomina||'Sin nombre',
+        nomina:emp.nomina||'',categoria:emp.categoria||'',
+        source:ds.source||'',filename:ds.filename||'',
+        date:etFmtDate(w.date),shift:w.info.label
+      };
+      if(w.info.total>540){
+        etPushError(errors,base,'turno_maximo',
+          'Jornada de '+etFmtDur(w.info.total)+'; el máximo es 9 h.',
+          {actualMinutes:w.info.total,requiredMinutes:540});
+      }
+      if(w.info.hasSplit){
+        if(w.info.gap<60){
+          etPushError(errors,base,'partido_minimo',
+            'Interrupción del turno partido de '+(w.info.gap<0?'tramos solapados':etFmtDur(w.info.gap))+
+            '; el mínimo es 1 h.',
+            {actualMinutes:w.info.gap,requiredMinutes:60});
+        }else if(w.info.gap>300){
+          etPushError(errors,base,'partido_maximo',
+            'Interrupción del turno partido de '+etFmtDur(w.info.gap)+'; el máximo es 5 h.',
+            {actualMinutes:w.info.gap,requiredMinutes:300});
+        }
+      }
+    });
+    // Descanso mínimo de 10 h entre cualquier par de turnos consecutivos.
+    for(var i=1;i<cal.work.length;i++){
+      var prev=cal.work[i-1],cur=cal.work[i];
+      var actual=cur.info.start-prev.info.end;
+      if(actual<600){
+        var base2={
+          employee:emp.nombre||emp.nomina||'Sin nombre',
+          nomina:emp.nomina||'',categoria:emp.categoria||'',
+          source:ds.source||'',filename:ds.filename||'',
+          date:etFmtDate(cur.date),shift:cur.info.label
+        };
+        etPushError(errors,base2,'descanso_10h',
+          'Descanso de '+(actual<0?'turnos solapados':etFmtDur(actual))+'; el mínimo entre turnos es 10 h.',
+          {
+            previousDate:etFmtDate(prev.date),previousShift:prev.info.label,
+            actualMinutes:actual,requiredMinutes:600
+          });
+      }
+    }
+
+    // Descanso semanal: se revisa cada semana completa de lunes a domingo.
+    // Si cualquiera de sus libranzas alcanza 46 h, la semana es correcta.
+    errors=errors.concat(etWeekly46Errors(cal,{
+      employee:emp.nombre||emp.nomina||'Sin nombre',
+      nomina:emp.nomina||'',categoria:emp.categoria||'',
+      source:ds.source||'',filename:ds.filename||''
+    }));
+  });
+  return errors;
+}
+function etDedup(errors){
+  var map={},out=[];
+  errors.forEach(function(e){
+    var fp=etNorm(e.employee)+'|'+e.date+'|'+e.type+'|'+e.shift+'|'+e.previousDate+'|'+e.previousShift;
+    if(!map[fp]){
+      map[fp]=e;out.push(e);
+    }else if(map[fp].source!=='Horas plantilla'&&e.source==='Horas plantilla'){
+      var idx=out.indexOf(map[fp]);map[fp]=e;if(idx>=0)out[idx]=e;
+    }
+  });
+  out.sort(function(a,b){
+    return a.employee.localeCompare(b.employee,'es',{sensitivity:'base'})||
+      a.date.split('/').reverse().join('').localeCompare(b.date.split('/').reverse().join(''))||
+      a.type.localeCompare(b.type);
+  });
+  return out;
+}
+function etRecalculate(){
+  var datasets=etReadHoursDatasets().concat(etReadAnalyzerDatasets());
+  var all=[],employeeMap={};
+  datasets.forEach(function(ds){
+    Object.keys(ds.employees||{}).forEach(function(k){
+      employeeMap[etNorm((ds.employees[k]||{}).nombre||k)]=true;
+    });
+    all=all.concat(etAnalyzeDataset(ds));
+  });
+  ET_LAST_RESULT={
+    errors:etDedup(all),employees:Object.keys(employeeMap).length,
+    datasets:datasets.length,generatedAt:new Date().toISOString()
+  };
+  etWriteJSON(ET_RESULT_KEY,ET_LAST_RESULT);
+  etRender();
+  return ET_LAST_RESULT;
+}
+function etSchedule(){
+  clearTimeout(ET_TIMER);
+  ET_TIMER=setTimeout(etRecalculate,700);
+}
+function etRuleName(type){
+  if(type==='descanso_10h')return 'Descanso entre turnos';
+  if(type==='descanso_46h')return 'Descanso con libranza';
+  if(type==='partido_minimo'||type==='partido_maximo')return 'Turno partido';
+  if(type==='turno_maximo')return 'Jornada máxima';
+  return 'Error de turno';
+}
+function etInitials(name){
+  var parts=String(name||'?').trim().split(/\s+/).filter(Boolean);
+  if(!parts.length)return'?';
+  return((parts[0][0]||'')+(parts.length>1?(parts[parts.length-1][0]||''):'')).toUpperCase();
+}
+function etMetricInfo(e){
+  if(e.actualMinutes===null||e.actualMinutes===undefined)return null;
+  var actual=e.actualMinutes<0?'Turnos solapados':etFmtDur(e.actualMinutes);
+  if(e.type==='descanso_10h')return{actualLabel:'Descanso real',actual:actual,limitLabel:'Mínimo exigido',limit:'10 h'};
+  if(e.type==='descanso_46h')return{actualLabel:'Mejor descanso',actual:actual,limitLabel:'Mínimo semanal',limit:'46 h'};
+  if(e.type==='turno_maximo')return{actualLabel:'Duración real',actual:actual,limitLabel:'Máximo permitido',limit:'9 h'};
+  if(e.type==='partido_minimo')return{actualLabel:'Interrupción',actual:actual,limitLabel:'Mínimo permitido',limit:'1 h'};
+  if(e.type==='partido_maximo')return{actualLabel:'Interrupción',actual:actual,limitLabel:'Máximo permitido',limit:'5 h'};
+  return null;
+}
+function etErrorCard(e){
+  var metric=etMetricInfo(e);
+  var html='<article class="et-card et-'+etEsc(e.type)+'">'+
+    '<div class="et-card-top">'+
+      '<div class="et-rule-wrap"><div class="et-rule-icon">!</div><div class="et-rule-copy">'+
+        '<div class="et-rule-title">'+etEsc(etRuleName(e.type))+'</div>'+
+        '<div class="et-source">'+etEsc(e.source)+(e.categoria?' · '+etEsc(e.categoria):'')+'</div>'+
+      '</div></div>'+
+      '<div class="et-date-pill">'+etEsc(e.date)+'</div>'+
+    '</div>'+
+    '<div class="et-detail"><span>'+(e.type==='descanso_46h'?'Semana':'Turno')+'</span><b>'+etEsc(e.shift)+'</b></div>';
+  if(e.previousDate){
+    html+='<div class="et-detail"><span>Turno anterior</span><b>'+etEsc(e.previousDate)+' · '+etEsc(e.previousShift)+'</b></div>';
+  }
+  if(e.nextDate){
+    html+='<div class="et-detail"><span>Turno posterior</span><b>'+etEsc(e.nextDate)+' · '+etEsc(e.nextShift)+'</b></div>';
+  }
+  if(metric){
+    html+='<div class="et-metrics">'+
+      '<div class="et-metric bad"><span>'+etEsc(metric.actualLabel)+'</span><b>'+etEsc(metric.actual)+'</b></div>'+
+      '<div class="et-metric"><span>'+etEsc(metric.limitLabel)+'</span><b>'+etEsc(metric.limit)+'</b></div>'+
+    '</div>';
+  }
+  html+='<div class="et-message">'+etEsc(e.message)+'</div></article>';
+  return html;
+}
+function etRender(){
+  var body=document.getElementById('et-body');
+  var summary=document.getElementById('et-summary');
+  if(!body||!summary)return;
+  var r=ET_LAST_RESULT;
+  if(!r||!r.generatedAt){
+    r=etReadJSON(ET_RESULT_KEY,{errors:[],employees:0,datasets:0,generatedAt:''});
+    ET_LAST_RESULT=r;
+  }
+  var errors=(r.errors||[]).filter(function(e){
+    if(!ET_FILTER)return true;
+    return etNorm([e.employee,e.nomina,e.categoria,e.date,e.shift,e.message,e.source].join(' ')).indexOf(ET_FILTER)>=0;
+  });
+
+  var groups={},order=[];
+  errors.forEach(function(e){
+    var key=etNorm(e.employee)+'|'+String(e.nomina||'');
+    if(!groups[key]){
+      groups[key]={employee:e.employee,nomina:e.nomina||'',categoria:e.categoria||'',sources:{},errors:[]};
+      order.push(key);
+    }
+    groups[key].errors.push(e);
+    if(e.source)groups[key].sources[e.source]=true;
+    if(!groups[key].categoria&&e.categoria)groups[key].categoria=e.categoria;
+  });
+
+  summary.innerHTML=
+    '<div class="et-kpi"><b>'+errors.length+'</b><span>Errores'+(ET_FILTER?' filtrados':'')+'</span></div>'+
+    '<div class="et-kpi"><b>'+order.length+'</b><span>Empleados con error</span></div>'+
+    '<div class="et-kpi"><b>'+Number(r.employees||0)+'</b><span>Empleados revisados</span></div>';
+
+  if(!r.datasets){
+    body.innerHTML='<div class="et-empty"><b>Sin turnos para revisar</b><br>Importa un Excel en Horas plantilla o en Analizador.</div>';
+    return;
+  }
+  if(!errors.length){
+    body.innerHTML='<div class="et-ok"><b>✓ No se han detectado errores</b><br>'+
+      (ET_FILTER?'No hay coincidencias con la búsqueda.':'Los turnos cargados cumplen las cuatro reglas configuradas.')+
+      '</div>';
+    return;
+  }
+
+  var html='';
+  order.forEach(function(key){
+    var g=groups[key];
+    var meta=[];
+    if(g.nomina)meta.push('Nómina '+g.nomina);
+    if(g.categoria)meta.push(g.categoria);
+    var sources=Object.keys(g.sources);
+    if(sources.length)meta.push(sources.join(' / '));
+    html+='<section class="et-employee-group">'+
+      '<div class="et-employee-head">'+
+        '<div class="et-avatar">'+etEsc(etInitials(g.employee))+'</div>'+
+        '<div class="et-employee-main"><div class="et-employee-name">'+etEsc(g.employee)+'</div>'+
+          '<div class="et-employee-meta">'+etEsc(meta.join(' · ')||'Turnos importados')+'</div></div>'+
+        '<div class="et-employee-count">'+g.errors.length+' '+(g.errors.length===1?'error':'errores')+'</div>'+
+      '</div><div class="et-error-list">';
+    g.errors.forEach(function(e){html+=etErrorCard(e);});
+    html+='</div></section>';
+  });
+  body.innerHTML=html;
+}
+function etSetFilter(value){
+  ET_FILTER=etNorm(value);
+  etRender();
+}
+function etOpen(){
+  var bg=document.getElementById('et-bg'),panel=document.getElementById('et-panel');
+  if(!bg||!panel)return;
+  bg.classList.add('show');panel.classList.add('show');
+  var input=document.getElementById('et-search');
+  if(input){input.value='';ET_FILTER='';}
+  etRecalculate();
+  try{if(typeof logActividad==='function')logActividad('abrirErroresTurno','Errores de turno');}catch(e){}
+}
+function etClose(){
+  var bg=document.getElementById('et-bg'),panel=document.getElementById('et-panel');
+  if(bg)bg.classList.remove('show');
+  if(panel)panel.classList.remove('show');
+}
+function etBuildUI(){
+  if(document.getElementById('et-bg'))return;
+  var bg=document.createElement('div');
+  bg.id='et-bg';
+  bg.innerHTML=
+    '<div id="et-panel" onclick="event.stopPropagation()">'+
+      '<div class="et-handle"></div>'+
+      '<div class="et-head">'+
+        '<div><div class="et-title">Errores de turno</div>'+
+        '<div class="et-sub">Comprobación automática de los turnos importados</div></div>'+
+        '<button class="et-x" type="button" onclick="cerrarErroresTurno()">×</button>'+
+      '</div>'+
+      '<div class="et-rules">'+
+        '<span>10 h entre turnos</span><span>46 h en una libranza iniciada esa semana</span>'+
+        '<span>Partido 1–5 h</span><span>Máximo 9 h</span>'+
+      '</div>'+
+      '<div id="et-summary" class="et-summary"></div>'+
+      '<div class="et-tools">'+
+        '<input id="et-search" type="search" placeholder="Buscar empleado, fecha o error" oninput="filtrarErroresTurno(this.value)">'+
+        '<button type="button" onclick="actualizarErroresTurno()">Actualizar</button>'+
+      '</div>'+
+      '<div class="et-note">Cada semana se revisa de lunes a domingo. Cada descanso continuo cuenta una sola vez: se asigna a la semana en la que comienza al terminar el turno anterior, aunque cruce al lunes siguiente. Si una libranza iniciada esa semana alcanza 46 h, la semana es correcta. Las semanas incompletas no se valoran.</div>'+
+      '<div id="et-body"></div>'+
+    '</div>';
+  bg.addEventListener('click',etClose);
+  document.body.appendChild(bg);
+}
+function etAddMenuButton(){
+  var menu=document.querySelector('#cta-secret-bg .cta-secret-menu');
+  if(!menu||document.getElementById('cta-secret-errors'))return;
+  var btn=document.createElement('button');
+  btn.id='cta-secret-errors';
+  btn.className='cta-secret-option';
+  btn.type='button';
+  btn.innerHTML='<div><b>Errores de turno</b><span>Descanso semanal, 10 h, partidos y jornadas máximas.</span></div><strong>&rsaquo;</strong>';
+  btn.onclick=function(){try{cerrarMenuSecretoCta();}catch(e){}setTimeout(etOpen,60);};
+  var close=menu.querySelector('.cta-secret-close');
+  menu.insertBefore(btn,close||null);
+}
+function etHookImports(){
+  if(typeof window.taAnalizarGrupoWorkbook==='function'&&!window.taAnalizarGrupoWorkbook.__etWrapped){
+    var originalGroup=window.taAnalizarGrupoWorkbook;
+    var wrappedGroup=function(wb,filename){
+      var result=originalGroup.apply(this,arguments);
+      try{
+        var year=etInferYear(filename);
+        (wb.SheetNames||[]).forEach(function(sheetName){
+          var parsed=(typeof window.taParseGrupoSheet==='function')?
+            window.taParseGrupoSheet(wb.Sheets[sheetName],sheetName):null;
+          if(parsed&&parsed.monthKey&&parsed.empleados&&parsed.empleados.length){
+            etSaveRawMonth({filename:filename||sheetName,year:year},parsed.empleados,parsed.monthKey);
+          }
+        });
+        etSchedule();
+      }catch(e){console.warn('Errores de turno: no se pudo guardar el detalle del grupo',e);}
+      return result;
+    };
+    wrappedGroup.__etWrapped=true;
+    window.taAnalizarGrupoWorkbook=wrappedGroup;
+  }
+  if(typeof window.taAnalizarSheet==='function'&&!window.taAnalizarSheet.__etWrapped){
+    var originalPerson=window.taAnalizarSheet;
+    var wrappedPerson=function(sheet,filename,leyenda){
+      var result=originalPerson.apply(this,arguments);
+      try{
+        var year=etInferYear(filename),persona=(leyenda&&leyenda.nombreCompleto)||result.persona||filename||'Calendario personal';
+        for(var row=3;row<=14;row++){
+          var raw=(typeof window.tiCellVal==='function')?window.tiCellVal(sheet,row,0):'';
+          if(!raw)continue;
+          var mk=null;
+          if(typeof window._MONTHS_MAP!=='undefined')mk=window._MONTHS_MAP[String(raw).toLowerCase()];
+          if(!mk)continue;
+          var dias={};
+          for(var col=1;col<=31;col++){
+            var p=(typeof window.taParseDia==='function')?window.taParseDia(sheet,row,col):null;
+            if(p)dias[col]=p;
+          }
+          etSaveRawMonth(
+            {filename:filename||'Calendario personal',year:year,persona:persona},
+            [{nomina:'',nombre:persona,categoria:'',dias:dias}],mk
+          );
+        }
+        etSchedule();
+      }catch(e){console.warn('Errores de turno: no se pudo guardar el calendario personal',e);}
+      return result;
+    };
+    wrappedPerson.__etWrapped=true;
+    window.taAnalizarSheet=wrappedPerson;
+  }
+  ['taGuardarImportacionEnMemoria','importarGrupoDesdePlantilla'].forEach(function(name){
+    var fn=window[name];
+    if(typeof fn!=='function'||fn.__etScheduleWrapped)return;
+    var w=function(){
+      var r=fn.apply(this,arguments);
+      setTimeout(etSchedule,200);
+      setTimeout(etSchedule,1200);
+      setTimeout(etSchedule,2800);
+      setTimeout(etSchedule,6000);
+      return r;
+    };
+    w.__etScheduleWrapped=true;
+    window[name]=w;
+  });
+}
+function etInit(){
+  etBuildUI();
+  etAddMenuButton();
+  etHookImports();
+  etRecalculate();
+  setTimeout(etHookImports,1000);
+  setTimeout(etHookImports,3500);
+}
+window.abrirErroresTurno=etOpen;
+window.cerrarErroresTurno=etClose;
+window.actualizarErroresTurno=etRecalculate;
+window.filtrarErroresTurno=etSetFilter;
+
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',etInit);
+else etInit();
+})();
+
+</script>
 </body>
 </html>
