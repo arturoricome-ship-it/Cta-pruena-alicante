@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+<!-- CTA_MENU_PERENTORIAS_HFUN_V1_2026-07-12 -->
 <!-- CTA_MODAL_CODIGO_Y_CABECERA_ERROR_V1_2026-07-12 -->
 <!-- CTA_MODO_PRUEBA_EMAIL_PERSONAL_2026-07-12 -->
 <!-- CTA_OPERATIVA_V73_CAMBIO_TURNO_SIMULADO_2026-06-19 -->
@@ -1552,6 +1553,52 @@ body[data-panel="afiliate"] #panel-afiliate{
   }
 }
 
+
+/* ── PERENTORIAS + HFUN EN MENÚ OCULTO ── */
+#perentorias-tool-bg{
+  display:none;position:fixed;inset:0;z-index:130000;
+  background:var(--bg,#0d1623);color:var(--white,#f0eee8);
+}
+#perentorias-tool-bg.show{display:flex;flex-direction:column}
+.perentorias-tool-head{
+  flex-shrink:0;display:flex;align-items:center;gap:10px;
+  min-height:54px;padding:9px 12px;
+  background:linear-gradient(160deg,#1a2a4a 0%,var(--bg,#0d1623) 100%);
+  border-bottom:1px solid rgba(200,168,75,.28);
+}
+.perentorias-tool-back{
+  width:38px;height:38px;border-radius:11px;
+  border:1px solid rgba(200,168,75,.38);
+  background:rgba(200,168,75,.11);color:var(--gold,#c8a84b);
+  font:800 19px "Outfit",sans-serif;cursor:pointer;
+}
+.perentorias-tool-info{flex:1;min-width:0}
+.perentorias-tool-title{
+  font-family:"Bebas Neue",sans-serif;font-size:20px;
+  letter-spacing:1px;color:var(--gold,#c8a84b);line-height:1;
+}
+.perentorias-tool-sub{
+  margin-top:3px;font-size:9.5px;color:var(--gray,#8a93a8);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+#perentorias-tool-frame{
+  width:100%;flex:1;min-height:0;border:0;background:#0A0E12;
+}
+.perentorias-tool-missing{
+  display:none;position:absolute;inset:55px 0 0;
+  align-items:center;justify-content:center;padding:24px;text-align:center;
+  background:var(--bg,#0d1623);z-index:2;
+}
+.perentorias-tool-missing.show{display:flex}
+.perentorias-tool-missing-card{
+  max-width:380px;background:var(--card,#182135);
+  border:1px solid rgba(239,68,68,.28);border-radius:16px;
+  padding:20px;font-size:12px;line-height:1.55;color:var(--gray,#8a93a8);
+}
+.perentorias-tool-missing-card b{
+  display:block;color:#fca5a5;font-size:15px;margin-bottom:7px;
+}
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
@@ -2180,6 +2227,10 @@ body[data-panel="afiliate"] #panel-afiliate{
     <button class="cta-secret-option" onclick="abrirOpcionSecretaCta('horas')">
       <div><b>Horas plantilla</b><span>Detalle mensual operativo: semanas, días y cambios aplicados.</span></div><strong>&rsaquo;</strong>
     </button>
+    
+    <button class="cta-secret-option" onclick="abrirOpcionSecretaCta('perentorias')">
+      <div><b>Perentorias y HFUN</b><span>Registro acumulado por trabajador, categorías, importaciones y detalle.</span></div><strong>&rsaquo;</strong>
+    </button>
     <button class="cta-secret-close" onclick="cerrarMenuSecretoCta()">Cerrar</button>
   </div>
 </div>
@@ -2194,6 +2245,29 @@ body[data-panel="afiliate"] #panel-afiliate{
     <div class="cta-code-actions">
       <button type="button" class="cta-code-btn cta-code-cancel" onclick="cerrarCodigoMenuCta()">Cancelar</button>
       <button type="button" class="cta-code-btn cta-code-enter" onclick="validarCodigoMenuCta()">Entrar</button>
+    </div>
+  </div>
+</div>
+
+
+<div id="perentorias-tool-bg" aria-hidden="true">
+  <div class="perentorias-tool-head">
+    <button type="button" class="perentorias-tool-back" onclick="cerrarPerentoriasCta()" aria-label="Volver">‹</button>
+    <div class="perentorias-tool-info">
+      <div class="perentorias-tool-title">Perentorias y HFUN</div>
+      <div class="perentorias-tool-sub">Herramienta independiente de registro y acumulación</div>
+    </div>
+  </div>
+  <iframe
+    id="perentorias-tool-frame"
+    title="Registro de Perentorias y HFUN"
+    data-src="registro-perentorias-hfun.html"
+    loading="eager"
+  ></iframe>
+  <div id="perentorias-tool-missing" class="perentorias-tool-missing">
+    <div class="perentorias-tool-missing-card">
+      <b>No se ha encontrado la herramienta</b>
+      Comprueba que <strong>registro-perentorias-hfun.html</strong> esté subido en la misma carpeta que este index.
     </div>
   </div>
 </div>
@@ -2727,11 +2801,43 @@ document.addEventListener('keydown',function(ev){
   if(ev.key==='Enter'){ev.preventDefault();validarCodigoMenuCta();}
   else if(ev.key==='Escape'){ev.preventDefault();cerrarCodigoMenuCta();}
 });
+
+function abrirPerentoriasCta(){
+  var bg=document.getElementById('perentorias-tool-bg');
+  var frame=document.getElementById('perentorias-tool-frame');
+  var missing=document.getElementById('perentorias-tool-missing');
+  if(!bg||!frame)return;
+  if(missing)missing.classList.remove('show');
+  bg.classList.add('show');
+  bg.setAttribute('aria-hidden','false');
+  document.body.style.overflow='hidden';
+
+  if(!frame.getAttribute('src')){
+    var src=frame.getAttribute('data-src')||'registro-perentorias-hfun.html';
+    frame.setAttribute('src',src);
+  }
+}
+function cerrarPerentoriasCta(){
+  var bg=document.getElementById('perentorias-tool-bg');
+  if(!bg)return;
+  bg.classList.remove('show');
+  bg.setAttribute('aria-hidden','true');
+  document.body.style.overflow='';
+}
+document.addEventListener('keydown',function(ev){
+  var bg=document.getElementById('perentorias-tool-bg');
+  if(bg&&bg.classList.contains('show')&&ev.key==='Escape'){
+    ev.preventDefault();
+    cerrarPerentoriasCta();
+  }
+});
+
 function abrirOpcionSecretaCta(tipo){
   cerrarMenuSecretoCta();
   setTimeout(function(){
     if(tipo==='analizador'&&typeof abrirAnalizadorTurnos==='function')abrirAnalizadorTurnos();
     else if(tipo==='horas'&&typeof abrirHorasPlantilla==='function')abrirHorasPlantilla();
+    else if(tipo==='perentorias')abrirPerentoriasCta();
   },60);
 }
 function _hpAbrirConGestoRapido(){
