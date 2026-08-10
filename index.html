@@ -17841,7 +17841,26 @@ else etInit();
       if(m==='app'){
         e.preventDefault();e.stopImmediatePropagation();
         var hasSplit=!!splitDayData(sel);
-        if(createNative(sel,hasSplit)&&hasSplit)queueSplitSuggestion(sel);
+
+        // IMPORTANTE: en la web publicada (HTTPS), Android puede abrir CTA Alarma
+        // inmediatamente y pausar esta página. Guardamos ANTES el segundo periodo
+        // para que al volver siempre pueda recuperarse y mostrarse.
+        if(hasSplit)splitPendingSave(sel);
+
+        var created=createNative(sel,hasSplit);
+        if(!created){
+          if(hasSplit)clearSplitPending();
+          return;
+        }
+
+        // Si la página sigue visible (por ejemplo en archivo local), lo mostramos
+        // enseguida. Si Android la ha pausado, pageshow/visibilitychange lo mostrará
+        // al regresar leyendo SPLIT_PENDING_KEY.
+        if(hasSplit){
+          setTimeout(function(){
+            if(document.visibilityState!=='hidden')showSplitSuggestion();
+          },450);
+        }
         return;
       }
       if(m==='browser'){
@@ -18070,5 +18089,13 @@ CORRECCION:
 - En turno partido vuelve a mostrarse "Alarma HH:MM creada".
 - Aparece una sola vez, justo encima de la tarjeta del 2.º periodo.
 - No reaparece al cambiar de pestaña o volver a la página.
+- APK v10 sin cambios.
+-->
+
+<!-- CTA_ALARMA_V10_2
+CORRECCION WEB PUBLICADA:
+- El segundo periodo se guarda ANTES de abrir ctaalarm3://set.
+- Evita perder la tarjeta cuando HTTPS entrega inmediatamente el enlace a Android.
+- Al volver, pageshow/visibilitychange recupera el pendiente desde localStorage.
 - APK v10 sin cambios.
 -->
